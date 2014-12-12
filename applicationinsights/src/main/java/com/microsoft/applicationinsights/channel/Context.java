@@ -13,7 +13,6 @@ import com.microsoft.applicationinsights.channel.contracts.Location;
 import com.microsoft.applicationinsights.channel.contracts.Operation;
 import com.microsoft.applicationinsights.channel.contracts.Session;
 import com.microsoft.applicationinsights.channel.contracts.User;
-import com.microsoft.applicationinsights.testapp.R;
 
 import java.util.HashMap;
 import java.util.UUID;

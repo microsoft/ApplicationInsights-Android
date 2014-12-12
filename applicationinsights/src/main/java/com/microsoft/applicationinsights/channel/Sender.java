@@ -72,6 +72,13 @@ public class Sender extends SenderConfig {
      * @return true if the item was successfully added to the queue
      */
     public boolean queue(IJsonSerializable item){
+//        // todo: remove this
+//        LinkedList<IJsonSerializable> list = new LinkedList<IJsonSerializable>();
+//        list.add(item);
+//        this.send(list);
+//
+//        return true;
+//
         // prevent invalid argument exception
         if(item == null)
             return false;
