@@ -3,7 +3,7 @@
   <component name="FacetManager">
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
-        <option name="GRADLE_PROJECT_PATH" value=":applicationinsightscore" />
+        <option name="GRADLE_PROJECT_PATH" value=":core" />
       </configuration>
     </facet>
     <facet type="java-gradle" name="Java-Gradle">
