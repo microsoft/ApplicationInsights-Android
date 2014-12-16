@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.channel;
 
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
+import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
@@ -33,11 +34,21 @@ public class Channel {
     protected Sender sender;
 
     /**
-     * Instantiates a new instance of Recorder
-     * @param config The configuration for this recorder
+     * Instantiates a new instance of Sender
+     * @param config The configuration for this channel
      */
     public Channel(IChannelConfig config) {
         this.sender = Sender.instance;
+        this.config = config;
+    }
+
+    /**
+     * Constructor for tests
+     * @param config The configuration for this channel
+     * @param sender The sender for this channel
+     */
+    protected Channel(IChannelConfig config, Sender sender) {
+        this.sender = sender;
         this.config = config;
     }
 

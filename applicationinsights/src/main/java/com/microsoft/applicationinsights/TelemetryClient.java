@@ -203,7 +203,7 @@ public class TelemetryClient {
      * @param itemDataType data type
      * @param itemType item type
      */
-    private void track(ITelemetry telemetry, String itemDataType, String itemType) {
+    protected void track(ITelemetry telemetry, String itemDataType, String itemType) {
         this.channel.send(this.context, telemetry, itemDataType, itemType);
     }
 }
