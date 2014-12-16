@@ -1,33 +1,18 @@
 package com.microsoft.applicationinsights.channel;
 
-import android.util.Log;
-
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-
 import org.json.JSONException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * This singleton class sends data to the endpoint
@@ -56,6 +41,7 @@ public class Sender extends SenderConfig {
     /**
      * The timer task for sending data
      */
+    private Object lock;
 
     /**
      * Prevent external instantiation
@@ -63,7 +49,7 @@ public class Sender extends SenderConfig {
     protected Sender() {
         this.queue = new LinkedBlockingQueue<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", false);
-        this.timer.scheduleAtFixedRate(this.getSenderTask(), new Date(), Sender.maxBatchIntervalMs);
+        this.lock = new Object();
     }
 
     /**
@@ -71,24 +57,25 @@ public class Sender extends SenderConfig {
      * @param item a telemetry item to send
      * @return true if the item was successfully added to the queue
      */
-    public boolean queue(IJsonSerializable item){
-//        // todo: remove this
-//        LinkedList<IJsonSerializable> list = new LinkedList<IJsonSerializable>();
-//        list.add(item);
-//        this.send(list);
-//
-//        return true;
-//
+    public boolean queue(IJsonSerializable item) {
         // prevent invalid argument exception
         if(item == null)
             return false;
 
-        // attempt to add the item to the queue
-        boolean success = this.queue.add(item);
+        boolean success = false;
+        synchronized (this.lock) {
+            // attempt to add the item to the queue
+            success = this.queue.add(item);
 
-        // flush if the queue is full
-        if(this.queue.size() >= Sender.maxBatchCount) {
-            this.flush();
+            if (success) {
+                if (this.queue.size() >= Sender.maxBatchCount) {
+                    // flush if the queue is full
+                    this.flush();
+                } else if (this.queue.size() == 1) {
+                    // schedule a batch send if this is the first item in the queue
+                    this.timer.schedule(this.getSenderTask(), Sender.maxBatchIntervalMs);
+                }
+            }
         }
 
         return success;
@@ -98,7 +85,15 @@ public class Sender extends SenderConfig {
      * Empties the queue and sends all items to the endpoint
      */
     public void flush() {
-        this.timer.schedule(this.getSenderTask(), 1);
+        // schedule a batch send if this is the first item in the queue
+        this.timer.schedule(this.getSenderTask(), 0);
+    }
+
+    /**
+     * Creates a task which will send all items in the queue
+     */
+    protected TimerTask getSenderTask() {
+        return new SendTask(this);
     }
 
     /**
@@ -155,23 +150,11 @@ public class Sender extends SenderConfig {
         }
     }
 
-    protected TimerTask getSenderTask() {
-        return new TimerTask() {
-
-            @Override
-            public void run() {
-                // drain the queue
-                List<IJsonSerializable> list = new LinkedList<IJsonSerializable>();
-                Sender.instance.queue.drainTo(list);
-
-                // send if more than one item is in the queue
-                if(list.size() > 0 ) {
-                    Sender.instance.send(list);
-                }
-            }
-        };
-    }
-
+    /**
+     * Handler for the http response from the sender
+     * @param connection a connection containing a response
+     * @param responseCode the response code from the connection
+     */
     protected void onResponse(HttpURLConnection connection, int responseCode) {
         BufferedReader reader = null;
         try {
@@ -207,8 +190,38 @@ public class Sender extends SenderConfig {
             }
         }
     }
-    
+
+    /**
+     * Gets a writer from the connection stream (allows for test hooks into the write stream)
+     * @param connection the connection to which the stream will be flushed
+     * @return a writer for the given connection stream
+     * @throws IOException
+     */
     protected Writer GetWriter(HttpURLConnection connection) throws IOException {
         return new OutputStreamWriter(connection.getOutputStream());
     }
+
+    private class SendTask extends TimerTask {
+        private Sender sender;
+
+        public SendTask(Sender sender) {
+            this.sender = sender;
+        }
+
+        @Override
+        public void run() {
+            // drain the queue
+            List<IJsonSerializable> list = new LinkedList<IJsonSerializable>();
+            synchronized (Sender.instance.lock) {
+                sender.queue.drainTo(list);
+                sender.timer.purge();
+            }
+
+            // send if more than one item is in the queue
+            if(list.size() > 0 ) {
+                sender.send(list);
+            }
+        }
+    }
 }
+
