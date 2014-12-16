@@ -2,8 +2,8 @@ package com.microsoft.applicationinsights;
 
 import android.text.TextUtils;
 
-import com.microsoft.applicationinsights.channel.Channel;
-import com.microsoft.applicationinsights.channel.Context;
+import com.microsoft.applicationinsights.channel.TelemetryChannel;
+import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
 import com.microsoft.applicationinsights.channel.contracts.ExceptionData;
 import com.microsoft.applicationinsights.channel.contracts.MessageData;
@@ -27,23 +27,23 @@ public class TelemetryClient {
     /**
      * The telemetry channel for this client.
      */
-    protected Channel channel;
+    protected TelemetryChannel channel;
 
     /**
-     * The telemetry context object.
+     * The telemetry telemetryContext object.
      */
-    protected Context context;
+    protected TelemetryContext telemetryContext;
 
     /**
      * Constructor of the class TelemetryClient.
      * 
      * @param iKey the instrumentation key
-     * @param context application context from the caller
+     * @param context application telemetryContext from the caller
      */
     public TelemetryClient(String iKey, android.content.Context context) {
         this.config = new TelemetryClientConfig(iKey, context);
-        this.channel = new Channel(this.config);
-        this.context = new Context(this.config);
+        this.channel = new TelemetryChannel(this.config);
+        this.telemetryContext = new TelemetryContext(this.config);
     }
 
     /**
@@ -204,6 +204,6 @@ public class TelemetryClient {
      * @param itemType item type
      */
     protected void track(ITelemetry telemetry, String itemDataType, String itemType) {
-        this.channel.send(this.context, telemetry, itemDataType, itemType);
+        this.channel.send(this.telemetryContext, telemetry, itemDataType, itemType);
     }
 }

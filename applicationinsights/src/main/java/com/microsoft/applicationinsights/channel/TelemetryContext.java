@@ -18,52 +18,52 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * This class is holding all context information.
+ * This class is holding all telemetryContext information.
  */
-public class Context {
+public class TelemetryContext {
 
     /**
-     * Android app context.
+     * Android app telemetryContext.
      */
     private android.content.Context androidAppContext;
 
     /**
-     * Application context.
+     * Application telemetryContext.
      */
     private Application application;
 
     /**
-     * Device context.
+     * Device telemetryContext.
      */
     private Device device;
 
     /**
-     * Location context.
+     * Location telemetryContext.
      */
     private Location location;
 
     /**
-     * Operation context.
+     * Operation telemetryContext.
      */
     private Operation operation;
 
     /**
-     * Session context.
+     * Session telemetryContext.
      */
     private Session session;
 
     /**
-     * User context.
+     * User telemetryContext.
      */
     private User user;
 
     /**
-     * Internal context.
+     * Internal telemetryContext.
      */
     private Internal internal;
 
     /**
-     * Properties associated with this context.
+     * Properties associated with this telemetryContext.
      */
     private HashMap<String, String> properties;
 
@@ -140,10 +140,10 @@ public class Context {
     }
 
     /**
-     * Constructs a new instance of the Telemetry context tag keys
-     * @param config the configuration for this context
+     * Constructs a new instance of the Telemetry telemetryContext tag keys
+     * @param config the configuration for this telemetryContext
      */
-    public Context(IContextConfig config) {
+    public TelemetryContext(IContextConfig config) {
         super();
         this.androidAppContext = config.getAppContext(); // todo: use session info
         this.properties = new HashMap<String, String>();
@@ -174,7 +174,7 @@ public class Context {
     }
 
     /**
-     * Sets the application context tags
+     * Sets the application telemetryContext tags
      */
     private void setAppContext() {
         ContentResolver resolver = this.androidAppContext.getContentResolver();
@@ -185,7 +185,7 @@ public class Context {
     }
 
     /**
-     * Sets the session context tags
+     * Sets the session telemetryContext tags
      */
     private void setSessionContext() {
         this.session.setIsNew("true");
@@ -193,7 +193,7 @@ public class Context {
     }
 
     /**
-     * Sets the device context tags
+     * Sets the device telemetryContext tags
      */
     private void setDeviceContext() {
 

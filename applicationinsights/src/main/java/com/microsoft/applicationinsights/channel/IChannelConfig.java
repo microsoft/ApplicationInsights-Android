@@ -4,12 +4,12 @@ import android.content.Context;
 
 public interface IChannelConfig {
     /**
-     * @return The instrumentation key for this context
+     * @return The instrumentation key for this telemetryContext
      */
     public String getInstrumentationKey();
 
     /**
-     * The application context for this recorder
+     * The application telemetryContext for this channel
      */
     public Context getAppContext();
 }

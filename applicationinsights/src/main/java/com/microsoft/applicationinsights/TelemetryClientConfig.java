@@ -12,17 +12,17 @@ import com.microsoft.applicationinsights.channel.SenderConfig;
  */
 public class TelemetryClientConfig extends SenderConfig implements IChannelConfig, IContextConfig {
     /**
-     * The instrumentation key for this context
+     * The instrumentation key for this telemetryContext
      */
     private final String instrumentationKey;
 
     /**
-     * The application context for this recorder
+     * The application telemetryContext for this recorder
      */
     private final Context appContext;
 
     /**
-     * The account id for this context
+     * The account id for this telemetryContext
      */
     private String accountId;
 
@@ -37,14 +37,14 @@ public class TelemetryClientConfig extends SenderConfig implements IChannelConfi
     private int sessionExpirationMs;
 
     /**
-     * The instrumentation key for this context
+     * The instrumentation key for this telemetryContext
      */
     public String getInstrumentationKey() {
         return this.instrumentationKey;
     }
 
     /**
-     * The application context for this recorder
+     * The application telemetryContext for this recorder
      */
     @Override
     public Context getAppContext() {
@@ -52,7 +52,7 @@ public class TelemetryClientConfig extends SenderConfig implements IChannelConfi
     }
 
     /**
-     * The account id for this context
+     * The account id for this telemetryContext
      */
     @Override
     public String getAccountId() {

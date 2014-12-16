@@ -9,17 +9,17 @@ import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
  */
 public class TelemetryClientWrapper extends TelemetryClient {
 
-    public ChannelWrapper channel;
+    public TelemetryChannelWrapper channel;
 
     /**
      * Constructor of the class TelemetryClient.
      *
      * @param iKey the instrumentation key
-     * @param context application context from the caller
+     * @param context application telemetryContext from the caller
      */
     public TelemetryClientWrapper(String iKey, android.content.Context context, Sender sender) {
         super(iKey, context);
-        this.channel = new ChannelWrapper(this.config, sender);
+        this.channel = new TelemetryChannelWrapper(this.config, sender);
     }
 
     /**
@@ -31,6 +31,6 @@ public class TelemetryClientWrapper extends TelemetryClient {
      */
     @Override
     protected void track(ITelemetry telemetry, String itemDataType, String itemType) {
-        this.channel.send(this.context, telemetry, itemDataType, itemType);
+        this.channel.send(this.telemetryContext, telemetry, itemDataType, itemType);
     }
 }

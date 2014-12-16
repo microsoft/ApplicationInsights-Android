@@ -2,22 +2,18 @@ package com.microsoft.applicationinsights.channel;
 
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
-import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.TimeZone;
 
 /**
  * This class records telemetry for application insights.
  */
-public class Channel {
+public class TelemetryChannel {
     /**
      * TAG for log cat.
      */
@@ -37,7 +33,7 @@ public class Channel {
      * Instantiates a new instance of Sender
      * @param config The configuration for this channel
      */
-    public Channel(IChannelConfig config) {
+    public TelemetryChannel(IChannelConfig config) {
         this.sender = Sender.instance;
         this.config = config;
     }
@@ -47,7 +43,7 @@ public class Channel {
      * @param config The configuration for this channel
      * @param sender The sender for this channel
      */
-    protected Channel(IChannelConfig config, Sender sender) {
+    protected TelemetryChannel(IChannelConfig config, Sender sender) {
         this.sender = sender;
         this.config = config;
     }
@@ -55,19 +51,19 @@ public class Channel {
     /**
      * Records the passed in data.
      *
-     * @param context The telemetry context for this record
+     * @param telemetryContext The telemetry telemetryContext for this record
      * @param telemetry The telemetry to record
      * @param envelopeName Value to fill Envelope's Content
      * @param baseType Value to fill Envelope's ItemType field
      */
-    public void send(Context context,
+    public void send(TelemetryContext telemetryContext,
                        ITelemetry telemetry,
                        String envelopeName,
                        String baseType) {
 
         // add common properties to this telemetry object
         HashMap<String, String> map = telemetry.getProperties();
-        map.putAll(context.getProperties());
+        map.putAll(telemetryContext.getProperties());
         telemetry.setProperties(map);
 
         // wrap the telemetry data in the common schema data
@@ -81,7 +77,7 @@ public class Channel {
         envelope.setData(data);
         envelope.setName(envelopeName);
         envelope.setTime(this.getUtcTime());
-        envelope.setTags(context.toHashMap());
+        envelope.setTags(telemetryContext.toHashMap());
 
         // send to queue
         this.sender.queue(envelope);
