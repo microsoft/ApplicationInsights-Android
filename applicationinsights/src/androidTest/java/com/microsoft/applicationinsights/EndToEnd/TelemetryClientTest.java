@@ -32,7 +32,7 @@ public class TelemetryClientTest extends AndroidTestCase {
     }
 
     public void tearDown() throws Exception {
-        Assert.assertTrue(true);
+
     }
 
     public void testTrackEvent() {
@@ -52,18 +52,40 @@ public class TelemetryClientTest extends AndroidTestCase {
         this.validateApi();
     }
 
+    public void testTrackTraceSerialization() {
+        this.sender.useFakeWriter = true;
+        this.tc.trackTrace("trace");
+        this.validatePayload();
+    }
+
     public void testTrackMetric() throws Exception {
-//        this.tc.trackMetric("metric", 0.0);
-//        this.validateApi();
+        this.tc.trackMetric("metric", 0.0);
+        this.validateApi();
+    }
+
+    public void testTrackMetricSerialization() throws Exception {
+        this.sender.useFakeWriter = true;
+        this.tc.trackMetric("metric", 0.0);
+        this.validatePayload();
     }
 
     public void testTrackException() throws Exception {
         //this.tc.trackException();
     }
 
+    public void testTrackExceptionSerialization() throws Exception {
+        //this.tc.trackException();
+    }
+
     public void testTrackPageView() throws Exception {
         this.tc.trackPageView("page");
         this.validateApi();
+    }
+
+    public void testTrackPageViewSerialization() throws Exception {
+        this.sender.useFakeWriter = true;
+        this.tc.trackPageView("page");
+        this.validatePayload();
     }
 
     private void validateApi() {
@@ -78,8 +100,9 @@ public class TelemetryClientTest extends AndroidTestCase {
     private void validatePayload() {
         try {
             this.signal.await(10, TimeUnit.SECONDS);
-            String payload = this.sender.writer.getBuffer().toString();
-            Assert.assertEquals("", payload);
+            String payload = this.sender.writer.toString();
+            Log.i("TelemetryClientTest.validatePayload", payload);
+            Assert.assertTrue("Payload length is greater than zero", payload.length() > 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }

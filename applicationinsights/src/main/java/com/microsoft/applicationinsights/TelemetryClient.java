@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
+import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
 import com.microsoft.applicationinsights.channel.contracts.ExceptionData;
 import com.microsoft.applicationinsights.channel.contracts.MessageData;
@@ -11,6 +12,7 @@ import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -119,8 +121,20 @@ public class TelemetryClient extends AbstractTelemetryClient {
             localName = "";
         }
 
+        // todo: client-side aggregation
+        DataPoint metric = new DataPoint();
+        metric.setName(name);
+        metric.setValue(value);
+        metric.setCount(1);
+        metric.setMax(value);
+        metric.setMin(value);
+
+        ArrayList<DataPoint> metrics = new ArrayList<DataPoint>();
+        metrics.add(metric);
+
         MetricData telemetry = new MetricData();
         telemetry.setProperties(properties);
+        telemetry.setMetrics(metrics);
 
         track(telemetry, MetricData.EnvelopeName, MetricData.BaseType);
     }
