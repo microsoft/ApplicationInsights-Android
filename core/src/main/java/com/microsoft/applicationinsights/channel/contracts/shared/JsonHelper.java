@@ -15,19 +15,15 @@ import java.util.Set;
  * converting.
  */
 public final class JsonHelper {
-    private static final int controlCharacterRange = 0x80;
     private static final String[] controlCharacters;
     static {
-        controlCharacters = new String[controlCharacterRange];
-
         // per RFC 4627 (JSON specification) section 2.5; escape control characters U+0000 -> U+001F
-        for(int i = 0; i <= 0x1f; i++) {
+        controlCharacters = new String[0x20];
+        for(int i = 0; i < controlCharacters.length; i++) {
             controlCharacters[i] = String.format("\\u%04X", i);
         }
 
-        // additionally escape quotation mark, reverse solidus, line breaks and whitespace
-        controlCharacters['\"'] = "\\\"";
-        controlCharacters['\\'] = "\\\\";
+        // JSON accepts the following friendly escape replacements instead of unicode
         controlCharacters['\b'] = "\\b";
         controlCharacters['\f'] = "\\f";
         controlCharacters['\n'] = "\\n";
@@ -40,13 +36,17 @@ public final class JsonHelper {
         builder.append("\"");
         for(int i = 0; i < input.length(); i++) {
             char charIndex = input.charAt(i);
-            if(charIndex < controlCharacterRange) {
+            if(charIndex < controlCharacters.length) {
                 String replacement = controlCharacters[charIndex];
                 if (replacement == null) {
                     builder.append(charIndex);
                 } else {
                     builder.append(replacement);
                 }
+            } else if(charIndex== '\"') {
+                builder.append("\\\"");
+            } else if(charIndex== '\\') {
+                builder.append("\\\\");
             } else if(charIndex== '\u2028') {
                 // JavaScript interprets '\u2028' as newline
                 builder.append("\\u2028");
