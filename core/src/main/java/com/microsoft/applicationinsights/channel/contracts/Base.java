@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.ArrayList;
-import org.json.JSONException;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
@@ -49,7 +48,7 @@ public class Base implements
      * @param writer The writer to serialize this object to.
      */
     @Override
-    public void serialize(Writer writer) throws IOException, JSONException
+    public void serialize(Writer writer) throws IOException
     {
         if (writer == null)
         {
@@ -65,7 +64,7 @@ public class Base implements
      * Serializes the beginning of this object to the passed in writer.
      * @param writer The writer to serialize this object to.
      */
-    protected String serializeContent(Writer writer) throws IOException, JSONException
+    protected String serializeContent(Writer writer) throws IOException
     {
         String prefix = "";
         if (!(this.baseType == null))

@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.ArrayList;
-import org.json.JSONException;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
@@ -78,7 +77,7 @@ public class PageViewData extends EventData implements
      * @param writer The writer to serialize this object to.
      */
     @Override
-    protected String serializeContent(Writer writer) throws IOException, JSONException
+    protected String serializeContent(Writer writer) throws IOException
     {
         String prefix = super.serializeContent(writer);
         if (!(this.url == null))

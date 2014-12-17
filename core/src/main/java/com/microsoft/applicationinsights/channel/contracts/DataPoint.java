@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.ArrayList;
-import org.json.JSONException;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.channel.contracts.shared.IContext;

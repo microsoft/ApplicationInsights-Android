@@ -1,7 +1,6 @@
 package com.microsoft.applicationinsights.channel;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-import org.json.JSONException;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -44,12 +43,18 @@ public class Sender extends SenderConfig {
     private Object lock;
 
     /**
+     * The internal logging adapter for this sender
+     */
+    private ILoggingInternal log;
+
+    /**
      * Prevent external instantiation
      */
     protected Sender() {
         this.queue = new LinkedBlockingQueue<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", false);
         this.lock = new Object();
+        this.log = log;
     }
 
     /**
@@ -112,7 +117,7 @@ public class Sender extends SenderConfig {
             connection.setDoOutput(true);
             connection.setDoInput(true);
 
-            writer = this.GetWriter(connection);
+            writer = this.getWriter(connection);
             writer.write('[');
 
             for (int i = 0; i < data.size(); i++) {
@@ -132,19 +137,17 @@ public class Sender extends SenderConfig {
             this.onResponse(connection, responseCode);
 
         } catch (MalformedURLException e) {
-            Logging.Warn(TAG, e.toString());
+            this.log(TAG, e.toString());
         } catch (ProtocolException e) {
-            Logging.Warn(TAG, e.toString());
-        } catch (JSONException e) {
-            Logging.Warn(TAG, e.toString());
+            this.log(TAG, e.toString());
         } catch (IOException e) {
-            Logging.Warn(TAG, e.toString());
+            this.log(TAG, e.toString());
         } finally {
             if (writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    Logging.Warn(TAG, e.toString());
+                    this.log(TAG, e.toString());
                 }
             }
         }
@@ -163,7 +166,7 @@ public class Sender extends SenderConfig {
                     || (responseCode >= 300 && responseCode < 400)
                     || (responseCode > 500 && responseCode != 529)) {
                 String message = String.format("Unexpected response code: %d", responseCode);
-                Logging.Warn(Sender.TAG, message);
+                this.log(Sender.TAG, message);
             }
 
             // If it isn't the usual success code (200), log the response from the server.
@@ -172,20 +175,20 @@ public class Sender extends SenderConfig {
                 InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
                 reader = new BufferedReader(streamReader);
                 String responseLine = reader.readLine();
-                Logging.Warn(TAG, "Error response:");
+                this.log(TAG, "Error response:");
                 while (responseLine != null) {
-                    Logging.Warn(TAG, responseLine);
+                    this.log(TAG, responseLine);
                     responseLine = reader.readLine();
                 }
             }
         } catch (IOException e) {
-            Logging.Warn(TAG, e.toString());
+            this.log(TAG, e.toString());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    Logging.Warn(TAG, e.toString());
+                    this.log(TAG, e.toString());
                 }
             }
         }
@@ -197,13 +200,31 @@ public class Sender extends SenderConfig {
      * @return a writer for the given connection stream
      * @throws IOException
      */
-    protected Writer GetWriter(HttpURLConnection connection) throws IOException {
+    protected Writer getWriter(HttpURLConnection connection) throws IOException {
         return new OutputStreamWriter(connection.getOutputStream());
     }
 
+    /**
+     * Writes a log to the provided adapter (note: the adapter must be set by the consumer)
+     * @param tag the tag for this message
+     * @param message the message to be logged
+     */
+    private void log(String tag, String message) {
+        if(this.log != null){
+            this.log.warn(tag, message);
+        }
+    }
+
+    /**
+     * Extension of TimerTask for thread-safely flushing the queue
+     */
     private class SendTask extends TimerTask {
         private Sender sender;
 
+        /**
+         * A sender instance is provided as a test hook
+         * @param sender the sender instance which will transmit the contents of the queue
+         */
         public SendTask(Sender sender) {
             this.sender = sender;
         }
@@ -212,7 +233,7 @@ public class Sender extends SenderConfig {
         public void run() {
             // drain the queue
             List<IJsonSerializable> list = new LinkedList<IJsonSerializable>();
-            synchronized (Sender.instance.lock) {
+            synchronized (sender.lock) {
                 sender.queue.drainTo(list);
                 sender.timer.purge();
             }

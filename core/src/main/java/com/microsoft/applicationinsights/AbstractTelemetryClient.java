@@ -18,12 +18,12 @@ import java.util.HashMap;
  * The public API for recording application insights telemetry.
  * Users would call TelemetryClient.track*
  */
-public abstract class TelemetryClient {
+public abstract class AbstractTelemetryClient {
 
     /**
-     * The telemetry channel for this client.
+     * The configuration for this telemetry client.
      */
-    protected TelemetryChannel channel;
+    public final AbstractTelemetryClientConfig config;
 
     /**
      * The telemetry telemetryContext object.
@@ -31,9 +31,15 @@ public abstract class TelemetryClient {
     protected ITelemetryContext telemetryContext;
 
     /**
+     * The telemetry channel for this client.
+     */
+    protected TelemetryChannel channel;
+
+    /**
      * Force inheritance via a protected constructor
      */
-    protected TelemetryClient() {
+    protected AbstractTelemetryClient(AbstractTelemetryClientConfig config) {
+        this.config = config;
     }
 
     /**
@@ -56,10 +62,10 @@ public abstract class TelemetryClient {
 
     /**
      * Track the event by event name and customized properties and metrics.
-     * 
-     * @param eventName event name
+     *
+     * @param eventName  event name
      * @param properties customized properties
-     * @param metrics customized metrics
+     * @param metrics    customized metrics
      */
     public void trackEvent(String eventName,
                            HashMap<String, String> properties,
@@ -85,7 +91,7 @@ public abstract class TelemetryClient {
     /**
      * track with the message and properties.
      *
-     * @param message message for transmission to Application insight
+     * @param message    message for transmission to Application insight
      * @param properties properties of the message
      */
     public void trackTrace(String message, HashMap<String, String> properties) {
@@ -99,7 +105,7 @@ public abstract class TelemetryClient {
     /**
      * track the metric.
      *
-     * @param name name of the metric
+     * @param name  name of the metric
      * @param value value of the metric
      */
     public void trackMetric(String name, Double value) {
@@ -109,8 +115,8 @@ public abstract class TelemetryClient {
     /**
      * Track the metric with properties.
      *
-     * @param name metric name
-     * @param value metric value
+     * @param name       metric name
+     * @param value      metric value
      * @param properties metric properties
      */
     public void trackMetric(String name, double value, HashMap<String, String> properties) {
@@ -144,7 +150,7 @@ public abstract class TelemetryClient {
     /**
      * Track exception with properties.
      *
-     * @param exception exception data object
+     * @param exception  exception data object
      * @param properties exception properties
      */
     public void trackException(ExceptionData exception, HashMap<String, String> properties) {
@@ -172,7 +178,7 @@ public abstract class TelemetryClient {
      * Sends information about the page viewed in the application to Application
      * Insights.
      *
-     * @param pageName Name of the page
+     * @param pageName   Name of the page
      * @param properties exception properties
      */
     public void trackPageView(String pageName, HashMap<String, String> properties) {
@@ -185,10 +191,10 @@ public abstract class TelemetryClient {
 
     /**
      * send message to the recorder.
-     * 
-     * @param telemetry telemetry object
+     *
+     * @param telemetry    telemetry object
      * @param itemDataType data type
-     * @param itemType item type
+     * @param itemType     item type
      */
     protected void track(ITelemetry telemetry, String itemDataType, String itemType) {
         this.channel.send(this.telemetryContext, telemetry, itemDataType, itemType);
