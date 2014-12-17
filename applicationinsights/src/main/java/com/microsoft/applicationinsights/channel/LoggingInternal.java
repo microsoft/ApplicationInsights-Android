@@ -2,17 +2,17 @@ package com.microsoft.applicationinsights.channel;
 
 import android.util.Log;
 
-public class Logging {
+public class LoggingInternal implements ILoggingInternal {
     public static boolean enableDebugMode = true;
     private static final String prefix = "com.microsoft.applicationinsights";
 
-    public static void Warn(String tag, String message) {
+    public void warn(String tag, String message) {
         if(enableDebugMode) {
             Log.w(prefix + tag, message);
         }
     }
 
-    public static void Throw(String tag, String message) throws Exception {
+    public void throwInternal(String tag, String message) throws Exception {
         Log.e(prefix + tag, message);
         if(enableDebugMode) {
             throw new Exception(tag + ": " + message);

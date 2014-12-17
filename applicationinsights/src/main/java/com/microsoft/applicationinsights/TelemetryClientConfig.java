@@ -2,19 +2,11 @@ package com.microsoft.applicationinsights;
 
 import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.IContextConfig;
-import com.microsoft.applicationinsights.channel.IChannelConfig;
-import com.microsoft.applicationinsights.channel.Sender;
-import com.microsoft.applicationinsights.channel.SenderConfig;
-
 /**
  * Configuration object when instantiating TelemetryClient
  */
-public class TelemetryClientConfig extends SenderConfig implements IChannelConfig, IContextConfig {
-    /**
-     * The instrumentation key for this telemetryContext
-     */
-    private final String instrumentationKey;
+public class TelemetryClientConfig extends AbstractTelemetryClientConfig {
+
 
     /**
      * The application telemetryContext for this recorder
@@ -46,7 +38,6 @@ public class TelemetryClientConfig extends SenderConfig implements IChannelConfi
     /**
      * The application telemetryContext for this recorder
      */
-    @Override
     public Context getAppContext() {
         return appContext;
     }
@@ -76,7 +67,7 @@ public class TelemetryClientConfig extends SenderConfig implements IChannelConfi
     }
 
     public TelemetryClientConfig(String iKey, Context context){
-        this.instrumentationKey = iKey;
+        super(iKey);
         this.appContext = context;
     }
 }

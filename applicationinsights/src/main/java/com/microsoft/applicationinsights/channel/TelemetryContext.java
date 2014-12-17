@@ -1,11 +1,13 @@
 package com.microsoft.applicationinsights.channel;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 
+import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.contracts.Application;
 import com.microsoft.applicationinsights.channel.contracts.Device;
 import com.microsoft.applicationinsights.channel.contracts.Internal;
@@ -20,12 +22,12 @@ import java.util.UUID;
 /**
  * This class is holding all telemetryContext information.
  */
-public class TelemetryContext {
+public class TelemetryContext implements ITelemetryContext {
 
     /**
      * Android app telemetryContext.
      */
-    private android.content.Context androidAppContext;
+    private Context androidAppContext;
 
     /**
      * Application telemetryContext.
@@ -143,7 +145,7 @@ public class TelemetryContext {
      * Constructs a new instance of the Telemetry telemetryContext tag keys
      * @param config the configuration for this telemetryContext
      */
-    public TelemetryContext(IContextConfig config) {
+    public TelemetryContext(TelemetryClientConfig config) {
         super();
         this.androidAppContext = config.getAppContext(); // todo: use session info
         this.properties = new HashMap<String, String>();

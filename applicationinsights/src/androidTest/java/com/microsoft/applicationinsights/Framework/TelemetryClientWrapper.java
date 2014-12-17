@@ -4,9 +4,6 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
-/**
- * Created by applicationinsights on 12/15/14.
- */
 public class TelemetryClientWrapper extends TelemetryClient {
 
     public TelemetryChannelWrapper channel;

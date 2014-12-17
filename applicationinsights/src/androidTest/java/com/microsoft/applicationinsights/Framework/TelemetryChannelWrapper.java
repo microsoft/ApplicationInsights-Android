@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights.Framework;
 
+import com.microsoft.applicationinsights.channel.ITelemetryContext;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.IChannelConfig;
@@ -10,8 +11,6 @@ import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
  * Created by applicationinsights on 12/15/14.
  */
 public class TelemetryChannelWrapper extends TelemetryChannel {
-
-    public SenderWrapper sender;
 
     /**
      * Instantiates a new instance of Recorder
@@ -30,7 +29,7 @@ public class TelemetryChannelWrapper extends TelemetryChannel {
      * @param baseType Value to fill Envelope's ItemType field
      */
     @Override
-    public void send(TelemetryContext telemetryContext,
+    public void send(ITelemetryContext telemetryContext,
                      ITelemetry telemetry,
                      String envelopeName,
                      String baseType) {

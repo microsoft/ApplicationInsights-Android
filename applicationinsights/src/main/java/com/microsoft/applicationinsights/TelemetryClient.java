@@ -17,22 +17,7 @@ import java.util.HashMap;
  * The public API for recording application insights telemetry.
  * Users would call TelemetryClient.track*
  */
-public class TelemetryClient {
-
-    /**
-     * The configuration for this telemetry client.
-     */
-    public final TelemetryClientConfig config;
-
-    /**
-     * The telemetry channel for this client.
-     */
-    protected TelemetryChannel channel;
-
-    /**
-     * The telemetry telemetryContext object.
-     */
-    protected TelemetryContext telemetryContext;
+public class TelemetryClient extends AbstractTelemetryClient {
 
     /**
      * Constructor of the class TelemetryClient.
@@ -41,9 +26,9 @@ public class TelemetryClient {
      * @param context application telemetryContext from the caller
      */
     public TelemetryClient(String iKey, android.content.Context context) {
-        this.config = new TelemetryClientConfig(iKey, context);
+        super(new TelemetryClientConfig(iKey, context));
+        this.telemetryContext = new TelemetryContext((TelemetryClientConfig)this.config);
         this.channel = new TelemetryChannel(this.config);
-        this.telemetryContext = new TelemetryContext(this.config);
     }
 
     /**
