@@ -31,7 +31,7 @@ public class SenderWrapper extends Sender {
     @Override
     protected void onResponse(HttpURLConnection connection, int responseCode) {
         this.signal.countDown();
-        Assert.assertEquals("Expected response code", this.expectedResponseCode, responseCode);
         super.onResponse(connection, responseCode);
+        Assert.assertEquals("Expected response code", this.expectedResponseCode, responseCode);
     }
 }

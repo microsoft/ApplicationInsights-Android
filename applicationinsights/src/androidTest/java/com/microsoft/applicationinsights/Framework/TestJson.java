@@ -21,7 +21,7 @@ public class TestJson implements
         this.value = value;
     }
 
-    public void serialize(Writer writer) throws IOException, JSONException
+    public void serialize(Writer writer) throws IOException
     {
         if (writer == null)
         {

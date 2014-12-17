@@ -30,7 +30,7 @@ public class Sender extends SenderConfig {
     /**
      * The queue for this sender
      */
-    private LinkedBlockingQueue<IJsonSerializable> queue;
+    protected LinkedBlockingQueue<IJsonSerializable> queue;
 
     /**
      * The timer for this sender
