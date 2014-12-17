@@ -37,6 +37,7 @@ public final class JsonHelper {
 
     private static String escapeJSON(String input) {
         StringBuilder builder = new StringBuilder();
+        builder.append("\"");
         for(int i = 0; i < input.length(); i++) {
             char charIndex = input.charAt(i);
             if(charIndex < controlCharacterRange) {
@@ -57,6 +58,7 @@ public final class JsonHelper {
             }
         }
 
+        builder.append("\"");
         return builder.toString();
     }
 
@@ -155,7 +157,7 @@ public final class JsonHelper {
      * @throws IOException
      */
     public static <T> void writeDictionary(Writer writer, Map<String, T> map) throws IOException {
-        if (map == null) {
+        if (map == null || map.size() < 1) {
             writer.write("null");
         } else {
             Set<String> keys = map.keySet();
@@ -195,7 +197,7 @@ public final class JsonHelper {
      * @throws IOException
      */
     public static <T extends IJsonSerializable> void writeList(Writer writer, List<T> list) throws IOException {
-        if (list == null) {
+        if (list == null || list.size() < 1) {
             writer.write("null");
         } else {
             Iterator<T> iterator = list.iterator();

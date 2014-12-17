@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.EndToEnd;
 
 import android.content.Context;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.microsoft.applicationinsights.Framework.SenderWrapper;
 import com.microsoft.applicationinsights.Framework.TelemetryClientWrapper;
@@ -16,6 +17,7 @@ public class TelemetryClientTest extends AndroidTestCase {
 
     private TelemetryClientWrapper tc;
     private CountDownLatch signal;
+    private SenderWrapper sender;
 
     public void setUp() throws Exception {
         super.setUp();
@@ -24,7 +26,7 @@ public class TelemetryClientTest extends AndroidTestCase {
         SenderConfig.maxBatchIntervalMs = 1;
 
         this.signal = new CountDownLatch(1);
-        SenderWrapper sender = new SenderWrapper(this.signal, 200);
+        this.sender = new SenderWrapper(this.signal, 200);
 
         this.tc = new TelemetryClientWrapper(iKey, context, sender);
     }
@@ -34,8 +36,15 @@ public class TelemetryClientTest extends AndroidTestCase {
     }
 
     public void testTrackEvent() {
+        Log.w("TelemetryClientTest.testTrackEvent", "Starting test");
         this.tc.trackEvent("event");
         this.validateApi();
+    }
+
+    public void testTrackEventSerialization() {
+        this.sender.useFakeWriter = true;
+        this.tc.trackEvent("event");
+        this.validatePayload();
     }
 
     public void testTrackTrace() {
@@ -61,6 +70,16 @@ public class TelemetryClientTest extends AndroidTestCase {
         try {
             this.signal.await(10, TimeUnit.SECONDS);
             Assert.assertEquals("Response was received", 0, this.signal.getCount());
+        } catch (InterruptedException e) {
+            Assert.fail("Failed to validate API\n\n" + e.toString());
+        }
+    }
+
+    private void validatePayload() {
+        try {
+            this.signal.await(10, TimeUnit.SECONDS);
+            String payload = this.sender.writer.getBuffer().toString();
+            Assert.assertEquals("", payload);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
