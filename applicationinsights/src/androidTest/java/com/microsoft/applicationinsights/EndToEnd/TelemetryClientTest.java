@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.EndToEnd;
 
 import android.content.Context;
 import android.test.AndroidTestCase;
