@@ -117,7 +117,6 @@ public class MessageData extends Domain implements
      * Serializes the beginning of this object to the passed in writer.
      * @param writer The writer to serialize this object to.
      */
-    @Override
     protected String serializeContent(Writer writer) throws IOException
     {
         String prefix = super.serializeContent(writer);

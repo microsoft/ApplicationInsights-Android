@@ -3,7 +3,6 @@ package com.microsoft.applicationinsights.channel.contracts.shared;
 import java.io.IOException;
 import java.io.Writer;
 
-
 /**
  * this is the interface for all the data contract objects.
  */

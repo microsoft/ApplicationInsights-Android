@@ -3,8 +3,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.List;
-
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
@@ -163,7 +161,6 @@ public class ExceptionData extends Domain implements
      * Serializes the beginning of this object to the passed in writer.
      * @param writer The writer to serialize this object to.
      */
-    @Override
     protected String serializeContent(Writer writer) throws IOException
     {
         String prefix = super.serializeContent(writer);
