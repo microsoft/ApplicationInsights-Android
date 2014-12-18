@@ -147,28 +147,28 @@ public class User implements
         String prefix = "";
         if (!(this.accountAcquisitionDate == null))
         {
-            writer.write(prefix + "\"accountAcquisitionDate\":");
+            writer.write(prefix + "\"ai.user.accountAcquisitionDate\":");
             writer.write(JsonHelper.convert(this.accountAcquisitionDate));
             prefix = ",";
         }
         
         if (!(this.accountId == null))
         {
-            writer.write(prefix + "\"accountId\":");
+            writer.write(prefix + "\"ai.user.accountId\":");
             writer.write(JsonHelper.convert(this.accountId));
             prefix = ",";
         }
         
         if (!(this.userAgent == null))
         {
-            writer.write(prefix + "\"userAgent\":");
+            writer.write(prefix + "\"ai.user.userAgent\":");
             writer.write(JsonHelper.convert(this.userAgent));
             prefix = ",";
         }
         
         if (!(this.id == null))
         {
-            writer.write(prefix + "\"id\":");
+            writer.write(prefix + "\"ai.user.id\":");
             writer.write(JsonHelper.convert(this.id));
             prefix = ",";
         }

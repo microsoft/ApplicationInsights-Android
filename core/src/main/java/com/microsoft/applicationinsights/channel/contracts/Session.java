@@ -125,21 +125,21 @@ public class Session implements
         String prefix = "";
         if (!(this.id == null))
         {
-            writer.write(prefix + "\"id\":");
+            writer.write(prefix + "\"ai.session.id\":");
             writer.write(JsonHelper.convert(this.id));
             prefix = ",";
         }
         
         if (!(this.isFirst == null))
         {
-            writer.write(prefix + "\"isFirst\":");
+            writer.write(prefix + "\"ai.session.isFirst\":");
             writer.write(JsonHelper.convert(this.isFirst));
             prefix = ",";
         }
         
         if (!(this.isNew == null))
         {
-            writer.write(prefix + "\"isNew\":");
+            writer.write(prefix + "\"ai.session.isNew\":");
             writer.write(JsonHelper.convert(this.isNew));
             prefix = ",";
         }

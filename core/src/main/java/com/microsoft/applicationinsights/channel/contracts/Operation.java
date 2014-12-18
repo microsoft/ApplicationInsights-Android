@@ -147,28 +147,28 @@ public class Operation implements
         String prefix = "";
         if (!(this.id == null))
         {
-            writer.write(prefix + "\"id\":");
+            writer.write(prefix + "\"ai.operation.id\":");
             writer.write(JsonHelper.convert(this.id));
             prefix = ",";
         }
         
         if (!(this.name == null))
         {
-            writer.write(prefix + "\"name\":");
+            writer.write(prefix + "\"ai.operation.name\":");
             writer.write(JsonHelper.convert(this.name));
             prefix = ",";
         }
         
         if (!(this.parentId == null))
         {
-            writer.write(prefix + "\"parentId\":");
+            writer.write(prefix + "\"ai.operation.parentId\":");
             writer.write(JsonHelper.convert(this.parentId));
             prefix = ",";
         }
         
         if (!(this.rootId == null))
         {
-            writer.write(prefix + "\"rootId\":");
+            writer.write(prefix + "\"ai.operation.rootId\":");
             writer.write(JsonHelper.convert(this.rootId));
             prefix = ",";
         }

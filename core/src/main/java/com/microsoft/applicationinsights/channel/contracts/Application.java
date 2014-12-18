@@ -81,7 +81,7 @@ public class Application implements
         String prefix = "";
         if (!(this.ver == null))
         {
-            writer.write(prefix + "\"ver\":");
+            writer.write(prefix + "\"ai.application.ver\":");
             writer.write(JsonHelper.convert(this.ver));
             prefix = ",";
         }

@@ -103,14 +103,14 @@ public class Internal implements
         String prefix = "";
         if (!(this.sdkVersion == null))
         {
-            writer.write(prefix + "\"sdkVersion\":");
+            writer.write(prefix + "\"ai.internal.sdkVersion\":");
             writer.write(JsonHelper.convert(this.sdkVersion));
             prefix = ",";
         }
         
         if (!(this.agentVersion == null))
         {
-            writer.write(prefix + "\"agentVersion\":");
+            writer.write(prefix + "\"ai.internal.agentVersion\":");
             writer.write(JsonHelper.convert(this.agentVersion));
             prefix = ",";
         }

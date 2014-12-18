@@ -81,7 +81,7 @@ public class Location implements
         String prefix = "";
         if (!(this.ip == null))
         {
-            writer.write(prefix + "\"ip\":");
+            writer.write(prefix + "\"ai.location.ip\":");
             writer.write(JsonHelper.convert(this.ip));
             prefix = ",";
         }

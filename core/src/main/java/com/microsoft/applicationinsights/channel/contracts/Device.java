@@ -367,98 +367,98 @@ public class Device implements
         String prefix = "";
         if (!(this.id == null))
         {
-            writer.write(prefix + "\"id\":");
+            writer.write(prefix + "\"ai.device.id\":");
             writer.write(JsonHelper.convert(this.id));
             prefix = ",";
         }
         
         if (!(this.ip == null))
         {
-            writer.write(prefix + "\"ip\":");
+            writer.write(prefix + "\"ai.device.ip\":");
             writer.write(JsonHelper.convert(this.ip));
             prefix = ",";
         }
         
         if (!(this.language == null))
         {
-            writer.write(prefix + "\"language\":");
+            writer.write(prefix + "\"ai.device.language\":");
             writer.write(JsonHelper.convert(this.language));
             prefix = ",";
         }
         
         if (!(this.locale == null))
         {
-            writer.write(prefix + "\"locale\":");
+            writer.write(prefix + "\"ai.device.locale\":");
             writer.write(JsonHelper.convert(this.locale));
             prefix = ",";
         }
         
         if (!(this.model == null))
         {
-            writer.write(prefix + "\"model\":");
+            writer.write(prefix + "\"ai.device.model\":");
             writer.write(JsonHelper.convert(this.model));
             prefix = ",";
         }
         
         if (!(this.network == null))
         {
-            writer.write(prefix + "\"network\":");
+            writer.write(prefix + "\"ai.device.network\":");
             writer.write(JsonHelper.convert(this.network));
             prefix = ",";
         }
         
         if (!(this.oemName == null))
         {
-            writer.write(prefix + "\"oemName\":");
+            writer.write(prefix + "\"ai.device.oemName\":");
             writer.write(JsonHelper.convert(this.oemName));
             prefix = ",";
         }
         
         if (!(this.os == null))
         {
-            writer.write(prefix + "\"os\":");
+            writer.write(prefix + "\"ai.device.os\":");
             writer.write(JsonHelper.convert(this.os));
             prefix = ",";
         }
         
         if (!(this.osVersion == null))
         {
-            writer.write(prefix + "\"osVersion\":");
+            writer.write(prefix + "\"ai.device.osVersion\":");
             writer.write(JsonHelper.convert(this.osVersion));
             prefix = ",";
         }
         
         if (!(this.roleInstance == null))
         {
-            writer.write(prefix + "\"roleInstance\":");
+            writer.write(prefix + "\"ai.device.roleInstance\":");
             writer.write(JsonHelper.convert(this.roleInstance));
             prefix = ",";
         }
         
         if (!(this.roleName == null))
         {
-            writer.write(prefix + "\"roleName\":");
+            writer.write(prefix + "\"ai.device.roleName\":");
             writer.write(JsonHelper.convert(this.roleName));
             prefix = ",";
         }
         
         if (!(this.screenResolution == null))
         {
-            writer.write(prefix + "\"screenResolution\":");
+            writer.write(prefix + "\"ai.device.screenResolution\":");
             writer.write(JsonHelper.convert(this.screenResolution));
             prefix = ",";
         }
         
         if (!(this.type == null))
         {
-            writer.write(prefix + "\"type\":");
+            writer.write(prefix + "\"ai.device.type\":");
             writer.write(JsonHelper.convert(this.type));
             prefix = ",";
         }
         
         if (!(this.vmName == null))
         {
-            writer.write(prefix + "\"vmName\":");
+            writer.write(prefix + "\"ai.device.vmName\":");
             writer.write(JsonHelper.convert(this.vmName));
             prefix = ",";
         }
