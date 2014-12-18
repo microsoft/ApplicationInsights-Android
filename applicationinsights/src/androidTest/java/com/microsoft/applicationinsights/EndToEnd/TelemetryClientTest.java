@@ -4,8 +4,8 @@ import android.content.Context;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.Framework.SenderWrapper;
 import com.microsoft.applicationinsights.Framework.TelemetryClientWrapper;
+import com.microsoft.applicationinsights.Framework.SenderWrapper;
 import com.microsoft.applicationinsights.channel.SenderConfig;
 
 import junit.framework.Assert;
@@ -26,7 +26,7 @@ public class TelemetryClientTest extends AndroidTestCase {
         SenderConfig.maxBatchIntervalMs = 1;
 
         this.signal = new CountDownLatch(1);
-        this.sender = new SenderWrapper(this.signal, 200);
+        this.sender = new SenderWrapper(this.signal);
 
         this.tc = new TelemetryClientWrapper(iKey, context, sender);
     }
@@ -88,6 +88,12 @@ public class TelemetryClientTest extends AndroidTestCase {
         this.validatePayload();
     }
 
+    public static void validateResponse(int responseCode, String responsePayload) {
+        Log.i("SenderWrapper.onResponse", "Response code is: " + responseCode);
+        prettyPrintPayload(responsePayload);
+        Assert.assertEquals("Expected response code", 200, responseCode);
+    }
+
     private void validateApi() {
         try {
             this.signal.await(10, TimeUnit.SECONDS);
@@ -102,9 +108,48 @@ public class TelemetryClientTest extends AndroidTestCase {
             this.signal.await(10, TimeUnit.SECONDS);
             String payload = this.sender.writer.toString();
             Log.i("TelemetryClientTest.validatePayload", payload);
+            prettyPrintPayload(payload);
             Assert.assertTrue("Payload length is greater than zero", payload.length() > 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
+    }
+
+    private static void prettyPrintPayload(String payload) {
+        if(payload == null)
+            return;
+
+        char[] chars = payload.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        String tabs = "";
+
+        // logcat doesn't like leading spaces, so add '|' to the start of each line
+        String logCatNewLine = "\n|";
+        sb.append(logCatNewLine);
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            switch (c) {
+                case '[':
+                case '{':
+                    tabs += "\t";
+                    sb.append(" " + c + logCatNewLine + tabs);
+                    break;
+                case ']':
+                case '}':
+                    tabs = tabs.substring(0, tabs.length() - 1);
+                    sb.append(logCatNewLine + tabs + c);
+                    break;
+                case ',':
+                    sb.append(c + logCatNewLine + tabs);
+                    break;
+                default:
+                    sb.append(c);
+            }
+        }
+
+        String result = sb.toString();
+        result.replaceAll("\t", "  ");
+
+        Log.i("TelemetryClientTest.prettyPrintPayload", result);
     }
 }

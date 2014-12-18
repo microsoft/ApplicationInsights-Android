@@ -1,17 +1,13 @@
 package com.microsoft.applicationinsights.UnitTests.channelTests;
 
-import junit.*;
-
 import android.test.AndroidTestCase;
-import android.content.Context;
+
 import com.microsoft.applicationinsights.Framework.SenderWrapper;
-import com.microsoft.applicationinsights.Framework.TelemetryClientWrapper;
 import com.microsoft.applicationinsights.Framework.TestJson;
 import com.microsoft.applicationinsights.channel.Sender;
-import com.microsoft.applicationinsights.channel.SenderConfig;
+
 import junit.framework.Assert;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class SenderTests extends AndroidTestCase {
 
@@ -22,7 +18,7 @@ public class SenderTests extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         this.signal = new CountDownLatch(1);
-        senderWrapper = new SenderWrapper(this.signal, 200);
+        senderWrapper = new SenderWrapper(this.signal);
         sender = SenderWrapper.instance;
         sender.maxBatchIntervalMs = 1000;
         sender.maxBatchCount = 5;

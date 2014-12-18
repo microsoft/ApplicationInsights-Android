@@ -190,6 +190,7 @@ public class TelemetryContext implements ITelemetryContext {
      * Sets the session telemetryContext tags
      */
     private void setSessionContext() {
+        // todo: handle sessions (update expire date every time this is read, renew after 24 hrs)
         this.session.setIsNew("true");
         this.session.setId(UUID.randomUUID().toString());
     }

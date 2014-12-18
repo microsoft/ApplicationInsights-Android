@@ -8,7 +8,6 @@ import com.microsoft.applicationinsights.channel.contracts.EventData;
 import com.microsoft.applicationinsights.channel.contracts.ExceptionData;
 import com.microsoft.applicationinsights.channel.contracts.MessageData;
 import com.microsoft.applicationinsights.channel.contracts.MetricData;
-import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
@@ -18,12 +17,12 @@ import java.util.HashMap;
  * The public API for recording application insights telemetry.
  * Users would call TelemetryClient.track*
  */
-public abstract class AbstractTelemetryClient {
+public class CoreTelemetryClient {
 
     /**
      * The configuration for this telemetry client.
      */
-    public final AbstractTelemetryClientConfig config;
+    public final CoreTelemetryClientConfig config;
 
     /**
      * The telemetry telemetryContext object.
@@ -38,7 +37,7 @@ public abstract class AbstractTelemetryClient {
     /**
      * Force inheritance via a protected constructor
      */
-    protected AbstractTelemetryClient(AbstractTelemetryClientConfig config) {
+    public CoreTelemetryClient(CoreTelemetryClientConfig config) {
         this.config = config;
     }
 
@@ -162,31 +161,6 @@ public abstract class AbstractTelemetryClient {
         exception.setProperties(properties);
 
         track(localException, ExceptionData.EnvelopeName, ExceptionData.BaseType);
-    }
-
-    /**
-     * Sends information about the page viewed in the application to Application
-     * Insights.
-     *
-     * @param pageName Name of the page
-     */
-    public void trackPageView(String pageName) {
-        this.trackPageView(pageName, null);
-    }
-
-    /**
-     * Sends information about the page viewed in the application to Application
-     * Insights.
-     *
-     * @param pageName   Name of the page
-     * @param properties exception properties
-     */
-    public void trackPageView(String pageName, HashMap<String, String> properties) {
-        PageViewData telemetry = new PageViewData();
-        telemetry.setName(pageName);
-        telemetry.setProperties(properties);
-
-        track(telemetry, PageViewData.EnvelopeName, PageViewData.BaseType);
     }
 
     /**

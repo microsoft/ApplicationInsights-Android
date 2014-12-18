@@ -157,15 +157,20 @@ public class Sender extends SenderConfig {
      * Handler for the http response from the sender
      * @param connection a connection containing a response
      * @param responseCode the response code from the connection
+     * @return null if the request was successful, the server response otherwise
      */
-    protected void onResponse(HttpURLConnection connection, int responseCode) {
+    protected String onResponse(HttpURLConnection connection, int responseCode) {
         BufferedReader reader = null;
+        String response = null;
         try {
+
+            StringBuilder responseBuilder = new StringBuilder();
 
             if ((responseCode < 200)
                     || (responseCode >= 300 && responseCode < 400)
                     || (responseCode > 500 && responseCode != 529)) {
                 String message = String.format("Unexpected response code: %d", responseCode);
+                responseBuilder.append(message + "\n");
                 this.log(Sender.TAG, message);
             }
 
@@ -178,8 +183,11 @@ public class Sender extends SenderConfig {
                 this.log(TAG, "Error response:");
                 while (responseLine != null) {
                     this.log(TAG, responseLine);
+                    responseBuilder.append(responseLine);
                     responseLine = reader.readLine();
                 }
+
+                response = responseBuilder.toString();
             }
         } catch (IOException e) {
             this.log(TAG, e.toString());
@@ -191,6 +199,8 @@ public class Sender extends SenderConfig {
                     this.log(TAG, e.toString());
                 }
             }
+
+            return response;
         }
     }
 

@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.Framework;
 
 import android.util.Log;
 
+import com.microsoft.applicationinsights.EndToEnd.TelemetryClientTest;
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
@@ -21,15 +22,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class SenderWrapper extends Sender {
 
     public CountDownLatch signal;
-    public int expectedResponseCode;
     public boolean useFakeWriter;
     public StringWriter writer;
 
-    public SenderWrapper(CountDownLatch signal, int expectedResponseCode) {
+    public SenderWrapper(CountDownLatch signal) {
         super();
         this.useFakeWriter = false;
         this.signal = signal;
-        this.expectedResponseCode = expectedResponseCode;
     }
 
     public LinkedBlockingQueue<IJsonSerializable> getQueue()
@@ -38,13 +37,15 @@ public class SenderWrapper extends Sender {
     }
 
     @Override
-    protected void onResponse(HttpURLConnection connection, int responseCode) {
+    protected String onResponse(HttpURLConnection connection, int responseCode) {
+        String response = null;
         if(!this.useFakeWriter) {
             this.signal.countDown();
-            super.onResponse(connection, responseCode);
-            Log.i("SenderWrapper.onResponse", "Response code is: " + responseCode);
-            Assert.assertEquals("Expected response code", this.expectedResponseCode, responseCode);
+            response = super.onResponse(connection, responseCode);
+            TelemetryClientTest.validateResponse(responseCode, response);
         }
+
+        return response;
     }
 
     @Override
