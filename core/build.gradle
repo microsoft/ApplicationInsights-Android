@@ -3,6 +3,11 @@ apply plugin: 'java'
 sourceCompatibility = '1.6'
 targetCompatibility = '1.6'
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile group: 'junit', name: 'junit', version: '3.+'
 }

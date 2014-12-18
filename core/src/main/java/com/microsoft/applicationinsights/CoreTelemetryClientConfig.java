@@ -70,6 +70,16 @@ public class CoreTelemetryClientConfig implements IChannelConfig, IContextConfig
      * @param iKey The instrumentation key
      */
     public CoreTelemetryClientConfig(String iKey){
+        this(iKey, null);
+    }
+
+    /**
+     * Constructs a new instance of the TelemetryClientConfig
+     * @param iKey The instrumentation key
+     * @param accountId The account ID
+     */
+    public CoreTelemetryClientConfig(String iKey, String accountId){
+        this.accountId = accountId;
         this.instrumentationKey = iKey;
         this.sessionExpirationMs = IContextConfig.defaultSessionExpirationMs;
         this.sessionRenewalMs = IContextConfig.defaultSessionRenewalMs;
