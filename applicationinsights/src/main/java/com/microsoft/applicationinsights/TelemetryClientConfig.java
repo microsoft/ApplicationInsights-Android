@@ -2,11 +2,14 @@ package com.microsoft.applicationinsights;
 
 import android.content.Context;
 
+import com.microsoft.applicationinsights.channel.LoggingInternal;
+import com.microsoft.applicationinsights.channel.Sender;
+import com.microsoft.applicationinsights.channel.SenderConfig;
+
 /**
  * Configuration object when instantiating TelemetryClient
  */
 public class TelemetryClientConfig extends CoreTelemetryClientConfig {
-
 
     /**
      * The application telemetryContext for this recorder
@@ -28,5 +31,14 @@ public class TelemetryClientConfig extends CoreTelemetryClientConfig {
     public TelemetryClientConfig(String iKey, Context context){
         super(iKey);
         this.appContext = context;
+    }
+
+    /**
+     * Assign the android internal logger
+     */
+    static {
+        LoggingInternal logger = new LoggingInternal();
+        SenderConfig config = Sender.instance.getConfig();
+        config.setLogger(logger);
     }
 }

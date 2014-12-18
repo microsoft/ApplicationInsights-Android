@@ -16,7 +16,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * This singleton class sends data to the endpoint
  */
-public class Sender extends SenderConfig {
+public class Sender {
     /**
      * TAG for log cat.
      */
@@ -28,9 +28,19 @@ public class Sender extends SenderConfig {
     public final static Sender instance = new Sender();
 
     /**
+     * The synchronization lock for sending
+     */
+    private static final Object lock = new Object();
+
+    /**
      * The queue for this sender
      */
     protected LinkedBlockingQueue<IJsonSerializable> queue;
+
+    /**
+     * The configuration for this sender
+     */
+    protected SenderConfig config;
 
     /**
      * The timer for this sender
@@ -38,23 +48,19 @@ public class Sender extends SenderConfig {
     private Timer timer;
 
     /**
-     * The timer task for sending data
-     */
-    private Object lock;
-
-    /**
-     * The internal logging adapter for this sender
-     */
-    private ILoggingInternal log;
-
-    /**
      * Prevent external instantiation
      */
     protected Sender() {
         this.queue = new LinkedBlockingQueue<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", false);
-        this.lock = new Object();
-        this.log = log;
+        this.config = new SenderConfig();
+    }
+
+    /**
+     * @return The configuration for this sender
+     */
+    public SenderConfig getConfig() {
+        return config;
     }
 
     /**
@@ -67,18 +73,18 @@ public class Sender extends SenderConfig {
         if(item == null)
             return false;
 
-        boolean success = false;
-        synchronized (this.lock) {
+        boolean success;
+        synchronized (Sender.lock) {
             // attempt to add the item to the queue
             success = this.queue.add(item);
 
             if (success) {
-                if (this.queue.size() >= Sender.maxBatchCount) {
+                if (this.queue.size() >= this.config.getMaxBatchCount()) {
                     // flush if the queue is full
                     this.flush();
                 } else if (this.queue.size() == 1) {
                     // schedule a batch send if this is the first item in the queue
-                    this.timer.schedule(this.getSenderTask(), Sender.maxBatchIntervalMs);
+                    this.timer.schedule(this.getSenderTask(), this.config.getMaxBatchIntervalMs());
                 }
             }
         }
@@ -108,7 +114,7 @@ public class Sender extends SenderConfig {
     protected void send(List<IJsonSerializable> data) {
         Writer writer = null;
         try {
-            URL url = new URL(SenderConfig.endpointUrl);
+            URL url = new URL(this.config.getEndpointUrl());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setReadTimeout(10000 /* milliseconds */);
             connection.setConnectTimeout(15000 /* milliseconds */);
@@ -170,7 +176,8 @@ public class Sender extends SenderConfig {
                     || (responseCode >= 300 && responseCode < 400)
                     || (responseCode > 500 && responseCode != 529)) {
                 String message = String.format("Unexpected response code: %d", responseCode);
-                responseBuilder.append(message + "\n");
+                responseBuilder.append(message);
+                responseBuilder.append("\n");
                 this.log(Sender.TAG, message);
             }
 
@@ -199,9 +206,9 @@ public class Sender extends SenderConfig {
                     this.log(TAG, e.toString());
                 }
             }
-
-            return response;
         }
+
+        return response;
     }
 
     /**
@@ -220,8 +227,9 @@ public class Sender extends SenderConfig {
      * @param message the message to be logged
      */
     private void log(String tag, String message) {
-        if(this.log != null){
-            this.log.warn(tag, message);
+        ILoggingInternal logger = this.config.getLogger();
+        if(logger != null){
+            logger.warn(tag, message);
         }
     }
 
@@ -243,7 +251,7 @@ public class Sender extends SenderConfig {
         public void run() {
             // drain the queue
             List<IJsonSerializable> list = new LinkedList<IJsonSerializable>();
-            synchronized (sender.lock) {
+            synchronized (Sender.lock) {
                 sender.queue.drainTo(list);
                 sender.timer.purge();
             }
