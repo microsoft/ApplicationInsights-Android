@@ -5,6 +5,7 @@ import android.test.AndroidTestCase;
 import com.microsoft.applicationinsights.Framework.SenderWrapper;
 import com.microsoft.applicationinsights.Framework.TestJson;
 import com.microsoft.applicationinsights.channel.Sender;
+import com.microsoft.applicationinsights.channel.SenderConfig;
 
 import junit.framework.Assert;
 import java.util.concurrent.CountDownLatch;
@@ -20,10 +21,11 @@ public class SenderTests extends AndroidTestCase {
         this.signal = new CountDownLatch(1);
         senderWrapper = new SenderWrapper(this.signal);
         sender = SenderWrapper.instance;
-        sender.maxBatchIntervalMs = 1000;
-        sender.maxBatchCount = 5;
-        sender.DisableTelemetry=false;
-        sender.endpointUrl="https://testing";
+        SenderConfig config = sender.getConfig();
+        config.setMaxBatchIntervalMs(1000);
+        config.setMaxBatchCount(5);
+        config.setDisableTelemetry(false);
+        config.setEndpointUrl("https://testing");
     }
 
     public void tearDown() throws Exception {

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.microsoft.applicationinsights.Framework.TelemetryClientWrapper;
 import com.microsoft.applicationinsights.Framework.SenderWrapper;
+import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.channel.SenderConfig;
 
 import junit.framework.Assert;
@@ -23,10 +24,10 @@ public class TelemetryClientTest extends AndroidTestCase {
         super.setUp();
         String iKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
         Context context = this.getContext();
-        SenderConfig.maxBatchIntervalMs = 1;
 
         this.signal = new CountDownLatch(1);
         this.sender = new SenderWrapper(this.signal);
+        this.sender.getConfig().setMaxBatchIntervalMs(1);
 
         this.tc = new TelemetryClientWrapper(iKey, context, sender);
     }
@@ -36,7 +37,7 @@ public class TelemetryClientTest extends AndroidTestCase {
     }
 
     public void testTrackEvent() {
-        Log.w("TelemetryClientTest.testTrackEvent", "Starting test");
+        Log.w("TelemetryClentTest.testTrackEvent", "Starting test");
         this.tc.trackEvent("event");
         this.validateApi();
     }

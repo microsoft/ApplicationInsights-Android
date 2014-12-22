@@ -2,12 +2,13 @@ package com.microsoft.applicationinsights;
 
 import com.microsoft.applicationinsights.channel.IChannelConfig;
 import com.microsoft.applicationinsights.channel.IContextConfig;
+import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.SenderConfig;
 
 /**
  * Configuration object when instantiating TelemetryClient
  */
-public class CoreTelemetryClientConfig extends SenderConfig implements IChannelConfig, IContextConfig {
+public class CoreTelemetryClientConfig implements IChannelConfig, IContextConfig {
 
     /**
      * The instrumentation key for this telemetryContext
@@ -57,9 +58,30 @@ public class CoreTelemetryClientConfig extends SenderConfig implements IChannelC
         return sessionExpirationMs;
     }
 
+    /**
+     * @return The sender instance for this channel
+     */
+    public SenderConfig getSenderConfig() {
+        return Sender.instance.getConfig();
+    }
+
+    /**
+     * Constructs a new instance of the TelemetryClientConfig
+     * @param iKey The instrumentation key
+     */
     public CoreTelemetryClientConfig(String iKey){
+        this(iKey, null);
+    }
+
+    /**
+     * Constructs a new instance of the TelemetryClientConfig
+     * @param iKey The instrumentation key
+     * @param accountId The account ID
+     */
+    public CoreTelemetryClientConfig(String iKey, String accountId){
+        this.accountId = accountId;
         this.instrumentationKey = iKey;
-        this.sessionExpirationMs = 24 * 60 * 60 * 1000; // 24 hours
-        this.sessionRenewalMs = 30 * 60 * 1000; // 30 minutes
+        this.sessionExpirationMs = IContextConfig.defaultSessionExpirationMs;
+        this.sessionRenewalMs = IContextConfig.defaultSessionRenewalMs;
     }
 }

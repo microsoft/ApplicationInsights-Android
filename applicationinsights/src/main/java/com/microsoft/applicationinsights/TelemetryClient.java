@@ -2,6 +2,8 @@ package com.microsoft.applicationinsights;
 
 import android.text.TextUtils;
 
+import com.microsoft.applicationinsights.channel.LoggingInternal;
+import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
