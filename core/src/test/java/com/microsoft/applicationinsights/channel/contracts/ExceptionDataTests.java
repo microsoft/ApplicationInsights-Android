@@ -97,7 +97,7 @@ public class ExceptionDataTests extends TestCase
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"ver\":42,\"handledAt\":\"Test string\",\"exceptions\":[{}],\"severityLevel\":5,\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"},\"measurements\":{\"key1\":3.1415,\"key2\":42.2}}";
+        String expected = "{\"ver\":42,\"handledAt\":\"Test string\",\"exceptions\":[{\"typeName\":null,\"message\":null,\"hasFullStack\":true}],\"severityLevel\":5,\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"},\"measurements\":{\"key1\":3.1415,\"key2\":42.2}}";
         Assert.assertEquals(expected, writer.toString());
     }
 

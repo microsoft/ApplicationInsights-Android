@@ -1,14 +1,11 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import junit.framework.TestCase;
 import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /// <summary>
 /// Data contract test class ExceptionDetailsTests.
@@ -121,7 +118,7 @@ public class ExceptionDetailsTests extends TestCase
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"id\":42,\"outerId\":42,\"typeName\":\"Test string\",\"message\":\"Test string\",\"hasFullStack\":true,\"stack\":\"Test string\",\"parsedStack\":[{}]}";
+        String expected = "{\"id\":42,\"outerId\":42,\"typeName\":\"Test string\",\"message\":\"Test string\",\"hasFullStack\":true,\"stack\":\"Test string\",\"parsedStack\":[{\"level\":0,\"method\":null}]}";
         Assert.assertEquals(expected, writer.toString());
     }
 
