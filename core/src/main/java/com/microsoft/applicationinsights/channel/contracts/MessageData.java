@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.channel.contracts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
@@ -43,7 +44,7 @@ public class MessageData extends Domain implements
     /**
      * Backing field for property Properties.
      */
-    private HashMap<String, String> properties;
+    private LinkedHashMap<String, String> properties;
     
     /**
      * Initializes a new instance of the <see cref="MessageData"/> class.
@@ -98,9 +99,9 @@ public class MessageData extends Domain implements
     /**
      * Gets the Properties property.
      */
-    public HashMap<String, String> getProperties() {
+    public LinkedHashMap<String, String> getProperties() {
         if (this.properties == null) {
-            this.properties = new HashMap<String, String>();
+            this.properties = new LinkedHashMap<String, String>();
         }
         return this.properties;
     }
@@ -108,7 +109,7 @@ public class MessageData extends Domain implements
     /**
      * Sets the Properties property.
      */
-    public void setProperties(HashMap<String, String> value) {
+    public void setProperties(LinkedHashMap<String, String> value) {
         this.properties = value;
     }
     

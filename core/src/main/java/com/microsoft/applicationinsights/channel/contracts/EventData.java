@@ -1,13 +1,10 @@
 package com.microsoft.applicationinsights.channel.contracts;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.ArrayList;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
-import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
+import java.util.LinkedHashMap;
 
 /**
  * Data contract class EventData.
@@ -38,12 +35,12 @@ public class EventData extends Domain implements
     /**
      * Backing field for property Properties.
      */
-    private HashMap<String, String> properties;
+    private LinkedHashMap<String, String> properties;
     
     /**
      * Backing field for property Measurements.
      */
-    private HashMap<String, Double> measurements;
+    private LinkedHashMap<String, Double> measurements;
     
     /**
      * Initializes a new instance of the <see cref="EventData"/> class.
@@ -84,9 +81,9 @@ public class EventData extends Domain implements
     /**
      * Gets the Properties property.
      */
-    public HashMap<String, String> getProperties() {
+    public LinkedHashMap<String, String> getProperties() {
         if (this.properties == null) {
-            this.properties = new HashMap<String, String>();
+            this.properties = new LinkedHashMap<String, String>();
         }
         return this.properties;
     }
@@ -94,16 +91,16 @@ public class EventData extends Domain implements
     /**
      * Sets the Properties property.
      */
-    public void setProperties(HashMap<String, String> value) {
+    public void setProperties(LinkedHashMap<String, String> value) {
         this.properties = value;
     }
     
     /**
      * Gets the Measurements property.
      */
-    public HashMap<String, Double> getMeasurements() {
+    public LinkedHashMap<String, Double> getMeasurements() {
         if (this.measurements == null) {
-            this.measurements = new HashMap<String, Double>();
+            this.measurements = new LinkedHashMap<String, Double>();
         }
         return this.measurements;
     }
@@ -111,7 +108,7 @@ public class EventData extends Domain implements
     /**
      * Sets the Measurements property.
      */
-    public void setMeasurements(HashMap<String, Double> value) {
+    public void setMeasurements(LinkedHashMap<String, Double> value) {
         this.measurements = value;
     }
     

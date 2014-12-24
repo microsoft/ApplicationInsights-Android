@@ -7,7 +7,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.TimeZone;
 
 /**
@@ -62,7 +62,7 @@ public class TelemetryChannel {
                        String baseType) {
 
         // add common properties to this telemetry object
-        HashMap<String, String> map = telemetry.getProperties();
+        LinkedHashMap<String, String> map = telemetry.getProperties();
         map.putAll(telemetryContext.getProperties());
         telemetry.setProperties(map);
 

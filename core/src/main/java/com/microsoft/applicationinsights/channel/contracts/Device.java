@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.channel.contracts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
@@ -294,7 +295,7 @@ public class Device implements
      * Adds all members of this class to a hashmap
      * @param map to which the members of this class will be added.
      */
-    public void addToHashMap(HashMap<String, String> map)
+    public void addToHashMap(LinkedHashMap<String, String> map)
     {
         if (!(this.id == null)) {
             map.put("id", this.id);
