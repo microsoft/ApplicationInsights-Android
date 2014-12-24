@@ -6,16 +6,16 @@ import junit.framework.TestCase;
 /// Data contract test class DataTests.
 /// </summary>
 public class DataTests extends TestCase
-{
-   /* public void testBase_dataPropertyWorksAsExpected()
+{/*
+    public void testBase_dataPropertyWorksAsExpected()
     {
-        TDomain expected = (com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData) new Object();
+        TDomain expected = (TDomain) new Object();
         Data item = new Data();
         item.setBaseData(expected);
         TDomain actual = item.getBaseData();
         Assert.assertEquals(expected, actual);
         
-        expected = (com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData) new Object();
+        expected = object();
         item.setBaseData(expected);
         actual = item.getBaseData();
         Assert.assertEquals(expected, actual);
@@ -24,7 +24,7 @@ public class DataTests extends TestCase
     public void testSerialize() throws IOException
     {
         Data item = new Data();
-        item.setBaseData((com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData) new Object());
+        item.setBaseData(object());
         StringWriter writer = new StringWriter();
         item.serialize(writer);
         String expected = "{\"baseData\":{}}";

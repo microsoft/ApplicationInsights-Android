@@ -1,11 +1,14 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
-
+import junit.framework.Assert;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /// <summary>
 /// Data contract test class ExceptionDetailsTests.
@@ -112,7 +115,7 @@ public class ExceptionDetailsTests extends TestCase
         item.setMessage("Test string");
         item.setHasFullStack(true);
         item.setStack("Test string");
-        for (StackFrame entry : new ArrayList<StackFrame>() {{add((StackFrame) new Object());}})
+        for (StackFrame entry : new ArrayList<StackFrame>() {{add(new StackFrame());}})
         {
             item.getParsedStack().add(entry);
         }

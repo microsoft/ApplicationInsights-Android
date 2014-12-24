@@ -1,10 +1,14 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
-
+import junit.framework.Assert;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /// <summary>
 /// Data contract test class DataPointTests.
@@ -33,7 +37,7 @@ public class DataPointTests extends TestCase
         int actual = item.getKind();
         Assert.assertEquals(expected, actual);
         
-        expected =3;
+        expected = 3;
         item.setKind(expected);
         actual = item.getKind();
         Assert.assertEquals(expected, actual);
@@ -113,7 +117,7 @@ public class DataPointTests extends TestCase
     {
         DataPoint item = new DataPoint();
         item.setName("Test string");
-        //item.setKind((int) new Object());
+        item.setKind(5);
         item.setValue(1.5);
         item.setCount(42);
         item.setMin(1.5);
@@ -121,7 +125,7 @@ public class DataPointTests extends TestCase
         item.setStdDev(1.5);
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"name\":\"Test string\",\"kind\":{},\"value\":1.5,\"count\":42,\"min\":1.5,\"max\":1.5,\"stdDev\":1.5}";
+        String expected = "{\"name\":\"Test string\",\"kind\":5,\"value\":1.5,\"count\":42,\"min\":1.5,\"max\":1.5,\"stdDev\":1.5}";
         Assert.assertEquals(expected, writer.toString());
     }
 

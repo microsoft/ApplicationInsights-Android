@@ -47,7 +47,7 @@ public class MetricDataTests extends TestCase
     {
         MetricData item = new MetricData();
         item.setVer(42);
-        for (DataPoint entry : new ArrayList<DataPoint>() {{add((DataPoint) new Object());}})
+        for (DataPoint entry : new ArrayList<DataPoint>() {{add(new DataPoint());}})
         {
             item.getMetrics().add(entry);
         }
