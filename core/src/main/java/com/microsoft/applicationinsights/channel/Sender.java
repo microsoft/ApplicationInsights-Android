@@ -8,17 +8,15 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This singleton class sends data to the endpoint
  */
 public class Sender {
     /**
-     * TAG for log cat.
+     * Tag for log messages
      */
     private static final String TAG = "Sender";
 
@@ -35,24 +33,29 @@ public class Sender {
     /**
      * The queue for this sender
      */
-    protected LinkedBlockingQueue<IJsonSerializable> queue;
+    protected LinkedList<IJsonSerializable> queue;
 
     /**
      * The configuration for this sender
      */
-    protected SenderConfig config;
+    protected final SenderConfig config;
 
     /**
      * The timer for this sender
      */
-    private Timer timer;
+    protected final Timer timer;
+
+    /**
+     * All tasks which have been scheduled and not cancelled
+     */
+    private TimerTask sendTask;
 
     /**
      * Prevent external instantiation
      */
     protected Sender() {
-        this.queue = new LinkedBlockingQueue<IJsonSerializable>();
-        this.timer = new Timer("Application Insights Sender Queue", false);
+        this.queue = new LinkedList<IJsonSerializable>();
+        this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = new SenderConfig();
     }
 
@@ -68,7 +71,7 @@ public class Sender {
      * @param item a telemetry item to send
      * @return true if the item was successfully added to the queue
      */
-    public boolean queue(IJsonSerializable item) {
+    public boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
         if(item == null)
             return false;
@@ -83,8 +86,9 @@ public class Sender {
                     // flush if the queue is full
                     this.flush();
                 } else if (this.queue.size() == 1) {
-                    // schedule a batch send if this is the first item in the queue
-                    this.timer.schedule(this.getSenderTask(), this.config.getMaxBatchIntervalMs());
+                    // schedule a FlushTask if this is the first item in the queue
+                    this.sendTask = new FlushTask(this);
+                    this.timer.schedule(this.sendTask, this.config.getMaxBatchIntervalMs());
                 }
             }
         }
@@ -96,27 +100,30 @@ public class Sender {
      * Empties the queue and sends all items to the endpoint
      */
     public void flush() {
-        // schedule a batch send if this is the first item in the queue
-        this.timer.schedule(this.getSenderTask(), 0);
-    }
 
-    /**
-     * Creates a task which will send all items in the queue
-     */
-    protected TimerTask getSenderTask() {
-        return new SendTask(this);
+        // asynchronously flush the queue with a non-daemon thread
+        // if this was called from the timer task it would inherit the daemon status
+        // since this thread does I/O it must not be a daemon thread
+        Thread flushThread = new Thread(new SendTask(this));
+        flushThread.setDaemon(false);
+        flushThread.start();
+
+        // cancel the scheduled send task if it exists
+        if(this.sendTask != null) {
+            this.sendTask.cancel();
+        }
     }
 
     /**
      * Sends data to the configured URL
      * @param data a collection of serializable data
      */
-    protected void send(List<IJsonSerializable> data) {
+    protected void send(IJsonSerializable[] data) {
         Writer writer = null;
         try {
             URL url = new URL(this.config.getEndpointUrl());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setReadTimeout(10000 /* milliseconds */);
+            connection.setReadTimeout(10000 /* milliseconds */); // todo: move to config
             connection.setConnectTimeout(15000 /* milliseconds */);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
@@ -126,12 +133,12 @@ public class Sender {
             writer = this.getWriter(connection);
             writer.write('[');
 
-            for (int i = 0; i < data.size(); i++) {
+            for (int i = 0; i < data.length; i++) {
                 if (i > 0) {
                     writer.write(',');
                 }
 
-                data.get(i).serialize(writer);
+                data[i].serialize(writer);
             }
 
             writer.write(']');
@@ -233,14 +240,28 @@ public class Sender {
         }
     }
 
-    /**
-     * Extension of TimerTask for thread-safely flushing the queue
-     */
+    private class FlushTask extends TimerTask {
+        private Sender sender;
+
+        /**
+         * The sender instance is provided to the constructor as a test hook
+         * @param sender the sender instance which will be flushed
+         */
+        public FlushTask(Sender sender) {
+            this.sender = sender;
+        }
+
+        @Override
+        public void run() {
+            this.sender.flush();
+        }
+    }
+
     private class SendTask extends TimerTask {
         private Sender sender;
 
         /**
-         * A sender instance is provided as a test hook
+         * The sender instance is provided to the constructor as a test hook
          * @param sender the sender instance which will transmit the contents of the queue
          */
         public SendTask(Sender sender) {
@@ -249,16 +270,13 @@ public class Sender {
 
         @Override
         public void run() {
-            // drain the queue
-            List<IJsonSerializable> list = new LinkedList<IJsonSerializable>();
             synchronized (Sender.lock) {
-                sender.queue.drainTo(list);
-                sender.timer.purge();
-            }
-
-            // send if more than one item is in the queue
-            if(list.size() > 0 ) {
-                sender.send(list);
+                // send if more than one item is in the queue
+                if(sender.queue.size() > 0 ) {
+                    IJsonSerializable[] data = new IJsonSerializable[sender.queue.size()];
+                    sender.queue.toArray(data);
+                    sender.send(data);
+                }
             }
         }
     }

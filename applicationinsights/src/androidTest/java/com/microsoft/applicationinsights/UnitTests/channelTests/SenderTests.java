@@ -36,7 +36,7 @@ public class SenderTests extends AndroidTestCase {
     {
         TestJson testJson = new TestJson("hello", "world");
 
-        sender.queue(testJson);
+        sender.enqueue(testJson);
         Assert.assertEquals("Got 1 item", 1, senderWrapper.getQueue().size());
     }
 
@@ -45,7 +45,7 @@ public class SenderTests extends AndroidTestCase {
         TestJson testJson = new TestJson("hello", "world");
 
         for (int i = 0; i < 5; i++) {
-            sender.queue(testJson);
+            sender.enqueue(testJson);
             Assert.assertEquals(String.format("Got {0} items", i+1), i+1, senderWrapper.getQueue().size());
         }
         Assert.assertEquals("Items were flushed", 0, senderWrapper.getQueue().size());

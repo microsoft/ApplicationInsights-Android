@@ -80,7 +80,7 @@ public class TelemetryChannel {
         envelope.setTags(telemetryContext.toHashMap());
 
         // send to queue
-        this.sender.queue(envelope);
+        this.sender.enqueue(envelope);
     }
 
     /**
