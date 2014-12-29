@@ -6,6 +6,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializa
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import java.util.LinkedList;
 import java.util.Timer;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -55,7 +56,7 @@ public class SenderTest extends TestCase {
             super();
         }
 
-        public LinkedBlockingQueue<IJsonSerializable> getQueue() {
+        public LinkedList<IJsonSerializable> getQueue() {
             return this.queue;
         }
 

@@ -31,7 +31,7 @@ public class ApplicationTests extends AndroidTestCase {
     public void testSerialize() throws IOException, JSONException
     {
         String version = "Test string";
-        String expected = "{\"ver\":\"Test string\"}";
+        String expected = "{\"ai.application.ver\":\"Test string\"}";
 
         Application app = new Application();
         app.setVer(version);
