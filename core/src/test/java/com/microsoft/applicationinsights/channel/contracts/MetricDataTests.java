@@ -1,13 +1,12 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import junit.framework.TestCase;
 import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /// <summary>
@@ -47,7 +46,7 @@ public class MetricDataTests extends TestCase
     {
         MetricData item = new MetricData();
         item.setVer(42);
-        for (DataPoint entry : new ArrayList<DataPoint>() {{add((DataPoint) new Object());}})
+        for (DataPoint entry : new ArrayList<DataPoint>() {{add(new DataPoint());}})
         {
             item.getMetrics().add(entry);
         }
@@ -57,7 +56,7 @@ public class MetricDataTests extends TestCase
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"ver\":42,\"metrics\":[{}],\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"}}";
+        String expected = "{\"ver\":42,\"metrics\":[{\"name\":null,\"value\":0.0}],\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"}}";
         Assert.assertEquals(expected, writer.toString());
     }
 

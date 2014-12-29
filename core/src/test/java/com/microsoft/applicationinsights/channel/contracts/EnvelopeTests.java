@@ -204,13 +204,13 @@ public class EnvelopeTests extends TestCase
     
     public void testDataPropertyWorksAsExpected()
     {
-        Base expected = (Base) new Object();
+        Base expected = new Base();
         Envelope item = new Envelope();
         item.setData(expected);
         Base actual = item.getData();
         Assert.assertEquals(expected, actual);
         
-        expected = (Base) new Object();
+        expected = new Base();
         item.setData(expected);
         actual = item.getData();
         Assert.assertEquals(expected, actual);
@@ -236,7 +236,7 @@ public class EnvelopeTests extends TestCase
         {
             item.getTags().put(entry.getKey(), entry.getValue());
         }
-        item.setData((Base) new Object());
+        item.setData(new Base());
         StringWriter writer = new StringWriter();
         item.serialize(writer);
         String expected = "{\"ver\":42,\"name\":\"Test string\",\"time\":\"Test string\",\"sampleRate\":1.5,\"seq\":\"Test string\",\"iKey\":\"Test string\",\"flags\":42,\"deviceId\":\"Test string\",\"os\":\"Test string\",\"osVer\":\"Test string\",\"appId\":\"Test string\",\"appVer\":\"Test string\",\"userId\":\"Test string\",\"tags\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"},\"data\":{}}";

@@ -16,7 +16,7 @@ import com.microsoft.applicationinsights.channel.contracts.Operation;
 import com.microsoft.applicationinsights.channel.contracts.Session;
 import com.microsoft.applicationinsights.channel.contracts.User;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 /**
@@ -67,7 +67,7 @@ public class TelemetryContext implements ITelemetryContext {
     /**
      * Properties associated with this telemetryContext.
      */
-    private HashMap<String, String> properties;
+    private LinkedHashMap<String, String> properties;
 
     public android.content.Context getAndroidApp() {
         return androidAppContext;
@@ -133,11 +133,11 @@ public class TelemetryContext implements ITelemetryContext {
         this.internal = internal;
     }
 
-    public HashMap<String, String> getProperties() {
+    public LinkedHashMap<String, String> getProperties() {
         return properties;
     }
 
-    public void setProperties(HashMap<String, String> properties) {
+    public void setProperties(LinkedHashMap<String, String> properties) {
         this.properties = properties;
     }
 
@@ -148,7 +148,7 @@ public class TelemetryContext implements ITelemetryContext {
     public TelemetryContext(TelemetryClientConfig config) {
         super();
         this.androidAppContext = config.getAppContext(); // todo: use session info
-        this.properties = new HashMap<String, String>();
+        this.properties = new LinkedHashMap<String, String>();
 
         this.application = new Application();
         this.device = new Device();
@@ -163,8 +163,8 @@ public class TelemetryContext implements ITelemetryContext {
         this.setSessionContext();
     }
 
-    public HashMap<String, String> toHashMap() {
-        HashMap<String, String> map = new HashMap<String, String>();
+    public LinkedHashMap<String, String> toHashMap() {
+        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
         this.application.addToHashMap(map);
         this.device.addToHashMap(map);
         this.location.addToHashMap(map);

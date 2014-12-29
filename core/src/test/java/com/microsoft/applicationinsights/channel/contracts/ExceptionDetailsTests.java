@@ -112,13 +112,13 @@ public class ExceptionDetailsTests extends TestCase
         item.setMessage("Test string");
         item.setHasFullStack(true);
         item.setStack("Test string");
-        for (StackFrame entry : new ArrayList<StackFrame>() {{add((StackFrame) new Object());}})
+        for (StackFrame entry : new ArrayList<StackFrame>() {{add(new StackFrame());}})
         {
             item.getParsedStack().add(entry);
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"id\":42,\"outerId\":42,\"typeName\":\"Test string\",\"message\":\"Test string\",\"hasFullStack\":true,\"stack\":\"Test string\",\"parsedStack\":[{}]}";
+        String expected = "{\"id\":42,\"outerId\":42,\"typeName\":\"Test string\",\"message\":\"Test string\",\"hasFullStack\":true,\"stack\":\"Test string\",\"parsedStack\":[{\"level\":0,\"method\":null}]}";
         Assert.assertEquals(expected, writer.toString());
     }
 

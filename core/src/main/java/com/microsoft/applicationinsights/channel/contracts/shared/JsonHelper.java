@@ -1,10 +1,7 @@
 package com.microsoft.applicationinsights.channel.contracts.shared;
 
-import com.microsoft.applicationinsights.channel.contracts.DataPoint;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -169,7 +166,7 @@ public final class JsonHelper {
                 String key = iterator.next();
                 T item = map.get(key);
 
-                writer.write(key);
+                writer.write("\"" + key + "\"");
                 writer.write(":");
                 writeItem(writer, item);
 
@@ -177,7 +174,7 @@ public final class JsonHelper {
                     key = iterator.next();
 
                     writer.write(",");
-                    writer.write(key);
+                    writer.write("\"" + key + "\"");
                     writer.write(":");
 
                     item = map.get(key);

@@ -1,11 +1,13 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
-
+import junit.framework.Assert;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /// <summary>
@@ -74,7 +76,7 @@ public class MessageDataTests extends TestCase
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"ver\":42,\"message\":\"Test string\",\"severityLevel\":{},\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"}}";
+        String expected = "{\"ver\":42,\"message\":\"Test string\",\"severityLevel\":5,\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"}}";
         Assert.assertEquals(expected, writer.toString());
     }
 

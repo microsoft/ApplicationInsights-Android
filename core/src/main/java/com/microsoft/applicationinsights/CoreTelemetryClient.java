@@ -1,7 +1,7 @@
 package com.microsoft.applicationinsights;
 
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.ITelemetryContext;
+import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
@@ -11,7 +11,7 @@ import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * The public API for recording application insights telemetry.
@@ -55,7 +55,7 @@ public class CoreTelemetryClient {
      *
      * @param eventName
      */
-    public void trackEvent(String eventName, HashMap<String, String> properties) {
+    public void trackEvent(String eventName, LinkedHashMap<String, String> properties) {
         trackEvent(eventName, properties, null);
     }
 
@@ -67,8 +67,8 @@ public class CoreTelemetryClient {
      * @param metrics    customized metrics
      */
     public void trackEvent(String eventName,
-                           HashMap<String, String> properties,
-                           HashMap<String, Double> metrics) {
+                           LinkedHashMap<String, String> properties,
+                           LinkedHashMap<String, Double> metrics) {
         String localEventName = eventName;
         EventData telemetry = new EventData();
         telemetry.setName(localEventName);
@@ -93,7 +93,7 @@ public class CoreTelemetryClient {
      * @param message    message for transmission to Application insight
      * @param properties properties of the message
      */
-    public void trackTrace(String message, HashMap<String, String> properties) {
+    public void trackTrace(String message, LinkedHashMap<String, String> properties) {
         MessageData telemetry = new MessageData();
         telemetry.setMessage(message);
         telemetry.setProperties(properties);
@@ -118,7 +118,7 @@ public class CoreTelemetryClient {
      * @param value      metric value
      * @param properties metric properties
      */
-    public void trackMetric(String name, double value, HashMap<String, String> properties) {
+    public void trackMetric(String name, double value, LinkedHashMap<String, String> properties) {
         MetricData telemetry = new MetricData();
         telemetry.setProperties(properties);
 
@@ -152,7 +152,7 @@ public class CoreTelemetryClient {
      * @param exception  exception data object
      * @param properties exception properties
      */
-    public void trackException(ExceptionData exception, HashMap<String, String> properties) {
+    public void trackException(ExceptionData exception, LinkedHashMap<String, String> properties) {
         ExceptionData localException = exception;
         if (localException == null) {
             localException = new ExceptionData();

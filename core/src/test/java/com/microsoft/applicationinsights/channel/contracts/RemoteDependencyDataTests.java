@@ -1,11 +1,13 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
-
+import junit.framework.Assert;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /// <summary>
@@ -193,23 +195,23 @@ public class RemoteDependencyDataTests extends TestCase
         RemoteDependencyData item = new RemoteDependencyData();
         item.setVer(42);
         item.setName("Test string");
-        //item.setKind((int)new Object());
+        item.setKind(5);
         item.setValue(1.5);
         item.setCount(42);
         item.setMin(1.5);
         item.setMax(1.5);
         item.setStdDev(1.5);
-        //item.setDependencyKind((int)new Object());
+        item.setDependencyKind(5);
         item.setSuccess(true);
         item.setAsync(true);
-        //item.setDependencySource((int)new Object());
+        item.setDependencySource(5);
         for (Map.Entry<String, String> entry : new LinkedHashMap<String, String>() {{put("key1", "test value 1"); put("key2", "test value 2"); }}.entrySet())
         {
             item.getProperties().put(entry.getKey(), entry.getValue());
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"ver\":42,\"name\":\"Test string\",\"kind\":{},\"value\":1.5,\"count\":42,\"min\":1.5,\"max\":1.5,\"stdDev\":1.5,\"dependencyKind\":{},\"success\":true,\"async\":true,\"dependencySource\":{},\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"}}";
+        String expected = "{\"ver\":42,\"name\":\"Test string\",\"kind\":5,\"value\":1.5,\"count\":42,\"min\":1.5,\"max\":1.5,\"stdDev\":1.5,\"dependencyKind\":5,\"success\":true,\"async\":true,\"dependencySource\":5,\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"}}";
         Assert.assertEquals(expected, writer.toString());
     }
 

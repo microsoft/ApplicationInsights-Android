@@ -2,20 +2,11 @@ package com.microsoft.applicationinsights;
 
 import android.text.TextUtils;
 
-import com.microsoft.applicationinsights.channel.LoggingInternal;
-import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.applicationinsights.channel.contracts.DataPoint;
-import com.microsoft.applicationinsights.channel.contracts.EventData;
-import com.microsoft.applicationinsights.channel.contracts.ExceptionData;
-import com.microsoft.applicationinsights.channel.contracts.MessageData;
-import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * The public API for recording application insights telemetry.
@@ -52,7 +43,7 @@ public class TelemetryClient extends CoreTelemetryClient {
      * @param pageName Name of the page
      * @param properties exception properties
      */
-    public void trackPageView(String pageName, HashMap<String, String> properties) {
+    public void trackPageView(String pageName, LinkedHashMap<String, String> properties) {
         String localPageName = pageName;
         if (TextUtils.isEmpty(localPageName)) {
             localPageName = "";

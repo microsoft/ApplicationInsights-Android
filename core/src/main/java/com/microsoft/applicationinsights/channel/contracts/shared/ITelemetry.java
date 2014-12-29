@@ -1,15 +1,15 @@
 package com.microsoft.applicationinsights.channel.contracts.shared;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public interface ITelemetry extends ITelemetryData {
     /**
      * Gets the properties.
      */
-    public HashMap<String, String> getProperties();
+    public LinkedHashMap<String, String> getProperties();
 
 	/**
      * Sets the properties.
      */
-    public void setProperties(HashMap<String, String> value);
+    public void setProperties(LinkedHashMap<String, String> value);
 }

@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.channel.contracts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
@@ -83,7 +84,7 @@ public class Envelope implements
     /**
      * Backing field for property Tags.
      */
-    private HashMap<String, String> tags;
+    private LinkedHashMap<String, String> tags;
     
     /**
      * Backing field for property Data.
@@ -283,9 +284,9 @@ public class Envelope implements
     /**
      * Gets the Tags property.
      */
-    public HashMap<String, String> getTags() {
+    public LinkedHashMap<String, String> getTags() {
         if (this.tags == null) {
-            this.tags = new HashMap<String, String>();
+            this.tags = new LinkedHashMap<String, String>();
         }
         return this.tags;
     }
@@ -293,7 +294,7 @@ public class Envelope implements
     /**
      * Sets the Tags property.
      */
-    public void setTags(HashMap<String, String> value) {
+    public void setTags(LinkedHashMap<String, String> value) {
         this.tags = value;
     }
     
