@@ -2,8 +2,6 @@ package com.microsoft.applicationinsights.Framework;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
-import org.json.JSONException;
-
 import java.io.IOException;
 import java.io.Writer;
 

@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights.channel;
 
+import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
@@ -72,7 +73,7 @@ public class SenderTest extends TestCase {
             Assert.assertEquals("batch was not sent before MaxIntervalMs",
                     1, this.sender.sendSignal.getCount());
             Assert.assertNotSame("queue is not empty prior to sending data",
-                    this.sender.queue.size(), 0);
+                    this.sender.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
@@ -85,7 +86,7 @@ public class SenderTest extends TestCase {
             Assert.assertEquals("batch was sent before maxIntervalMs after reaching MaxBatchCount",
                     0, this.sender.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
-                    this.sender.queue.size(), 0);
+                    this.sender.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
@@ -104,7 +105,7 @@ public class SenderTest extends TestCase {
             Assert.assertEquals("second batch was sent before maxIntervalMs after reaching MaxBatchCount",
                     0, this.sender.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
-                    this.sender.queue.size(), 0);
+                    this.sender.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
@@ -120,7 +121,7 @@ public class SenderTest extends TestCase {
             Assert.assertEquals("single item was sent after reaching MaxInterval",
                     0, this.sender.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
-                    this.sender.queue.size(), 0);
+                    this.sender.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
@@ -137,14 +138,14 @@ public class SenderTest extends TestCase {
             Assert.assertEquals("single item was not sent before reaching MaxInterval",
                     1, this.sender.sendSignal.getCount());
             Assert.assertNotSame("queue is not empty prior to sending data",
-                    this.sender.queue.size(), 0);
+                    this.sender.getQueue().size(), 0);
 
             this.sender.flush();
             this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
             Assert.assertEquals("single item was sent after calling sender.flush",
                     0, this.sender.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
-                    this.sender.queue.size(), 0);
+                    this.sender.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }

@@ -30,12 +30,18 @@ public class TelemetryChannel {
     protected Sender sender;
 
     /**
+     * Properties associated with this telemetryContext.
+     */
+    public LinkedHashMap<String, String> properties;
+
+    /**
      * Instantiates a new instance of Sender
      * @param config The configuration for this channel
      */
     public TelemetryChannel(IChannelConfig config) {
         this.sender = Sender.instance;
         this.config = config;
+        this.properties = null;
     }
 
     /**
@@ -56,15 +62,20 @@ public class TelemetryChannel {
      * @param envelopeName Value to fill Envelope's Content
      * @param baseType Value to fill Envelope's ItemType field
      */
-    public void send(ITelemetryContext telemetryContext,
+    public void send(TelemetryContext telemetryContext,
                        ITelemetry telemetry,
                        String envelopeName,
                        String baseType) {
 
         // add common properties to this telemetry object
-        LinkedHashMap<String, String> map = telemetry.getProperties();
-        map.putAll(telemetryContext.getProperties());
-        telemetry.setProperties(map);
+        if(this.properties != null) {
+            LinkedHashMap<String, String> map = telemetry.getProperties();
+            if(map != null) {
+                map.putAll(this.properties);
+            }
+
+            telemetry.setProperties(map);
+        }
 
         // wrap the telemetry data in the common schema data
         Data<ITelemetryData> data = new Data<ITelemetryData>();
@@ -77,7 +88,7 @@ public class TelemetryChannel {
         envelope.setData(data);
         envelope.setName(envelopeName);
         envelope.setTime(this.getUtcTime());
-        envelope.setTags(telemetryContext.toHashMap());
+        envelope.setTags(telemetryContext.getContextTags());
 
         // send to queue
         this.sender.enqueue(envelope);

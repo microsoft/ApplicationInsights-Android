@@ -8,7 +8,7 @@ import com.microsoft.applicationinsights.channel.SenderConfig;
 /**
  * Configuration object when instantiating TelemetryClient
  */
-public class CoreTelemetryClientConfig implements IChannelConfig, IContextConfig {
+public class TelemetryClientConfig implements IChannelConfig, IContextConfig {
 
     /**
      * The instrumentation key for this telemetryContext
@@ -69,7 +69,7 @@ public class CoreTelemetryClientConfig implements IChannelConfig, IContextConfig
      * Constructs a new instance of the TelemetryClientConfig
      * @param iKey The instrumentation key
      */
-    public CoreTelemetryClientConfig(String iKey){
+    public TelemetryClientConfig(String iKey){
         this(iKey, null);
     }
 
@@ -78,7 +78,7 @@ public class CoreTelemetryClientConfig implements IChannelConfig, IContextConfig
      * @param iKey The instrumentation key
      * @param accountId The account ID
      */
-    public CoreTelemetryClientConfig(String iKey, String accountId){
+    public TelemetryClientConfig(String iKey, String accountId){
         this.accountId = accountId;
         this.instrumentationKey = iKey;
         this.sessionExpirationMs = IContextConfig.defaultSessionExpirationMs;

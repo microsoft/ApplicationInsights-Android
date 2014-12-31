@@ -1,10 +1,9 @@
 package com.microsoft.applicationinsights;
 
-import android.text.TextUtils;
+import android.content.Context;
 
+import com.microsoft.applicationinsights.channel.AndroidTelemetryContext;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
-import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 
 import java.util.LinkedHashMap;
 
@@ -12,7 +11,7 @@ import java.util.LinkedHashMap;
  * The public API for recording application insights telemetry.
  * Users would call TelemetryClient.track*
  */
-public class TelemetryClient extends CoreTelemetryClient {
+public class TelemetryClient extends AbstractTelemetryClient<AndroidConfig> {
 
     /**
      * Constructor of the class TelemetryClient.
@@ -20,10 +19,19 @@ public class TelemetryClient extends CoreTelemetryClient {
      * @param iKey the instrumentation key
      * @param context application telemetryContext from the caller
      */
-    public TelemetryClient(String iKey, android.content.Context context) {
-        super(new TelemetryClientConfig(iKey, context));
-        this.telemetryContext = new TelemetryContext((TelemetryClientConfig)this.config);
+    public TelemetryClient(String iKey, Context context) {
+        super(new AndroidConfig(iKey, context));
+        this.telemetryContext = new AndroidTelemetryContext(this.config);
         this.channel = new TelemetryChannel(this.config);
+    }
+
+    /**
+     * Sends information about a page view to Application Insights.
+     *
+     * @param pageName the name of the page
+     */
+    public void trackPageView(String pageName) {
+        this.trackPageView(pageName, 0, null);
     }
 
     /**

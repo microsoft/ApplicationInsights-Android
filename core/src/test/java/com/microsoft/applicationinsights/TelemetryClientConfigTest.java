@@ -1,17 +1,18 @@
 package com.microsoft.applicationinsights;
 
+import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.IContextConfig;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-public class CoreTelemetryClientConfigTest extends TestCase {
+public class TelemetryClientConfigTest extends TestCase {
 
-    CoreTelemetryClientConfig config;
+    TelemetryClientConfig config;
 
     public void setUp() throws Exception {
         super.setUp();
-        this.config = new CoreTelemetryClientConfig("ikey");
+        this.config = new TelemetryClientConfig("ikey");
     }
 
     public void tearDown() throws Exception {

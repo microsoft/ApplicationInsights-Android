@@ -1,10 +1,9 @@
 package com.microsoft.applicationinsights.Framework;
 
-import com.microsoft.applicationinsights.channel.ITelemetryContext;
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
-import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.IChannelConfig;
 import com.microsoft.applicationinsights.channel.Sender;
+import com.microsoft.applicationinsights.channel.TelemetryChannel;
+import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 /**
@@ -29,7 +28,7 @@ public class TelemetryChannelWrapper extends TelemetryChannel {
      * @param baseType Value to fill Envelope's ItemType field
      */
     @Override
-    public void send(ITelemetryContext telemetryContext,
+    public void send(TelemetryContext telemetryContext,
                      ITelemetry telemetry,
                      String envelopeName,
                      String baseType) {

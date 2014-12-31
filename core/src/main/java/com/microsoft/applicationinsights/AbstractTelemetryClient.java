@@ -1,7 +1,7 @@
 package com.microsoft.applicationinsights;
 
-import com.microsoft.applicationinsights.channel.ITelemetryContext;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
+import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.Util;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
@@ -21,17 +21,17 @@ import java.util.LinkedHashMap;
  * The public API for recording application insights telemetry.
  * Users would call TelemetryClient.track*
  */
-public class CoreTelemetryClient {
+public abstract class AbstractTelemetryClient<TConfig extends TelemetryClientConfig> {
 
     /**
      * The configuration for this telemetry client.
      */
-    public final CoreTelemetryClientConfig config;
+    public final TConfig config;
 
     /**
      * The telemetry telemetryContext object.
      */
-    protected ITelemetryContext telemetryContext;
+    protected TelemetryContext telemetryContext;
 
     /**
      * The telemetry channel for this client.
@@ -41,8 +41,10 @@ public class CoreTelemetryClient {
     /**
      * Force inheritance via a protected constructor
      */
-    public CoreTelemetryClient(CoreTelemetryClientConfig config) {
+    protected AbstractTelemetryClient(TConfig config) {
         this.config = config;
+        this.telemetryContext = new TelemetryContext(this.config);
+        this.channel = new TelemetryChannel(this.config);
     }
 
     /**
