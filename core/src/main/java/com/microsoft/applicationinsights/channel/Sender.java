@@ -270,13 +270,18 @@ public class Sender {
 
         @Override
         public void run() {
+            IJsonSerializable[] data = null;
             synchronized (Sender.lock) {
                 // send if more than one item is in the queue
                 if(sender.queue.size() > 0 ) {
-                    IJsonSerializable[] data = new IJsonSerializable[sender.queue.size()];
+                    data = new IJsonSerializable[sender.queue.size()];
                     sender.queue.toArray(data);
-                    sender.send(data);
+                    sender.queue.clear();
                 }
+            }
+
+            if(data != null) {
+                sender.send(data);
             }
         }
     }
