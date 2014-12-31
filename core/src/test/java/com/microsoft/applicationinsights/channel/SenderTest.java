@@ -6,17 +6,28 @@ import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializa
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.HttpURLConnection;
 import java.util.LinkedList;
 import java.util.Timer;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class SenderTest extends TestCase {
 
-    TestSender sender;
+    private TestSender sender;
+    private IJsonSerializable item;
+
+    private final int batchInterval = 100;
+    private final int batchMargin = 25;
 
     public void setUp() throws Exception {
         super.setUp();
         this.sender = new TestSender();
+        this.sender.getConfig().setMaxBatchIntervalMs(batchInterval);
+        this.item = new Envelope();
     }
 
     public void tearDown() throws Exception {
@@ -51,9 +62,104 @@ public class SenderTest extends TestCase {
 
     }
 
+    public void testBatchingLimit() {
+        this.sender.getConfig().setMaxBatchCount(3);
+        this.sender.enqueue(this.item);
+
+        // enqueue one item and verify that it did not trigger a send
+        try {
+            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            Assert.assertEquals("batch was not sent before MaxIntervalMs",
+                    1, this.sender.sendSignal.getCount());
+            Assert.assertNotSame("queue is not empty prior to sending data",
+                    this.sender.queue.size(), 0);
+        } catch (InterruptedException e) {
+            Assert.fail("Failed to validate API\n\n" + e.toString());
+        }
+
+        // enqueue two items (to reach maxBatchCount) and verify that data was flushed
+        this.sender.enqueue(this.item);
+        this.sender.enqueue(this.item);
+        try {
+            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            Assert.assertEquals("batch was sent before maxIntervalMs after reaching MaxBatchCount",
+                    0, this.sender.sendSignal.getCount());
+            Assert.assertEquals("queue is empty after sending data",
+                    this.sender.queue.size(), 0);
+        } catch (InterruptedException e) {
+            Assert.fail("Failed to validate API\n\n" + e.toString());
+        }
+    }
+
+    public void testBatchingLimitExceed() {
+        this.sender.getConfig().setMaxBatchCount(3);
+
+        // send 4 items (exceeding maxBatchCount is supported) and verify that data was flushed
+        this.sender.enqueue(this.item);
+        this.sender.enqueue(this.item);
+        this.sender.enqueue(this.item);
+        this.sender.enqueue(this.item);
+        try {
+            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            Assert.assertEquals("second batch was sent before maxIntervalMs after reaching MaxBatchCount",
+                    0, this.sender.sendSignal.getCount());
+            Assert.assertEquals("queue is empty after sending data",
+                    this.sender.queue.size(), 0);
+        } catch (InterruptedException e) {
+            Assert.fail("Failed to validate API\n\n" + e.toString());
+        }
+    }
+
+    public void testBatchingTimer() {
+        this.sender.getConfig().setMaxBatchCount(3);
+
+        // send one item and wait for the queue to flush via the timer
+        this.sender.enqueue(this.item);
+        try {
+            this.sender.sendSignal.await(batchMargin + this.sender.getConfig().getMaxBatchIntervalMs(), TimeUnit.MILLISECONDS);
+            Assert.assertEquals("single item was sent after reaching MaxInterval",
+                    0, this.sender.sendSignal.getCount());
+            Assert.assertEquals("queue is empty after sending data",
+                    this.sender.queue.size(), 0);
+        } catch (InterruptedException e) {
+            Assert.fail("Failed to validate API\n\n" + e.toString());
+        }
+    }
+
+    public void testBatchingFlush() {
+        this.sender.getConfig().setMaxBatchCount(3);
+
+        // send one item and flush it to bypass the timer
+        this.sender.enqueue(this.item);
+        try {
+
+            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            Assert.assertEquals("single item was not sent before reaching MaxInterval",
+                    1, this.sender.sendSignal.getCount());
+            Assert.assertNotSame("queue is not empty prior to sending data",
+                    this.sender.queue.size(), 0);
+
+            this.sender.flush();
+            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            Assert.assertEquals("single item was sent after calling sender.flush",
+                    0, this.sender.sendSignal.getCount());
+            Assert.assertEquals("queue is empty after sending data",
+                    this.sender.queue.size(), 0);
+        } catch (InterruptedException e) {
+            Assert.fail("Failed to validate API\n\n" + e.toString());
+        }
+    }
+
     private class TestSender extends Sender {
+
+        public CountDownLatch sendSignal;
+        public CountDownLatch responseSignal;
+        public StringWriter writer;
+
         public TestSender() {
             super();
+            this.sendSignal = new CountDownLatch(1);
+            this.responseSignal = new CountDownLatch(1);
         }
 
         public LinkedList<IJsonSerializable> getQueue() {
@@ -62,6 +168,25 @@ public class SenderTest extends TestCase {
 
         public Timer getTimer() {
             return this.timer;
+        }
+
+        @Override
+        protected void send(IJsonSerializable[] data) {
+            this.sendSignal.countDown();
+            super.send(data);
+        }
+
+        @Override
+        protected String onResponse(HttpURLConnection connection, int responseCode) {
+            String response = null;
+            this.responseSignal.countDown();
+            return response;
+        }
+
+        @Override
+        protected Writer getWriter(HttpURLConnection connection) throws IOException {
+            this.writer = new StringWriter();
+            return this.writer;
         }
     }
 }
