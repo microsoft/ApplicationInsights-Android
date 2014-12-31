@@ -2,15 +2,19 @@ package com.microsoft.applicationinsights;
 
 import com.microsoft.applicationinsights.channel.ITelemetryContext;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
+import com.microsoft.applicationinsights.channel.Util;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
 import com.microsoft.applicationinsights.channel.contracts.ExceptionData;
 import com.microsoft.applicationinsights.channel.contracts.MessageData;
 import com.microsoft.applicationinsights.channel.contracts.MetricData;
+import com.microsoft.applicationinsights.channel.contracts.PageViewData;
+import com.microsoft.applicationinsights.channel.contracts.RequestData;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 
 /**
@@ -63,17 +67,19 @@ public class CoreTelemetryClient {
      * Track the event by event name and customized properties and metrics.
      *
      * @param eventName  event name
-     * @param properties customized properties
-     * @param metrics    customized metrics
+     * @param properties custom properties
+     * @param measurements    custom metrics
      */
-    public void trackEvent(String eventName,
-                           LinkedHashMap<String, String> properties,
-                           LinkedHashMap<String, Double> metrics) {
-        String localEventName = eventName;
+    public void trackEvent(
+            String eventName,
+            LinkedHashMap<String, String> properties,
+            LinkedHashMap<String, Double> measurements) {
+
         EventData telemetry = new EventData();
-        telemetry.setName(localEventName);
+
+        telemetry.setName(eventName);
         telemetry.setProperties(properties);
-        telemetry.setMeasurements(metrics);
+        telemetry.setMeasurements(measurements);
 
         track(telemetry, EventData.EnvelopeName, EventData.BaseType);
     }
@@ -95,6 +101,7 @@ public class CoreTelemetryClient {
      */
     public void trackTrace(String message, LinkedHashMap<String, String> properties) {
         MessageData telemetry = new MessageData();
+
         telemetry.setMessage(message);
         telemetry.setProperties(properties);
 
@@ -120,7 +127,6 @@ public class CoreTelemetryClient {
      */
     public void trackMetric(String name, double value, LinkedHashMap<String, String> properties) {
         MetricData telemetry = new MetricData();
-        telemetry.setProperties(properties);
 
         // todo: batch in client
         DataPoint data = new DataPoint();
@@ -130,9 +136,11 @@ public class CoreTelemetryClient {
         data.setMax(value);
         data.setName(name);
         data.setValue(value);
-        ArrayList<DataPoint> list = new ArrayList<DataPoint>();
-        list.add(data);
-        telemetry.setMetrics(list);
+        ArrayList<DataPoint> metricsList = new ArrayList<DataPoint>();
+        metricsList.add(data);
+
+        telemetry.setMetrics(metricsList);
+        telemetry.setProperties(properties);
 
         track(telemetry, MetricData.EnvelopeName, MetricData.BaseType);
     }
@@ -158,13 +166,80 @@ public class CoreTelemetryClient {
             localException = new ExceptionData();
         }
 
+        // todo: fill in data and accept a java Exception object as input
         exception.setProperties(properties);
 
         track(localException, ExceptionData.EnvelopeName, ExceptionData.BaseType);
     }
 
     /**
-     * send message to the recorder.
+     * Sends information about a page view to Application Insights.
+     *
+     * @param pageName the name of the page
+     * @param url the url of the page
+     * @param pageLoadDurationMs the duration of the page load
+     * @param properties custom properties
+     * @param measurements    custom metrics
+     */
+    protected void trackPageView(
+            String pageName,
+            String url,
+            long pageLoadDurationMs,
+            LinkedHashMap<String, String> properties,
+            LinkedHashMap<String, Double> measurements) {
+
+        PageViewData telemetry = new PageViewData();
+
+        telemetry.setName(pageName);
+        telemetry.setUrl(url);
+        telemetry.setDuration(Util.msToTimeSpan(pageLoadDurationMs));
+        telemetry.setProperties(properties);
+        telemetry.setMeasurements(measurements);
+
+        track(telemetry, PageViewData.EnvelopeName, PageViewData.BaseType);
+    }
+
+    /**
+     * Sends information about a request to Application Insights.
+     *
+     * @param name hte name of this request
+     * @param url the url for this request
+     * @param httpMethod the http method for this request
+     * @param startTime the start time of this request
+     * @param durationMs the duration of this request in milliseconds
+     * @param responseCode the response code for this request
+     * @param isSuccess the success status of this request
+     * @param properties custom properties
+     * @param measurements    custom metrics
+     */
+    protected void trackRequest(
+            String name,
+            String url,
+            String httpMethod,
+            Date startTime,
+            long durationMs,
+            int responseCode,
+            boolean isSuccess,
+            LinkedHashMap<String, String> properties,
+            LinkedHashMap<String, Double> measurements) {
+
+        RequestData telemetry = new RequestData();
+
+        telemetry.setName(name);
+        telemetry.setUrl(url);
+        telemetry.setHttpMethod(httpMethod);
+        telemetry.setStartTime(Util.dateToISO8601(startTime));
+        telemetry.setDuration(Util.msToTimeSpan(durationMs));
+        telemetry.setResponseCode(String.valueOf(responseCode));
+        telemetry.setSuccess(isSuccess);
+        telemetry.setProperties(properties);
+        telemetry.setMeasurements(measurements);
+
+        track(telemetry, RequestData.EnvelopeName, RequestData.BaseType);
+    }
+
+    /**
+     * Send message to the channel.
      *
      * @param telemetry    telemetry object
      * @param itemDataType data type

@@ -27,32 +27,44 @@ public class TelemetryClient extends CoreTelemetryClient {
     }
 
     /**
-     * Sends information about the page viewed in the application to Application
-     * Insights.
+     * Sends information about a page view to Application Insights.
      *
-     * @param pageName Name of the page
+     * @param pageName the name of the page
+     * @param pageLoadDurationMs the duration of the page load
      */
-    public void trackPageView(String pageName) {
-        this.trackPageView(pageName, null);
+    public void trackPageView(String pageName, long pageLoadDurationMs) {
+        this.trackPageView(pageName, pageLoadDurationMs, null);
     }
 
     /**
-     * Sends information about the page viewed in the application to Application
-     * Insights.
+     * Sends information about a page view to Application Insights.
      *
-     * @param pageName Name of the page
-     * @param properties exception properties
+     * @param pageName the name of the page
+     * @param pageLoadDurationMs the duration of the page load
+     * @param properties custom properties
      */
-    public void trackPageView(String pageName, LinkedHashMap<String, String> properties) {
-        String localPageName = pageName;
-        if (TextUtils.isEmpty(localPageName)) {
-            localPageName = "";
-        }
+    public void trackPageView(
+            String pageName,
+            long pageLoadDurationMs,
+            LinkedHashMap<String, String> properties) {
+        this.trackPageView(pageName, null, pageLoadDurationMs, properties, null);
+    }
 
-        PageViewData telemetry = new PageViewData();
-        telemetry.setName(localPageName);
-        telemetry.setProperties(properties);
-
-        track(telemetry, PageViewData.EnvelopeName, PageViewData.BaseType);
+    /**
+     * Sends information about a page view to Application Insights.
+     *
+     * @param pageName the name of the page
+     * @param url the url of the page
+     * @param pageLoadDurationMs the duration of the page load
+     * @param properties custom properties
+     * @param measurements    custom metrics
+     */
+    public void trackPageView(
+            String pageName,
+            String url,
+            long pageLoadDurationMs,
+            LinkedHashMap<String, String> properties,
+            LinkedHashMap<String, Double> measurements) {
+        super.trackPageView(pageName, null, pageLoadDurationMs, properties, measurements);
     }
 }
