@@ -95,7 +95,7 @@ public class PageViewPerfDataTests extends TestCase
         item.setDomProcessing("Test string");
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"perfTotal\":\"Test string\",\"networkConnect\":\"Test string\",\"sentRequest\":\"Test string\",\"receivedResponse\":\"Test string\",\"domProcessing\":\"Test string\"}";
+        String expected = "{\"ver\":2,\"name\":null,\"perfTotal\":\"Test string\",\"networkConnect\":\"Test string\",\"sentRequest\":\"Test string\",\"receivedResponse\":\"Test string\",\"domProcessing\":\"Test string\"}";
         Assert.assertEquals(expected, writer.toString());
     }
 

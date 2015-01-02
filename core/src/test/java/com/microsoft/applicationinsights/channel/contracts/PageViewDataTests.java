@@ -50,7 +50,7 @@ public class PageViewDataTests extends TestCase
         item.setDuration("Test string");
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"url\":\"Test string\",\"duration\":\"Test string\"}";
+        String expected = "{\"ver\":2,\"name\":null,\"url\":\"Test string\",\"duration\":\"Test string\"}";
         Assert.assertEquals(expected, writer.toString());
     }
 
