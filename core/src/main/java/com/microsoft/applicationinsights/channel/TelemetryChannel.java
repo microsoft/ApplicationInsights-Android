@@ -45,16 +45,6 @@ public class TelemetryChannel {
     }
 
     /**
-     * Constructor for tests
-     * @param config The configuration for this channel
-     * @param sender The sender for this channel
-     */
-    protected TelemetryChannel(IChannelConfig config, Sender sender) {
-        this.sender = sender;
-        this.config = config;
-    }
-
-    /**
      * Records the passed in data.
      *
      * @param telemetryContext The telemetry telemetryContext for this record
@@ -87,21 +77,10 @@ public class TelemetryChannel {
         envelope.setIKey(this.config.getInstrumentationKey());
         envelope.setData(data);
         envelope.setName(envelopeName);
-        envelope.setTime(this.getUtcTime());
+        envelope.setTime(Util.dateToISO8601(new Date()));
         envelope.setTags(telemetryContext.getContextTags());
 
         // send to queue
         this.sender.enqueue(envelope);
-    }
-
-    /**
-     * Gets a UTC formatted time stamp.
-     * @return UTC format string representing the current time.
-     */
-    private String getUtcTime() {
-        TimeZone timeZone = TimeZone.getTimeZone("UTC");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
-        dateFormat.setTimeZone(timeZone);
-        return dateFormat.format(new Date());
     }
 }

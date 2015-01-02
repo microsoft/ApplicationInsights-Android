@@ -16,6 +16,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 /**
  * The public API for recording application insights telemetry.
@@ -204,7 +205,7 @@ public abstract class AbstractTelemetryClient<TConfig extends TelemetryClientCon
     /**
      * Sends information about a request to Application Insights.
      *
-     * @param name hte name of this request
+     * @param name the name of this request
      * @param url the url for this request
      * @param httpMethod the http method for this request
      * @param startTime the start time of this request
@@ -227,6 +228,7 @@ public abstract class AbstractTelemetryClient<TConfig extends TelemetryClientCon
 
         RequestData telemetry = new RequestData();
 
+        telemetry.setId(UUID.randomUUID().toString());
         telemetry.setName(name);
         telemetry.setUrl(url);
         telemetry.setHttpMethod(httpMethod);
