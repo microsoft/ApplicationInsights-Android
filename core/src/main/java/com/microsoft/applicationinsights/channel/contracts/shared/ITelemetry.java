@@ -12,4 +12,9 @@ public interface ITelemetry extends ITelemetryData {
      * Sets the properties.
      */
     public void setProperties(LinkedHashMap<String, String> value);
+
+    /**
+     * Sets the version
+     */
+    public void setVer(int ver);
 }

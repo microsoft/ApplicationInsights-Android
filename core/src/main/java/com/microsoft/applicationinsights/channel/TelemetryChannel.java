@@ -23,7 +23,7 @@ public class TelemetryChannel {
     /**
      * Test hook to the sender
      */
-    protected Sender sender;
+    private Sender sender;
 
     /**
      * Properties associated with this telemetryContext.
@@ -41,6 +41,14 @@ public class TelemetryChannel {
     }
 
     /**
+     * Sets the sender to be used by this channel
+     * @param sender
+     */
+    public void setSender(Sender sender) {
+        this.sender = sender;
+    }
+
+    /**
      * Records the passed in data.
      *
      * @param telemetryContext The telemetry telemetryContext for this record
@@ -52,6 +60,9 @@ public class TelemetryChannel {
                        ITelemetry telemetry,
                        String envelopeName,
                        String baseType) {
+
+        // set the version
+        telemetry.setVer(2);
 
         // add common properties to this telemetry object
         if(this.properties != null) {
