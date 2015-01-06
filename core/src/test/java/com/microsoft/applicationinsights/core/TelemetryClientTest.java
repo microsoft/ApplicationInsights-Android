@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.core;
 
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
@@ -10,6 +10,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -21,18 +22,20 @@ import java.util.concurrent.TimeUnit;
 
 public class TelemetryClientTest extends TestCase {
 
-    private TestTelemetryClient client;
+    private TelemetryClient client;
+    private TestSender sender;
 
     public void setUp() throws Exception {
         super.setUp();
-        this.client = new TestTelemetryClient("2b240a15-4b1c-4c40-a4f0-0e8142116250");
+        this.client = new TelemetryClient("2b240a15-4b1c-4c40-a4f0-0e8142116250");
+        this.sender = new TestSender(1);
+        this.client.channel.setSender(this.sender);
         this.client.config.getSenderConfig().setMaxBatchIntervalMs(10);
     }
 
     public void tearDown() throws Exception {
         try {
-            TestSender sender = this.client.getSender();
-            CountDownLatch signal = sender.responseSignal;
+            CountDownLatch signal = this.sender.responseSignal;
             signal.await(30, TimeUnit.SECONDS);
             Assert.assertEquals("response was received", 0, signal.getCount());
             Assert.assertEquals("response is success", 200, sender.responseCode);
@@ -54,54 +57,38 @@ public class TelemetryClientTest extends TestCase {
     }
 
     public void testTrackException() throws Exception {
-        ExceptionData exception = new ExceptionData();
-        exception.setHandledAt("here");
-        ExceptionDetails detail = new ExceptionDetails();
-        detail.setMessage("message");
-        detail.setStack("stack");
-        detail.setTypeName("core exception");
-        ArrayList<ExceptionDetails> details = new ArrayList<ExceptionDetails>();
-        details.add(detail);
-        exception.setExceptions(details);
-        this.client.trackException(exception);
+        try {
+            throw new InvalidObjectException("this is expected");
+        } catch (InvalidObjectException exception) {
+            this.client.trackException(exception, "core handler", null, null);
+        }
     }
 
     public void testTrackPageView() throws Exception {
-        this.client.trackPageView("core page", null, 10);
+        this.client.trackPageView("core page", null, 10, null, null);
     }
 
     public void testTrackRequest() throws Exception {
-        this.client.trackRequest("core request", "http://google.com", "GET");
+        this.client.trackRequest(
+                "core request", "http://google.com", "GET", new Date(), 50, 200, true, null, null);
     }
 
-    private class TestTelemetryClient extends TelemetryClient<TelemetryClientConfig> {
-        public TestTelemetryClient(String iKey) {
-            super(new TelemetryClientConfig(iKey));
-            this.channel = new TestChannel(this.config);
+    public void testTrackAllRequests() throws Exception {
+
+        this.sender = new TestSender(6);
+        this.client.channel.setSender(this.sender);
+
+        this.sender.getConfig().setMaxBatchCount(100);
+        for(int i = 0; i < 100; i++) {
+            this.testTrackEvent();
+            this.testTrackException();
+            this.testTrackMetric();
+            this.testTrackPageView();
+            this.testTrackRequest();
+            this.testTrackTrace();
         }
 
-        public TestSender getSender(){
-            return ((TestChannel)this.channel).getSender();
-        }
-
-        protected void trackPageView(String pageName, String url, long pageLoadDurationMs) {
-            super.trackPageView(pageName, url, pageLoadDurationMs, null, null);
-        }
-
-        protected void trackRequest(String name, String url, String httpMethod) {
-            super.trackRequest(name, url, httpMethod, new Date(), 50, 200, true, null, null);
-        }
-    }
-
-    private class TestChannel extends TelemetryChannel {
-        public TestChannel(TelemetryClientConfig config){
-            super(config);
-            this.sender = new TestSender();
-        }
-
-        public TestSender getSender() {
-            return (TestSender)this.sender;
-        }
+        this.sender.flush();
     }
 
     private class TestSender extends Sender {
@@ -111,10 +98,10 @@ public class TelemetryClientTest extends TestCase {
         public boolean useFakeWriter;
         public StringWriter writer;
 
-        public TestSender() {
+        public TestSender(int expectedSendCount) {
             super();
             this.responseCode = 0;
-            this.responseSignal = new CountDownLatch(1);
+            this.responseSignal = new CountDownLatch(expectedSendCount);
         }
 
         @Override

@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.core;
 
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
@@ -7,10 +7,12 @@ import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
 import com.microsoft.applicationinsights.channel.contracts.ExceptionData;
+import com.microsoft.applicationinsights.channel.contracts.ExceptionDetails;
 import com.microsoft.applicationinsights.channel.contracts.MessageData;
 import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 import com.microsoft.applicationinsights.channel.contracts.RequestData;
+import com.microsoft.applicationinsights.channel.contracts.StackFrame;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
@@ -22,12 +24,12 @@ import java.util.UUID;
  * The public API for recording application insights telemetry.
  * Users would call TelemetryClient.track*
  */
-public abstract class AbstractTelemetryClient<TConfig extends TelemetryClientConfig> {
+public class TelemetryClient {
 
     /**
      * The configuration for this telemetry client.
      */
-    public final TConfig config;
+    protected TelemetryClientConfig config;
 
     /**
      * The telemetry telemetryContext object.
@@ -40,12 +42,19 @@ public abstract class AbstractTelemetryClient<TConfig extends TelemetryClientCon
     protected TelemetryChannel channel;
 
     /**
-     * Force inheritance via a protected constructor
+     * Construct a new instance of the telemetry client
      */
-    protected TelemetryClient(TConfig config) {
+    protected TelemetryClient(TelemetryClientConfig config) {
         this.config = config;
         this.telemetryContext = new TelemetryContext(this.config);
         this.channel = new TelemetryChannel(this.config);
+    }
+
+    /**
+     * Construct a new instance of the telemetry client
+     */
+    public TelemetryClient(String instrumentationKey) {
+        this(new TelemetryClientConfig(instrumentationKey));
     }
 
     /**
@@ -151,28 +160,45 @@ public abstract class AbstractTelemetryClient<TConfig extends TelemetryClientCon
     /**
      * Track exception with properties.
      *
-     * @param exception exception data object
-     */
-    public void trackException(ExceptionData exception) {
-        this.trackException(exception, null);
-    }
-
-    /**
-     * Track exception with properties.
-     *
      * @param exception  exception data object
      * @param properties exception properties
      */
-    public void trackException(ExceptionData exception, LinkedHashMap<String, String> properties) {
-        ExceptionData localException = exception;
-        if (localException == null) {
-            localException = new ExceptionData();
+    public void trackException(
+            Exception exception,
+            String handledAt,
+            LinkedHashMap<String, String> properties,
+            LinkedHashMap<String, Double> measurements) {
+
+        // read stack frames
+        ArrayList<StackFrame> stackFrames = new ArrayList<StackFrame>();
+        StackTraceElement[] stack = exception.getStackTrace();
+        for(int i = 0; i < stack.length; i++){
+            StackTraceElement rawFrame = stack[i];
+            StackFrame frame = new StackFrame();
+            frame.setAssembly(rawFrame.getClassName());
+            frame.setFileName(rawFrame.getFileName());
+            frame.setLine(rawFrame.getLineNumber());
+            frame.setMethod(rawFrame.getMethodName());
+            frame.setLevel(i);
         }
 
-        // todo: fill in data and accept a java Exception object as input
-        exception.setProperties(properties);
+        // read exception detail
+        ExceptionDetails detail = new ExceptionDetails();
+        detail.setMessage(exception.getMessage());
+        detail.setTypeName(exception.getClass().getName());
+        detail.setHasFullStack(true);
+        detail.setParsedStack(stackFrames);
+        ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
+        exceptions.add(detail);
 
-        track(localException, ExceptionData.EnvelopeName, ExceptionData.BaseType);
+        // populate ExceptionData
+        ExceptionData telemetry = new ExceptionData();
+        telemetry.setHandledAt(handledAt);
+        telemetry.setExceptions(exceptions);
+        telemetry.setProperties(properties);
+        telemetry.setMeasurements(measurements);
+
+        track(telemetry, ExceptionData.EnvelopeName, ExceptionData.BaseType);
     }
 
     /**
@@ -184,7 +210,7 @@ public abstract class AbstractTelemetryClient<TConfig extends TelemetryClientCon
      * @param properties custom properties
      * @param measurements    custom metrics
      */
-    protected void trackPageView(
+    public void trackPageView(
             String pageName,
             String url,
             long pageLoadDurationMs,
@@ -215,7 +241,7 @@ public abstract class AbstractTelemetryClient<TConfig extends TelemetryClientCon
      * @param properties custom properties
      * @param measurements    custom metrics
      */
-    protected void trackRequest(
+    public void trackRequest(
             String name,
             String url,
             String httpMethod,

@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.core;
 
 import com.microsoft.applicationinsights.channel.IChannelConfig;
 import com.microsoft.applicationinsights.channel.IContextConfig;
@@ -13,7 +13,7 @@ public class TelemetryClientConfig implements IChannelConfig, IContextConfig {
     /**
      * The instrumentation key for this telemetryContext
      */
-    protected final String instrumentationKey;
+    protected String instrumentationKey;
 
     /**
      * The account id for this telemetryContext
@@ -41,21 +41,21 @@ public class TelemetryClientConfig implements IChannelConfig, IContextConfig {
      * The account id for this telemetryContext
      */
     public String getAccountId() {
-        return accountId;
+        return this.accountId;
     }
 
     /**
      * The number of milliseconds which must expire before a session is renewed.
      */
     public int getSessionRenewalMs() {
-        return sessionRenewalMs;
+        return this.sessionRenewalMs;
     }
 
     /**
      * The number of milliseconds until a session expires.
      */
     public int getSessionExpirationMs() {
-        return sessionExpirationMs;
+        return this.sessionExpirationMs;
     }
 
     /**

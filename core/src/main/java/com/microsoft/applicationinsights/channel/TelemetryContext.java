@@ -1,6 +1,6 @@
 package com.microsoft.applicationinsights.channel;
 
-import com.microsoft.applicationinsights.TelemetryClientConfig;
+import com.microsoft.applicationinsights.core.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.contracts.Application;
 import com.microsoft.applicationinsights.channel.contracts.Device;
 import com.microsoft.applicationinsights.channel.contracts.Internal;

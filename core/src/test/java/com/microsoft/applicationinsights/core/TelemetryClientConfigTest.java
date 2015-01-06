@@ -1,6 +1,5 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.core;
 
-import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.IContextConfig;
 
 import junit.framework.Assert;
