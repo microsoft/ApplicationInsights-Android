@@ -129,6 +129,7 @@ public class Sender {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
             connection.setDoInput(true);
+            connection.setUseCaches(false);
 
             writer = this.getWriter(connection);
             writer.write('[');
