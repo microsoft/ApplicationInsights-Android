@@ -16,7 +16,8 @@ public class TelemetryChannelWrapper extends TelemetryChannel {
      * @param config The configuration for this recorder
      */
     public TelemetryChannelWrapper(IChannelConfig config, Sender sender) {
-        super(config, sender);
+        super(config);
+        this.sender = sender;
     }
 
     /**

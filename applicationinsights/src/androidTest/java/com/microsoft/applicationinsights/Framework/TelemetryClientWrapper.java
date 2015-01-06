@@ -1,10 +1,10 @@
 package com.microsoft.applicationinsights.Framework;
 
-import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.AndroidTelemetryClient;
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
-public class TelemetryClientWrapper extends TelemetryClient {
+public class TelemetryClientWrapper extends AndroidTelemetryClient {
 
     public TelemetryChannelWrapper channel;
 

@@ -9,13 +9,17 @@ import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializa
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class AbstractTelemetryClientTest extends TestCase {
+public class TelemetryClientTest extends TestCase {
 
     private TestTelemetryClient client;
 
@@ -70,7 +74,7 @@ public class AbstractTelemetryClientTest extends TestCase {
         this.client.trackRequest("core request", "http://google.com", "GET");
     }
 
-    private class TestTelemetryClient extends AbstractTelemetryClient<TelemetryClientConfig>{
+    private class TestTelemetryClient extends TelemetryClient<TelemetryClientConfig> {
         public TestTelemetryClient(String iKey) {
             super(new TelemetryClientConfig(iKey));
             this.channel = new TestChannel(this.config);
@@ -104,6 +108,8 @@ public class AbstractTelemetryClientTest extends TestCase {
 
         public int responseCode;
         public CountDownLatch responseSignal;
+        public boolean useFakeWriter;
+        public StringWriter writer;
 
         public TestSender() {
             super();
@@ -124,6 +130,16 @@ public class AbstractTelemetryClientTest extends TestCase {
             this.responseCode = responseCode;
             this.responseSignal.countDown();
             return response;
+        }
+
+        @Override
+        protected Writer getWriter(HttpURLConnection connection) throws IOException {
+            if(this.useFakeWriter){
+                this.writer = new StringWriter();
+                return this.writer;
+            } else {
+                return new OutputStreamWriter(connection.getOutputStream());
+            }
         }
 
         private String prettyPrintJSON(String payload) {

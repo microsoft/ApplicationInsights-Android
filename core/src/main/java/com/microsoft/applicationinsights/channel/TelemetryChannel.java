@@ -14,10 +14,6 @@ import java.util.TimeZone;
  * This class records telemetry for application insights.
  */
 public class TelemetryChannel {
-    /**
-     * TAG for log cat.
-     */
-    private static final String TAG = "TelemetryChannel";
 
     /**
      * The configuration for this recorder

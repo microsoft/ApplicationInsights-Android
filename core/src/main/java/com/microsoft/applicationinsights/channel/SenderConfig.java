@@ -26,6 +26,10 @@ public class SenderConfig {
      */
     private ILoggingInternal internalLogger;
 
+    /**
+     * Getters and setters
+     **/
+
     public String getEndpointUrl() {
         return endpointUrl;
     }

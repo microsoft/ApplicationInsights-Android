@@ -42,7 +42,7 @@ public abstract class AbstractTelemetryClient<TConfig extends TelemetryClientCon
     /**
      * Force inheritance via a protected constructor
      */
-    protected AbstractTelemetryClient(TConfig config) {
+    protected TelemetryClient(TConfig config) {
         this.config = config;
         this.telemetryContext = new TelemetryContext(this.config);
         this.channel = new TelemetryChannel(this.config);
