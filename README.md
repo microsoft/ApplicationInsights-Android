@@ -24,7 +24,7 @@ dependencies {
 import com.microsoft.applicationinsights.TelemetryClient;
 ```
 ```java
-String instrumentationKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
+String instrumentationKey = "<INSTRUMENTATION_KEY>";
 Context context = this.getApplicationContext();
 TelemetryClient client = new TelemetryClient(instrumentationKey, context);
 
