@@ -131,6 +131,16 @@ public class TelemetryClient {
     }
 
     /**
+     * track the metric.
+     *
+     * @param name  name of the metric
+     * @param value value of the metric
+     */
+    public void trackMetric(String name, long value) {
+        this.trackMetric(name, value, null);
+    }
+
+    /**
      * Track the metric with properties.
      *
      * @param name       metric name
