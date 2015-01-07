@@ -12,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -19,46 +20,68 @@ public class TelemetryClientTest extends TestCase {
 
     private TelemetryClient client;
     private TestSender sender;
+    private LinkedHashMap<String, String> properties;
+    private LinkedHashMap<String, Double> measurements;
 
     public void setUp() throws Exception {
         super.setUp();
         this.client = new TelemetryClient("2b240a15-4b1c-4c40-a4f0-0e8142116250");
         this.sender = new TestSender(1);
         this.client.channel.setSender(this.sender);
-        this.client.config.getSenderConfig().setMaxBatchIntervalMs(10);
+        this.client.config.getSenderConfig().maxBatchIntervalMs = 10;
+        this.properties = new LinkedHashMap<String, String>();
+        this.properties.put("core property", "core value");
+        this.measurements = new LinkedHashMap<String, Double>();
+        this.measurements.put("core measurement", 5.5);
     }
 
     public void testTrackEvent() throws Exception {
-        this.client.trackEvent("core event");
+        this.client.trackEvent(null);
+        this.client.trackEvent("core event1");
+        this.client.trackEvent("core event2", properties);
+        this.client.trackEvent("core event3", properties, measurements);
         this.validate();
     }
 
     public void testTrackTrace() throws Exception {
-        this.client.trackTrace("core trace");
+        this.client.trackTrace(null);
+        this.client.trackTrace("core trace1");
+        this.client.trackTrace("core trace2", properties);
         this.validate();
     }
 
     public void testTrackMetric() throws Exception {
-        this.client.trackMetric("core metric", 0.0);
+        this.client.trackMetric(null, 0);
+        this.client.trackMetric("core metric1", 1.1);
+        this.client.trackMetric("core metric2", 3);
+        this.client.trackMetric("core metric3", 3.3, properties);
+        this.client.trackMetric("core metric3", 4, properties);
         this.validate();
     }
 
     public void testTrackException() throws Exception {
+        this.client.trackException(null);
+        this.client.trackException(new Exception());
         try {
             throw new InvalidObjectException("this is expected");
         } catch (InvalidObjectException exception) {
-            this.client.trackException(exception, "core handler", null, null);
+            this.client.trackException(exception);
+            this.client.trackException(exception, "core handler");
+            this.client.trackException(exception, "core handler1", properties);
+            this.client.trackException(exception, "core handler2", properties, measurements);
         }
 
         this.validate();
     }
 
     public void testTrackPageView() throws Exception {
+        this.client.trackPageView(null, null, 0, null, null);
         this.client.trackPageView("core page", null, 10, null, null);
         this.validate();
     }
 
     public void testTrackRequest() throws Exception {
+        this.client.trackRequest(null, null, null, null, 0, 0, true, null, null);
         this.client.trackRequest("core request", "http://google.com", "GET",
                 new Date(), 50, 200, true, null, null);
         this.validate();
@@ -75,7 +98,7 @@ public class TelemetryClientTest extends TestCase {
             exception = e;
         }
 
-        this.sender.getConfig().setMaxBatchCount(10);
+        this.sender.getConfig().maxBatchCount = 10;
         for(int i = 0; i < 10; i++) {
             this.client.trackEvent("core event");
             this.client.trackTrace("core trace");

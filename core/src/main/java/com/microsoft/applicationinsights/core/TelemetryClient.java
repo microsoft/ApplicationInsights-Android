@@ -34,7 +34,7 @@ public class TelemetryClient {
     /**
      * The telemetry telemetryContext object.
      */
-    protected TelemetryContext telemetryContext;
+    public TelemetryContext context;
 
     /**
      * The telemetry channel for this client.
@@ -46,7 +46,7 @@ public class TelemetryClient {
      */
     protected TelemetryClient(TelemetryClientConfig config) {
         this.config = config;
-        this.telemetryContext = new TelemetryContext(this.config);
+        this.context = new TelemetryContext(this.config);
         this.channel = new TelemetryChannel(this.config);
     }
 
@@ -60,7 +60,7 @@ public class TelemetryClient {
     /**
      * track the event by name.
      *
-     * @param eventName
+     * @param eventName the name of this event
      */
     public void trackEvent(String eventName) {
         trackEvent(eventName, null, null);
@@ -69,7 +69,7 @@ public class TelemetryClient {
     /**
      * track the event by name.
      *
-     * @param eventName
+     * @param eventName the name of this event
      */
     public void trackEvent(String eventName, LinkedHashMap<String, String> properties) {
         trackEvent(eventName, properties, null);
@@ -89,11 +89,11 @@ public class TelemetryClient {
 
         EventData telemetry = new EventData();
 
-        telemetry.setName(eventName);
+        telemetry.setName(this.ensureValid(eventName));
         telemetry.setProperties(properties);
         telemetry.setMeasurements(measurements);
 
-        track(telemetry, EventData.EnvelopeName, EventData.BaseType);
+        track(telemetry);
     }
 
     /**
@@ -114,10 +114,10 @@ public class TelemetryClient {
     public void trackTrace(String message, LinkedHashMap<String, String> properties) {
         MessageData telemetry = new MessageData();
 
-        telemetry.setMessage(message);
+        telemetry.setMessage(this.ensureValid(message));
         telemetry.setProperties(properties);
 
-        track(telemetry, MessageData.EnvelopeName, MessageData.BaseType);
+        track(telemetry);
     }
 
     /**
@@ -150,13 +150,12 @@ public class TelemetryClient {
     public void trackMetric(String name, double value, LinkedHashMap<String, String> properties) {
         MetricData telemetry = new MetricData();
 
-        // todo: batch in client
         DataPoint data = new DataPoint();
         data.setCount(1);
         data.setKind(DataPointType.Measurement);
         data.setMax(value);
         data.setMax(value);
-        data.setName(name);
+        data.setName(this.ensureValid(name));
         data.setValue(value);
         ArrayList<DataPoint> metricsList = new ArrayList<DataPoint>();
         metricsList.add(data);
@@ -164,7 +163,7 @@ public class TelemetryClient {
         telemetry.setMetrics(metricsList);
         telemetry.setProperties(properties);
 
-        track(telemetry, MetricData.EnvelopeName, MetricData.BaseType);
+        track(telemetry);
     }
 
     /**
@@ -214,6 +213,10 @@ public class TelemetryClient {
             LinkedHashMap<String, String> properties,
             LinkedHashMap<String, Double> measurements) {
 
+        if(exception == null) {
+            exception = new Exception();
+        }
+
         // read stack frames
         ArrayList<StackFrame> stackFrames = new ArrayList<StackFrame>();
         StackTraceElement[] stack = exception.getStackTrace();
@@ -231,12 +234,7 @@ public class TelemetryClient {
         // read exception detail
         ExceptionDetails detail = new ExceptionDetails();
         String message = exception.getMessage();
-        if(message == null) {
-            detail.setMessage("");
-        } else {
-            detail.setMessage(message);
-        }
-
+        detail.setMessage(this.ensureValid(message));
         detail.setTypeName(exception.getClass().getName());
         detail.setHasFullStack(true);
         detail.setParsedStack(stackFrames);
@@ -245,12 +243,12 @@ public class TelemetryClient {
 
         // populate ExceptionData
         ExceptionData telemetry = new ExceptionData();
-        telemetry.setHandledAt(handledAt);
+        telemetry.setHandledAt(this.ensureValid(handledAt));
         telemetry.setExceptions(exceptions);
         telemetry.setProperties(properties);
         telemetry.setMeasurements(measurements);
 
-        track(telemetry, ExceptionData.EnvelopeName, ExceptionData.BaseType);
+        track(telemetry);
     }
 
     /**
@@ -271,13 +269,13 @@ public class TelemetryClient {
 
         PageViewData telemetry = new PageViewData();
 
-        telemetry.setName(pageName);
+        telemetry.setName(this.ensureValid(pageName));
         telemetry.setUrl(url);
         telemetry.setDuration(Util.msToTimeSpan(pageLoadDurationMs));
         telemetry.setProperties(properties);
         telemetry.setMeasurements(measurements);
 
-        track(telemetry, PageViewData.EnvelopeName, PageViewData.BaseType);
+        track(telemetry);
     }
 
     /**
@@ -307,9 +305,9 @@ public class TelemetryClient {
         RequestData telemetry = new RequestData();
 
         telemetry.setId(UUID.randomUUID().toString());
-        telemetry.setName(name);
-        telemetry.setUrl(url);
-        telemetry.setHttpMethod(httpMethod);
+        telemetry.setName(this.ensureValid(name));
+        telemetry.setUrl(this.ensureValid(url));
+        telemetry.setHttpMethod(this.ensureValid(httpMethod));
         telemetry.setStartTime(Util.dateToISO8601(startTime));
         telemetry.setDuration(Util.msToTimeSpan(durationMs));
         telemetry.setResponseCode(String.valueOf(responseCode));
@@ -317,17 +315,26 @@ public class TelemetryClient {
         telemetry.setProperties(properties);
         telemetry.setMeasurements(measurements);
 
-        track(telemetry, RequestData.EnvelopeName, RequestData.BaseType);
+        track(telemetry);
     }
 
     /**
      * Send message to the channel.
      *
      * @param telemetry    telemetry object
-     * @param itemDataType data type
-     * @param itemType     item type
      */
-    protected void track(ITelemetry telemetry, String itemDataType, String itemType) {
-        this.channel.send(this.telemetryContext, telemetry, itemDataType, itemType);
+    protected void track(ITelemetry telemetry) {
+        this.channel.send(this.context, telemetry);
+    }
+
+    /**
+     * Ensures required string values are non-null
+     */
+    private String ensureValid(String input) {
+        if(input == null) {
+            return "";
+        } else {
+            return input;
+        }
     }
 }

@@ -27,7 +27,7 @@ public class SenderTest extends TestCase {
     public void setUp() throws Exception {
         super.setUp();
         this.sender = new TestSender();
-        this.sender.getConfig().setMaxBatchIntervalMs(batchInterval);
+        this.sender.getConfig().maxBatchIntervalMs = batchInterval;
         this.item = new Envelope();
     }
 
@@ -64,7 +64,7 @@ public class SenderTest extends TestCase {
     }
 
     public void testBatchingLimit() {
-        this.sender.getConfig().setMaxBatchCount(3);
+        this.sender.getConfig().maxBatchCount = 3;
         this.sender.enqueue(this.item);
 
         // enqueue one item and verify that it did not trigger a send
@@ -93,7 +93,7 @@ public class SenderTest extends TestCase {
     }
 
     public void testBatchingLimitExceed() {
-        this.sender.getConfig().setMaxBatchCount(3);
+        this.sender.getConfig().maxBatchCount = 3;
 
         // send 4 items (exceeding maxBatchCount is supported) and verify that data was flushed
         this.sender.enqueue(this.item);
@@ -112,12 +112,12 @@ public class SenderTest extends TestCase {
     }
 
     public void testBatchingTimer() {
-        this.sender.getConfig().setMaxBatchCount(3);
+        this.sender.getConfig().maxBatchCount = 3;
 
         // send one item and wait for the queue to flush via the timer
         this.sender.enqueue(this.item);
         try {
-            this.sender.sendSignal.await(batchMargin + this.sender.getConfig().getMaxBatchIntervalMs(), TimeUnit.MILLISECONDS);
+            this.sender.sendSignal.await(batchMargin + this.sender.getConfig().maxBatchIntervalMs, TimeUnit.MILLISECONDS);
             Assert.assertEquals("single item was sent after reaching MaxInterval",
                     0, this.sender.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
@@ -128,7 +128,7 @@ public class SenderTest extends TestCase {
     }
 
     public void testBatchingFlush() {
-        this.sender.getConfig().setMaxBatchCount(3);
+        this.sender.getConfig().maxBatchCount = 3;
 
         // send one item and flush it to bypass the timer
         this.sender.enqueue(this.item);

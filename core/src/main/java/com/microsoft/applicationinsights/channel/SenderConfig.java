@@ -1,72 +1,44 @@
 package com.microsoft.applicationinsights.channel;
 
 public class SenderConfig {
+
+    public static final String defaultEndpointUrl = "https://dc.services.visualstudio.com/v2/track";
+    public static final int defaultMaxBatchCount = 100;
+    public static final int defaultMaxBatchIntervalMs = 15 * 1000; // 15 seconds
+    public static final boolean defaultDisableTelemetry = false;
+
     /**
      * The url to which payloads will be sent
      */
-    private String endpointUrl = "https://dc.services.visualstudio.com/v2/track";
+    public String endpointUrl;
 
     /**
      * The maximum size of a batch in bytes
      */
-    private int maxBatchCount = 100;
+    public int maxBatchCount;
 
     /**
      * The maximum interval allowed between calls to batchInvoke
      */
-    private int maxBatchIntervalMs = 15 * 1000; // 15 seconds
+    public int maxBatchIntervalMs; // 15 seconds
 
     /**
      * The master off switch.  Do not send any data if set to TRUE
      */
-    private boolean DisableTelemetry = false;
+    public boolean disableTelemetry;
 
     /**
      * The platform specific internal logging mechanism
      */
-    private ILoggingInternal internalLogger;
+    public ILoggingInternal internalLogger;
 
     /**
-     * Getters and setters
-     **/
-
-    public String getEndpointUrl() {
-        return endpointUrl;
-    }
-
-    public void setEndpointUrl(String endpointUrl) {
-        this.endpointUrl = endpointUrl;
-    }
-
-    public int getMaxBatchCount() {
-        return maxBatchCount;
-    }
-
-    public void setMaxBatchCount(int maxBatchCount) {
-        this.maxBatchCount = maxBatchCount;
-    }
-
-    public int getMaxBatchIntervalMs() {
-        return maxBatchIntervalMs;
-    }
-
-    public void setMaxBatchIntervalMs(int maxBatchIntervalMs) {
-        this.maxBatchIntervalMs = maxBatchIntervalMs;
-    }
-
-    public boolean isDisableTelemetry() {
-        return DisableTelemetry;
-    }
-
-    public void setDisableTelemetry(boolean disableTelemetry) {
-        DisableTelemetry = disableTelemetry;
-    }
-
-    public ILoggingInternal getLogger() {
-        return internalLogger;
-    }
-
-    public void setLogger(ILoggingInternal logger) {
-        this.internalLogger = logger;
+     * Constructs a new instance of the sender config
+     */
+    public SenderConfig() {
+        this.endpointUrl = SenderConfig.defaultEndpointUrl;
+        this.maxBatchCount = SenderConfig.defaultMaxBatchCount;
+        this.maxBatchIntervalMs = SenderConfig.defaultMaxBatchIntervalMs;
+        this.disableTelemetry = SenderConfig.defaultDisableTelemetry;
     }
 }

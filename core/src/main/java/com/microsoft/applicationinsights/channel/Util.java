@@ -20,6 +20,10 @@ public class Util {
      * @return an ISO 8601 string representation of the date
      */
     public static String dateToISO8601(Date date) {
+        if(date == null) {
+            date = new Date();
+        }
+
         String result = dateFormat.format(date);
         return result;
     }
@@ -31,22 +35,22 @@ public class Util {
      */
     public static String msToTimeSpan(long durationMs) {
         if (durationMs <= 0) {
-            return null;
-        } else {
-            long ms = durationMs % 1000;
-            long sec = (durationMs / 1000) % 60;
-            long min = (durationMs / (1000 * 60)) % 60;
-            long hour = (durationMs / (1000 * 60 * 60)) % 24;
-            long days = durationMs / (1000 * 60 * 60 * 24);
-
-            String result;
-            if (days == 0) {
-                result = String.format("%02d:%02d:%02d.%03d", hour, min, sec, ms);
-            } else {
-                result = String.format("%d.%02d:%02d:%02d.%03d", days, hour, min, sec, ms);
-            }
-
-            return result;
+            durationMs = 0;
         }
+
+        long ms = durationMs % 1000;
+        long sec = (durationMs / 1000) % 60;
+        long min = (durationMs / (1000 * 60)) % 60;
+        long hour = (durationMs / (1000 * 60 * 60)) % 24;
+        long days = durationMs / (1000 * 60 * 60 * 24);
+
+        String result;
+        if (days == 0) {
+            result = String.format("%02d:%02d:%02d.%03d", hour, min, sec, ms);
+        } else {
+            result = String.format("%d.%02d:%02d:%02d.%03d", days, hour, min, sec, ms);
+        }
+
+        return result;
     }
 }

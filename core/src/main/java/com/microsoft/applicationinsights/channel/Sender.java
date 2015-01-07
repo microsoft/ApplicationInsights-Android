@@ -82,13 +82,13 @@ public class Sender {
             success = this.queue.add(item);
 
             if (success) {
-                if (this.queue.size() >= this.config.getMaxBatchCount()) {
+                if (this.queue.size() >= this.config.maxBatchCount) {
                     // flush if the queue is full
                     this.flush();
                 } else if (this.queue.size() == 1) {
                     // schedule a FlushTask if this is the first item in the queue
                     this.sendTask = new FlushTask(this);
-                    this.timer.schedule(this.sendTask, this.config.getMaxBatchIntervalMs());
+                    this.timer.schedule(this.sendTask, this.config.maxBatchIntervalMs);
                 }
             }
         }
@@ -121,7 +121,7 @@ public class Sender {
     protected void send(IJsonSerializable[] data) {
         Writer writer = null;
         try {
-            URL url = new URL(this.config.getEndpointUrl());
+            URL url = new URL(this.config.endpointUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setReadTimeout(10000 /* milliseconds */); // todo: move to config
             connection.setConnectTimeout(15000 /* milliseconds */);
@@ -243,7 +243,7 @@ public class Sender {
      * @param message the message to be logged
      */
     private void log(String tag, String message) {
-        ILoggingInternal logger = this.config.getLogger();
+        ILoggingInternal logger = this.config.internalLogger;
         if(logger != null){
             logger.warn(tag, message);
         }

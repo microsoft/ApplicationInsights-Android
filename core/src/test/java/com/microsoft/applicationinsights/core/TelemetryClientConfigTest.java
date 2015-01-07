@@ -1,7 +1,5 @@
 package com.microsoft.applicationinsights.core;
 
-import com.microsoft.applicationinsights.channel.IContextConfig;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -19,21 +17,21 @@ public class TelemetryClientConfigTest extends TestCase {
     }
 
     public void testGetInstrumentationKey() throws Exception {
-        Assert.assertEquals("Ikey is set", "ikey", this.config.getInstrumentationKey());
+        Assert.assertEquals("Ikey is set", "ikey", this.config.instrumentationKey);
     }
 
     public void testGetAccountId() throws Exception {
-        Assert.assertEquals("Account ID is set", null, this.config.getAccountId());
+        Assert.assertEquals("Account ID is set", null, this.config.accountId);
     }
 
     public void testGetSessionRenewalMs() throws Exception {
-        Assert.assertEquals("SessionRenewal is set", IContextConfig.defaultSessionRenewalMs,
-                this.config.getSessionRenewalMs());
+        Assert.assertEquals("SessionRenewal is set", TelemetryClientConfig.defaultSessionRenewalMs,
+                this.config.sessionRenewalMs);
     }
 
     public void testGetSessionExpirationMs() throws Exception {
-        Assert.assertEquals("SessionExpiry is set", IContextConfig.defaultSessionExpirationMs,
-                this.config.getSessionExpirationMs());
+        Assert.assertEquals("SessionExpiry is set", TelemetryClientConfig.defaultSessionExpirationMs,
+                this.config.sessionExpirationMs);
     }
 
     public void testGetSenderConfig() throws Exception {
