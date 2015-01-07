@@ -192,17 +192,25 @@ public class Sender {
             // If it isn't the usual success code (200), log the response from the server.
             if (responseCode != 200) {
                 InputStream inputStream = connection.getErrorStream();
-                InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
-                reader = new BufferedReader(streamReader);
-                String responseLine = reader.readLine();
-                this.log(TAG, "Error response:");
-                while (responseLine != null) {
-                    this.log(TAG, responseLine);
-                    responseBuilder.append(responseLine);
-                    responseLine = reader.readLine();
+                if(inputStream == null) {
+                    inputStream = connection.getInputStream();
                 }
 
-                response = responseBuilder.toString();
+                if(inputStream != null) {
+                    InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
+                    reader = new BufferedReader(streamReader);
+                    String responseLine = reader.readLine();
+                    this.log(TAG, "Error response:");
+                    while (responseLine != null) {
+                        this.log(TAG, responseLine);
+                        responseBuilder.append(responseLine);
+                        responseLine = reader.readLine();
+                    }
+
+                    response = responseBuilder.toString();
+                } else {
+                    response = connection.getResponseMessage();
+                }
             }
         } catch (IOException e) {
             this.log(TAG, e.toString());
