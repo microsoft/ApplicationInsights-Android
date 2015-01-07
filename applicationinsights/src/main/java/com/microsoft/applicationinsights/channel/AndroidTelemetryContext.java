@@ -6,7 +6,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
-import com.microsoft.applicationinsights.AndroidConfig;
+import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.contracts.Application;
 import com.microsoft.applicationinsights.channel.contracts.Device;
 import com.microsoft.applicationinsights.channel.contracts.Internal;
@@ -29,7 +29,7 @@ public class AndroidTelemetryContext extends TelemetryContext {
      * Constructs a new instance of the Telemetry telemetryContext tag keys
      * @param config the configuration for this telemetryContext
      */
-    public AndroidTelemetryContext(AndroidConfig config) {
+    public AndroidTelemetryContext(TelemetryClientConfig config) {
         super(config);
         this.androidAppContext = config.getAppContext(); // todo: use session info
 

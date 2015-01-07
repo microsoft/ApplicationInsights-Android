@@ -9,7 +9,8 @@ import com.microsoft.applicationinsights.channel.SenderConfig;
 /**
  * Configuration object when instantiating TelemetryClient
  */
-public class AndroidConfig extends TelemetryClientConfig {
+public class TelemetryClientConfig extends
+        com.microsoft.applicationinsights.core.TelemetryClientConfig {
 
     /**
      * The application telemetryContext for this recorder
@@ -28,7 +29,7 @@ public class AndroidConfig extends TelemetryClientConfig {
      * @param iKey The instrumentation key for this app
      * @param context The android app context
      */
-    public AndroidConfig(String iKey, Context context){
+    public TelemetryClientConfig(String iKey, Context context){
         super(iKey);
         this.appContext = context;
     }
