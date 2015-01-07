@@ -1,9 +1,12 @@
 package com.microsoft.appinsights_android;
 
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.microsoft.applicationinsights.TelemetryClient;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -12,6 +15,15 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        String instrumentationKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
+        Context context = this.getApplicationContext();
+        TelemetryClient client = new TelemetryClient(instrumentationKey, context);
+
+        client.trackEvent("test app started");
+        client.trackMetric("test app startup complete", 1);
+        client.trackTrace("test app example trace message");
+        client.trackException(new Exception("example exception"));
     }
 
 

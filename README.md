@@ -6,9 +6,11 @@ This project extends the Application Insights API surface to support Android. [A
 
 
 ## Requirements ##
-**Install**
-```
-    TBD
+**Install with gradle**
+```gradle
+dependencies {
+    compile project(':applicationinsights')
+}
 ```
 **Get an instrumentation key**
 >**Note**: an instrumentation key is required before any data can be sent. Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information. To try the SDK without an instrumentation key, set the instrumentationKey config value to a non-empty string.
@@ -18,12 +20,21 @@ This project extends the Application Insights API surface to support Android. [A
 
 ## Usage ##
 **Configuration**
+```java
+import com.microsoft.applicationinsights.TelemetryClient;
+```
+```java
+String instrumentationKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
+Context context = this.getApplicationContext();
+TelemetryClient client = new TelemetryClient(instrumentationKey, context);
+
+```
 **Track events/metrics/traces/exceptions**
-```javascript
-appInsights.trackTrace("example trace");
-appInsights.trackEvent("example event");
-appInsights.trackException(new Error("example error"), "handledAt");
-appInsights.trackMetric("example metric", 1);
+```java
+client.trackTrace("example trace");
+client.trackEvent("example event");
+client.trackException(new Error("example error"), "handledAt");
+client.trackMetric("example metric", 1);
 ```
 
 
