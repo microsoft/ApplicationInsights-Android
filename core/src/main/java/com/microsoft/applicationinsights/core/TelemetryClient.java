@@ -207,7 +207,7 @@ public class TelemetryClient {
         // read stack frames
         ArrayList<StackFrame> stackFrames = new ArrayList<StackFrame>();
         StackTraceElement[] stack = exception.getStackTrace();
-        for(int i = 0; i < stack.length; i++){
+        for(int i = stack.length - 1; i >= 0; i--){
             StackTraceElement rawFrame = stack[i];
             StackFrame frame = new StackFrame();
             frame.setAssembly(rawFrame.getClassName());
