@@ -1,11 +1,14 @@
 package com.microsoft.applicationinsights.channel.contracts;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
+import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 /**
  * Data contract class ExceptionData.
@@ -16,12 +19,16 @@ public class ExceptionData extends Domain implements
     /**
      * Envelope Name for this telemetry.
      */
-    public static final String EnvelopeName = "Microsoft.ApplicationInsights.Exception";
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Exception";
+    }
     
     /**
      * Base Type for this telemetry.
      */
-    public static final String BaseType = "Microsoft.ApplicationInsights.ExceptionData";
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.ExceptionData";
+    }
     
     /**
      * Backing field for property Ver.

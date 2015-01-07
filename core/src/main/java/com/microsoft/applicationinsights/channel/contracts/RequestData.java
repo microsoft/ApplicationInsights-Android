@@ -19,12 +19,16 @@ public class RequestData extends Domain implements
     /**
      * Envelope Name for this telemetry.
      */
-    public static final String EnvelopeName = "Microsoft.ApplicationInsights.Request";
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Request";
+    }
     
     /**
      * Base Type for this telemetry.
      */
-    public static final String BaseType = "Microsoft.ApplicationInsights.RequestData";
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.RequestData";
+    }
     
     /**
      * Backing field for property Ver.

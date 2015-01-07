@@ -19,12 +19,16 @@ public class RemoteDependencyData extends Domain implements
     /**
      * Envelope Name for this telemetry.
      */
-    public static final String EnvelopeName = "Microsoft.ApplicationInsights.RemoteDependency";
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.RemoteDependency";
+    }
     
     /**
      * Base Type for this telemetry.
      */
-    public static final String BaseType = "Microsoft.ApplicationInsights.RemoteDependencyData";
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.RemoteDependencyData";
+    }
     
     /**
      * Backing field for property Ver.

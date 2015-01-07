@@ -19,12 +19,16 @@ public class PageViewPerfData extends PageViewData implements
     /**
      * Envelope Name for this telemetry.
      */
-    public static final String EnvelopeName = "Microsoft.ApplicationInsights.PageViewPerf";
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.PageViewPerf";
+    }
     
     /**
      * Base Type for this telemetry.
      */
-    public static final String BaseType = "Microsoft.ApplicationInsights.PageViewPerfData";
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.PageViewPerfData";
+    }
     
     /**
      * Backing field for property PerfTotal.

@@ -1,10 +1,14 @@
 package com.microsoft.applicationinsights.channel.contracts;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
-
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
+import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 /**
  * Data contract class EventData.
@@ -15,12 +19,16 @@ public class EventData extends Domain implements
     /**
      * Envelope Name for this telemetry.
      */
-    public static final String EnvelopeName = "Microsoft.ApplicationInsights.Event";
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Event";
+    }
     
     /**
      * Base Type for this telemetry.
      */
-    public static final String BaseType = "Microsoft.ApplicationInsights.EventData";
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.EventData";
+    }
     
     /**
      * Backing field for property Ver.

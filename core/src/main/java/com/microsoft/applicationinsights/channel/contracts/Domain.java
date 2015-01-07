@@ -19,12 +19,16 @@ public class Domain implements
     /**
      * Envelope Name for this telemetry.
      */
-    public static final String EnvelopeName = "Microsoft.ApplicationInsights.Do";
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Do";
+    }
     
     /**
      * Base Type for this telemetry.
      */
-    public static final String BaseType = "Microsoft.ApplicationInsights.Domain";
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.Domain";
+    }
     
     /**
      * Initializes a new instance of the <see cref="Domain"/> class.

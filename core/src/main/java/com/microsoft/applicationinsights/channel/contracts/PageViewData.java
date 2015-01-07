@@ -19,12 +19,16 @@ public class PageViewData extends EventData implements
     /**
      * Envelope Name for this telemetry.
      */
-    public static final String EnvelopeName = "Microsoft.ApplicationInsights.PageView";
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.PageView";
+    }
     
     /**
      * Base Type for this telemetry.
      */
-    public static final String BaseType = "Microsoft.ApplicationInsights.PageViewData";
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.PageViewData";
+    }
     
     /**
      * Backing field for property Url.

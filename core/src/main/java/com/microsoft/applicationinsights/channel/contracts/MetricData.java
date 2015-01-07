@@ -19,12 +19,16 @@ public class MetricData extends Domain implements
     /**
      * Envelope Name for this telemetry.
      */
-    public static final String EnvelopeName = "Microsoft.ApplicationInsights.Metric";
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Metric";
+    }
     
     /**
      * Base Type for this telemetry.
      */
-    public static final String BaseType = "Microsoft.ApplicationInsights.MetricData";
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.MetricData";
+    }
     
     /**
      * Backing field for property Ver.

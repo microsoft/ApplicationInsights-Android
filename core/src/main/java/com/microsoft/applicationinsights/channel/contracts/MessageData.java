@@ -19,12 +19,16 @@ public class MessageData extends Domain implements
     /**
      * Envelope Name for this telemetry.
      */
-    public static final String EnvelopeName = "Microsoft.ApplicationInsights.Message";
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Message";
+    }
     
     /**
      * Base Type for this telemetry.
      */
-    public static final String BaseType = "Microsoft.ApplicationInsights.MessageData";
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.MessageData";
+    }
     
     /**
      * Backing field for property Ver.
