@@ -39,7 +39,7 @@ public class TelemetryClient {
     /**
      * The telemetry channel for this client.
      */
-    protected TelemetryChannel channel;
+    public TelemetryChannel channel;
 
     /**
      * Construct a new instance of the telemetry client
@@ -158,10 +158,45 @@ public class TelemetryClient {
     }
 
     /**
-     * Track exception with properties.
+     * Sends information about an exception to Application Insights.
      *
-     * @param exception  exception data object
-     * @param properties exception properties
+     * @param exception the exception to track
+     */
+    public void trackException(Exception exception) {
+        this.trackException(exception, null);
+    }
+
+    /**
+     * Sends information about an exception to Application Insights.
+     *
+     * @param exception the exception to track
+     * @param handledAt the location this exception was handled (null if unhandled)
+     */
+    public void trackException(Exception exception, String handledAt) {
+        this.trackException(exception, handledAt, null);
+    }
+
+    /**
+     * Sends information about an exception to Application Insights.
+     *
+     * @param exception the exception to track
+     * @param handledAt the location this exception was handled (null if unhandled)
+     * @param properties properties associated with this exception
+     */
+    public void trackException(
+            Exception exception,
+            String handledAt,
+            LinkedHashMap<String, String> properties) {
+        this.trackException(exception, handledAt, properties, null);
+    }
+
+    /**
+     * Sends information about an exception to Application Insights.
+     *
+     * @param exception the exception to track
+     * @param handledAt the location this exception was handled (null if unhandled)
+     * @param properties properties associated with this exception
+     * @param measurements measurements associated with this exception
      */
     public void trackException(
             Exception exception,
@@ -180,11 +215,18 @@ public class TelemetryClient {
             frame.setLine(rawFrame.getLineNumber());
             frame.setMethod(rawFrame.getMethodName());
             frame.setLevel(i);
+            stackFrames.add(frame);
         }
 
         // read exception detail
         ExceptionDetails detail = new ExceptionDetails();
-        detail.setMessage(exception.getMessage());
+        String message = exception.getMessage();
+        if(message == null) {
+            detail.setMessage("");
+        } else {
+            detail.setMessage(message);
+        }
+
         detail.setTypeName(exception.getClass().getName());
         detail.setHasFullStack(true);
         detail.setParsedStack(stackFrames);
