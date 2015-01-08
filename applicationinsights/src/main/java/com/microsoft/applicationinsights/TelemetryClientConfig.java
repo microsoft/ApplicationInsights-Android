@@ -5,12 +5,13 @@ import android.content.Context;
 import com.microsoft.applicationinsights.channel.LoggingInternal;
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.SenderConfig;
+import com.microsoft.applicationinsights.common.AbstractTelemetryClientConfig;
 
 /**
  * Configuration object when instantiating TelemetryClient
  */
 public class TelemetryClientConfig extends
-        com.microsoft.applicationinsights.core.TelemetryClientConfig {
+        AbstractTelemetryClientConfig {
 
     /**
      * The application telemetryContext for this recorder
@@ -40,6 +41,6 @@ public class TelemetryClientConfig extends
     static {
         LoggingInternal logger = new LoggingInternal();
         SenderConfig config = Sender.instance.getConfig();
-        config.setLogger(logger);
+        config.setInternalLogger(logger);
     }
 }

@@ -3,7 +3,7 @@
   <component name="FacetManager">
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
-        <option name="GRADLE_PROJECT_PATH" value=":core" />
+        <option name="GRADLE_PROJECT_PATH" value=":common" />
       </configuration>
     </facet>
     <facet type="java-gradle" name="Java-Gradle">
@@ -26,7 +26,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="common" exported="" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-3.8.2" level="project" />
   </component>
 </module>

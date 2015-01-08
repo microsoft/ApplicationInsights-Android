@@ -2,8 +2,9 @@ package com.microsoft.applicationinsights;
 
 import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.AndroidTelemetryContext;
+import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
+import com.microsoft.applicationinsights.common.AbstractTelemetryClient;
 
 import java.util.LinkedHashMap;
 
@@ -12,12 +13,7 @@ import java.util.LinkedHashMap;
  * Users would call TelemetryClient.track*
  */
 public class TelemetryClient extends
-        com.microsoft.applicationinsights.core.TelemetryClient{
-
-    /**
-     * The telemetry client configuration.
-     */
-    public TelemetryClientConfig config;
+        AbstractTelemetryClient<TelemetryClientConfig, TelemetryContext> {
 
     /**
      * Constructor of the class TelemetryClient.
@@ -26,10 +22,26 @@ public class TelemetryClient extends
      * @param context application telemetryContext from the caller
      */
     public TelemetryClient(String iKey, Context context) {
-        super(new TelemetryClientConfig(iKey, context));
-        this.config = (TelemetryClientConfig)super.config;
-        this.telemetryContext = new AndroidTelemetryContext(this.config);
-        this.channel = new TelemetryChannel(this.config);
+        this(new TelemetryClientConfig(iKey, context));
+    }
+
+    /**
+     * Constructor of the class TelemetryClient.
+     *
+     * @param config the configuration for this client
+     */
+    public TelemetryClient(TelemetryClientConfig config) {
+        this(config, new TelemetryContext(config));
+    }
+
+    /**
+     * Constructor of the class TelemetryClient.
+     *
+     * @param config the configuration for this client
+     * @param context application telemetryContext from the caller
+     */
+    private TelemetryClient(TelemetryClientConfig config, TelemetryContext context) {
+        super(config, context);
     }
 
     /**

@@ -1,88 +1,112 @@
-package com.microsoft.applicationinsights.EndToEnd;
+package com.microsoft.applicationinsights;
 
-import android.content.Context;
-import android.test.AndroidTestCase;
-import android.util.Log;
-
-import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
 import junit.framework.Assert;
+import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class TelemetryClientTest extends AndroidTestCase {
+public class TelemetryClientTest extends TestCase {
 
     private TelemetryClient client;
     private TestSender sender;
+    private LinkedHashMap<String, String> properties;
+    private LinkedHashMap<String, Double> measurements;
 
     public void setUp() throws Exception {
         super.setUp();
-        String iKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
-        Context context = this.getContext();
-
-        this.client = new TelemetryClient(iKey, context);
+        this.client = new TelemetryClient("2b240a15-4b1c-4c40-a4f0-0e8142116250");
         this.sender = new TestSender(1);
         this.client.getChannel().setSender(this.sender);
         this.client.getConfig().getSenderConfig().setMaxBatchIntervalMs(10);
+        this.properties = new LinkedHashMap<String, String>();
+        this.properties.put("core property", "core value");
+        this.measurements = new LinkedHashMap<String, Double>();
+        this.measurements.put("core measurement", 5.5);
     }
 
     public void testTrackEvent() throws Exception {
-        this.client.trackEvent("android event");
+        this.client.trackEvent(null);
+        this.client.trackEvent("core event1");
+        this.client.trackEvent("core event2", properties);
+        this.client.trackEvent("core event3", properties, measurements);
         this.validate();
     }
 
     public void testTrackTrace() throws Exception {
-        this.client.trackTrace("android trace");
+        this.client.trackTrace(null);
+        this.client.trackTrace("core trace1");
+        this.client.trackTrace("core trace2", properties);
         this.validate();
     }
 
     public void testTrackMetric() throws Exception {
-        this.client.trackMetric("android metric", 0.0);
+        this.client.trackMetric(null, 0);
+        this.client.trackMetric("core metric1", 1.1);
+        this.client.trackMetric("core metric2", 3);
+        this.client.trackMetric("core metric3", 3.3, properties);
+        this.client.trackMetric("core metric3", 4, properties);
         this.validate();
     }
 
     public void testTrackException() throws Exception {
+        this.client.trackException(null);
+        this.client.trackException(new Exception());
         try {
             throw new InvalidObjectException("this is expected");
         } catch (InvalidObjectException exception) {
-            this.client.trackException(exception, "android handler");
+            this.client.trackException(exception);
+            this.client.trackException(exception, "core handler");
+            this.client.trackException(exception, "core handler1", properties);
+            this.client.trackException(exception, "core handler2", properties, measurements);
         }
 
         this.validate();
     }
 
     public void testTrackPageView() throws Exception {
-        this.client.trackPageView("android page");
+        this.client.trackPageView(null, null, 0, null, null);
+        this.client.trackPageView("core page", null, 10, null, null);
+        this.validate();
+    }
+
+    public void testTrackRequest() throws Exception {
+        this.client.trackRequest(null, null, null, null, 0, 0, true, null, null);
+        this.client.trackRequest("core request", "http://google.com", "GET",
+                new Date(), 50, 200, true, null, null);
         this.validate();
     }
 
     public void testTrackAllRequests() throws Exception {
 
-        this.sender = new TestSender(5);
+        this.sender = new TestSender(6);
         this.client.getChannel().setSender(this.sender);
         Exception exception;
         try {
-            throw new Exception();
-        } catch (Exception e) {
+            throw new InvalidObjectException("this is expected");
+        } catch (InvalidObjectException e) {
             exception = e;
         }
 
         this.sender.getConfig().setMaxBatchCount(10);
-        for (int i = 0; i < 10; i++) {
-            this.client.trackEvent("android event");
-            this.client.trackTrace("android trace");
-            this.client.trackMetric("android metric", 0.0);
-            this.client.trackException(exception, "android handler");
-            this.client.trackPageView("android page");
-            Thread.sleep(10);
+        for(int i = 0; i < 10; i++) {
+            this.client.trackEvent("core event");
+            this.client.trackTrace("core trace");
+            this.client.trackMetric("core metric", 0.0);
+            this.client.trackException(exception, "core handler", null, null);
+            this.client.trackPageView("core page", null, 10, null, null);
+            this.client.trackRequest("core request", "http://google.com", "GET",
+                    new Date(), 50, 200, true, null, null);
         }
 
         this.sender.flush();
@@ -95,13 +119,12 @@ public class TelemetryClientTest extends AndroidTestCase {
             CountDownLatch sendSignal = this.sender.sendSignal;
             rspSignal.await(30, TimeUnit.SECONDS);
 
-            Log.i("PAYLOAD", this.sender.getLastPayload());
-            Log.i("RESPONSE", this.sender.getLastResponse());
+            System.out.println(this.sender.getLastResponse());
 
             if(rspSignal.getCount() < sendSignal.getCount()) {
-                Log.w("BACKEND_ERROR", "response count is lower than send count");
+                System.out.println("response count is lower than send count");
             } else if(sender.responseCode == 206) {
-                Log.w("BACKEND_ERROR", "response is 206, some telemetry was rejected");
+                System.out.println("response is 206, some telemetry was rejected");
             }
 
             if(sender.responseCode != 200) {
@@ -114,12 +137,11 @@ public class TelemetryClientTest extends AndroidTestCase {
         }
     }
 
-    private class TestSender extends Sender {
+    protected class TestSender extends Sender {
 
         public int responseCode;
         public CountDownLatch sendSignal;
         public CountDownLatch responseSignal;
-        private WriterListener writer;
         private String lastResponse;
 
         public TestSender(int expectedSendCount) {
@@ -130,18 +152,12 @@ public class TelemetryClientTest extends AndroidTestCase {
             this.lastResponse = null;
         }
 
-        public String getLastPayload() {
-            String payload = this.writer.stringBuilder.toString();
-            return this.prettyPrintJSON(payload);
-        }
-
         public String getLastResponse() {
             return this.lastResponse;
         }
 
         @Override
         protected void send(IJsonSerializable[] data) {
-            this.sendSignal.countDown();
             super.send(data);
         }
 
@@ -157,8 +173,7 @@ public class TelemetryClientTest extends AndroidTestCase {
         @Override
         protected Writer getWriter(HttpURLConnection connection) throws IOException {
             Writer writer = new OutputStreamWriter(connection.getOutputStream());
-            this.writer = new WriterListener(writer);
-            return this.writer;
+            return writer;
         }
 
         private String prettyPrintJSON(String payload) {
@@ -196,33 +211,6 @@ public class TelemetryClientTest extends AndroidTestCase {
             result.replaceAll("\t", "  ");
 
             return result;
-        }
-
-        private class WriterListener extends Writer {
-
-            private Writer baseWriter;
-            private StringBuilder stringBuilder;
-
-            public WriterListener(Writer baseWriter) {
-                this.baseWriter = baseWriter;
-                this.stringBuilder = new StringBuilder();
-            }
-
-            @Override
-            public void close() throws IOException {
-                baseWriter.close();
-            }
-
-            @Override
-            public void flush() throws IOException {
-                baseWriter.flush();
-            }
-
-            @Override
-            public void write(char[] buf, int offset, int count) throws IOException {
-                stringBuilder.append(buf);
-                baseWriter.write(buf);
-            }
         }
     }
 }
