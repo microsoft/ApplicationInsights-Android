@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * This singleton class sends data to the endpoint
@@ -131,7 +132,6 @@ public class Sender {
             connection.setReadTimeout(10000 /* milliseconds */); // todo: move to config
             connection.setConnectTimeout(15000 /* milliseconds */);
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setUseCaches(false);
@@ -239,7 +239,10 @@ public class Sender {
      * @throws java.io.IOException
      */
     protected Writer getWriter(HttpURLConnection connection) throws IOException {
-        return new OutputStreamWriter(connection.getOutputStream());
+        connection.addRequestProperty("Content-Encoding", "gzip");
+        connection.setRequestProperty("Content-Type", "application/json");
+        GZIPOutputStream gzip = new GZIPOutputStream(connection.getOutputStream(), true);
+        return new OutputStreamWriter(gzip);
     }
 
     /**
