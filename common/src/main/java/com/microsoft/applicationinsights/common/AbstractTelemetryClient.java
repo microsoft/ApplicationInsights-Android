@@ -241,10 +241,9 @@ public abstract class AbstractTelemetryClient<
         for(int i = stack.length - 1; i >= 0; i--){
             StackTraceElement rawFrame = stack[i];
             StackFrame frame = new StackFrame();
-            frame.setAssembly(rawFrame.getClassName());
             frame.setFileName(rawFrame.getFileName());
             frame.setLine(rawFrame.getLineNumber());
-            frame.setMethod(rawFrame.getMethodName());
+            frame.setMethod(rawFrame.getClassName() + "." + rawFrame.getMethodName());
             frame.setLevel(i);
             stackFrames.add(frame);
         }
