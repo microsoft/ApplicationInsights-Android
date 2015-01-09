@@ -30,8 +30,8 @@ public class TelemetryClientTest extends AndroidTestCase {
 
         this.client = new TelemetryClient(iKey, context);
         this.sender = new TestSender(1);
+        this.sender.getConfig().setMaxBatchIntervalMs(20);
         this.client.getChannel().setSender(this.sender);
-        this.client.getConfig().getSenderConfig().setMaxBatchIntervalMs(10);
     }
 
     public void testTrackEvent() throws Exception {
@@ -86,6 +86,7 @@ public class TelemetryClientTest extends AndroidTestCase {
         }
 
         this.sender.flush();
+        Thread.sleep(10);
         this.validate();
     }
 
@@ -95,7 +96,6 @@ public class TelemetryClientTest extends AndroidTestCase {
             CountDownLatch sendSignal = this.sender.sendSignal;
             rspSignal.await(30, TimeUnit.SECONDS);
 
-            Log.i("PAYLOAD", this.sender.getLastPayload());
             Log.i("RESPONSE", this.sender.getLastResponse());
 
             if(rspSignal.getCount() < sendSignal.getCount()) {
@@ -109,6 +109,7 @@ public class TelemetryClientTest extends AndroidTestCase {
             }
 
             Assert.assertEquals("response was received", 0, rspSignal.getCount());
+            Assert.assertEquals("queue is empty", 0, this.sender.getQueueSize());
         } catch (InterruptedException e) {
             Assert.fail(e.toString());
         }
@@ -119,7 +120,6 @@ public class TelemetryClientTest extends AndroidTestCase {
         public int responseCode;
         public CountDownLatch sendSignal;
         public CountDownLatch responseSignal;
-        private WriterListener writer;
         private String lastResponse;
 
         public TestSender(int expectedSendCount) {
@@ -130,13 +130,16 @@ public class TelemetryClientTest extends AndroidTestCase {
             this.lastResponse = null;
         }
 
-        public String getLastPayload() {
-            String payload = this.writer.stringBuilder.toString();
-            return this.prettyPrintJSON(payload);
+        public String getLastResponse() {
+            if (this.lastResponse == null) {
+                return "";
+            } else {
+                return this.lastResponse;
+            }
         }
 
-        public String getLastResponse() {
-            return this.lastResponse;
+        public long getQueueSize() {
+            return this.queue.size();
         }
 
         @Override
@@ -152,13 +155,6 @@ public class TelemetryClientTest extends AndroidTestCase {
             this.responseCode = responseCode;
             this.responseSignal.countDown();
             return response;
-        }
-
-        @Override
-        protected Writer getWriter(HttpURLConnection connection) throws IOException {
-            Writer writer = new OutputStreamWriter(connection.getOutputStream());
-            this.writer = new WriterListener(writer);
-            return this.writer;
         }
 
         private String prettyPrintJSON(String payload) {
