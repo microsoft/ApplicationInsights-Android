@@ -18,6 +18,11 @@ import java.util.UUID;
 public abstract class AbstractTelemetryContext {
 
     /**
+     * The configuration for this context.
+     */
+    protected IContextConfig config;
+
+    /**
      * Application telemetryContext.
      */
     private Application application;
@@ -136,8 +141,7 @@ public abstract class AbstractTelemetryContext {
      * @param config the configuration for this telemetryContext
      */
     protected AbstractTelemetryContext(IContextConfig config) {
-        super();
-
+        this.config = config;
         this.application = new Application();
         this.device = new Device();
         this.location = new Location();
@@ -147,6 +151,9 @@ public abstract class AbstractTelemetryContext {
         this.internal = new Internal();
     }
 
+    /**
+     * @return a map of the context tags assembled in the required data contract format.
+     */
     public LinkedHashMap<String, String> getContextTags() {
         LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
         this.application.addToHashMap(map);
