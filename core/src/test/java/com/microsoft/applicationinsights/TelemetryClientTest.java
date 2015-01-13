@@ -27,8 +27,6 @@ public class TelemetryClientTest extends TestCase {
         super.setUp();
         this.client = new TelemetryClient("2b240a15-4b1c-4c40-a4f0-0e8142116250");
         this.sender = new TestSender(1);
-        this.sender.getConfig().setMaxBatchIntervalMs(20);
-        this.sender.getConfig().setEndpointUrl("http://dc.services.visualstudio.com/v2/track");
         this.client.getChannel().setSender(this.sender);
         this.properties = new LinkedHashMap<String, String>();
         this.properties.put("core property", "core value");
@@ -149,6 +147,8 @@ public class TelemetryClientTest extends TestCase {
 
         public TestSender(int expectedSendCount) {
             super();
+            this.config.setMaxBatchIntervalMs(20);
+            this.config.setEndpointUrl("http://dc.services.visualstudio.com/v2/track");
             this.responseCode = 0;
             this.sendSignal = new CountDownLatch(expectedSendCount);
             this.responseSignal = new CountDownLatch(expectedSendCount);
