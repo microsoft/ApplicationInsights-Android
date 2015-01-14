@@ -15,6 +15,7 @@ import java.io.InvalidObjectException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +23,8 @@ public class TelemetryClientTest extends AndroidTestCase {
 
     private TelemetryClient client;
     private TestSender sender;
+    private LinkedHashMap<String, String> properties;
+    private LinkedHashMap<String, Double> measurements;
 
     public void setUp() throws Exception {
         super.setUp();
@@ -32,6 +35,11 @@ public class TelemetryClientTest extends AndroidTestCase {
         this.sender = new TestSender(1);
         this.sender.getConfig().setMaxBatchIntervalMs(20);
         this.client.getChannel().setSender(this.sender);
+
+        this.properties = new LinkedHashMap<String, String>();
+        this.properties.put("core property", "core value");
+        this.measurements = new LinkedHashMap<String, Double>();
+        this.measurements.put("core measurement", 5.5);
     }
 
     public void testTrackEvent() throws Exception {
@@ -61,6 +69,9 @@ public class TelemetryClientTest extends AndroidTestCase {
 
     public void testTrackPageView() throws Exception {
         this.client.trackPageView("android page");
+        this.client.trackPageView("android page", 50);
+        this.client.trackPageView("android page", 50, this.properties);
+        this.client.trackPageView("android page", 50, this.properties, this.measurements);
         this.validate();
     }
 
