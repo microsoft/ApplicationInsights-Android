@@ -79,7 +79,7 @@ public class Sender {
      */
     public boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
-        if(item == null)
+        if(item == null || this.config.isTelemetryDisabled())
             return false;
 
         boolean success;

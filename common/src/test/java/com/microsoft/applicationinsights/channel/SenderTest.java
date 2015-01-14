@@ -150,6 +150,20 @@ public class SenderTest extends TestCase {
         }
     }
 
+    public void testDisableTelemetry() {
+        this.sender.getConfig().setTelemetryDisabled(true);
+
+        this.sender.enqueue(this.item);
+        long queueSize = this.sender.getQueue().size();
+        Assert.assertEquals("item is not queued when telemetry is disabled", 0, queueSize);
+
+        this.sender.getConfig().setTelemetryDisabled(false);
+
+        this.sender.enqueue(this.item);
+        queueSize = this.sender.getQueue().size();
+        Assert.assertEquals("item is queued when telemetry is enabled", 1, queueSize);
+    }
+
     private class TestSender extends Sender {
 
         public CountDownLatch sendSignal;
