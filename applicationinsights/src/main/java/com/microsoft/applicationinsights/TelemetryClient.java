@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
 public class TelemetryClient extends
         AbstractTelemetryClient<TelemetryClientConfig, TelemetryContext> {
 
+    // todo: write queued telemetry to persistent storage on app exit
+
     /**
      * Constructor of the class TelemetryClient.
      * 

@@ -7,8 +7,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 
 /**
- * The public API for recording application insights telemetry.
- * Users would call TelemetryClient.track*
+ * A basic implementation of the SDK for Java 1.6 (no android dependencies).
  */
 public class TelemetryClient extends
         AbstractTelemetryClient<TelemetryClientConfig, TelemetryContext> {
