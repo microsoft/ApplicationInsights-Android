@@ -26,7 +26,8 @@ import java.util.UUID;
  */
 public abstract class AbstractTelemetryClient<
         TConfig extends AbstractTelemetryClientConfig,
-        TContext extends AbstractTelemetryContext> {
+        TContext extends AbstractTelemetryContext,
+        TChannel extends TelemetryChannel> {
 
     /**
      * The configuration for this telemetry client.
@@ -44,17 +45,18 @@ public abstract class AbstractTelemetryClient<
     protected TelemetryChannel channel;
 
     /**
+     * Properties associated with this telemetryContext.
+     */
+    private LinkedHashMap<String, String> commonProperties;
+
+    /**
      * The telemetry telemetryContext object.
      */
     public TContext getContext() {
-        return context;
-    }
 
-    /**
-     * The telemetry channel for this client.
-     */
-    public TelemetryChannel getChannel() {
-        return channel;
+        // todo: add cloneContext (possibly rename getContext to make it's scope clear)
+
+        return context;
     }
 
     /**
@@ -64,15 +66,33 @@ public abstract class AbstractTelemetryClient<
         return config;
     }
 
+
+    /**
+     * Gets the properties which are common to all telemetry sent from this client.
+     * @return
+     */
+    public LinkedHashMap<String, String> getCommonProperties() {
+        return commonProperties;
+    }
+
+    /**
+     * Sets properties which are common to all telemetry sent form this client.
+     * @param commonProperties a dictionary of properties to send with all telemetry.
+     */
+    public void setCommonProperties(LinkedHashMap<String, String> commonProperties) {
+        this.commonProperties = commonProperties;
+    }
+
     /**
      * Construct a new instance of the telemetry client
      */
     protected AbstractTelemetryClient(
             TConfig config,
-            TContext context) {
+            TContext context,
+            TChannel channel) {
         this.config = config;
         this.context = context;
-        this.channel = new TelemetryChannel(this.config);
+        this.channel = channel;
     }
 
     /**
@@ -336,12 +356,41 @@ public abstract class AbstractTelemetryClient<
     }
 
     /**
-     * Send message to the channel.
+     * Send telemetry to the queue.
      *
      * @param telemetry    telemetry object
      */
     public void track(ITelemetry telemetry) {
-        this.channel.send(this.context, telemetry);
+        this.track(telemetry, this.context);
+    }
+
+    /**
+     * Send telemetry with context to the queue.
+     */
+    public void track(ITelemetry telemetry, TContext context) {
+
+        // set the version
+        telemetry.setVer(2);
+
+        // add common properties to this telemetry object
+        if(this.commonProperties != null) {
+            LinkedHashMap<String, String> map = telemetry.getProperties();
+            if(map != null) {
+                map.putAll(this.commonProperties);
+            }
+
+            telemetry.setProperties(map);
+        }
+
+        this.channel.send(context, telemetry);
+    }
+
+    /**
+     * Triggers an asynchronous flush of the queued telemetry.
+     * note: this will be called after SenderConfig.maxBatchIntervalMs if flush is never called.
+     */
+    public void flush() {
+        this.channel.getSender().flush();
     }
 
     /**

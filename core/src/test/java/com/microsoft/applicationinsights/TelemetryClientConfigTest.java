@@ -20,10 +20,6 @@ public class TelemetryClientConfigTest extends TestCase {
         Assert.assertEquals("Ikey is set", "ikey", this.config.getInstrumentationKey());
     }
 
-    public void testGetAccountId() throws Exception {
-        Assert.assertEquals("Account ID is set", null, this.config.getAccountId());
-    }
-
     public void testGetSessionRenewalMs() throws Exception {
         Assert.assertEquals("SessionRenewal is set", TelemetryClientConfig.defaultSessionRenewalMs,
                 this.config.getSessionRenewalMs());
@@ -35,6 +31,6 @@ public class TelemetryClientConfigTest extends TestCase {
     }
 
     public void testGetSenderConfig() throws Exception {
-        Assert.assertNotNull("Sender config is not null", this.config.getSenderConfig());
+        Assert.assertNotNull("Sender config is not null", this.config.getGlobalSenderConfig());
     }
 }

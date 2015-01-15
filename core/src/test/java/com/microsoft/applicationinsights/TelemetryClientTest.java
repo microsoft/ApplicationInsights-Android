@@ -1,6 +1,8 @@
 package com.microsoft.applicationinsights;
 
 import com.microsoft.applicationinsights.channel.Sender;
+import com.microsoft.applicationinsights.channel.TelemetryChannel;
+import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
 import junit.framework.Assert;
@@ -18,14 +20,14 @@ import java.util.concurrent.TimeUnit;
 
 public class TelemetryClientTest extends TestCase {
 
-    private TelemetryClient client;
+    private TestTelemetryClient client;
     private TestSender sender;
     private LinkedHashMap<String, String> properties;
     private LinkedHashMap<String, Double> measurements;
 
     public void setUp() throws Exception {
         super.setUp();
-        this.client = new TelemetryClient("2b240a15-4b1c-4c40-a4f0-0e8142116250");
+        this.client = new TestTelemetryClient("2b240a15-4b1c-4c40-a4f0-0e8142116250");
         this.sender = new TestSender(1);
         this.client.getChannel().setSender(this.sender);
         this.properties = new LinkedHashMap<String, String>();
@@ -135,6 +137,16 @@ public class TelemetryClientTest extends TestCase {
             Assert.assertEquals("response was received", 0, rspSignal.getCount());
         } catch (InterruptedException e) {
             Assert.fail(e.toString());
+        }
+    }
+
+    protected class TestTelemetryClient extends TelemetryClient {
+        public TestTelemetryClient (String iKey) {
+            super(iKey);
+        }
+
+        public TelemetryChannel getChannel() {
+            return this.channel;
         }
     }
 

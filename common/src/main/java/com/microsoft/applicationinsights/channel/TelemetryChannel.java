@@ -25,26 +25,27 @@ public class TelemetryChannel {
     private Sender sender;
 
     /**
-     * Properties associated with this telemetryContext.
-     */
-    public LinkedHashMap<String, String> properties;
-
-    /**
      * Instantiates a new instance of Sender
      * @param config The configuration for this channel
      */
     public TelemetryChannel(AbstractTelemetryClientConfig config) {
         this.sender = Sender.instance;
         this.config = config;
-        this.properties = null;
     }
 
     /**
      * Sets the sender to be used by this channel
-     * @param sender
+     * @param sender the sender to use for this channel
      */
     public void setSender(Sender sender) {
         this.sender = sender;
+    }
+
+    /**
+     * @return the sender for this channel.
+     */
+    public Sender getSender() {
+        return this.sender;
     }
 
     /**
@@ -54,20 +55,6 @@ public class TelemetryChannel {
      * @param telemetry The telemetry to record
      */
     public void send(AbstractTelemetryContext telemetryContext, ITelemetry telemetry) {
-
-        // set the version
-        telemetry.setVer(2);
-
-        // add common properties to this telemetry object
-        if(this.properties != null) {
-            LinkedHashMap<String, String> map = telemetry.getProperties();
-            if(map != null) {
-                map.putAll(this.properties);
-            }
-
-            telemetry.setProperties(map);
-        }
-
         // wrap the telemetry data in the common schema data
         Data<ITelemetryData> data = new Data<ITelemetryData>();
         data.setBaseData(telemetry);

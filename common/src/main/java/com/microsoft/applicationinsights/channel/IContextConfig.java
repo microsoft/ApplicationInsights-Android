@@ -5,11 +5,6 @@ public interface IContextConfig extends IChannelConfig {
     public static int defaultSessionExpirationMs = 24 * 60 * 60 * 1000; // 24 hours
 
     /**
-     * @return The account id for this telemetryContext
-     */
-    public String getAccountId();
-
-    /**
      * @return The number of milliseconds which must expire before a session is renewed.
      */
     public int getSessionRenewalMs();

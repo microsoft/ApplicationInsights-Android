@@ -7,6 +7,8 @@ public class SenderConfig {
     public static final int defaultMaxBatchIntervalMs = 15 * 1000; // 15 seconds
     public static final boolean defaultDisableTelemetry = false;
 
+    // todo: thread-safe config?
+
     /**
      * The url to which payloads will be sent
      */
@@ -86,20 +88,6 @@ public class SenderConfig {
      */
     public void setTelemetryDisabled(boolean disableTelemetry) {
         this.telemetryDisabled = disableTelemetry;
-    }
-
-    /**
-     * Gets the platform specific internal logging mechanism
-     */
-    public ILoggingInternal getInternalLogger() {
-        return internalLogger;
-    }
-
-    /**
-     * Sets the platform specific internal logging mechanism
-     */
-    public void setInternalLogger(ILoggingInternal internalLogger) {
-        this.internalLogger = internalLogger;
     }
 
     /**

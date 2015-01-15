@@ -16,11 +16,6 @@ public abstract class AbstractTelemetryClientConfig implements IChannelConfig, I
     private String instrumentationKey;
 
     /**
-     * The account id for this telemetryContext
-     */
-    private String accountId;
-
-    /**
      * The number of milliseconds which must expire before a session is renewed.
      */
     private int sessionRenewalMs;
@@ -47,20 +42,6 @@ public abstract class AbstractTelemetryClientConfig implements IChannelConfig, I
      */
     public void setInstrumentationKey(String instrumentationKey) {
         this.instrumentationKey = instrumentationKey;
-    }
-
-    /**
-     * Gets the account id for this telemetryContext
-     */
-    public String getAccountId() {
-        return accountId;
-    }
-
-    /**
-     * Sets the account id for this telemetryContext
-     */
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
     }
 
     /**
@@ -94,7 +75,7 @@ public abstract class AbstractTelemetryClientConfig implements IChannelConfig, I
     /**
      * Gets the sender instance configuration for this channel.
      */
-    public SenderConfig getSenderConfig() {
+    public SenderConfig getGlobalSenderConfig() {
         return senderConfig;
     }
 
@@ -104,7 +85,6 @@ public abstract class AbstractTelemetryClientConfig implements IChannelConfig, I
      */
     protected AbstractTelemetryClientConfig(String iKey){
         this.instrumentationKey = iKey;
-        this.accountId = null;
         this.sessionExpirationMs = IContextConfig.defaultSessionExpirationMs;
         this.sessionRenewalMs = IContextConfig.defaultSessionRenewalMs;
         this.senderConfig = Sender.instance.getConfig();

@@ -26,12 +26,12 @@ public class MainActivity extends ActionBarActivity {
         client.trackTrace("test app example trace message");
         client.trackException(new Exception("example exception"));
 
-        // flush all data asynchronously from the singleton sender
-        Sender.instance.flush();
+        // asynchronously send all queued data
+        client.flush();
 
         // update configuration to flush every 1 second or when 3 items are queued
-        Sender.instance.getConfig().setMaxBatchIntervalMs(1000);
-        Sender.instance.getConfig().setMaxBatchCount(3);
+        client.getConfig().getGlobalSenderConfig().setMaxBatchIntervalMs(1000);
+        client.getConfig().getGlobalSenderConfig().setMaxBatchCount(3);
 
         client.trackEvent("test app started");
         client.trackMetric("test app startup complete", 1);

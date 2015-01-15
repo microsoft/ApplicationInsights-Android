@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.channel.Sender;
+import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
 import junit.framework.Assert;
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TelemetryClientTest extends AndroidTestCase {
 
-    private TelemetryClient client;
+    private TestTelemetryClient client;
     private TestSender sender;
     private LinkedHashMap<String, String> properties;
     private LinkedHashMap<String, Double> measurements;
@@ -31,7 +32,7 @@ public class TelemetryClientTest extends AndroidTestCase {
         String iKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
         Context context = this.getContext();
 
-        this.client = new TelemetryClient(iKey, context);
+        this.client = new TestTelemetryClient(iKey, context);
         this.sender = new TestSender(1);
         this.sender.getConfig().setMaxBatchIntervalMs(20);
         this.client.getChannel().setSender(this.sender);
@@ -123,6 +124,16 @@ public class TelemetryClientTest extends AndroidTestCase {
             Assert.assertEquals("queue is empty", 0, this.sender.getQueueSize());
         } catch (InterruptedException e) {
             Assert.fail(e.toString());
+        }
+    }
+
+    protected class TestTelemetryClient extends TelemetryClient {
+        public TestTelemetryClient (String iKey, Context context) {
+            super(iKey, context);
+        }
+
+        public TelemetryChannel getChannel() {
+            return this.channel;
         }
     }
 

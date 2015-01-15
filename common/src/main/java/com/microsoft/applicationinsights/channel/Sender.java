@@ -57,6 +57,11 @@ public class Sender {
     private TimerTask sendTask;
 
     /**
+     * The internal logger for this sender
+     */
+    private ILoggingInternal logger;
+
+    /**
      * Prevent external instantiation
      */
     protected Sender() {
@@ -70,6 +75,14 @@ public class Sender {
      */
     public SenderConfig getConfig() {
         return config;
+    }
+
+    /**
+     * Sets the internal logging implementation
+     * @param logger
+     */
+    public void setInternalLogger(ILoggingInternal logger) {
+        this.logger = logger;
     }
 
     /**
@@ -251,9 +264,8 @@ public class Sender {
      * @param message the message to be logged
      */
     private void log(String tag, String message) {
-        ILoggingInternal logger = this.config.getInternalLogger();
-        if(logger != null){
-            logger.warn(tag, message);
+        if(this.logger != null) {
+            this.logger.warn(tag, message);
         }
     }
 

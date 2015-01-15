@@ -40,7 +40,6 @@ public class TelemetryClientConfig extends
      */
     static {
         LoggingInternal logger = new LoggingInternal();
-        SenderConfig config = Sender.instance.getConfig();
-        config.setInternalLogger(logger);
+        Sender.instance.setInternalLogger(logger);
     }
 }

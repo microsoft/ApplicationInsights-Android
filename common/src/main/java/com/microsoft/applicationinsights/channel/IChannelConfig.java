@@ -9,5 +9,5 @@ public interface IChannelConfig {
     /**
      * @return The sender instance for this channel
      */
-    public SenderConfig getSenderConfig();
+    public SenderConfig getGlobalSenderConfig();
 }

@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights;
 
+import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.common.AbstractTelemetryClient;
 
@@ -10,7 +11,7 @@ import java.util.LinkedHashMap;
  * A basic implementation of the SDK for Java 1.6 (no android dependencies).
  */
 public class TelemetryClient extends
-        AbstractTelemetryClient<TelemetryClientConfig, TelemetryContext> {
+        AbstractTelemetryClient<TelemetryClientConfig, TelemetryContext, TelemetryChannel> {
 
     /**
      * Construct a new instance of the telemetry client
@@ -22,8 +23,18 @@ public class TelemetryClient extends
     /**
      * Construct a new instance of the telemetry client
      */
-    private TelemetryClient(TelemetryClientConfig config) {
-        super(config, new TelemetryContext(config));
+    protected TelemetryClient(TelemetryClientConfig config) {
+        super(config, new TelemetryContext(config), new TelemetryChannel(config));
+    }
+
+    /**
+     * Construct a new instance of the telemetry client
+     */
+    protected TelemetryClient (
+            TelemetryClientConfig config,
+            TelemetryContext context,
+            TelemetryChannel channel) {
+        super(config, context, channel);
     }
 
     /**

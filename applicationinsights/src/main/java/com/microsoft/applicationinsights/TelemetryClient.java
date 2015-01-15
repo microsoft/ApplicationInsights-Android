@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
  * Users would call TelemetryClient.track*
  */
 public class TelemetryClient extends
-        AbstractTelemetryClient<TelemetryClientConfig, TelemetryContext> {
+        AbstractTelemetryClient<TelemetryClientConfig, TelemetryContext, TelemetryChannel> {
 
     // todo: write queued telemetry to persistent storage on app exit
 
@@ -33,7 +33,7 @@ public class TelemetryClient extends
      * @param config the configuration for this client
      */
     public TelemetryClient(TelemetryClientConfig config) {
-        this(config, new TelemetryContext(config));
+        this(config, new TelemetryContext(config), new TelemetryChannel(config));
     }
 
     /**
@@ -41,9 +41,13 @@ public class TelemetryClient extends
      *
      * @param config the configuration for this client
      * @param context application telemetryContext from the caller
+     * @param channel the channel for this client
      */
-    private TelemetryClient(TelemetryClientConfig config, TelemetryContext context) {
-        super(config, context);
+    private TelemetryClient(
+            TelemetryClientConfig config,
+            TelemetryContext context,
+            TelemetryChannel channel) {
+        super(config, context, channel);
     }
 
     /**
