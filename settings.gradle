@@ -1,1 +1,1 @@
-include ':app', ':applicationinsights', ':core', ':common'
+include ':android-sdk', ':core', ':common'
