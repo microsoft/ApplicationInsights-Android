@@ -12,10 +12,9 @@ dependencies {
     testCompile 'junit:junit:3.+'
 }
 
-sourceSets {
-    unitTest {
-        java.srcDir file('src/test/java')
-        resources.srcDir file('src/test/resources')
+sourceSets {   unitTest {
+        java.srcDir file('test')
+        resources.srcDir file('test/resources')
     }
 }
 
