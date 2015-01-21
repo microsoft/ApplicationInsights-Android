@@ -10,7 +10,6 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:3.+'
-    compile project(':contracts')
 }
 
 sourceSets {

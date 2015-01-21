@@ -7,10 +7,8 @@ import com.microsoft.applicationinsights.channel.contracts.Location;
 import com.microsoft.applicationinsights.channel.contracts.Operation;
 import com.microsoft.applicationinsights.channel.contracts.Session;
 import com.microsoft.applicationinsights.channel.contracts.User;
-import com.microsoft.applicationinsights.common.AbstractTelemetryClientConfig;
 
 import java.util.LinkedHashMap;
-import java.util.UUID;
 
 /**
  * This class is holding all telemetryContext information.
