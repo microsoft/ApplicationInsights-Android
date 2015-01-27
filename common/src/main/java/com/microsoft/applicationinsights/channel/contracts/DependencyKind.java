@@ -4,8 +4,7 @@ package com.microsoft.applicationinsights.channel.contracts;
  */
 public class DependencyKind
 {
-    public static int Undefined = 0;
-    public static int HttpOnly = 1;
-    public static int HttpAny = 2;
-    public static int SQL = 3;
+    public static int SQL = 0;
+    public static int Http = 1;
+    public static int Other = 2;
 }

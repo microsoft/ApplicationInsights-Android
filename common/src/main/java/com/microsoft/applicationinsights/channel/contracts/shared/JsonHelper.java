@@ -137,7 +137,7 @@ public final class JsonHelper {
      *
      * @param writer Writer object
      * @param value IJsonSerializable object
-     * @throws java.io.IOException
+     * @throws IOException
      */
     public static void writeJsonSerializable(Writer writer, IJsonSerializable value)
             throws IOException {
@@ -151,7 +151,7 @@ public final class JsonHelper {
      *
      * @param writer Writer object
      * @param map Map object
-     * @throws java.io.IOException
+     * @throws IOException
      */
     public static <T> void writeDictionary(Writer writer, Map<String, T> map) throws IOException {
         if (map == null || map.size() < 1) {
@@ -191,7 +191,7 @@ public final class JsonHelper {
      *
      * @param writer Writer object
      * @param list List object
-     * @throws java.io.IOException
+     * @throws IOException
      */
     public static <T extends IJsonSerializable> void writeList(Writer writer, List<T> list) throws IOException {
         if (list == null || list.size() < 1) {
@@ -220,7 +220,7 @@ public final class JsonHelper {
      * @param writer The writer to which this item will be emitted
      * @param item The item to write
      * @param <T> The type of the item
-     * @throws java.io.IOException if no handler exists for the type
+     * @throws IOException if no handler exists for the type
      */
     private static <T> void writeItem(Writer writer, T item) throws IOException {
         if (item instanceof String) {

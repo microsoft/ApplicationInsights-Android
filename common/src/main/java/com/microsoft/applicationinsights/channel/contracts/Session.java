@@ -1,11 +1,14 @@
 package com.microsoft.applicationinsights.channel.contracts;
-
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
-
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
+import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 /**
  * Data contract class Session.
@@ -86,13 +89,13 @@ public class Session implements
     public void addToHashMap(LinkedHashMap<String, String> map)
     {
         if (!(this.id == null)) {
-            map.put("id", this.id);
+            map.put("ai.session.id", this.id);
         }
         if (!(this.isFirst == null)) {
-            map.put("isFirst", this.isFirst);
+            map.put("ai.session.isFirst", this.isFirst);
         }
         if (!(this.isNew == null)) {
-            map.put("isNew", this.isNew);
+            map.put("ai.session.isNew", this.isNew);
         }
     }
     

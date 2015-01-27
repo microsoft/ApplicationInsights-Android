@@ -1,11 +1,14 @@
 package com.microsoft.applicationinsights.channel.contracts;
-
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
-
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
+import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 /**
  * Data contract class Device.
@@ -79,9 +82,9 @@ public class Device implements
     private String type;
     
     /**
-     * Backing field for property VmName.
+     * Backing field for property MachineName.
      */
-    private String vmName;
+    private String machineName;
     
     /**
      * Initializes a new instance of the <see cref="Device"/> class.
@@ -274,17 +277,17 @@ public class Device implements
     }
     
     /**
-     * Gets the VmName property.
+     * Gets the MachineName property.
      */
-    public String getVmName() {
-        return this.vmName;
+    public String getMachineName() {
+        return this.machineName;
     }
     
     /**
-     * Sets the VmName property.
+     * Sets the MachineName property.
      */
-    public void setVmName(String value) {
-        this.vmName = value;
+    public void setMachineName(String value) {
+        this.machineName = value;
     }
     
 
@@ -295,46 +298,46 @@ public class Device implements
     public void addToHashMap(LinkedHashMap<String, String> map)
     {
         if (!(this.id == null)) {
-            map.put("id", this.id);
+            map.put("ai.device.id", this.id);
         }
         if (!(this.ip == null)) {
-            map.put("ip", this.ip);
+            map.put("ai.device.ip", this.ip);
         }
         if (!(this.language == null)) {
-            map.put("language", this.language);
+            map.put("ai.device.language", this.language);
         }
         if (!(this.locale == null)) {
-            map.put("locale", this.locale);
+            map.put("ai.device.locale", this.locale);
         }
         if (!(this.model == null)) {
-            map.put("model", this.model);
+            map.put("ai.device.model", this.model);
         }
         if (!(this.network == null)) {
-            map.put("network", this.network);
+            map.put("ai.device.network", this.network);
         }
         if (!(this.oemName == null)) {
-            map.put("oemName", this.oemName);
+            map.put("ai.device.oemName", this.oemName);
         }
         if (!(this.os == null)) {
-            map.put("os", this.os);
+            map.put("ai.device.os", this.os);
         }
         if (!(this.osVersion == null)) {
-            map.put("osVersion", this.osVersion);
+            map.put("ai.device.osVersion", this.osVersion);
         }
         if (!(this.roleInstance == null)) {
-            map.put("roleInstance", this.roleInstance);
+            map.put("ai.device.roleInstance", this.roleInstance);
         }
         if (!(this.roleName == null)) {
-            map.put("roleName", this.roleName);
+            map.put("ai.device.roleName", this.roleName);
         }
         if (!(this.screenResolution == null)) {
-            map.put("screenResolution", this.screenResolution);
+            map.put("ai.device.screenResolution", this.screenResolution);
         }
         if (!(this.type == null)) {
-            map.put("type", this.type);
+            map.put("ai.device.type", this.type);
         }
-        if (!(this.vmName == null)) {
-            map.put("vmName", this.vmName);
+        if (!(this.machineName == null)) {
+            map.put("ai.device.machineName", this.machineName);
         }
     }
     
@@ -454,10 +457,10 @@ public class Device implements
             prefix = ",";
         }
         
-        if (!(this.vmName == null))
+        if (!(this.machineName == null))
         {
-            writer.write(prefix + "\"ai.device.vmName\":");
-            writer.write(JsonHelper.convert(this.vmName));
+            writer.write(prefix + "\"ai.device.machineName\":");
+            writer.write(JsonHelper.convert(this.machineName));
             prefix = ",";
         }
         

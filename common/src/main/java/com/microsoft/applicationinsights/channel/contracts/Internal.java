@@ -1,11 +1,14 @@
 package com.microsoft.applicationinsights.channel.contracts;
-
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
-
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
+import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 /**
  * Data contract class Internal.
@@ -67,10 +70,10 @@ public class Internal implements
     public void addToHashMap(LinkedHashMap<String, String> map)
     {
         if (!(this.sdkVersion == null)) {
-            map.put("sdkVersion", this.sdkVersion);
+            map.put("ai.internal.sdkVersion", this.sdkVersion);
         }
         if (!(this.agentVersion == null)) {
-            map.put("agentVersion", this.agentVersion);
+            map.put("ai.internal.agentVersion", this.agentVersion);
         }
     }
     

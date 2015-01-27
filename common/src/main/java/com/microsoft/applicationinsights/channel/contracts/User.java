@@ -1,11 +1,14 @@
 package com.microsoft.applicationinsights.channel.contracts;
-
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
-
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
+import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 /**
  * Data contract class User.
@@ -105,16 +108,16 @@ public class User implements
     public void addToHashMap(LinkedHashMap<String, String> map)
     {
         if (!(this.accountAcquisitionDate == null)) {
-            map.put("accountAcquisitionDate", this.accountAcquisitionDate);
+            map.put("ai.user.accountAcquisitionDate", this.accountAcquisitionDate);
         }
         if (!(this.accountId == null)) {
-            map.put("accountId", this.accountId);
+            map.put("ai.user.accountId", this.accountId);
         }
         if (!(this.userAgent == null)) {
-            map.put("userAgent", this.userAgent);
+            map.put("ai.user.userAgent", this.userAgent);
         }
         if (!(this.id == null)) {
-            map.put("id", this.id);
+            map.put("ai.user.id", this.id);
         }
     }
     

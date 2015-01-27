@@ -192,21 +192,7 @@ public class DeviceTests extends TestCase
         actual = item.getType();
         Assert.assertEquals(expected, actual);
     }
-    
-    public void testVm_namePropertyWorksAsExpected()
-    {
-        String expected = "Test string";
-        Device item = new Device();
-        item.setVmName(expected);
-        String actual = item.getVmName();
-        Assert.assertEquals(expected, actual);
-        
-        expected = "Other string";
-        item.setVmName(expected);
-        actual = item.getVmName();
-        Assert.assertEquals(expected, actual);
-    }
-    
+
     public void testSerialize() throws IOException
     {
         Device item = new Device();
@@ -223,10 +209,9 @@ public class DeviceTests extends TestCase
         item.setRoleName("Test string");
         item.setScreenResolution("Test string");
         item.setType("Test string");
-        item.setVmName("Test string");
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"ai.device.id\":\"Test string\",\"ai.device.ip\":\"Test string\",\"ai.device.language\":\"Test string\",\"ai.device.locale\":\"Test string\",\"ai.device.model\":\"Test string\",\"ai.device.network\":\"Test string\",\"ai.device.oemName\":\"Test string\",\"ai.device.os\":\"Test string\",\"ai.device.osVersion\":\"Test string\",\"ai.device.roleInstance\":\"Test string\",\"ai.device.roleName\":\"Test string\",\"ai.device.screenResolution\":\"Test string\",\"ai.device.type\":\"Test string\",\"ai.device.vmName\":\"Test string\"}";
+        String expected = "{\"ai.device.id\":\"Test string\",\"ai.device.ip\":\"Test string\",\"ai.device.language\":\"Test string\",\"ai.device.locale\":\"Test string\",\"ai.device.model\":\"Test string\",\"ai.device.network\":\"Test string\",\"ai.device.oemName\":\"Test string\",\"ai.device.os\":\"Test string\",\"ai.device.osVersion\":\"Test string\",\"ai.device.roleInstance\":\"Test string\",\"ai.device.roleName\":\"Test string\",\"ai.device.screenResolution\":\"Test string\",\"ai.device.type\":\"Test string\"}";
         Assert.assertEquals(expected, writer.toString());
     }
 
