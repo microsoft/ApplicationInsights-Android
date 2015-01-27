@@ -6,12 +6,28 @@ This project extends the Application Insights API surface to support Android. [A
 
 
 ## Requirements ##
-**Install with gradle**
+
+
+
+
+>_****temporary - until hosted publicly****_
+
+>- clone and build locally
+- copy android-sdk.aar and common.jar into your libs folder
+- reference the libs folder from gradle and add to dependencies
+
 ```gradle
-dependencies {
-    compile project(':applicationinsights')
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
 }
+
+compile(name: 'android-sdk-debug', ext: 'aar')
 ```
+
+
+
 **Get an instrumentation key**
 >**Note**: an instrumentation key is required before any data can be sent. Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information. To try the SDK without an instrumentation key, set the instrumentationKey config value to a non-empty string.
 
