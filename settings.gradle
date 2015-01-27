@@ -1,1 +1,1 @@
-include ':android-sdk', ':common', ':java16-sdk'
+include ':android-sdk', ':common'
