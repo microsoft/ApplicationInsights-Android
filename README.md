@@ -10,9 +10,9 @@ This project extends the Application Insights API surface to support Android. [A
 
 
 
->_****temporary - until hosted publicly****_
+**Build SDK and add to your project**
 
->- clone and build locally
+- clone the repo and build locally
 - copy android-sdk.aar and common.jar into your libs folder
 - reference the libs folder from gradle and add to dependencies
 
