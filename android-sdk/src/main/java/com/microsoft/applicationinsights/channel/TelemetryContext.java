@@ -3,6 +3,8 @@ package com.microsoft.applicationinsights.channel;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -11,9 +13,11 @@ import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.contracts.Application;
 import com.microsoft.applicationinsights.channel.contracts.Device;
 import com.microsoft.applicationinsights.channel.contracts.Session;
+import com.microsoft.applicationinsights.channel.contracts.User;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -24,6 +28,7 @@ public class TelemetryContext extends AbstractTelemetryContext {
     protected static final String SHARED_PREFERENCES_KEY = "APPINSIGHTS_CONTEXT";
     protected static final String SESSION_ID_KEY = "SESSION_ID";
     protected static final String SESSION_ACQUISITION_KEY = "SESSION_ACQUISITION";
+    protected static final String USER_ID_KEY = "USER_ID";
 
     /**
      * Android app telemetryContext.
@@ -59,6 +64,7 @@ public class TelemetryContext extends AbstractTelemetryContext {
         this.setAppContext();
         this.setDeviceContext();
         this.setSessionContext();
+        this.setUserContext();
     }
 
     /**
@@ -97,23 +103,54 @@ public class TelemetryContext extends AbstractTelemetryContext {
         }
 
         // check device type
-        final TelephonyManager manager = (TelephonyManager)
-                this.androidAppContext.getSystemService(android.content.Context.TELEPHONY_SERVICE);
-        if (manager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE) {
+        final TelephonyManager telephonyManager = (TelephonyManager)
+                this.androidAppContext.getSystemService(Context.TELEPHONY_SERVICE);
+        if (telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE) {
             context.setType("Phone");
         } else {
             context.setType("Tablet");
+        }
+
+        // check network type
+        final ConnectivityManager connectivityManager = (ConnectivityManager)
+                this.androidAppContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        if (activeNetwork != null) {
+            int networkType = activeNetwork.getType();
+            switch (networkType) {
+                case ConnectivityManager.TYPE_WIFI:
+                    context.setNetwork("WiFi");
+                    break;
+                case ConnectivityManager.TYPE_MOBILE:
+                    context.setNetwork("Mobile");
+            }
         }
 
         context.setOsVersion(Build.VERSION.RELEASE);
         context.setOs("Android");
         context.setOemName(Build.MANUFACTURER);
         context.setModel(Build.MODEL);
-        context.setLocale(java.util.Locale.getDefault().toString());
+        context.setLocale(Locale.getDefault().toString());
+        context.setLanguage(Locale.getDefault().getLanguage());
     }
 
     /**
-     * Sets the session context tags
+     * Sets the user context
+     */
+    private void setUserContext() {
+        String userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
+        if(userId == null) {
+            userId = UUID.randomUUID().toString();
+            SharedPreferences.Editor editor = this.settings.edit();
+            editor.putString(TelemetryContext.USER_ID_KEY, userId);
+        }
+
+        User context = this.getUser();
+        context.setId(userId);
+    }
+
+    /**
+     * Sets the session context
      */
     private void setSessionContext() {
 

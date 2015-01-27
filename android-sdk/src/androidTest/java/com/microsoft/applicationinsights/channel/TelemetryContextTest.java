@@ -8,12 +8,14 @@ import com.microsoft.applicationinsights.TelemetryClientConfig;
 import junit.framework.Assert;
 
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 public class TelemetryContextTest extends AndroidTestCase {
 
-    private final String idKey = "id";
-    private final String isFirstKey = "isFirst";
-    private final String isNewKey = "isNew";
+    private final String sessionIdKey = "ai.session.id";
+    private final String sessionIsFirstKey = "ai.session.isFirst";
+    private final String sessionIsNewKey = "ai.session.isNew";
+    private final String userIdKey = "ai.user.id";
 
     private final int renewalTime = 50;
     private final int expireTime = 250;
@@ -30,11 +32,36 @@ public class TelemetryContextTest extends AndroidTestCase {
                 TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
         editor.putString(TelemetryContext.SESSION_ID_KEY, "");
         editor.putLong(TelemetryContext.SESSION_ACQUISITION_KEY, 0);
+        editor.putString(TelemetryContext.USER_ID_KEY, null);
         editor.commit();
     }
 
     public void tearDown() throws Exception {
 
+    }
+
+    public void testUserContextInitialization() {
+        TestContext tc = new TestContext(this.config);
+
+        String id = tc.getContextTags().get(userIdKey);
+        try {
+            UUID guidId = UUID.fromString(id);
+            Assert.assertNotNull("generated ID is a valid GUID", guidId);
+        } catch (Exception e) {
+            Assert.fail("id was not properly initialized by constructor\n" + e.toString());
+        }
+    }
+
+    public void testUserContextPersistence() {
+        SharedPreferences.Editor editor = this.getContext().getSharedPreferences(
+                TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
+        editor.putString(TelemetryContext.USER_ID_KEY, "test value");
+        editor.commit();
+
+        // this should load context from shared storage to match firstId
+        TestContext tc = new TestContext(this.config);
+        String newId = tc.getContextTags().get(userIdKey);
+        Assert.assertEquals("ID persists in local storage", "test value", newId);
     }
 
     public void testSessionContextInitialization() throws Exception {
@@ -86,9 +113,9 @@ public class TelemetryContextTest extends AndroidTestCase {
 
     private String checkSessionTags(TelemetryContext tc, String message, String id, String isFirst, String isNew) {
         LinkedHashMap<String, String> tags = tc.getContextTags();
-        String _id = tags.get(idKey);
-        String _isFirst = tags.get(isFirstKey);
-        String _isNew = tags.get(isNewKey);
+        String _id = tags.get(sessionIdKey);
+        String _isFirst = tags.get(sessionIsFirstKey);
+        String _isNew = tags.get(sessionIsNewKey);
 
         if(id != null) {
             assertEquals(message + " - id", id, _id);

@@ -5,7 +5,7 @@ This project extends the Application Insights API surface to support Android. [A
 
 
 
-## Requirements ##
+## Setup ##
 
 
 
@@ -29,13 +29,25 @@ compile(name: 'android-sdk-debug', ext: 'aar')
 
 
 **Get an instrumentation key**
->**Note**: an instrumentation key is required before any data can be sent. Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information. To try the SDK without an instrumentation key, set the instrumentationKey config value to a non-empty string.
+
+Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information. To try the SDK without an instrumentation key, set the instrumentationKey config value to a non-empty string.
+>**Note**: an instrumentation key is required before any data can be viewed in the Azure portal.
+
+**Allow the following permissions in your AndroidManifest.xml**
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```
+
 
 
 
 
 ## Usage ##
-**Configuration**
+**Track an activity**
+
+From an activity in your app, import and instantiate a telemetry client
 ```java
 import com.microsoft.applicationinsights.TelemetryClient;
 ```
@@ -43,8 +55,8 @@ import com.microsoft.applicationinsights.TelemetryClient;
 String instrumentationKey = "<INSTRUMENTATION_KEY>";
 Context context = this.getApplicationContext();
 TelemetryClient client = new TelemetryClient(instrumentationKey, context);
-
 ```
+Override the onStart and onStop methods and track events
 **Track events/metrics/traces/exceptions**
 ```java
 client.trackTrace("example trace");
@@ -52,6 +64,9 @@ client.trackEvent("example event");
 client.trackException(new Error("example error"), "handledAt");
 client.trackMetric("example metric", 1);
 ```
+
+
+
 
 
 ## Contributing ##
