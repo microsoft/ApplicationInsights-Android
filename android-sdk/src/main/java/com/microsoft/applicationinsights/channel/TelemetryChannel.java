@@ -1,13 +1,12 @@
 package com.microsoft.applicationinsights.channel;
 
+import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
-import com.microsoft.applicationinsights.common.AbstractTelemetryClientConfig;
 
 import java.util.Date;
-import java.util.LinkedHashMap;
 
 /**
  * This class records telemetry for application insights.
@@ -28,7 +27,7 @@ public class TelemetryChannel {
      * Instantiates a new instance of Sender
      * @param config The configuration for this channel
      */
-    public TelemetryChannel(AbstractTelemetryClientConfig config) {
+    public TelemetryChannel(TelemetryClientConfig config) {
         this.sender = Sender.instance;
         this.config = config;
     }
@@ -54,7 +53,7 @@ public class TelemetryChannel {
      * @param telemetryContext The telemetry telemetryContext for this record
      * @param telemetry The telemetry to record
      */
-    public void send(AbstractTelemetryContext telemetryContext, ITelemetry telemetry) {
+    public void send(TelemetryContext telemetryContext, ITelemetry telemetry) {
         // wrap the telemetry data in the common schema data
         Data<ITelemetryData> data = new Data<ITelemetryData>();
         data.setBaseData(telemetry);

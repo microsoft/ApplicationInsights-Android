@@ -12,6 +12,9 @@ import android.telephony.TelephonyManager;
 import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.contracts.Application;
 import com.microsoft.applicationinsights.channel.contracts.Device;
+import com.microsoft.applicationinsights.channel.contracts.Internal;
+import com.microsoft.applicationinsights.channel.contracts.Location;
+import com.microsoft.applicationinsights.channel.contracts.Operation;
 import com.microsoft.applicationinsights.channel.contracts.Session;
 import com.microsoft.applicationinsights.channel.contracts.User;
 
@@ -23,12 +26,17 @@ import java.util.UUID;
 /**
  * This class is holding all telemetryContext information.
  */
-public class TelemetryContext extends AbstractTelemetryContext {
+public class TelemetryContext {
 
     protected static final String SHARED_PREFERENCES_KEY = "APPINSIGHTS_CONTEXT";
     protected static final String SESSION_ID_KEY = "SESSION_ID";
     protected static final String SESSION_ACQUISITION_KEY = "SESSION_ACQUISITION";
     protected static final String USER_ID_KEY = "USER_ID";
+
+    /**
+     * The configuration for this context.
+     */
+    protected IContextConfig config;
 
     /**
      * Android app telemetryContext.
@@ -51,16 +59,145 @@ public class TelemetryContext extends AbstractTelemetryContext {
     private SharedPreferences settings;
 
     /**
+     * Application telemetryContext.
+     */
+    private Application application;
+
+    /**
+     * Device telemetryContext.
+     */
+    private Device device;
+
+    /**
+     * Location telemetryContext.
+     */
+    private Location location;
+
+    /**
+     * Operation telemetryContext.
+     */
+    private Operation operation;
+
+    /**
+     * Session telemetryContext.
+     */
+    private Session session;
+
+    /**
+     * User telemetryContext.
+     */
+    private User user;
+
+    /**
+     * Internal telemetryContext.
+     */
+    private Internal internal;
+
+
+    /**
+     * Get user telemetryContext.
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * Set user telemetryContext.
+     */
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    /**
+     * Get device telemetryContext.
+     */
+    public Device getDevice() {
+        return device;
+    }
+
+    /**
+     * Set device telemetryContext.
+     */
+    public void setDevice(Device device) {
+        this.device = device;
+    }
+
+    /**
+     * Get locaction context
+     * @return
+     */
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    /**
+     * Operation telemetryContext.
+     */
+    public Operation getOperation() {
+        return operation;
+    }
+
+    /**
+     * Operation telemetryContext.
+     */
+    public void setOperation(Operation operation) {
+        this.operation = operation;
+    }
+
+    /**
+     * Session telemetryContext.
+     */
+    public Session getSession() {
+        return session;
+    }
+
+    /**
+     * Session telemetryContext.
+     */
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    /**
+     * Application telemetryContext.
+     */
+    public Application getApplication() {
+        return application;
+    }
+
+    /**
+     * Application telemetryContext.
+     */
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+
+    /**
      * Constructs a new instance of the Telemetry telemetryContext tag keys
      * @param config the configuration for this telemetryContext
      */
     public TelemetryContext(TelemetryClientConfig config) {
-        super(config);
 
+        // initialization
+        this.config = config;
+        this.application = new Application();
+        this.device = new Device();
+        this.location = new Location();
+        this.operation = new Operation();
+        this.session = new Session();
+        this.user = new User();
+        this.internal = new Internal();
+
+        // get an instance of the shared preferences manager for persistent context fields
         this.androidAppContext = config.getAppContext();
         this.settings = androidAppContext.getSharedPreferences(
                 TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
 
+        // initialize default values for all context objects
         this.setAppContext();
         this.setDeviceContext();
         this.setSessionContext();
@@ -68,13 +205,23 @@ public class TelemetryContext extends AbstractTelemetryContext {
     }
 
     /**
-     * Update the session context and
      * @return a map of the context tags assembled in the required data contract format.
      */
-    @Override
     public LinkedHashMap<String, String> getContextTags() {
+        // update session context
         this.updateSessionContext();
-        return super.getContextTags();
+
+        // create a new hash map and add all context to it
+        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+        this.application.addToHashMap(map);
+        this.device.addToHashMap(map);
+        this.location.addToHashMap(map);
+        this.operation.addToHashMap(map);
+        this.session.addToHashMap(map);
+        this.user.addToHashMap(map);
+        this.internal.addToHashMap(map);
+
+        return map;
     }
 
     /**
