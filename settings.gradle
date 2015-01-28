@@ -1,1 +1,2 @@
 include ':android-sdk', ':common'
+rootProject.name='android-sdk'

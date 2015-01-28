@@ -1,4 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = projectGroup
+version = projectVersion
 
 android {
     compileSdkVersion 21
@@ -19,8 +24,67 @@ android {
     }
 }
 
+bintray {
+    user = bintray_user
+    key = bintray_key
+
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = project.name
+        desc = 'Application Insights SDK for Android'
+        websiteUrl = projectRepo
+        issueTrackerUrl = projectRepo + '/issues'
+        vcsUrl = projectRepo + '.git'
+        licenses = ['mit']
+        labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            vcsTag = '0.0.2'
+            gpg {
+                sign = true
+                passphrase = bintray_gpg_passphrase
+            }
+            // mavenCentralSync {
+            //     sync = true
+            //     user = maven_user
+            //     password = maven_password
+            // }
+        }
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging 'aar'
+            name project.name
+            url projectRepo
+            licenses {
+                license {
+                    name 'MIT'
+                    url 'http://opensource.org/licenses/MIT'
+                }
+            }
+            developers {
+                developer {
+                    id 'appinsights-android'
+                    email 'appinsights-android@microsoft.com'
+                }
+            }
+            scm {
+                connection projectRepo + '.git'
+                developerConnection projectRepo + '.git'
+                url projectRepo
+            }
+        }
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile project(':common')
 }
+
