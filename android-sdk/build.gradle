@@ -36,7 +36,7 @@ bintray {
         websiteUrl = projectRepo
         issueTrackerUrl = projectRepo + '/issues'
         vcsUrl = projectRepo + '.git'
-        licenses = ['mit']
+        licenses = ['MIT']
         labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
         publicDownloadNumbers = true
         version {
