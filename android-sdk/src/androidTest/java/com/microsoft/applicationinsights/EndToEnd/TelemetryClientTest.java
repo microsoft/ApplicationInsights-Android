@@ -44,25 +44,39 @@ public class TelemetryClientTest extends AndroidTestCase {
     }
 
     public void testTrackEvent() throws Exception {
-        this.client.trackEvent("android event");
+        this.client.trackEvent(null);
+        this.client.trackEvent("event1");
+        this.client.trackEvent("event2", properties);
+        this.client.trackEvent("event3", properties, measurements);
         this.validate();
     }
 
     public void testTrackTrace() throws Exception {
-        this.client.trackTrace("android trace");
+        this.client.trackTrace(null);
+        this.client.trackTrace("trace1");
+        this.client.trackTrace("trace2", properties);
         this.validate();
     }
 
     public void testTrackMetric() throws Exception {
-        this.client.trackMetric("android metric", 0.0);
+        this.client.trackMetric(null, 0);
+        this.client.trackMetric("metric1", 1.1);
+        this.client.trackMetric("metric2", 3);
+        this.client.trackMetric("metric3", 3.3, properties);
+        this.client.trackMetric("metric3", 4, properties);
         this.validate();
     }
 
     public void testTrackException() throws Exception {
+        this.client.trackException(null);
+        this.client.trackException(new Exception());
         try {
             throw new InvalidObjectException("this is expected");
         } catch (InvalidObjectException exception) {
-            this.client.trackException(exception, "android handler");
+            this.client.trackException(exception);
+            this.client.trackException(exception, "core handler");
+            this.client.trackException(exception, "core handler1", properties);
+            this.client.trackException(exception, "core handler2", properties, measurements);
         }
 
         this.validate();
