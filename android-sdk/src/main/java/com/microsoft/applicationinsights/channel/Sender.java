@@ -1,5 +1,7 @@
 package com.microsoft.applicationinsights.channel;
 
+import android.os.Build;
+
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
 import java.io.BufferedReader;
@@ -52,14 +54,14 @@ public class Sender {
     protected final Timer timer;
 
     /**
+     * The internal logger for this sender
+     */
+    private final LoggingInternal logger;
+
+    /**
      * All tasks which have been scheduled and not cancelled
      */
     private TimerTask sendTask;
-
-    /**
-     * The internal logger for this sender
-     */
-    private ILoggingInternal logger;
 
     /**
      * Prevent external instantiation
@@ -68,6 +70,7 @@ public class Sender {
         this.queue = new LinkedList<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = new SenderConfig();
+        this.logger = new LoggingInternal();
     }
 
     /**
@@ -75,14 +78,6 @@ public class Sender {
      */
     public SenderConfig getConfig() {
         return config;
-    }
-
-    /**
-     * Sets the internal logging implementation
-     * @param logger
-     */
-    public void setInternalLogger(ILoggingInternal logger) {
-        this.logger = logger;
     }
 
     /**
@@ -169,17 +164,17 @@ public class Sender {
             this.onResponse(connection, responseCode);
 
         } catch (MalformedURLException e) {
-            this.log(TAG, e.toString());
+            this.log(e.toString());
         } catch (ProtocolException e) {
-            this.log(TAG, e.toString());
+            this.log(e.toString());
         } catch (IOException e) {
-            this.log(TAG, e.toString());
+            this.log(e.toString());
         } finally {
             if (writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    this.log(TAG, e.toString());
+                    this.log(e.toString());
                 }
             }
         }
@@ -204,7 +199,7 @@ public class Sender {
                 String message = String.format("Unexpected response code: %d", responseCode);
                 responseBuilder.append(message);
                 responseBuilder.append("\n");
-                this.log(Sender.TAG, message);
+                this.log(message);
             }
 
             // If it isn't the usual success code (200), log the response from the server.
@@ -218,9 +213,9 @@ public class Sender {
                     InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
                     reader = new BufferedReader(streamReader);
                     String responseLine = reader.readLine();
-                    this.log(TAG, "Error response:");
+                    this.log("Error response:");
                     while (responseLine != null) {
-                        this.log(TAG, responseLine);
+                        this.log(responseLine);
                         responseBuilder.append(responseLine);
                         responseLine = reader.readLine();
                     }
@@ -231,13 +226,13 @@ public class Sender {
                 }
             }
         } catch (IOException e) {
-            this.log(TAG, e.toString());
+            this.log(e.toString());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    this.log(TAG, e.toString());
+                    this.log(e.toString());
                 }
             }
         }
@@ -252,21 +247,24 @@ public class Sender {
      * @throws java.io.IOException
      */
     protected Writer getWriter(HttpURLConnection connection) throws IOException {
-        connection.addRequestProperty("Content-Encoding", "gzip");
-        connection.setRequestProperty("Content-Type", "application/json");
-        GZIPOutputStream gzip = new GZIPOutputStream(connection.getOutputStream(), true);
-        return new OutputStreamWriter(gzip);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // GZIP if we are running SDK 19 or higher
+            connection.addRequestProperty("Content-Encoding", "gzip");
+            connection.setRequestProperty("Content-Type", "application/json");
+            GZIPOutputStream gzip = new GZIPOutputStream(connection.getOutputStream(), true);
+            return new OutputStreamWriter(gzip);
+        } else {
+            // no GZIP for older devices
+            return new OutputStreamWriter(connection.getOutputStream());
+        }
     }
 
     /**
      * Writes a log to the provided adapter (note: the adapter must be set by the consumer)
-     * @param tag the tag for this message
      * @param message the message to be logged
      */
-    private void log(String tag, String message) {
-        if(this.logger != null) {
-            this.logger.warn(tag, message);
-        }
+    private void log(String message) {
+        this.logger.warn(Sender.TAG, message);
     }
 
     private class FlushTask extends TimerTask {

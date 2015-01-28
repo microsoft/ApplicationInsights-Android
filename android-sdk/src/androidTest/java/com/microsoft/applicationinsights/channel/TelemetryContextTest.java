@@ -12,9 +12,6 @@ import java.util.UUID;
 
 public class TelemetryContextTest extends AndroidTestCase {
 
-    private final String sessionIdKey = "ai.session.id";
-    private final String sessionIsFirstKey = "ai.session.isFirst";
-    private final String sessionIsNewKey = "ai.session.isNew";
     private final String userIdKey = "ai.user.id";
 
     private final int renewalTime = 50;
@@ -113,8 +110,11 @@ public class TelemetryContextTest extends AndroidTestCase {
 
     private String checkSessionTags(TelemetryContext tc, String message, String id, String isFirst, String isNew) {
         LinkedHashMap<String, String> tags = tc.getContextTags();
+        String sessionIdKey = "ai.session.id";
         String _id = tags.get(sessionIdKey);
+        String sessionIsFirstKey = "ai.session.isFirst";
         String _isFirst = tags.get(sessionIsFirstKey);
+        String sessionIsNewKey = "ai.session.isNew";
         String _isNew = tags.get(sessionIsNewKey);
 
         if(id != null) {

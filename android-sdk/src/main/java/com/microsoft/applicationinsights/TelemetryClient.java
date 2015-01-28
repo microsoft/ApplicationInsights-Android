@@ -68,7 +68,7 @@ public class TelemetryClient {
 
     /**
      * Gets the properties which are common to all telemetry sent from this client.
-     * @return
+     * @return common properties for this telemetry client
      */
     public LinkedHashMap<String, String> getCommonProperties() {
         return commonProperties;

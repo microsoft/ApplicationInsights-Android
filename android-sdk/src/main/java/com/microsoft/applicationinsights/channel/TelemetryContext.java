@@ -290,6 +290,7 @@ public class TelemetryContext {
             userId = UUID.randomUUID().toString();
             SharedPreferences.Editor editor = this.settings.edit();
             editor.putString(TelemetryContext.USER_ID_KEY, userId);
+            editor.apply();
         }
 
         User context = this.getUser();

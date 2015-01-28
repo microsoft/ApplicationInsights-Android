@@ -2,9 +2,7 @@ package com.microsoft.applicationinsights.channel;
 
 import android.util.Log;
 
-import com.microsoft.applicationinsights.channel.ILoggingInternal;
-
-public class LoggingInternal implements ILoggingInternal {
+public class LoggingInternal {
     // todo: implement 'development mode' in config/common
     public static boolean enableDebugMode = true;
     private static final String prefix = "com.microsoft.applicationinsights";

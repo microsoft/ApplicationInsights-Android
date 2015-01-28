@@ -20,12 +20,12 @@ public class SenderTest extends TestCase {
     private TestSender sender;
     private IJsonSerializable item;
 
-    private final int batchInterval = 100;
     private final int batchMargin = 25;
 
     public void setUp() throws Exception {
         super.setUp();
         this.sender = new TestSender();
+        int batchInterval = 100;
         this.sender.getConfig().setMaxBatchIntervalMs(batchInterval);
         this.item = new Envelope();
     }

@@ -22,6 +22,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 bintray {
@@ -29,6 +33,7 @@ bintray {
     key = bintray_key
 
     configurations = ['archives']
+
     pkg {
         repo = 'maven'
         name = project.name
@@ -39,6 +44,7 @@ bintray {
         licenses = ['MIT']
         labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
         publicDownloadNumbers = true
+
         version {
             name = project.version
             vcsTag = '0.0.2'
@@ -61,18 +67,21 @@ install {
             packaging 'aar'
             name project.name
             url projectRepo
+
             licenses {
                 license {
                     name 'MIT'
                     url 'http://opensource.org/licenses/MIT'
                 }
             }
+
             developers {
                 developer {
                     id 'appinsights-android'
                     email 'appinsights-android@microsoft.com'
                 }
             }
+            
             scm {
                 connection projectRepo + '.git'
                 developerConnection projectRepo + '.git'

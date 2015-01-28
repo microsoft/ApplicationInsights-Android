@@ -30,11 +30,6 @@ public class SenderConfig {
     private boolean telemetryDisabled;
 
     /**
-     * The platform specific internal logging mechanism
-     */
-    private ILoggingInternal internalLogger;
-
-    /**
      * Gets the url to which payloads will be sent
      */
     public String getEndpointUrl() {

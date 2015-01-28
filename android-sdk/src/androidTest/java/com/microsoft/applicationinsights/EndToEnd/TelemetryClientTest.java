@@ -13,7 +13,6 @@ import junit.framework.Assert;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.util.LinkedHashMap;

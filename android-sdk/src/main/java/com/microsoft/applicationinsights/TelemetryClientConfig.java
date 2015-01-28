@@ -111,6 +111,5 @@ public class TelemetryClientConfig implements IChannelConfig, IContextConfig {
      */
     static {
         LoggingInternal logger = new LoggingInternal();
-        Sender.instance.setInternalLogger(logger);
     }
 }
