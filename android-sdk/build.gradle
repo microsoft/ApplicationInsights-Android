@@ -28,64 +28,81 @@ android {
     }
 }
 
-bintray {
-    user = bintray_user
-    key = bintray_key
-
-    configurations = ['archives']
-
-    pkg {
-        repo = 'maven'
-        name = project.name
-        desc = 'Application Insights SDK for Android'
-        websiteUrl = projectRepo
-        issueTrackerUrl = projectRepo + '/issues'
-        vcsUrl = projectRepo + '.git'
-        licenses = ['MIT']
-        labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
-        publicDownloadNumbers = true
-
-        version {
-            name = project.version
-            vcsTag = '0.0.2'
-            gpg {
-                sign = true
-                passphrase = bintray_gpg_passphrase
-            }
-            // mavenCentralSync {
-            //     sync = true
-            //     user = maven_user
-            //     password = maven_password
-            // }
+if (!this.hasProperty('bintray_user') ||
+    !this.hasProperty('bintray_key') ||
+    !this.hasProperty('bintray_gpg_passphrase')) {
+    println 'set bintray_user, bintray_key, and bintray_gpg_passphrase in ' +
+            '~/.gradle/gradle.properties to enable the bintray task'
+    bintray {
+        user = " "
+        key = " "
+        dryRun = true
+        pkg {
+            repo=" "
+            name=" "
         }
     }
-}
+} else {
+    bintray {
 
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            packaging 'aar'
-            name project.name
-            url projectRepo
+        user = bintray_user
+        key = bintray_key
 
-            licenses {
-                license {
-                    name 'MIT'
-                    url 'http://opensource.org/licenses/MIT'
+        configurations = ['archives']
+
+        pkg {
+            repo = 'maven'
+            name = project.name
+            desc = 'Application Insights SDK for Android'
+            websiteUrl = projectRepo
+            issueTrackerUrl = projectRepo + '/issues'
+            vcsUrl = projectRepo + '.git'
+            licenses = ['MIT']
+            labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
+            publicDownloadNumbers = true
+
+            version {
+                name = project.version
+                vcsTag = '0.0.2'
+                gpg {
+                    sign = true
+                    passphrase = bintray_gpg_passphrase
                 }
+                // mavenCentralSync {
+                //     sync = true
+                //     user = maven_user
+                //     password = maven_password
+                // }
             }
+        }
+    }
 
-            developers {
-                developer {
-                    id 'appinsights-android'
-                    email 'appinsights-android@microsoft.com'
-                }
-            }
-            
-            scm {
-                connection projectRepo + '.git'
-                developerConnection projectRepo + '.git'
+    install {
+        repositories.mavenInstaller {
+            pom.project {
+                packaging 'aar'
+                name project.name
                 url projectRepo
+
+                licenses {
+                    license {
+                        name 'MIT'
+                        url 'http://opensource.org/licenses/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'appinsights-android'
+                        email 'appinsights-android@microsoft.com'
+                    }
+                }
+
+                scm {
+                    connection projectRepo + '.git'
+                    developerConnection projectRepo + '.git'
+                    url projectRepo
+                }
             }
         }
     }
