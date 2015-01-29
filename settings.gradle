@@ -1,1 +1,1 @@
-include ':android-sdk'
+include ':applicationinsights-android'
