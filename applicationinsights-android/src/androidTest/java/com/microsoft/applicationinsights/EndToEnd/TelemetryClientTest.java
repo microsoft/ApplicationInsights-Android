@@ -5,6 +5,7 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
@@ -142,7 +143,7 @@ public class TelemetryClientTest extends AndroidTestCase {
 
     protected class TestTelemetryClient extends TelemetryClient {
         public TestTelemetryClient (String iKey, Context context) {
-            super(iKey, context);
+            super(new TelemetryClientConfig(iKey, context));
         }
 
         public TelemetryChannel getChannel() {

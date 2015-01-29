@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.microsoft.applicationinsights.channel.IChannelConfig;
@@ -96,9 +97,13 @@ public class TelemetryClientConfig implements IChannelConfig, IContextConfig {
     /**
      * Constructs a new instance of TelemetryClientConfig
      * @param iKey The instrumentation key for this app
-     * @param context The android app context
+     * @param activity The android app context
      */
-    public TelemetryClientConfig(String iKey, Context context){
+    public TelemetryClientConfig(String iKey, Activity activity){
+        this(iKey, activity.getApplicationContext());
+    }
+
+    public TelemetryClientConfig(String iKey, Context context) {
         this.instrumentationKey = iKey;
         this.sessionExpirationMs = IContextConfig.defaultSessionExpirationMs;
         this.sessionRenewalMs = IContextConfig.defaultSessionRenewalMs;

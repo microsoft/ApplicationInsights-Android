@@ -1,6 +1,6 @@
 package com.microsoft.applicationinsights;
 
-import android.content.Context;
+import android.app.Activity;
 
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
@@ -85,11 +85,11 @@ public class TelemetryClient {
     /**
      * Constructor of the class TelemetryClient.
      *
+     * @param activity the activity to initialize this client's context
      * @param iKey the instrumentation key
-     * @param context application telemetryContext from the caller
      */
-    public TelemetryClient(String iKey, Context context) {
-        this(new TelemetryClientConfig(iKey, context));
+    public TelemetryClient(Activity activity, String iKey) {
+        this(new TelemetryClientConfig(iKey, activity));
     }
 
     /**

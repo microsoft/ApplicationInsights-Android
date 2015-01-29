@@ -47,19 +47,24 @@ Please see the "[Getting an Application Insights Instrumentation Key](https://gi
 ## Usage ##
 
 
-**Track an activity**
-
-From an activity in your app, import and instantiate a telemetry client
+**Initialization**
 ```java
 import com.microsoft.applicationinsights.TelemetryClient;
 ```
 ```java
-String instrumentationKey = "<INSTRUMENTATION_KEY>";
-Context context = this.getApplicationContext();
-TelemetryClient client = new TelemetryClient(instrumentationKey, context);
-```
-Override the onStart and onStop methods and track events
+public class MyActivity extends Activity {
 
+    private TelemetryClient client;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        //... other initialization code ...//
+
+        String key = "<INSTRUMENTATION_KEY>";
+        client = new TelemetryClient(this, key);
+    }
+}
+```
 
 **Track events/metrics/traces/exceptions**
 
@@ -68,6 +73,15 @@ client.trackTrace("example trace");
 client.trackEvent("example event");
 client.trackException(new Error("example error"), "handledAt");
 client.trackMetric("example metric", 1);
+```
+
+**Track page views and user sessions**
+```java
+@Override
+public void onStart() {
+    super.onStart();
+    client.trackPageView("page name");
+}
 ```
 
 
