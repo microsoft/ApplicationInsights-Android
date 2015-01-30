@@ -1,7 +1,9 @@
 package com.microsoft.applicationinsights;
 
 import android.app.Activity;
+import android.content.res.Resources;
 
+import com.microsoft.applicationinsights.channel.InternalLogging;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.Util;
@@ -29,33 +31,11 @@ import java.util.UUID;
 public class TelemetryClient {
 
     /**
-     * The configuration for this telemetry client.
-     */
-    protected TelemetryClientConfig config;
-
-    /**
-     * The telemetry telemetryContext object.
-     */
-    private TelemetryContext context;
-
-    /**
-     * The telemetry channel for this client.
-     */
-    protected TelemetryChannel channel;
-
-    /**
-     * Properties associated with this telemetryContext.
-     */
-    private LinkedHashMap<String, String> commonProperties;
-
-    /**
      * The telemetry telemetryContext object.
      */
     public TelemetryContext getContext() {
-
         // todo: add cloneContext (possibly rename getContext to make it's scope clear)
-
-        return context;
+        return this.context;
     }
 
     /**
@@ -64,7 +44,6 @@ public class TelemetryClient {
     public TelemetryClientConfig getConfig() {
         return config;
     }
-
 
     /**
      * Gets the properties which are common to all telemetry sent from this client.
@@ -83,21 +62,52 @@ public class TelemetryClient {
     }
 
     /**
-     * Constructor of the class TelemetryClient.
-     *
-     * @param activity the activity to initialize this client's context
-     * @param iKey the instrumentation key
+     * Gets an instance of the telemetry client
+     * @param activity the activity to register
+     * @return a telemetry client associated with the activity (or null if the activity is null)
+     * @throws Exception if activity is null or an instrumentation key has not been configured
      */
-    public TelemetryClient(Activity activity, String iKey) {
-        this(new TelemetryClientConfig(iKey, activity));
+    public static TelemetryClient getInstance(Activity activity) throws Exception {
+        TelemetryClient client = null;
+
+        // attempt to read the iKey from resources if the client is null
+        if(activity == null) {
+            InternalLogging._throw("TelemetryClient.getInstance", "activity is null");
+        } else {
+            String iKey = TelemetryClient.getInstrumentationKey(activity);
+            TelemetryClientConfig config = new TelemetryClientConfig(iKey, activity);
+            client = new TelemetryClient(config);
+        }
+
+        return client;
     }
+
+    /**
+     * The configuration for this telemetry client.
+     */
+    protected final TelemetryClientConfig config;
+
+    /**
+     * The telemetry telemetryContext object.
+     */
+    protected final TelemetryContext context;
+
+    /**
+     * The telemetry channel for this client.
+     */
+    protected final TelemetryChannel channel;
+
+    /**
+     * Properties associated with this telemetryContext.
+     */
+    private LinkedHashMap<String, String> commonProperties;
 
     /**
      * Constructor of the class TelemetryClient.
      *
      * @param config the configuration for this client
      */
-    public TelemetryClient(TelemetryClientConfig config) {
+    protected TelemetryClient(TelemetryClientConfig config) {
         this(config, new TelemetryContext(config), new TelemetryChannel(config));
     }
 
@@ -105,10 +115,10 @@ public class TelemetryClient {
      * Constructor of the class TelemetryClient.
      *
      * @param config the configuration for this client
-     * @param context application telemetryContext from the caller
+     * @param context the context for this client
      * @param channel the channel for this client
      */
-    private TelemetryClient(
+    protected TelemetryClient(
             TelemetryClientConfig config,
             TelemetryContext context,
             TelemetryChannel channel) {
@@ -127,7 +137,7 @@ public class TelemetryClient {
     }
 
     /**
-     * track the event by name.
+     * track the event by name with custom properties.
      *
      * @param eventName the name of this event
      */
@@ -136,7 +146,7 @@ public class TelemetryClient {
     }
 
     /**
-     * Track the event by event name and customized properties and metrics.
+     * Track the event by event name with custom properties and metrics.
      *
      * @param eventName  event name
      * @param properties custom properties
@@ -217,7 +227,7 @@ public class TelemetryClient {
         data.setMax(value);
         data.setName(this.ensureValid(name));
         data.setValue(value);
-        ArrayList<DataPoint> metricsList = new ArrayList<DataPoint>();
+        ArrayList<DataPoint> metricsList = new ArrayList<>();
         metricsList.add(data);
 
         telemetry.setMetrics(metricsList);
@@ -265,20 +275,20 @@ public class TelemetryClient {
      * @param exception the exception to track
      * @param handledAt the location this exception was handled (null if unhandled)
      * @param properties properties associated with this exception
-     * @param metrics measurements associated with this exception
+     * @param measurements measurements associated with this exception
      */
     public void trackException(
             Exception exception,
             String handledAt,
             LinkedHashMap<String, String> properties,
-            LinkedHashMap<String, Double> metrics) {
+            LinkedHashMap<String, Double> measurements) {
 
         if(exception == null) {
             exception = new Exception();
         }
 
         // read stack frames
-        ArrayList<StackFrame> stackFrames = new ArrayList<StackFrame>();
+        ArrayList<StackFrame> stackFrames = new ArrayList<>();
         StackTraceElement[] stack = exception.getStackTrace();
         for(int i = stack.length - 1; i >= 0; i--){
             StackTraceElement rawFrame = stack[i];
@@ -297,7 +307,7 @@ public class TelemetryClient {
         detail.setTypeName(exception.getClass().getName());
         detail.setHasFullStack(true);
         detail.setParsedStack(stackFrames);
-        ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
+        ArrayList<ExceptionDetails> exceptions = new ArrayList<>();
         exceptions.add(detail);
 
         // populate ExceptionData
@@ -305,7 +315,7 @@ public class TelemetryClient {
         telemetry.setHandledAt(this.ensureValid(handledAt));
         telemetry.setExceptions(exceptions);
         telemetry.setProperties(properties);
-        telemetry.setMeasurements(metrics);
+        telemetry.setMeasurements(measurements);
 
         track(telemetry);
     }
@@ -349,7 +359,7 @@ public class TelemetryClient {
      * @param pageName the name of the page
      * @param pageLoadDurationMs the duration of the page load
      * @param properties custom properties
-     * @param measurements    custom metrics
+     * @param measurements    custom measurements
      */
     public void trackPageView(
             String pageName,
@@ -379,7 +389,7 @@ public class TelemetryClient {
      * @param responseCode the response code for this request
      * @param isSuccess the success status of this request
      * @param properties custom properties
-     * @param metrics    custom metrics
+     * @param measurements    custom measurements
      */
     protected void trackRequest(
             String name,
@@ -390,8 +400,9 @@ public class TelemetryClient {
             int responseCode,
             boolean isSuccess,
             LinkedHashMap<String, String> properties,
-            LinkedHashMap<String, Double> metrics) {
+            LinkedHashMap<String, Double> measurements) {
 
+        // todo: expose this publicly via a method that instruments a RequestQueue
         RequestData telemetry = new RequestData();
 
         telemetry.setId(UUID.randomUUID().toString());
@@ -403,7 +414,7 @@ public class TelemetryClient {
         telemetry.setResponseCode(String.valueOf(responseCode));
         telemetry.setSuccess(isSuccess);
         telemetry.setProperties(properties);
-        telemetry.setMeasurements(metrics);
+        telemetry.setMeasurements(measurements);
 
         track(telemetry);
     }
@@ -420,7 +431,7 @@ public class TelemetryClient {
     /**
      * Send telemetry with context to the queue.
      */
-    public void track(ITelemetry telemetry, TelemetryContext context) {
+    private void track(ITelemetry telemetry, TelemetryContext context) {
 
         // set the version
         telemetry.setVer(2);
@@ -455,5 +466,26 @@ public class TelemetryClient {
         } else {
             return input;
         }
+    }
+
+    /**
+     * Reads the instrumentation key from application resources if it is available
+     * @param activity the activity to check resources from
+     * @return the instrumentation key configured for the activity
+     */
+    private static String getInstrumentationKey(Activity activity) throws Exception {
+        Resources resources = activity.getResources();
+        int identifier = resources.getIdentifier("ai_instrumentationKey", "string",
+                activity.getPackageName());
+
+        String iKey = null;
+        if(identifier != 0) {
+            iKey = resources.getString(identifier);
+        } else {
+            InternalLogging._throw("TelemetryClient",
+                    "set instrumentation key in res/values/application_insights.xml");
+        }
+
+        return iKey;
     }
 }

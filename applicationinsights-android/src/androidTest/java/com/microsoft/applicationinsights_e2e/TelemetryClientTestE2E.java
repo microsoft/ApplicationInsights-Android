@@ -1,5 +1,6 @@
-package com.microsoft.applicationinsights.EndToEnd;
+package com.microsoft.applicationinsights_e2e;
 
+import android.app.Activity;
 import android.content.Context;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -20,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class TelemetryClientTest extends AndroidTestCase {
+public class TelemetryClientTestE2E extends AndroidTestCase {
 
     private TestTelemetryClient client;
     private TestSender sender;
@@ -30,16 +31,15 @@ public class TelemetryClientTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         String iKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
-        Context context = this.getContext();
 
-        this.client = new TestTelemetryClient(iKey, context);
+        this.client = new TestTelemetryClient(this.getContext(), iKey);
         this.sender = new TestSender(1);
         this.sender.getConfig().setMaxBatchIntervalMs(20);
         this.client.getChannel().setSender(this.sender);
 
-        this.properties = new LinkedHashMap<String, String>();
+        this.properties = new LinkedHashMap<>();
         this.properties.put("core property", "core value");
-        this.measurements = new LinkedHashMap<String, Double>();
+        this.measurements = new LinkedHashMap<>();
         this.measurements.put("core measurement", 5.5);
     }
 
@@ -85,8 +85,8 @@ public class TelemetryClientTest extends AndroidTestCase {
     public void testTrackPageView() throws Exception {
         this.client.trackPageView("android page");
         this.client.trackPageView("android page", 50);
-        this.client.trackPageView("android page", 50, this.properties);
-        this.client.trackPageView("android page", 50, this.properties, this.measurements);
+        this.client.trackPageView("android page", 50, properties);
+        this.client.trackPageView("android page", 50, properties, measurements);
         this.validate();
     }
 
@@ -142,7 +142,7 @@ public class TelemetryClientTest extends AndroidTestCase {
     }
 
     protected class TestTelemetryClient extends TelemetryClient {
-        public TestTelemetryClient (String iKey, Context context) {
+        public TestTelemetryClient (Context context, String iKey) {
             super(new TelemetryClientConfig(iKey, context));
         }
 
