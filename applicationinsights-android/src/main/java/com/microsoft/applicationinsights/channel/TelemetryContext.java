@@ -44,16 +44,6 @@ public class TelemetryContext {
     private Context androidAppContext;
 
     /**
-     * The session acquisition date.
-     */
-    private long acquisitionMs;
-
-    /**
-     * The session renewal date.
-     */
-    private long renewalMs;
-
-    /**
      * The shared preferences reader for this context.
      */
     private SharedPreferences settings;
@@ -209,7 +199,7 @@ public class TelemetryContext {
      */
     public LinkedHashMap<String, String> getContextTags() {
         // update session context
-        this.updateSessionContext();
+        this.renewSessionContext(false);
 
         // create a new hash map and add all context to it
         LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
@@ -303,47 +293,33 @@ public class TelemetryContext {
     private void setSessionContext() {
 
         // read session info from persistent storage
-        this.acquisitionMs = this.settings.getLong(TelemetryContext.SESSION_ACQUISITION_KEY, 0);
-        this.renewalMs = this.acquisitionMs;
         String sessionId = this.settings.getString(TelemetryContext.SESSION_ID_KEY, "");
         this.getSession().setId(sessionId);
     }
 
     /**
-     * Updates the session context
+     * Renews the session context
      *
-     * The session ID is renewed after 30min of inactivity or 24 hours of
-     * continuous use. Additionally, the isFirst flag is set if no data was
+     * The session ID is on demand. Additionally, the isFirst flag is set if no data was
      * found in settings and the isNew flag is set each time a new UUID is
      * generated.
      */
-    private void updateSessionContext() {
+    public void renewSessionContext(boolean getNewUUID) {
         long now = this.getTime();
 
         // check if this is the first known session (default value of 0 is assigned by setSessionContext)
-        boolean isFirst = this.acquisitionMs == 0 || this.renewalMs == 0;
-
-        // check if the session has expired
-        boolean acqExpired = (now - this.acquisitionMs) > this.config.getSessionExpirationMs();
-        boolean renewalExpired = (now - this.renewalMs) > this.config.getSessionRenewalMs();
+        String currentId = settings.getString(SESSION_ID_KEY, "");
+        boolean isFirst = currentId == "";
 
         // renew if this is the first update or if acquisitionSpan/renewalSpan have elapsed
         Session session = this.getSession();
         session.setIsFirst(isFirst ? "true" : "false");
-        if (isFirst || acqExpired || renewalExpired) {
+        if (getNewUUID || isFirst) {
             session.setId(UUID.randomUUID().toString());
-            session.setIsNew("true");
-
-            this.renewalMs = now;
-            this.acquisitionMs = now;
 
             SharedPreferences.Editor editor = this.settings.edit();
             editor.putString(TelemetryContext.SESSION_ID_KEY, session.getId());
-            editor.putLong(TelemetryContext.SESSION_ACQUISITION_KEY, this.acquisitionMs);
             editor.apply();
-        } else {
-            this.renewalMs = now;
-            session.setIsNew("false");
         }
     }
 

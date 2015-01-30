@@ -64,7 +64,7 @@ public class TelemetryContextTest extends AndroidTestCase {
     public void testSessionContextInitialization() throws Exception {
         TestContext tc = new TestContext(this.config);
 
-        String firstId = checkSessionTags(tc, "initial id", null, "true", "true");
+        String firstId = checkSessionTags(tc, "initial id", null, "true");
         try {
             java.util.UUID.fromString(firstId);
         } catch (Exception e) {
@@ -73,56 +73,41 @@ public class TelemetryContextTest extends AndroidTestCase {
 
         // this should load context from shared storage to match firstId
         TestContext newerTc = new TestContext(this.config);
-        checkSessionTags(newerTc, "id was loaded from storage", firstId, "false", "false");
+        checkSessionTags(newerTc, "id was loaded from storage", firstId, "false");
     }
 
     public void testSessionContextRenewal() throws Exception {
         TestContext tc = new TestContext(this.config);
-        String firstId = checkSessionTags(tc, "initial id", null, "true", "true");
-
-        // wait half renewal time
-        tc.incrementTime(renewalTime / 2);
-        checkSessionTags(tc, "session id persists", firstId, "false", "false");
+        String firstId = checkSessionTags(tc, "initial id", null, "true");
 
         // trigger renewal
-        tc.incrementTime(renewalTime + 1);
-        String secondId = checkSessionTags(tc, "session id is renewed", null, "false", "true");
+        tc.renewSessionContext(true);
+        String secondId = checkSessionTags(tc, "session id is renewed", null, "false");
         Assert.assertNotSame("session id is renewed", firstId, secondId);
     }
 
-    public void testSessionContextExpiration() throws Exception {
+    public void testSessionContextRenewalWithoutUUIDRenewal() throws Exception {
         TestContext tc = new TestContext(this.config);
-        String firstId = checkSessionTags(tc, "initial id", null, "true", "true");
+        String firstId = checkSessionTags(tc, "initial id", null, "true");
 
-        // trigger expiration
-        int duration = 0;
-        int interval = renewalTime / 2;
-        while(duration < expireTime) {
-            duration += interval;
-            tc.incrementTime(interval);
-            checkSessionTags(tc, "session id persists loop", firstId, "false", "false");
-        }
-
-        tc.incrementTime(interval);
-        String secondId = checkSessionTags(tc, "session id is renewed after expire", null, "false", "true");
-        Assert.assertNotSame("session id is renewed after expire", firstId, secondId);
+        // trigger renewal
+        tc.renewSessionContext(false);
+        String secondId = checkSessionTags(tc, "session id is not renewed", null, "false");
+        Assert.assertEquals("session id should not be renewed", firstId, secondId);
     }
 
-    private String checkSessionTags(TelemetryContext tc, String message, String id, String isFirst, String isNew) {
+    private String checkSessionTags(TelemetryContext tc, String message, String id, String isFirst) {
         LinkedHashMap<String, String> tags = tc.getContextTags();
         String sessionIdKey = "ai.session.id";
         String _id = tags.get(sessionIdKey);
         String sessionIsFirstKey = "ai.session.isFirst";
         String _isFirst = tags.get(sessionIsFirstKey);
-        String sessionIsNewKey = "ai.session.isNew";
-        String _isNew = tags.get(sessionIsNewKey);
 
         if(id != null) {
             assertEquals(message + " - id", id, _id);
         }
 
         assertEquals(message + " - isFirst", isFirst, _isFirst);
-        assertEquals(message + " - isNew", isNew, _isNew);
 
         return _id;
     }
