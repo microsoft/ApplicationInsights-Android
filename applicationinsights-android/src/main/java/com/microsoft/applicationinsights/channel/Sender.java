@@ -11,8 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.Timer;
@@ -23,10 +21,6 @@ import java.util.zip.GZIPOutputStream;
  * This singleton class sends data to the endpoint
  */
 public class Sender {
-    /**
-     * Tag for log messages
-     */
-    private static final String TAG = "Sender";
 
     /**
      * The singleton instance
@@ -54,11 +48,6 @@ public class Sender {
     protected final Timer timer;
 
     /**
-     * The internal logger for this sender
-     */
-    private final LoggingInternal logger;
-
-    /**
      * All tasks which have been scheduled and not cancelled
      */
     private TimerTask sendTask;
@@ -67,10 +56,9 @@ public class Sender {
      * Prevent external instantiation
      */
     protected Sender() {
-        this.queue = new LinkedList<IJsonSerializable>();
+        this.queue = new LinkedList<>();
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = new SenderConfig();
-        this.logger = new LoggingInternal();
     }
 
     /**
@@ -163,10 +151,6 @@ public class Sender {
             int responseCode = connection.getResponseCode();
             this.onResponse(connection, responseCode);
 
-        } catch (MalformedURLException e) {
-            this.log(e.toString());
-        } catch (ProtocolException e) {
-            this.log(e.toString());
         } catch (IOException e) {
             this.log(e.toString());
         } finally {
@@ -264,9 +248,12 @@ public class Sender {
      * @param message the message to be logged
      */
     private void log(String message) {
-        this.logger.warn(Sender.TAG, message);
+        InternalLogging._warn("Sender", message);
     }
 
+    /**
+     * A task to initiate queue flush on another thread
+     */
     private class FlushTask extends TimerTask {
         private Sender sender;
 
@@ -284,6 +271,9 @@ public class Sender {
         }
     }
 
+    /**
+     * A task to initiate network I/O on another thread
+     */
     private class SendTask extends TimerTask {
         private Sender sender;
 

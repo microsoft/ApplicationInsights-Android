@@ -16,7 +16,7 @@ public class TelemetryChannel {
     /**
      * The configuration for this recorder
      */
-    private final IChannelConfig config;
+    private final TelemetryClientConfig config;
 
     /**
      * Test hook to the sender
@@ -55,7 +55,7 @@ public class TelemetryChannel {
      */
     public void send(TelemetryContext telemetryContext, ITelemetry telemetry) {
         // wrap the telemetry data in the common schema data
-        Data<ITelemetryData> data = new Data<ITelemetryData>();
+        Data<ITelemetryData> data = new Data<>();
         data.setBaseData(telemetry);
         data.setBaseType(telemetry.getBaseType());
 
