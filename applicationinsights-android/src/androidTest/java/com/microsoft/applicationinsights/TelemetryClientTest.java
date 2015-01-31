@@ -76,8 +76,8 @@ public class TelemetryClientTest extends ActivityTestCase {
         client.trackMetric(null, 0);
         client.trackMetric("metric1", 1.1);
         client.trackMetric("metric2", 3);
-        client.trackMetric("metric3", 3.3, properties);
-        client.trackMetric("metric3", 4, properties);
+        client.trackMetric("metric3", 3.3);
+        client.trackMetric("metric3", 4);
     }
 
     public void testTrackException() throws Exception {
@@ -103,9 +103,9 @@ public class TelemetryClientTest extends ActivityTestCase {
         LinkedHashMap<String, Double> measurements = new LinkedHashMap<>();
 
         client.trackPageView("android page");
-        client.trackPageView("android page", 50);
-        client.trackPageView("android page", 50, properties);
-        client.trackPageView("android page", 50, properties, measurements);
+        client.trackPageView("android page");
+        client.trackPageView("android page", properties);
+        client.trackPageView("android page", properties, measurements);
     }
 
     public void testTrack() throws Exception {

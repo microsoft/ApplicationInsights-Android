@@ -83,6 +83,11 @@ public class TelemetryContext {
     private Internal internal;
 
     /**
+     * The last session ID
+     */
+    private String lastSessionId;
+
+    /**
      * Get user telemetryContext.
      */
     public User getUser() {
@@ -181,6 +186,7 @@ public class TelemetryContext {
         this.session = new Session();
         this.user = new User();
         this.internal = new Internal();
+        this.lastSessionId = null;
 
         // get an instance of the shared preferences manager for persistent context fields
         this.androidAppContext = config.getAppContext();
@@ -199,6 +205,9 @@ public class TelemetryContext {
      */
     public LinkedHashMap<String, String> getContextTags() {
 
+        // update session context
+        this.setSessionFlags();
+
         // create a new hash map and add all context to it
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         this.application.addToHashMap(map);
@@ -210,6 +219,67 @@ public class TelemetryContext {
         this.internal.addToHashMap(map);
 
         return map;
+    }
+
+    /**
+     * Renews the session context
+     *
+     * The session ID is on demand. Additionally, the isFirst flag is set if no data was
+     * found in settings and the isNew flag is set each time a new UUID is
+     * generated.
+     */
+    public void renewSessionId() {
+        String newId = UUID.randomUUID().toString();
+
+        this.session.setId(newId);
+
+        SharedPreferences.Editor editor = this.settings.edit();
+        editor.putString(TelemetryContext.SESSION_ID_KEY, session.getId());
+        editor.apply();
+    }
+
+    /**
+     * Sets the session context
+     */
+    private void setSessionContext() {
+        this.lastSessionId = this.settings.getString(TelemetryContext.SESSION_ID_KEY, null);
+        if(this.lastSessionId == null) {
+            this.renewSessionId();
+        } else {
+            this.getSession().setId(this.lastSessionId);
+        }
+    }
+
+    /**
+     * Sets the session context flags based on the previous session ID.
+     */
+    private void setSessionFlags() {
+        String currentId = this.session.getId();
+
+        // default value of lastsessionId in setSessionContext is null, so isFirst is true if null
+        boolean isFirst = this.lastSessionId == null;
+        boolean isNew = currentId != this.lastSessionId;
+
+        this.lastSessionId = currentId;
+
+        this.session.setIsFirst(isFirst ? "true" : "false");
+        this.session.setIsNew(isNew ? "true" : "false");
+    }
+
+    /**
+     * Sets the user context
+     */
+    private void setUserContext() {
+        String userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
+        if(userId == null) {
+            userId = UUID.randomUUID().toString();
+            SharedPreferences.Editor editor = this.settings.edit();
+            editor.putString(TelemetryContext.USER_ID_KEY, userId);
+            editor.apply();
+        }
+
+        User context = this.getUser();
+        context.setId(userId);
     }
 
     /**
@@ -267,37 +337,5 @@ public class TelemetryContext {
         context.setModel(Build.MODEL);
         context.setLocale(Locale.getDefault().toString());
         context.setLanguage(Locale.getDefault().getLanguage());
-    }
-
-    /**
-     * Sets the user context
-     */
-    private void setUserContext() {
-        String userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
-        if(userId == null) {
-            userId = UUID.randomUUID().toString();
-            SharedPreferences.Editor editor = this.settings.edit();
-            editor.putString(TelemetryContext.USER_ID_KEY, userId);
-            editor.apply();
-        }
-
-        User context = this.getUser();
-        context.setId(userId);
-    }
-
-    /**
-     * Sets the session context
-     */
-    private void setSessionContext() {
-        String sessionId = UUID.randomUUID().toString();
-        this.getSession().setId(sessionId);
-    }
-
-    /**
-     * Gets the current time in milliseconds (also allows a test hook for session logic).
-     * @return the current time in milliseconds
-     */
-    protected long getTime() {
-        return new Date().getTime();
     }
 }

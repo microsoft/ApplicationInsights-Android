@@ -13,7 +13,6 @@ import java.util.UUID;
 public class TelemetryContextTest extends AndroidTestCase {
 
     private final String userIdKey = "ai.user.id";
-    private final String sessionIdKey = "ai.session.id";
 
     private TelemetryClientConfig config;
 
@@ -23,7 +22,7 @@ public class TelemetryContextTest extends AndroidTestCase {
 
         SharedPreferences.Editor editor = this.getContext().getSharedPreferences(
                 TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
-        editor.putString(TelemetryContext.SESSION_ID_KEY, "");
+        editor.putString(TelemetryContext.SESSION_ID_KEY, null);
         editor.putString(TelemetryContext.USER_ID_KEY, null);
         editor.commit();
     }
@@ -33,7 +32,7 @@ public class TelemetryContextTest extends AndroidTestCase {
     }
 
     public void testUserContextInitialization() {
-        TestContext tc = new TestContext(this.config);
+        TelemetryContext tc = new TelemetryContext(this.config);
 
         String id = tc.getContextTags().get(userIdKey);
         try {
@@ -51,37 +50,53 @@ public class TelemetryContextTest extends AndroidTestCase {
         editor.commit();
 
         // this should load context from shared storage to match firstId
-        TestContext tc = new TestContext(this.config);
+        TelemetryContext tc = new TelemetryContext(this.config);
         String newId = tc.getContextTags().get(userIdKey);
         Assert.assertEquals("ID persists in local storage", "test value", newId);
     }
 
     public void testSessionContextInitialization() throws Exception {
-        TestContext tc = new TestContext(this.config);
+        TelemetryContext tc = new TelemetryContext(this.config);
 
-        String firstId = tc.getContextTags().get(sessionIdKey);
+        String firstId = checkSessionTags(tc, "initial id", null, "true");
         try {
             java.util.UUID.fromString(firstId);
         } catch (Exception e) {
             Assert.fail("id was not properly initialized by constructor\n" + e.toString());
         }
+
+        // this should load context from shared storage to match firstId
+        TelemetryContext newerTc = new TelemetryContext(this.config);
+        checkSessionTags(newerTc, "id was loaded from storage", firstId, "false");
     }
 
-    private class TestContext extends TelemetryContext {
+    public void testSessionContextRenewal() throws Exception {
+        TelemetryContext tc = new TelemetryContext(this.config);
+        String firstId = checkSessionTags(tc, "initial id", null, "true");
 
-        private long timeMs;
+        // trigger renewal
+        tc.renewSessionId();
+        String secondId = checkSessionTags(tc, "session id is renewed", null, "false");
+        Assert.assertNotSame("session id is renewed", firstId, secondId);
 
-        public TestContext(TelemetryClientConfig config) {
-            super(config);
-            this.timeMs = super.getTime();
+        // check that it doesn't change when accessed a second time
+        String thirdId = checkSessionTags(tc, "session id is not renewed", secondId, "false");
+        Assert.assertSame("session id is not renewed", secondId, thirdId);
+    }
+
+    private String checkSessionTags(TelemetryContext tc, String message, String id, String isFirst) {
+        LinkedHashMap<String, String> tags = tc.getContextTags();
+        String sessionIdKey = "ai.session.id";
+        String _id = tags.get(sessionIdKey);
+        String sessionIsFirstKey = "ai.session.isFirst";
+        String _isFirst = tags.get(sessionIsFirstKey);
+
+        if(id != null) {
+            assertEquals(message + " - id", id, _id);
         }
 
-        public void incrementTime(long timeMs) {
-            this.timeMs += timeMs;
-        }
+        assertEquals(message + " - isFirst", isFirst, _isFirst);
 
-        protected long getTime() {
-            return this.timeMs;
-        }
+        return _id;
     }
 }

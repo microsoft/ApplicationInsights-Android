@@ -62,8 +62,8 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
         this.client.trackMetric(null, 0);
         this.client.trackMetric("metric1", 1.1);
         this.client.trackMetric("metric2", 3);
-        this.client.trackMetric("metric3", 3.3, properties);
-        this.client.trackMetric("metric3", 4, properties);
+        this.client.trackMetric("metric3", 3.3);
+        this.client.trackMetric("metric3", 4);
         this.validate();
     }
 
@@ -84,9 +84,9 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
 
     public void testTrackPageView() throws Exception {
         this.client.trackPageView("android page");
-        this.client.trackPageView("android page", 50);
-        this.client.trackPageView("android page", 50, properties);
-        this.client.trackPageView("android page", 50, properties, measurements);
+        this.client.trackPageView("android page");
+        this.client.trackPageView("android page", properties);
+        this.client.trackPageView("android page", properties, measurements);
         this.validate();
     }
 
