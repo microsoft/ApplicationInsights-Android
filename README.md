@@ -29,10 +29,17 @@ dependencies {
 }
 ```
 
-**Get an instrumentation key**
+**Configure the instrumentation key**
 
 Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information. To try the SDK without an instrumentation key, set the instrumentationKey config value to a non-empty string.
 >**Note**: an instrumentation key is required before any data can be viewed in the Azure portal.
+
+Set the instrumentation key as a string resource _(somewhere under /res/values/*.xml)_
+```xml
+<resources>
+    <item name="ai_instrumentationKey" type="string">Instrumentation_Key_Goes_Here</item>
+</resources>
+```
 
 **Allow the following permissions in your AndroidManifest.xml**
 
@@ -40,6 +47,7 @@ Please see the "[Getting an Application Insights Instrumentation Key](https://gi
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 ```
+
 
 
 
@@ -60,8 +68,8 @@ public class MyActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         //... other initialization code ...//
 
-        String key = "<INSTRUMENTATION_KEY>";
-        client = new TelemetryClient(this, key);
+        client = TelemetryClient.getInstance(this);
+        client.trackEvent("onCreate");
     }
 }
 ```

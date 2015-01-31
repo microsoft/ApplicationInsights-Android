@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="ai_instrumentationKey" type="string">Instrumentation_Key_Goes_Here</item>
+</resources>
