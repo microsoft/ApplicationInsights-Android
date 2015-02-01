@@ -22,7 +22,7 @@ mv applicationinsights-android/build/docs/javadoc/* ./
 rm -rf applicationinsights-android
 git add -A
 git commit -m "updating docs via update-docs.sh"
-git push
+git push origin gh-pages
 
 # restore local.properties
 git checkout master
