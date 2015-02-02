@@ -6,6 +6,7 @@ import android.content.Context;
 import com.microsoft.applicationinsights.channel.IChannelConfig;
 import com.microsoft.applicationinsights.channel.IContextConfig;
 import com.microsoft.applicationinsights.channel.LoggingInternal;
+import com.microsoft.applicationinsights.channel.Persistence;
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.SenderConfig;
 
@@ -95,6 +96,18 @@ public class TelemetryClientConfig implements IChannelConfig, IContextConfig {
     }
 
     /**
+     * The persisted data for this application
+     */
+    private Persistence persist;
+
+    /**
+     * The persisted data for the application
+     */
+    public Persistence getPersistence() {
+        return persist;
+    }
+
+    /**
      * Constructs a new instance of TelemetryClientConfig
      * @param iKey The instrumentation key for this app
      * @param activity The android app context
@@ -108,6 +121,8 @@ public class TelemetryClientConfig implements IChannelConfig, IContextConfig {
         this.sessionExpirationMs = IContextConfig.defaultSessionExpirationMs;
         this.sessionRenewalMs = IContextConfig.defaultSessionRenewalMs;
         this.senderConfig = Sender.instance.getConfig();
+        this.persist = Persistence.getInstance();
+        persist.setPersistenceContext(context);
         this.appContext = context;
     }
 

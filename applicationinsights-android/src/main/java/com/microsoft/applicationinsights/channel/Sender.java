@@ -4,11 +4,14 @@ import android.os.Build;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -64,6 +67,16 @@ public class Sender {
     private TimerTask sendTask;
 
     /**
+     * Saves data to disk if there is a protocol error
+     */
+    private Persistence persist;
+
+    /**
+     * Saves data to disk if there is a protocol error
+     */
+    protected String serializedData;
+
+    /**
      * Prevent external instantiation
      */
     protected Sender() {
@@ -71,6 +84,7 @@ public class Sender {
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = new SenderConfig();
         this.logger = new LoggingInternal();
+        this.persist = Persistence.getInstance();
     }
 
     /**
@@ -133,50 +147,60 @@ public class Sender {
      * @param data a collection of serializable data
      */
     protected void send(IJsonSerializable[] data) {
-        Writer writer = null;
+        StringBuilder buffer = new StringBuilder();
+
         try {
-            URL url = new URL(this.config.getEndpointUrl());
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setReadTimeout(10000 /* milliseconds */); // todo: move to config
-            connection.setConnectTimeout(15000 /* milliseconds */);
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setUseCaches(false);
-
-            writer = this.getWriter(connection);
-            writer.write('[');
-
+            buffer.append('[');
             for (int i = 0; i < data.length; i++) {
                 if (i > 0) {
-                    writer.write(',');
+                    buffer.append(',');
                 }
+                StringWriter stringWriter = new StringWriter();
+                data[i].serialize(stringWriter);
+            }
+            buffer.append(']');
 
-                data[i].serialize(writer);
+            // Send the persisted data
+            String persistedData = persist.getData();
+            if (persistedData != "")
+            {
+                sendRequestWithPayload(persistedData);
+                persist.clearData();
             }
 
-            writer.write(']');
-            writer.flush();
-
-            // Starts the query
-            connection.connect();
-            int responseCode = connection.getResponseCode();
-            this.onResponse(connection, responseCode);
-
+            // Send the new data
+            serializedData = buffer.toString();
+            sendRequestWithPayload(serializedData);
         } catch (MalformedURLException e) {
             this.log(e.toString());
         } catch (ProtocolException e) {
             this.log(e.toString());
         } catch (IOException e) {
             this.log(e.toString());
+        }
+    }
+
+    private void sendRequestWithPayload(String payload) throws IOException {
+        URL url = new URL(this.config.getEndpointUrl());
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setReadTimeout(10000 /* milliseconds */); // todo: move to config
+        connection.setConnectTimeout(15000 /* milliseconds */);
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+        connection.setDoInput(true);
+        connection.setUseCaches(false);
+
+        OutputStream os = new BufferedOutputStream(connection.getOutputStream());
+
+        try {
+            os.write(payload.getBytes());
+
+            // Starts the query
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            this.onResponse(connection, responseCode);
         } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    this.log(e.toString());
-                }
-            }
+            os.close();
         }
     }
 
@@ -200,6 +224,12 @@ public class Sender {
                 responseBuilder.append(message);
                 responseBuilder.append("\n");
                 this.log(message);
+            }
+
+            //If there was a server issue, persist the data
+            if(responseCode >= 500 && responseCode != 529)
+            {
+                persist.saveData(this.serializedData);
             }
 
             // If it isn't the usual success code (200), log the response from the server.
