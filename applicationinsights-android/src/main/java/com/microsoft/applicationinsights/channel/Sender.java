@@ -1,15 +1,15 @@
 package com.microsoft.applicationinsights.channel;
 
 import android.os.Build;
+import android.util.Log;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
-import java.io.BufferedOutputStream;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -69,7 +69,7 @@ public class Sender {
      * Prevent external instantiation
      */
     protected Sender() {
-        this.queue = new LinkedList<>();
+        this.queue = new LinkedList<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = new SenderConfig();
         this.persist = Persistence.getInstance();
@@ -145,6 +145,7 @@ public class Sender {
                 }
                 StringWriter stringWriter = new StringWriter();
                 data[i].serialize(stringWriter);
+                buffer.append(stringWriter.toString());
             }
             buffer.append(']');
 
@@ -159,16 +160,13 @@ public class Sender {
             // Send the new data
             serializedData = buffer.toString();
             sendRequestWithPayload(serializedData);
-        } catch (MalformedURLException e) {
-            this.log(e.toString());
-        } catch (ProtocolException e) {
-            this.log(e.toString());
         } catch (IOException e) {
             this.log(e.toString());
         }
     }
 
     private void sendRequestWithPayload(String payload) throws IOException {
+        Writer writer = null;
         URL url = new URL(this.config.getEndpointUrl());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setReadTimeout(10000 /* milliseconds */); // todo: move to config
@@ -178,17 +176,25 @@ public class Sender {
         connection.setDoInput(true);
         connection.setUseCaches(false);
 
-        OutputStream os = new BufferedOutputStream(connection.getOutputStream());
-
         try {
-            os.write(payload.getBytes());
+            writer = this.getWriter(connection);
+            writer.write(payload);
+            writer.flush();
 
             // Starts the query
             connection.connect();
             int responseCode = connection.getResponseCode();
             this.onResponse(connection, responseCode);
         } finally {
-            os.close();
+            if(writer != null)
+            {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    this.log(e.toString());
+                }
+
+            }
         }
     }
 

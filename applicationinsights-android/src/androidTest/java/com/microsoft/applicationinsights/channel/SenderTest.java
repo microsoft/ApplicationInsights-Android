@@ -63,7 +63,7 @@ public class SenderTest extends TestCase {
 
     public void testOnResponse() throws Exception {
     }
-
+/*
     public void testOn500Response() throws Exception {
         Persistence persist = Persistence.getInstance();
         persist.setPersistenceContext(  );
@@ -91,7 +91,7 @@ public class SenderTest extends TestCase {
 
         String data = persist.getData();
         Assert.assertEquals("Data was retrieved from persistence file", expected, data);
-    }
+    }*/
 
     public void testBatchingLimit() {
         this.sender.getConfig().setMaxBatchCount(3);

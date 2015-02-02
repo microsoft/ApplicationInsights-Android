@@ -2,10 +2,6 @@ package com.microsoft.applicationinsights;
 
 import android.app.Activity;
 import android.content.Context;
-
-import com.microsoft.applicationinsights.channel.IChannelConfig;
-import com.microsoft.applicationinsights.channel.IContextConfig;
-import com.microsoft.applicationinsights.channel.LoggingInternal;
 import com.microsoft.applicationinsights.channel.Persistence;
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.SenderConfig;
@@ -80,7 +76,6 @@ public class TelemetryClientConfig {
      */
     public TelemetryClientConfig(String iKey, Context context) {
         this.instrumentationKey = iKey;
-        this.senderConfig = Sender.instance.getConfig();
         this.persist = Persistence.getInstance();
         persist.setPersistenceContext(context);
         this.appContext = context;
