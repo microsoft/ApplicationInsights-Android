@@ -7,7 +7,7 @@ public class SenderConfig {
     public static final int defaultMaxBatchIntervalMs = 15 * 1000; // 15 seconds
     public static final boolean defaultDisableTelemetry = false;
 
-    // todo: thread-safe config?
+    // todo: make this config thread-safe
 
     /**
      * The url to which payloads will be sent

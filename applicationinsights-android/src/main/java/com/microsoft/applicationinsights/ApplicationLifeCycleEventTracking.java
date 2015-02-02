@@ -50,7 +50,7 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
         String iKey = getIKey(activity);
         if(activityCount == 1 && iKey != "00000000-0000-0000-0000-000000000000") {
             if ( tc == null ) {
-                tc = new TelemetryClient(activity, iKey);
+                tc = TelemetryClient.getInstance(activity);
             }
             tc.trackEvent("Session Start Event");
         }
@@ -66,7 +66,7 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
         Date now = new Date();
         if (lastBackground != null && tc != null) {
             if ((now.getTime() - lastBackground.getTime()) > BackgroundInterval) {
-                tc.getContext().renewSessionContext(true);
+                tc.getContext().renewSessionId();
                 tc.trackEvent("Session Start Event");
             }
         }

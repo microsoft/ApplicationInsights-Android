@@ -28,6 +28,28 @@ android {
     }
 }
 
+task docs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    options.links("http://d.android.com/reference/")
+}
+
+task docsJar(type: Jar) {
+    classifier = 'javadoc'
+    baseName = project.name
+    from docs.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    baseName = project.name
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives docsJar
+    archives sourcesJar
+}
+
 if (!this.hasProperty('bintray_user') ||
     !this.hasProperty('bintray_key') ||
     !this.hasProperty('bintray_gpg_passphrase')) {

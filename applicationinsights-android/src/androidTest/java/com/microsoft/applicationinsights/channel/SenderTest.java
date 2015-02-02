@@ -130,6 +130,7 @@ public class SenderTest extends TestCase {
         this.sender.enqueue(this.item);
         this.sender.enqueue(this.item);
         this.sender.enqueue(this.item);
+
         try {
             this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
             Assert.assertEquals("second batch was sent before maxIntervalMs after reaching MaxBatchCount",
@@ -147,7 +148,7 @@ public class SenderTest extends TestCase {
         // send one item and wait for the queue to flush via the timer
         this.sender.enqueue(this.item);
         try {
-            this.sender.sendSignal.await(batchMargin + this.sender.getConfig().getMaxBatchIntervalMs(), TimeUnit.MILLISECONDS);
+            this.sender.sendSignal.await(batchMargin + this.sender.getConfig().getMaxBatchIntervalMs() + 1, TimeUnit.MILLISECONDS);
             Assert.assertEquals("single item was sent after reaching MaxInterval",
                     0, this.sender.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",

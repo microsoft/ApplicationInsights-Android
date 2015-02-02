@@ -14,21 +14,15 @@ public class TelemetryContextTest extends AndroidTestCase {
 
     private final String userIdKey = "ai.user.id";
 
-    private final int renewalTime = 50;
-    private final int expireTime = 250;
-
     private TelemetryClientConfig config;
 
     public void setUp() throws Exception {
         super.setUp();
         this.config = new TelemetryClientConfig("iKey", this.getContext());
-        config.setSessionRenewalMs(renewalTime);
-        config.setSessionExpirationMs(expireTime);
 
         SharedPreferences.Editor editor = this.getContext().getSharedPreferences(
                 TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
-        editor.putString(TelemetryContext.SESSION_ID_KEY, "");
-        editor.putLong(TelemetryContext.SESSION_ACQUISITION_KEY, 0);
+        editor.putString(TelemetryContext.SESSION_ID_KEY, null);
         editor.putString(TelemetryContext.USER_ID_KEY, null);
         editor.commit();
     }
@@ -38,7 +32,7 @@ public class TelemetryContextTest extends AndroidTestCase {
     }
 
     public void testUserContextInitialization() {
-        TestContext tc = new TestContext(this.config);
+        TelemetryContext tc = new TelemetryContext(this.config);
 
         String id = tc.getContextTags().get(userIdKey);
         try {
@@ -56,13 +50,13 @@ public class TelemetryContextTest extends AndroidTestCase {
         editor.commit();
 
         // this should load context from shared storage to match firstId
-        TestContext tc = new TestContext(this.config);
+        TelemetryContext tc = new TelemetryContext(this.config);
         String newId = tc.getContextTags().get(userIdKey);
         Assert.assertEquals("ID persists in local storage", "test value", newId);
     }
 
     public void testSessionContextInitialization() throws Exception {
-        TestContext tc = new TestContext(this.config);
+        TelemetryContext tc = new TelemetryContext(this.config);
 
         String firstId = checkSessionTags(tc, "initial id", null, "true");
         try {
@@ -72,28 +66,22 @@ public class TelemetryContextTest extends AndroidTestCase {
         }
 
         // this should load context from shared storage to match firstId
-        TestContext newerTc = new TestContext(this.config);
+        TelemetryContext newerTc = new TelemetryContext(this.config);
         checkSessionTags(newerTc, "id was loaded from storage", firstId, "false");
     }
 
     public void testSessionContextRenewal() throws Exception {
-        TestContext tc = new TestContext(this.config);
+        TelemetryContext tc = new TelemetryContext(this.config);
         String firstId = checkSessionTags(tc, "initial id", null, "true");
 
         // trigger renewal
-        tc.renewSessionContext(true);
+        tc.renewSessionId();
         String secondId = checkSessionTags(tc, "session id is renewed", null, "false");
         Assert.assertNotSame("session id is renewed", firstId, secondId);
-    }
 
-    public void testSessionContextRenewalWithoutUUIDRenewal() throws Exception {
-        TestContext tc = new TestContext(this.config);
-        String firstId = checkSessionTags(tc, "initial id", null, "true");
-
-        // trigger renewal
-        tc.renewSessionContext(false);
-        String secondId = checkSessionTags(tc, "session id is not renewed", null, "false");
-        Assert.assertEquals("session id should not be renewed", firstId, secondId);
+        // check that it doesn't change when accessed a second time
+        String thirdId = checkSessionTags(tc, "session id is not renewed", secondId, "false");
+        Assert.assertSame("session id is not renewed", secondId, thirdId);
     }
 
     private String checkSessionTags(TelemetryContext tc, String message, String id, String isFirst) {
@@ -110,23 +98,5 @@ public class TelemetryContextTest extends AndroidTestCase {
         assertEquals(message + " - isFirst", isFirst, _isFirst);
 
         return _id;
-    }
-
-    private class TestContext extends TelemetryContext {
-
-        private long timeMs;
-
-        public TestContext(TelemetryClientConfig config) {
-            super(config);
-            this.timeMs = super.getTime();
-        }
-
-        public void incrementTime(long timeMs) {
-            this.timeMs += timeMs;
-        }
-
-        protected long getTime() {
-            return this.timeMs;
-        }
     }
 }

@@ -2,17 +2,17 @@ package com.microsoft.applicationinsights.channel;
 
 import android.util.Log;
 
-public class LoggingInternal {
+public class InternalLogging {
     // todo: implement 'development mode' in config/common
     public static boolean enableDebugMode = true;
-    private static final String prefix = "com.microsoft.applicationinsights";
+    private static final String prefix = InternalLogging.class.getPackage().getName();
 
     /**
      * Warn SDK users about non-critical SDK misuse
      * @param tag the log context
      * @param message the log message
      */
-    public void warn(String tag, String message) {
+    public static void _warn(String tag, String message) {
         if(enableDebugMode) {
             Log.w(prefix + tag, message);
         }
@@ -24,7 +24,7 @@ public class LoggingInternal {
      * @param message the log message
      * @throws Exception
      */
-    public void throwInternal(String tag, String message) throws Exception {
+    public static void _throw(String tag, String message) throws Exception {
 
         // todo: track SDK misuse as an event
         Log.e(prefix + tag, message);

@@ -24,8 +24,7 @@ public class Util {
             date = new Date();
         }
 
-        String result = dateFormat.format(date);
-        return result;
+        return dateFormat.format(date);
     }
 
     /**
