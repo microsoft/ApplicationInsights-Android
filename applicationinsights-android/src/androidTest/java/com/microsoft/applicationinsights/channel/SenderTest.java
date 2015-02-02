@@ -1,6 +1,7 @@
 package com.microsoft.applicationinsights.channel;
 
 import android.app.Activity;
+import android.test.AndroidTestCase;
 
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
@@ -63,35 +64,6 @@ public class SenderTest extends TestCase {
 
     public void testOnResponse() throws Exception {
     }
-/*
-    public void testOn500Response() throws Exception {
-        Persistence persist = Persistence.getInstance();
-        persist.setPersistenceContext(  );
-        Sender sender = new Sender();
-        URL url = new URL("http://www.android.com/");
-        HttpURLConnection conn = new HttpURLConnection(url) {
-            @Override
-            public void disconnect() {
-
-            }
-
-            @Override
-            public boolean usingProxy() {
-                return false;
-            }
-
-            @Override
-            public void connect() throws IOException {
-
-            }
-        };
-        String expected = "THIS IS A TEST";
-        sender.serializedData = expected;
-        sender.onResponse(conn, 501);
-
-        String data = persist.getData();
-        Assert.assertEquals("Data was retrieved from persistence file", expected, data);
-    }*/
 
     public void testBatchingLimit() {
         this.sender.getConfig().setMaxBatchCount(3);
@@ -235,3 +207,4 @@ public class SenderTest extends TestCase {
         }
     }
 }
+

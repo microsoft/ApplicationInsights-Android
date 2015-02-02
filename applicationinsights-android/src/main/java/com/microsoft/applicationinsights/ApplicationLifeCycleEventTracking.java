@@ -8,6 +8,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
+import com.microsoft.applicationinsights.channel.Persistence;
+
 import java.util.Date;
 
 
@@ -92,6 +94,9 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
         activityCount --;
         if(tc != null && activityCount == 0) {
             tc.trackEvent("Session Stop Event");
+
+            // Try to send the data if we can
+            tc.flush();
             tc = null;
             lastBackground = null;
         }
