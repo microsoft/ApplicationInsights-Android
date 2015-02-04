@@ -3,6 +3,8 @@ package com.microsoft.applicationinsights.channel;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -31,6 +33,7 @@ public class TelemetryContext {
     protected static final String SHARED_PREFERENCES_KEY = "APP_INSIGHTS_CONTEXT";
     protected static final String SESSION_ID_KEY = "SESSION_ID";
     protected static final String USER_ID_KEY = "USER_ID";
+    protected static final String USER_ACQ_KEY = "USER_ACQ";
 
     /**
      * The configuration for this context.
@@ -256,9 +259,9 @@ public class TelemetryContext {
     private void setSessionFlags() {
         String currentId = this.session.getId();
 
-        // default value of lastsessionId in setSessionContext is null, so isFirst is true if null
+        // default value of last sessionId in setSessionContext is null, so isFirst is true if null
         boolean isFirst = this.lastSessionId == null;
-        boolean isNew = currentId != this.lastSessionId;
+        boolean isNew = currentId.equals(this.lastSessionId);
 
         this.lastSessionId = currentId;
 
@@ -271,15 +274,21 @@ public class TelemetryContext {
      */
     private void setUserContext() {
         String userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
-        if(userId == null) {
+        String userAcq = this.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
+
+        if(userId == null || userAcq == null) {
             userId = UUID.randomUUID().toString();
+            userAcq = Util.dateToISO8601(new Date());
+
             SharedPreferences.Editor editor = this.settings.edit();
             editor.putString(TelemetryContext.USER_ID_KEY, userId);
+            editor.putString(TelemetryContext.USER_ACQ_KEY, userAcq);
             editor.apply();
         }
 
         User context = this.getUser();
         context.setId(userId);
+        context.setAccountAcquisitionDate(userAcq);
     }
 
     /**
@@ -287,11 +296,25 @@ public class TelemetryContext {
      */
     private void setAppContext() {
         Application context = this.getApplication();
-        ContentResolver resolver = this.androidAppContext.getContentResolver();
-        String id = Settings.Secure.getString(resolver, Settings.Secure.ANDROID_ID);
-        if(id != null) {
-            context.setVer(id);
+
+        String id = "";
+        String version = "";
+
+        try {
+            final PackageManager manager = this.androidAppContext.getPackageManager();
+            final PackageInfo info = manager
+                    .getPackageInfo(this.androidAppContext.getPackageName(), 0);
+
+            id = Integer.toString(info.versionCode);
+            if(version != null) {
+                version = info.packageName;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            InternalLogging._warn("TelemetryContext", "Could not collect application context");
         }
+
+        context.setVer(id);
+        context.setId(version);
     }
 
     /**
@@ -300,11 +323,18 @@ public class TelemetryContext {
     private void setDeviceContext() {
         Device context = this.getDevice();
 
+        context.setOsVersion(Build.VERSION.RELEASE);
+        context.setOs("Android");
+        context.setModel(Build.MODEL);
+        context.setOemName(Build.MANUFACTURER);
+        context.setLocale(Locale.getDefault().toString());
+
         // get device ID
         ContentResolver resolver = this.androidAppContext.getContentResolver();
         String deviceIdentifier = Settings.Secure.getString(resolver, Settings.Secure.ANDROID_ID);
         if(deviceIdentifier != null) {
-            context.setId(deviceIdentifier);
+            String deviceIdentifierHash = Util.tryHashStringSha256(deviceIdentifier);
+            context.setId(deviceIdentifierHash);
         }
 
         // check device type
@@ -331,11 +361,9 @@ public class TelemetryContext {
             }
         }
 
-        context.setOsVersion(Build.VERSION.RELEASE);
-        context.setOs("Android");
-        context.setOemName(Build.MANUFACTURER);
-        context.setModel(Build.MODEL);
-        context.setLocale(Locale.getDefault().toString());
-        context.setLanguage(Locale.getDefault().getLanguage());
+        // detect emulator
+        if(Build.FINGERPRINT.startsWith("generic")) {
+            context.setModel("[Emulator]" + context.getModel());
+        }
     }
 }
