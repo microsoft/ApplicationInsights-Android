@@ -54,6 +54,6 @@ ehthumbs.db
 Desktop.ini
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
-local.propertiesupload-to-hockey.sh
+upload-to-hockey.sh
 local.properties
 *.iml

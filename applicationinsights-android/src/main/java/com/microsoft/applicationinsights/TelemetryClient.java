@@ -215,7 +215,7 @@ public class TelemetryClient {
         data.setMax(value);
         data.setName(this.ensureValid(name));
         data.setValue(value);
-        ArrayList<DataPoint> metricsList = new ArrayList<>();
+        ArrayList<DataPoint> metricsList = new ArrayList<DataPoint>();
         metricsList.add(data);
 
         telemetry.setMetrics(metricsList);
@@ -275,7 +275,7 @@ public class TelemetryClient {
         }
 
         // read stack frames
-        ArrayList<StackFrame> stackFrames = new ArrayList<>();
+        ArrayList<StackFrame> stackFrames = new ArrayList<StackFrame>();
         StackTraceElement[] stack = exception.getStackTrace();
         for(int i = stack.length - 1; i >= 0; i--){
             StackTraceElement rawFrame = stack[i];
@@ -294,7 +294,7 @@ public class TelemetryClient {
         detail.setTypeName(exception.getClass().getName());
         detail.setHasFullStack(true);
         detail.setParsedStack(stackFrames);
-        ArrayList<ExceptionDetails> exceptions = new ArrayList<>();
+        ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
         exceptions.add(detail);
 
         // populate ExceptionData

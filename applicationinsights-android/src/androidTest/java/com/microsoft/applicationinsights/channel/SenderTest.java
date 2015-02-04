@@ -1,5 +1,8 @@
 package com.microsoft.applicationinsights.channel;
 
+import android.app.Activity;
+import android.test.AndroidTestCase;
+
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
@@ -10,6 +13,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
@@ -59,7 +63,6 @@ public class SenderTest extends TestCase {
     }
 
     public void testOnResponse() throws Exception {
-
     }
 
     public void testBatchingLimit() {
@@ -204,3 +207,4 @@ public class SenderTest extends TestCase {
         }
     }
 }
+
