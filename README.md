@@ -31,8 +31,7 @@ dependencies {
 
 **Configure the instrumentation key**
 
-Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information. To try the SDK without an instrumentation key, set the instrumentationKey config value to a non-empty string.
->**Note**: an instrumentation key is required before any data can be viewed in the Azure portal.
+>Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
 Set the instrumentation key as a string resource _(somewhere under /res/values/*.xml)_
 ```xml
@@ -44,8 +43,10 @@ Set the instrumentation key as a string resource _(somewhere under /res/values/*
 **Allow the following permissions in your AndroidManifest.xml**
 
 ```xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<manifest>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+</manifest>
 ```
 
 
@@ -92,6 +93,10 @@ public void onStart() {
 }
 ```
 **Documentation**
+
+http://microsoft.github.io/AppInsights-Android/
+
+## Documentation ##
 
 http://microsoft.github.io/AppInsights-Android/
 
