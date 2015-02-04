@@ -92,9 +92,6 @@ public void onStart() {
     client.trackPageView("page name");
 }
 ```
-**Documentation**
-
-http://microsoft.github.io/AppInsights-Android/
 
 ## Documentation ##
 
