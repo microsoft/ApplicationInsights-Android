@@ -17,6 +17,11 @@ public class Application implements
     IJsonSerializable
 {
     /**
+     * The ID of this application
+     */
+    private String id;
+
+    /**
      * Backing field for property Ver.
      */
     private String ver;
@@ -42,7 +47,20 @@ public class Application implements
     public void setVer(String value) {
         this.ver = value;
     }
-    
+
+    /**
+     * Gets the Id property.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Sets the Id property.
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
 
     /**
      * Adds all members of this class to a hashmap
@@ -52,6 +70,7 @@ public class Application implements
     {
         if (!(this.ver == null)) {
             map.put("ai.application.ver", this.ver);
+            map.put("ai.application.id", this.id);
         }
     }
     

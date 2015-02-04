@@ -3,6 +3,7 @@ package com.microsoft.applicationinsights.channel;
 import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 
+import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryClientConfig;
 
 import junit.framework.Assert;
@@ -13,6 +14,7 @@ import java.util.UUID;
 public class TelemetryContextTest extends AndroidTestCase {
 
     private final String userIdKey = "ai.user.id";
+    private final String userAcqKey = "ai.user.accountAcquisitionDate";
 
     private TelemetryClientConfig config;
 
@@ -47,12 +49,16 @@ public class TelemetryContextTest extends AndroidTestCase {
         SharedPreferences.Editor editor = this.getContext().getSharedPreferences(
                 TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
         editor.putString(TelemetryContext.USER_ID_KEY, "test value");
+        editor.putString(TelemetryContext.USER_ACQ_KEY, "test acq");
         editor.commit();
 
         // this should load context from shared storage to match firstId
         TelemetryContext tc = new TelemetryContext(this.config);
-        String newId = tc.getContextTags().get(userIdKey);
+        LinkedHashMap<String, String> tags = tc.getContextTags();
+        String newId = tags.get(userIdKey);
+        String newAcq = tags.get(userAcqKey);
         Assert.assertEquals("ID persists in local storage", "test value", newId);
+        Assert.assertEquals("Acquisition date persists in local storage", "test acq", newAcq);
     }
 
     public void testSessionContextInitialization() throws Exception {

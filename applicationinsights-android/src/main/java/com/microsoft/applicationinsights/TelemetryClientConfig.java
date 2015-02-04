@@ -2,7 +2,7 @@ package com.microsoft.applicationinsights;
 
 import android.app.Activity;
 import android.content.Context;
-
+import com.microsoft.applicationinsights.channel.Persistence;
 import com.microsoft.applicationinsights.channel.Sender;
 import com.microsoft.applicationinsights.channel.SenderConfig;
 
@@ -49,6 +49,18 @@ public class TelemetryClientConfig {
     }
 
     /**
+     * The persisted data for this application
+     */
+    private Persistence persist;
+
+    /**
+     * The persisted data for the application
+     */
+    public Persistence getPersistence() {
+        return persist;
+    }
+
+    /**
      * Constructs a new instance of TelemetryClientConfig
      * @param iKey The instrumentation key for this app
      * @param activity The android activity context
@@ -64,6 +76,8 @@ public class TelemetryClientConfig {
      */
     public TelemetryClientConfig(String iKey, Context context) {
         this.instrumentationKey = iKey;
+        this.persist = Persistence.getInstance();
+        persist.setPersistenceContext(context);
         this.appContext = context;
     }
 }
