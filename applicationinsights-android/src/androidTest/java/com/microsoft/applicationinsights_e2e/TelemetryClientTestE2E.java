@@ -2,14 +2,15 @@ package com.microsoft.applicationinsights_e2e;
 
 import android.app.Activity;
 import android.content.Context;
-import android.test.AndroidTestCase;
+import android.content.res.Resources;
+import android.test.ActivityTestCase;
 import android.util.Log;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryClientConfig;
-import com.microsoft.applicationinsights.channel.Sender;
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.commonlogging.channel.Sender;
+import com.microsoft.commonlogging.channel.TelemetryChannel;
+import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
 
 import junit.framework.Assert;
 
@@ -21,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class TelemetryClientTestE2E extends AndroidTestCase {
+public class TelemetryClientTestE2E extends ActivityTestCase {
 
     private TestTelemetryClient client;
     private TestSender sender;
@@ -30,9 +31,9 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        String iKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
 
-        this.client = new TestTelemetryClient(this.getContext(), iKey);
+        MockActivity activity = new MockActivity(getInstrumentation().getContext());
+        this.client = new TestTelemetryClient(activity);
         this.sender = new TestSender(1);
         this.sender.getConfig().setMaxBatchIntervalMs(20);
         this.client.getChannel().setSender(this.sender);
@@ -91,9 +92,12 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
     }
 
     public void testTrackAllRequests() throws Exception {
-
         this.sender = new TestSender(5);
         this.client.getChannel().setSender(this.sender);
+
+        String endpoint = this.sender.getConfig().getEndpointUrl();
+        this.sender.getConfig().setEndpointUrl(endpoint.replace("https", "http"));
+
         Exception exception;
         try {
             throw new Exception();
@@ -142,8 +146,8 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
     }
 
     protected class TestTelemetryClient extends TelemetryClient {
-        public TestTelemetryClient (Context context, String iKey) {
-            super(new TelemetryClientConfig(iKey, context));
+        public TestTelemetryClient (Activity activity) {
+            super(new TelemetryClientConfig(activity));
         }
 
         public TelemetryChannel getChannel() {
@@ -255,6 +259,28 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
                 stringBuilder.append(buf);
                 baseWriter.write(buf);
             }
+        }
+    }
+
+    private class MockActivity extends Activity {
+        public Context context;
+        public MockActivity(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public Resources getResources() {
+            return this.context.getResources();
+        }
+
+        @Override
+        public Context getApplicationContext() {
+            return this.context;
+        }
+
+        @Override
+        public String getPackageName() {
+            return "com.microsoft.applicationinsights.test";
         }
     }
 }

@@ -8,7 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import com.microsoft.applicationinsights.channel.Persistence;
+import com.microsoft.commonlogging.channel.Persistence;
 
 import java.util.Date;
 
