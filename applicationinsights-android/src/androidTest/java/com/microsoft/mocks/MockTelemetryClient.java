@@ -1,6 +1,6 @@
 package com.microsoft.mocks;
 
-import android.content.Context;
+import android.app.Activity;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryClientConfig;
@@ -11,8 +11,9 @@ import java.util.ArrayList;
 public class MockTelemetryClient extends TelemetryClient {
     ArrayList<ITelemetry> messages = new ArrayList<ITelemetry>(10);
 
-    public MockTelemetryClient (Context context, String iKey) {
-        super(new TelemetryClientConfig(iKey, context));
+    public MockTelemetryClient (Activity activity) {
+        super(new TelemetryClientConfig(TelemetryClient.getInstrumentationKey(activity),
+                activity.getApplicationContext()));
     }
 
     @Override

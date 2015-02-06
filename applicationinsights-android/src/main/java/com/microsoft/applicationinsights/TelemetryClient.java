@@ -442,7 +442,7 @@ public class TelemetryClient {
      * @param activity the activity to check resources from
      * @return the instrumentation key configured for the activity
      */
-    private static String getInstrumentationKey(Activity activity) {
+    protected static String getInstrumentationKey(Activity activity) {
         Resources resources = activity.getResources();
         int identifier = resources.getIdentifier("ai_instrumentationKey", "string",
                 activity.getPackageName());
