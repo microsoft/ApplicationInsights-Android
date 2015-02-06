@@ -66,7 +66,11 @@ public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<
         MockActivity activity = this.startActivity(intent, null, null);
         getInstrumentation().callActivityOnStart(activity);
         getInstrumentation().callActivityOnPause(activity);
-        Thread.sleep(21*1000);
+
+        // increment time by session interval to trigger a new session ID
+        MockLifeCycleTracking.instance.currentTime += MockLifeCycleTracking.instance.getSessionInterval() + 1;
+
+        // validate new session ID
         MockLifeCycleTracking.instance.tc.clearMessages();
         getInstrumentation().callActivityOnResume(activity);
         ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();

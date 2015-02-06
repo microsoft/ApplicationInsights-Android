@@ -9,12 +9,15 @@ public class MockLifeCycleTracking extends ApplicationLifeCycleEventTracking {
 
     public MockTelemetryClient tc;
 
+    public long currentTime;
+
     public static final MockLifeCycleTracking instance = new MockLifeCycleTracking();
 
     private static final Object lock = new Object();
 
     private MockLifeCycleTracking() {
         super();
+        currentTime = 0;
     }
 
     @Override
@@ -26,5 +29,14 @@ public class MockLifeCycleTracking extends ApplicationLifeCycleEventTracking {
         }
 
         return this.tc;
+    }
+
+    @Override
+    protected long getTime() {
+        return currentTime;
+    }
+
+    public long getSessionInterval() {
+        return ApplicationLifeCycleEventTracking.SessionInterval;
     }
 }

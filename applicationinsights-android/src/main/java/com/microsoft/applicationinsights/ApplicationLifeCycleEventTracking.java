@@ -19,9 +19,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ApplicationLifeCycleEventTracking implements Application.ActivityLifecycleCallbacks {
 
     /**
-     * The interval at which sessions are renewed
+     * The interval at which sessions are renewed; todo: move this to TelemetryClientConfig
      */
-    private static final int SessionInterval = 20 * 1000; // 20 seconds
+    protected static final int SessionInterval = 20 * 1000; // 20 seconds
 
     /**
      * Singleton instance of this class

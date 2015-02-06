@@ -240,6 +240,8 @@ public class TelemetryContext {
     private void setSessionFlags() {
         String currentId = this.session.getId();
 
+        // todo: make this detect app-restart and generate new sessions when the app restarts
+
         // default value of last sessionId in setSessionContext is null, so isFirst is true if null
         boolean isFirst = this.lastSessionId == null;
         boolean isNew = currentId.equals(this.lastSessionId);
