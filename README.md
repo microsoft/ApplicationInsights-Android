@@ -94,6 +94,38 @@ public void onStart() {
 ```
 
 
+## AutoCollection of Event ##
+Right now we can auto collect pageviews and the start and stop events for an application.
+You will need to enable this by adding the following code.
+
+***NOTE:  THIS ONLY WORKS WITH VERSION 15 AND UP***
+
+***1) In you application, add a new JavaClass that extends application***
+```java
+import com.microsoft.applicationinsights.ApplicationLifeCycleEventTracking;
+```
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            registerActivityLifecycleCallbacks(MockLifeCycleTracking.instance);
+        }
+    }
+}
+```
+
+***2) Add the Application name to your AndroidManifest.xml***
+```java
+<application
+...
+android:name="MyApplication"
+...>
+```
+
+
 ## Documentation ##
 
 http://microsoft.github.io/AppInsights-Android/
