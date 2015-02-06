@@ -422,11 +422,11 @@ public class TelemetryClient {
     /**
      * Triggers an asynchronous flush of queued telemetry.
      * note: this will be called
-     * {@link com.microsoft.commonlogging.channel.SenderConfig#maxBatchIntervalMs} after
+     * {@link com.microsoft.commonlogging.channel.TelemetryQueueConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public void flush() {
-        this.channel.getSender().flush();
+        this.channel.getQueue().flush();
     }
 
     /**

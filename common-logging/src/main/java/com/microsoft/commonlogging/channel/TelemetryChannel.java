@@ -38,14 +38,14 @@ public class TelemetryChannel<TConfig extends TelemetryChannelConfig> {
     /**
      * Test hook to the sender
      */
-    private Sender sender;
+    private TelemetryQueue queue;
 
     /**
      * Instantiates a new instance of Sender
      * @param config The configuration for this channel
      */
     public TelemetryChannel(TConfig config) {
-        this.sender = Sender.instance;
+        this.queue = TelemetryQueue.instance;
         this.config = config;
         this.context = new CommonContext(config.getAppContext());
 
@@ -55,18 +55,18 @@ public class TelemetryChannel<TConfig extends TelemetryChannelConfig> {
     }
 
     /**
-     * Sets the sender to be used by this channel
-     * @param sender the sender to use for this channel
+     * @return the sender for this channel.
      */
-    public void setSender(Sender sender) {
-        this.sender = sender;
+    public TelemetryQueue getQueue() {
+        return this.queue;
     }
 
     /**
-     * @return the sender for this channel.
+     * Test hook to set the queue for this channel
+     * @param queue the queue to use for this channel
      */
-    public Sender getSender() {
-        return this.sender;
+    protected void setQueue(TelemetryQueue queue) {
+        this.queue = queue;
     }
 
     /**
@@ -90,7 +90,7 @@ public class TelemetryChannel<TConfig extends TelemetryChannelConfig> {
         Envelope envelope = this.getEnvelope(telemetry, tags);
 
         // send to queue
-        this.sender.enqueue(envelope);
+        this.queue.enqueue(envelope);
     }
 
     /**

@@ -71,7 +71,6 @@ public class TelemetryClientTest extends ActivityTestCase {
 
     public void testTrackMetric() throws Exception {
         TelemetryClient client = TelemetryClient.getInstance(this.mockActivity);
-        LinkedHashMap<String, String> properties = new LinkedHashMap<>();
 
         client.trackMetric(null, 0);
         client.trackMetric("metric1", 1.1);

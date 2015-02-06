@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 
+import java.util.Queue;
+
 public class TelemetryChannelConfig {
 
     /**
@@ -38,8 +40,8 @@ public class TelemetryChannelConfig {
     /**
      * Gets the sender config instance for this channel.
      */
-    public SenderConfig getGlobalSenderConfig() {
-        return Sender.instance.getConfig();
+    public TelemetryQueueConfig getGlobalQueueConfig() {
+        return TelemetryQueue.instance.getConfig();
     }
 
     /**

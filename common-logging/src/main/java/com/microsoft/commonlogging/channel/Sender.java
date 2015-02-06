@@ -26,34 +26,9 @@ import java.util.zip.GZIPOutputStream;
 public class Sender {
 
     /**
-     * The singleton instance
-     */
-    public final static Sender instance = new Sender();
-
-    /**
-     * The synchronization lock for sending
-     */
-    private static final Object lock = new Object();
-
-    /**
-     * The queue for this sender
-     */
-    protected LinkedList<IJsonSerializable> queue;
-
-    /**
      * The configuration for this sender
      */
     protected final SenderConfig config;
-
-    /**
-     * The timer for this sender
-     */
-    protected final Timer timer;
-
-    /**
-     * All tasks which have been scheduled and not cancelled
-     */
-    private TimerTask sendTask;
 
     /**
      * Saves data to disk if there is a protocol error
@@ -68,9 +43,7 @@ public class Sender {
     /**
      * Prevent external instantiation
      */
-    protected Sender() {
-        this.queue = new LinkedList<IJsonSerializable>();
-        this.timer = new Timer("Application Insights Sender Queue", true);
+    public Sender() {
         this.config = new SenderConfig();
         this.persist = Persistence.getInstance();
     }
@@ -80,54 +53,6 @@ public class Sender {
      */
     public SenderConfig getConfig() {
         return config;
-    }
-
-    /**
-     * Adds an item to the sender queue
-     * @param item a telemetry item to send
-     * @return true if the item was successfully added to the queue
-     */
-    public boolean enqueue(IJsonSerializable item) {
-        // prevent invalid argument exception
-        if(item == null || this.config.isTelemetryDisabled())
-            return false;
-
-        boolean success;
-        synchronized (Sender.lock) {
-            // attempt to add the item to the queue
-            success = this.queue.add(item);
-
-            if (success) {
-                if (this.queue.size() >= this.config.getMaxBatchCount()) {
-                    // flush if the queue is full
-                    this.flush();
-                } else if (this.queue.size() == 1) {
-                    // schedule a FlushTask if this is the first item in the queue
-                    this.sendTask = new FlushTask(this);
-                    this.timer.schedule(this.sendTask, this.config.getMaxBatchIntervalMs());
-                }
-            }
-        }
-
-        return success;
-    }
-
-    /**
-     * Empties the queue and sends all items to the endpoint
-     */
-    public void flush() {
-
-        // asynchronously flush the queue with a non-daemon thread
-        // if this was called from the timer task it would inherit the daemon status
-        // since this thread does I/O it must not be a daemon thread
-        Thread flushThread = new Thread(new SendTask(this));
-        flushThread.setDaemon(false);
-        flushThread.start();
-
-        // cancel the scheduled send task if it exists
-        if(this.sendTask != null) {
-            this.sendTask.cancel();
-        }
     }
 
     /**
@@ -289,58 +214,6 @@ public class Sender {
      */
     private void log(String message) {
         InternalLogging._warn("Sender", message);
-    }
-
-    /**
-     * A task to initiate queue flush on another thread
-     */
-    private class FlushTask extends TimerTask {
-        private Sender sender;
-
-        /**
-         * The sender instance is provided to the constructor as a test hook
-         * @param sender the sender instance which will be flushed
-         */
-        public FlushTask(Sender sender) {
-            this.sender = sender;
-        }
-
-        @Override
-        public void run() {
-            this.sender.flush();
-        }
-    }
-
-    /**
-     * A task to initiate network I/O on another thread
-     */
-    private class SendTask extends TimerTask {
-        private Sender sender;
-
-        /**
-         * The sender instance is provided to the constructor as a test hook
-         * @param sender the sender instance which will transmit the contents of the queue
-         */
-        public SendTask(Sender sender) {
-            this.sender = sender;
-        }
-
-        @Override
-        public void run() {
-            IJsonSerializable[] data = null;
-            synchronized (Sender.lock) {
-                // send if more than one item is in the queue
-                if(sender.queue.size() > 0 ) {
-                    data = new IJsonSerializable[sender.queue.size()];
-                    sender.queue.toArray(data);
-                    sender.queue.clear();
-                }
-            }
-
-            if(data != null) {
-                sender.send(data);
-            }
-        }
     }
 }
 
