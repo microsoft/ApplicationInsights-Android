@@ -11,6 +11,9 @@ import android.preference.PreferenceManager;
 import com.microsoft.applicationinsights.channel.Persistence;
 
 import java.util.Date;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -19,65 +22,89 @@ import java.util.Date;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class ApplicationLifeCycleEventTracking implements Application.ActivityLifecycleCallbacks {
-    static int activityCount = 0;
-    static Date lastBackground;
 
-    public int getCount() {
-        return activityCount;
+    /**
+     * The interval at which sessions are renewed
+     */
+    private static final int SessionInterval = 20 * 1000; // 20 seconds
+
+    /**
+     * Singleton instance of this class
+     */
+    public static final ApplicationLifeCycleEventTracking instance =
+            new ApplicationLifeCycleEventTracking();
+
+    /**
+     * The lock for initializing the telemetry client
+     */
+    private static final Object lock = new Object();
+
+    /**
+     * The telemetry client for this instance
+     */
+    private TelemetryClient _telemetryClient;
+
+    /**
+     * The activity counter
+     */
+    private final AtomicInteger activityCount;
+
+    /**
+     * The timestamp of the last activity
+     */
+    private final AtomicLong lastBackground;
+
+    /**
+     * Hide the constructor to ensure singleton use
+     */
+    protected ApplicationLifeCycleEventTracking() {
+        this.activityCount = new AtomicInteger(0);
+        this.lastBackground = new AtomicLong(0);
     }
 
-    private int BackgroundInterval = 20 * 1000;  //20 seconds
-    private TelemetryClient tc;
+    /**
+     * Gets the instance of telemetry client for this class or creates it
+     * @param activity the activity to use when creating the telemetry client
+     * @return a telemetry client
+     */
+    protected TelemetryClient getTelemetryClient(Activity activity) {
+        if (this._telemetryClient == null) {
+            synchronized (ApplicationLifeCycleEventTracking.lock) {
+                this._telemetryClient = TelemetryClient.getInstance(activity);
+            }
+        }
 
-    public ApplicationLifeCycleEventTracking getApplicationLifeCycleEventTracking() {
-        return this;
-    }
-
-    public void setIKey(Activity activity, String iKey) {
-        SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
-        SharedPreferences.Editor editor = preference.edit();
-        editor.putString("iKey", iKey);
-        editor.commit();
-    }
-
-    public String getIKey(Activity activity) {
-        SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(activity.getApplicationContext());
-        String iKey = preference.getString("iKey", "00000000-0000-0000-0000-000000000000");
-        return iKey;
+        return this._telemetryClient;
     }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        activityCount ++;
-        String iKey = getIKey(activity);
-        if(activityCount == 1 && iKey != "00000000-0000-0000-0000-000000000000") {
-            if ( tc == null ) {
-                tc = TelemetryClient.getInstance(activity);
-            }
+        activityCount.incrementAndGet();
+        this.getTelemetryClient(activity).trackEvent("Session Start Event");
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+        this.getTelemetryClient(activity).trackPageView(activity.getClass().getName());
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+        long now = new Date().getTime();
+        long then = this.lastBackground.get();
+
+        boolean shouldRenew = now - then > ApplicationLifeCycleEventTracking.SessionInterval;
+        if(shouldRenew) {
+            TelemetryClient tc = this.getTelemetryClient(activity);
+            tc.getContext().renewSessionId();
             tc.trackEvent("Session Start Event");
         }
     }
 
     @Override
-    public void onActivityStarted(Activity activity) {
-        tc.trackPageView(activity.getApplicationInfo().className);
-    }
-
-    @Override
-    public void onActivityResumed(Activity activity) {
-        Date now = new Date();
-        if (lastBackground != null && tc != null) {
-            if ((now.getTime() - lastBackground.getTime()) > BackgroundInterval) {
-                tc.getContext().renewSessionId();
-                tc.trackEvent("Session Start Event");
-            }
-        }
-    }
-
-    @Override
     public void onActivityPaused(Activity activity) {
-        Date date = new Date();
-        lastBackground = new Date();
+        long now = new Date().getTime();
+        this.lastBackground.set(now);
     }
 
     @Override
@@ -91,14 +118,17 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-        activityCount --;
-        if(tc != null && activityCount == 0) {
+        int count = this.activityCount.decrementAndGet();
+
+        if(count == 0) {
+            TelemetryClient tc = this.getTelemetryClient(activity);
             tc.trackEvent("Session Stop Event");
 
             // Try to send the data if we can
             tc.flush();
-            tc = null;
-            lastBackground = null;
+
+            // reset date timer
+            this.activityCount.set(0);
         }
     }
 }
