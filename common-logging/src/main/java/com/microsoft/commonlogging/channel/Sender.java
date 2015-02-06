@@ -75,11 +75,11 @@ public class Sender {
             buffer.append(']');
 
             // Send the persisted data
-            String persistedData = persist.getData();
+            String persistedData = this.persist.getData();
             if (persistedData != "")
             {
                 sendRequestWithPayload(persistedData);
-                persist.clearData();
+                this.persist.clearData();
             }
 
             // Send the new data
@@ -110,6 +110,8 @@ public class Sender {
             connection.connect();
             int responseCode = connection.getResponseCode();
             this.onResponse(connection, responseCode);
+        } catch (IOException e){
+            this.persist.saveData(this.serializedData);
         } finally {
             if(writer != null)
             {
