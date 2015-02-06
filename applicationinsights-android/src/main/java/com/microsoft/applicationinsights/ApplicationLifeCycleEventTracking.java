@@ -85,7 +85,7 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
 
     @Override
     public void onActivityStarted(Activity activity) {
-        this.getTelemetryClient(activity).trackPageView(activity.getApplicationInfo().className);
+        this.getTelemetryClient(activity).trackPageView(activity.getClass().getName());
     }
 
     @Override
