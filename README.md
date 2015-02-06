@@ -98,7 +98,7 @@ public void onStart() {
 Right now we can auto collect pageviews and the start and stop events for an application.
 You will need to enable this by adding the following code.
 
-***NOTE:  THIS ONLY WORKS WITH VERSION 15 AND UP***
+***NOTE:  THIS ONLY WORKS WITH VERSION 15 (ICE_CREAM_SANDWICH) AND UP***
 
 ***1) In you application, add a new JavaClass that extends application***
 ```java
