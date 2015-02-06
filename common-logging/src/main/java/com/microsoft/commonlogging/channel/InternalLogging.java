@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.channel;
+package com.microsoft.commonlogging.channel;
 
 import android.util.Log;
 

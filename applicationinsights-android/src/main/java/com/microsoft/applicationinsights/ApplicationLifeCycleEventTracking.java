@@ -3,15 +3,10 @@ package com.microsoft.applicationinsights;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-
-import com.microsoft.applicationinsights.channel.Persistence;
 
 import java.util.Date;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -24,9 +19,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ApplicationLifeCycleEventTracking implements Application.ActivityLifecycleCallbacks {
 
     /**
-     * The interval at which sessions are renewed
+     * The interval at which sessions are renewed; todo: move this to TelemetryClientConfig
      */
-    private static final int SessionInterval = 20 * 1000; // 20 seconds
+    protected static final int SessionInterval = 20 * 1000; // 20 seconds
 
     /**
      * Singleton instance of this class
@@ -90,7 +85,7 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
 
     @Override
     public void onActivityResumed(Activity activity) {
-        long now = new Date().getTime();
+        long now = this.getTime();
         long then = this.lastBackground.get();
 
         boolean shouldRenew = now - then > ApplicationLifeCycleEventTracking.SessionInterval;
@@ -103,7 +98,7 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
 
     @Override
     public void onActivityPaused(Activity activity) {
-        long now = new Date().getTime();
+        long now = this.getTime();
         this.lastBackground.set(now);
     }
 
@@ -130,5 +125,13 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
             // reset date timer
             this.activityCount.set(0);
         }
+    }
+
+    /**
+     * Test hook to get the current time
+     * @return the current time in milliseconds
+     */
+    protected long getTime() {
+        return new Date().getTime();
     }
 }

@@ -1,9 +1,11 @@
 package com.microsoft.applicationinsights.channel;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.test.AndroidTestCase;
+import android.content.res.Resources;
+import android.test.ActivityTestCase;
 
-import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryClientConfig;
 
 import junit.framework.Assert;
@@ -11,7 +13,7 @@ import junit.framework.Assert;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
-public class TelemetryContextTest extends AndroidTestCase {
+public class TelemetryContextTest extends ActivityTestCase {
 
     private final String userIdKey = "ai.user.id";
     private final String userAcqKey = "ai.user.accountAcquisitionDate";
@@ -20,10 +22,12 @@ public class TelemetryContextTest extends AndroidTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        this.config = new TelemetryClientConfig("iKey", this.getContext());
+        MockActivity activity = new MockActivity(getInstrumentation().getContext());
+        this.setActivity(activity);
+        this.config = new TelemetryClientConfig(activity);
 
-        SharedPreferences.Editor editor = this.getContext().getSharedPreferences(
-                TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
+        SharedPreferences.Editor editor = this.getActivity().getApplicationContext()
+                .getSharedPreferences(TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
         editor.putString(TelemetryContext.SESSION_ID_KEY, null);
         editor.putString(TelemetryContext.USER_ID_KEY, null);
         editor.commit();
@@ -46,8 +50,8 @@ public class TelemetryContextTest extends AndroidTestCase {
     }
 
     public void testUserContextPersistence() {
-        SharedPreferences.Editor editor = this.getContext().getSharedPreferences(
-                TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
+        SharedPreferences.Editor editor = this.getActivity().getApplicationContext()
+                .getSharedPreferences(TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
         editor.putString(TelemetryContext.USER_ID_KEY, "test value");
         editor.putString(TelemetryContext.USER_ACQ_KEY, "test acq");
         editor.commit();
@@ -104,5 +108,27 @@ public class TelemetryContextTest extends AndroidTestCase {
         assertEquals(message + " - isFirst", isFirst, _isFirst);
 
         return _id;
+    }
+
+    private class MockActivity extends Activity {
+        public Context context;
+        public MockActivity(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public Resources getResources() {
+            return this.context.getResources();
+        }
+
+        @Override
+        public Context getApplicationContext() {
+            return this.context;
+        }
+
+        @Override
+        public String getPackageName() {
+            return "com.microsoft.applicationinsights.test";
+        }
     }
 }

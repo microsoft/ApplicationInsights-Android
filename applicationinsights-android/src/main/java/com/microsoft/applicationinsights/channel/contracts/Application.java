@@ -4,11 +4,11 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
-import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
+import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
+import com.microsoft.commonlogging.channel.contracts.shared.ITelemetryData;
+import com.microsoft.commonlogging.channel.contracts.shared.IContext;
+import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.commonlogging.channel.contracts.shared.JsonHelper;
 
 /**
  * Data contract class Application.
@@ -16,11 +16,6 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 public class Application implements
     IJsonSerializable
 {
-    /**
-     * The ID of this application
-     */
-    private String id;
-
     /**
      * Backing field for property Ver.
      */
@@ -49,20 +44,6 @@ public class Application implements
     }
 
     /**
-     * Gets the Id property.
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Sets the Id property.
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
      * Adds all members of this class to a hashmap
      * @param map to which the members of this class will be added.
      */
@@ -70,10 +51,8 @@ public class Application implements
     {
         if (!(this.ver == null)) {
             map.put("ai.application.ver", this.ver);
-            map.put("ai.application.id", this.id);
         }
     }
-    
 
     /**
      * Serializes the beginning of this object to the passed in writer.

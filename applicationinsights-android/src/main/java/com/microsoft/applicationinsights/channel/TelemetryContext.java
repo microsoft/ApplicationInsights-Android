@@ -1,26 +1,21 @@
 package com.microsoft.applicationinsights.channel;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
 import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.contracts.Application;
 import com.microsoft.applicationinsights.channel.contracts.Device;
 import com.microsoft.applicationinsights.channel.contracts.Internal;
-import com.microsoft.applicationinsights.channel.contracts.Location;
 import com.microsoft.applicationinsights.channel.contracts.Operation;
 import com.microsoft.applicationinsights.channel.contracts.Session;
 import com.microsoft.applicationinsights.channel.contracts.User;
+import com.microsoft.commonlogging.channel.CommonContext;
 
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.UUID;
@@ -38,7 +33,12 @@ public class TelemetryContext {
     /**
      * The configuration for this context.
      */
-    protected TelemetryClientConfig config;
+    protected final TelemetryClientConfig config;
+
+    /**
+     * The common context already collected by common-logging
+     */
+    protected final CommonContext commonContext;
 
     /**
      * Android app telemetryContext.
@@ -59,11 +59,6 @@ public class TelemetryContext {
      * Device telemetryContext.
      */
     private Device device;
-
-    /**
-     * Location telemetryContext.
-     */
-    private Location location;
 
     /**
      * Operation telemetryContext.
@@ -119,20 +114,6 @@ public class TelemetryContext {
     }
 
     /**
-     * Get location context
-     */
-    public Location getLocation() {
-        return location;
-    }
-
-    /**
-     * Set location context
-     */
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-    /**
      * Operation telemetryContext.
      */
     public Operation getOperation() {
@@ -182,9 +163,10 @@ public class TelemetryContext {
 
         // initialization
         this.config = config;
+        this.commonContext = new CommonContext(config.getAppContext());
+
         this.application = new Application();
         this.device = new Device();
-        this.location = new Location();
         this.operation = new Operation();
         this.session = new Session();
         this.user = new User();
@@ -215,7 +197,6 @@ public class TelemetryContext {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         this.application.addToHashMap(map);
         this.device.addToHashMap(map);
-        this.location.addToHashMap(map);
         this.operation.addToHashMap(map);
         this.session.addToHashMap(map);
         this.user.addToHashMap(map);
@@ -259,6 +240,8 @@ public class TelemetryContext {
     private void setSessionFlags() {
         String currentId = this.session.getId();
 
+        // todo: make this detect app-restart and generate new sessions when the app restarts
+
         // default value of last sessionId in setSessionContext is null, so isFirst is true if null
         boolean isFirst = this.lastSessionId == null;
         boolean isNew = currentId.equals(this.lastSessionId);
@@ -273,48 +256,20 @@ public class TelemetryContext {
      * Sets the user context
      */
     private void setUserContext() {
-        String userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
-        String userAcq = this.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
-
-        if(userId == null || userAcq == null) {
-            userId = UUID.randomUUID().toString();
-            userAcq = Util.dateToISO8601(new Date());
-
-            SharedPreferences.Editor editor = this.settings.edit();
-            editor.putString(TelemetryContext.USER_ID_KEY, userId);
-            editor.putString(TelemetryContext.USER_ACQ_KEY, userAcq);
-            editor.apply();
-        }
-
         User context = this.getUser();
-        context.setId(userId);
-        context.setAccountAcquisitionDate(userAcq);
+        context.setId(this.commonContext.getUserId());
+        context.setAccountAcquisitionDate(this.commonContext.getUserAcquisitionDate());
     }
 
     /**
      * Sets the application telemetryContext tags
      */
     private void setAppContext() {
+        CommonContext common = this.commonContext;
+        String ver = String.format("%s (%S)", common.getAppId(), common.getAppBuild());
+
         Application context = this.getApplication();
-
-        String id = "";
-        String version = "";
-
-        try {
-            final PackageManager manager = this.androidAppContext.getPackageManager();
-            final PackageInfo info = manager
-                    .getPackageInfo(this.androidAppContext.getPackageName(), 0);
-
-            id = Integer.toString(info.versionCode);
-            if(version != null) {
-                version = info.packageName;
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            InternalLogging._warn("TelemetryContext", "Could not collect application context");
-        }
-
-        context.setVer(id);
-        context.setId(version);
+        context.setVer(ver);
     }
 
     /**
@@ -323,19 +278,12 @@ public class TelemetryContext {
     private void setDeviceContext() {
         Device context = this.getDevice();
 
-        context.setOsVersion(Build.VERSION.RELEASE);
-        context.setOs("Android");
+        context.setId(this.commonContext.getDeviceId());
+        context.setOsVersion(this.commonContext.getDeviceOsVersion());
+        context.setOs(this.commonContext.getDeviceOs());
         context.setModel(Build.MODEL);
         context.setOemName(Build.MANUFACTURER);
         context.setLocale(Locale.getDefault().toString());
-
-        // get device ID
-        ContentResolver resolver = this.androidAppContext.getContentResolver();
-        String deviceIdentifier = Settings.Secure.getString(resolver, Settings.Secure.ANDROID_ID);
-        if(deviceIdentifier != null) {
-            String deviceIdentifierHash = Util.tryHashStringSha256(deviceIdentifier);
-            context.setId(deviceIdentifierHash);
-        }
 
         // check device type
         final TelephonyManager telephonyManager = (TelephonyManager)

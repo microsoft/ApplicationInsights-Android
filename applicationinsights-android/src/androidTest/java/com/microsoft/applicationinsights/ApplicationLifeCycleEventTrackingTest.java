@@ -1,25 +1,19 @@
 package com.microsoft.applicationinsights;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Build;
-import android.test.ActivityTestCase;
 import android.test.ActivityUnitTestCase;
 
 import com.microsoft.applicationinsights.channel.contracts.EventData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockApplication;
 import com.microsoft.mocks.MockLifeCycleTracking;
-import com.microsoft.mocks.MockTelemetryClient;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import java.util.ArrayList;
 
@@ -72,7 +66,11 @@ public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<
         MockActivity activity = this.startActivity(intent, null, null);
         getInstrumentation().callActivityOnStart(activity);
         getInstrumentation().callActivityOnPause(activity);
-        Thread.sleep(21*1000);
+
+        // increment time by session interval to trigger a new session ID
+        MockLifeCycleTracking.instance.currentTime += MockLifeCycleTracking.instance.getSessionInterval() + 1;
+
+        // validate new session ID
         MockLifeCycleTracking.instance.tc.clearMessages();
         getInstrumentation().callActivityOnResume(activity);
         ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();

@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.channel.contracts.shared;
+package com.microsoft.commonlogging.channel.contracts.shared;
 
 import java.util.LinkedHashMap;
 

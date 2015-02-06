@@ -2,14 +2,18 @@ package com.microsoft.applicationinsights_e2e;
 
 import android.app.Activity;
 import android.content.Context;
-import android.test.AndroidTestCase;
+import android.content.res.Resources;
+import android.test.ActivityTestCase;
 import android.util.Log;
 
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryClientConfig;
-import com.microsoft.applicationinsights.channel.Sender;
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.TelemetryContext;
+import com.microsoft.commonlogging.channel.Sender;
+import com.microsoft.commonlogging.channel.TelemetryChannel;
+import com.microsoft.commonlogging.channel.TelemetryChannelConfig;
+import com.microsoft.commonlogging.channel.TelemetryQueue;
+import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
 
 import junit.framework.Assert;
 
@@ -21,21 +25,18 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class TelemetryClientTestE2E extends AndroidTestCase {
+public class TelemetryClientTestE2E extends ActivityTestCase {
 
-    private TestTelemetryClient client;
-    private TestSender sender;
+    private TestClient client;
     private LinkedHashMap<String, String> properties;
     private LinkedHashMap<String, Double> measurements;
 
     public void setUp() throws Exception {
         super.setUp();
-        String iKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
 
-        this.client = new TestTelemetryClient(this.getContext(), iKey);
-        this.sender = new TestSender(1);
-        this.sender.getConfig().setMaxBatchIntervalMs(20);
-        this.client.getChannel().setSender(this.sender);
+        MockActivity activity = new MockActivity(getInstrumentation().getContext());
+        this.client = new TestClient(activity);
+        this.client.getChannel().getQueue().getConfig().setMaxBatchIntervalMs(20);
 
         this.properties = new LinkedHashMap<>();
         this.properties.put("core property", "core value");
@@ -91,9 +92,11 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
     }
 
     public void testTrackAllRequests() throws Exception {
+        TestQueue queue = new TestQueue(5);
+        String endpoint = queue.sender.getConfig().getEndpointUrl();
+        queue.sender.getConfig().setEndpointUrl(endpoint.replace("https", "http"));
+        this.client.getChannel().setQueue(queue);
 
-        this.sender = new TestSender(5);
-        this.client.getChannel().setSender(this.sender);
         Exception exception;
         try {
             throw new Exception();
@@ -101,7 +104,7 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
             exception = e;
         }
 
-        this.sender.getConfig().setMaxBatchCount(10);
+        queue.getConfig().setMaxBatchCount(10);
         for (int i = 0; i < 10; i++) {
             this.client.trackEvent("android event");
             this.client.trackTrace("android trace");
@@ -111,43 +114,90 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
             Thread.sleep(10);
         }
 
-        this.sender.flush();
+        queue.flush();
         Thread.sleep(10);
         this.validate();
     }
 
     public void validate() throws Exception {
         try {
-            CountDownLatch rspSignal = this.sender.responseSignal;
-            CountDownLatch sendSignal = this.sender.sendSignal;
+            TestQueue queue = this.client.getChannel().getQueue();
+            CountDownLatch rspSignal = queue.sender.responseSignal;
+            CountDownLatch sendSignal = queue.sender.sendSignal;
             rspSignal.await(30, TimeUnit.SECONDS);
 
-            Log.i("RESPONSE", this.sender.getLastResponse());
+            Log.i("RESPONSE", queue.sender.getLastResponse());
 
-            if(rspSignal.getCount() < sendSignal.getCount()) {
+            if (rspSignal.getCount() < sendSignal.getCount()) {
                 Log.w("BACKEND_ERROR", "response count is lower than send count");
-            } else if(sender.responseCode == 206) {
+            } else if (queue.sender.responseCode == 206) {
                 Log.w("BACKEND_ERROR", "response is 206, some telemetry was rejected");
             }
 
-            if(sender.responseCode != 200) {
-                Assert.fail("response rejected with: " + this.sender.getLastResponse());
+            if (queue.sender.responseCode != 200) {
+                Assert.fail("response rejected with: " + queue.sender.getLastResponse());
             }
 
             Assert.assertEquals("response was received", 0, rspSignal.getCount());
-            Assert.assertEquals("queue is empty", 0, this.sender.getQueueSize());
+            Assert.assertEquals("queue is empty", 0, queue.getQueueSize());
         } catch (InterruptedException e) {
             Assert.fail(e.toString());
         }
     }
 
-    protected class TestTelemetryClient extends TelemetryClient {
-        public TestTelemetryClient (Context context, String iKey) {
-            super(new TelemetryClientConfig(iKey, context));
+    private class TestClient extends TelemetryClient {
+        public TestClient(Activity activity) {
+            this(new TelemetryClientConfig(activity));
         }
 
-        public TelemetryChannel getChannel() {
-            return this.channel;
+        protected TestClient(TelemetryClientConfig config) {
+            this(config, new TestChannel(config));
+        }
+
+        protected TestClient(TelemetryClientConfig config, TestChannel channel) {
+            super(config,new TelemetryContext(config), channel);
+            channel.setQueue(new TestQueue(1));
+        }
+
+        public TestChannel getChannel() {
+            return (TestChannel)this.channel;
+        }
+    }
+
+    private class TestChannel extends TelemetryChannel{
+        public TestChannel(TelemetryClientConfig config) {
+            super(config);
+        }
+
+        @Override
+        public void setQueue(TelemetryQueue queue) {
+            super.setQueue(queue);
+        }
+
+        @Override
+        public TestQueue getQueue() {
+            return (TestQueue)super.getQueue();
+        }
+    }
+
+    private class TestQueue extends TelemetryQueue {
+
+        public int responseCode;
+        public CountDownLatch sendSignal;
+        public CountDownLatch responseSignal;
+        public TestSender sender;
+
+        public TestQueue(int expectedSendCount) {
+            super();
+            this.responseCode = 0;
+            this.sendSignal = new CountDownLatch(expectedSendCount);
+            this.responseSignal = new CountDownLatch(expectedSendCount);
+            this.sender = new TestSender(sendSignal, responseSignal);
+            super.sender = this.sender;
+        }
+
+        public long getQueueSize() {
+            return this.linkedList.size();
         }
     }
 
@@ -158,11 +208,11 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
         public CountDownLatch responseSignal;
         private String lastResponse;
 
-        public TestSender(int expectedSendCount) {
+        public TestSender(CountDownLatch sendSignal, CountDownLatch responseSignal) {
             super();
             this.responseCode = 0;
-            this.sendSignal = new CountDownLatch(expectedSendCount);
-            this.responseSignal = new CountDownLatch(expectedSendCount);
+            this.sendSignal = sendSignal;
+            this.responseSignal = responseSignal;
             this.lastResponse = null;
         }
 
@@ -172,10 +222,6 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
             } else {
                 return this.lastResponse;
             }
-        }
-
-        public long getQueueSize() {
-            return this.queue.size();
         }
 
         @Override
@@ -255,6 +301,28 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
                 stringBuilder.append(buf);
                 baseWriter.write(buf);
             }
+        }
+    }
+
+    private class MockActivity extends Activity {
+        public Context context;
+        public MockActivity(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public Resources getResources() {
+            return this.context.getResources();
+        }
+
+        @Override
+        public Context getApplicationContext() {
+            return this.context;
+        }
+
+        @Override
+        public String getPackageName() {
+            return "com.microsoft.applicationinsights.test";
         }
     }
 }

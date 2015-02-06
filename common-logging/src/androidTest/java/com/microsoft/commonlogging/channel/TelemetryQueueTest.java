@@ -1,10 +1,11 @@
-package com.microsoft.applicationinsights.channel;
+package com.microsoft.commonlogging.channel;
 
 import android.app.Activity;
 import android.test.AndroidTestCase;
 
-import com.microsoft.applicationinsights.channel.contracts.Envelope;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.commonlogging.channel.contracts.Envelope;
+import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -19,18 +20,18 @@ import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class SenderTest extends TestCase {
+public class TelemetryQueueTest extends TestCase {
 
-    private TestSender sender;
+    private TestQueue queue;
     private IJsonSerializable item;
 
     private final int batchMargin = 25;
 
     public void setUp() throws Exception {
         super.setUp();
-        this.sender = new TestSender();
+        this.queue = new TestQueue();
         int batchInterval = 100;
-        this.sender.getConfig().setMaxBatchIntervalMs(batchInterval);
+        this.queue.getConfig().setMaxBatchIntervalMs(batchInterval);
         this.item = new Envelope();
     }
 
@@ -39,14 +40,14 @@ public class SenderTest extends TestCase {
     }
 
     public void testGetConfig() throws Exception {
-        Assert.assertNotNull("Sender constructor should initialize config", this.sender.getConfig());
+        Assert.assertNotNull("Sender constructor should initialize config", this.queue.getConfig());
     }
 
     public void testQueue() throws Exception {
         Envelope env = new Envelope();
-        this.sender.enqueue(env);
-        this.sender.getTimer().cancel();
-        IJsonSerializable env2 = this.sender.getQueue().peek();
+        this.queue.enqueue(env);
+        this.queue.getTimer().cancel();
+        IJsonSerializable env2 = this.queue.getQueue().peek();
         Assert.assertTrue("item was successfully queued", env == env2);
     }
 
@@ -66,144 +67,142 @@ public class SenderTest extends TestCase {
     }
 
     public void testBatchingLimit() {
-        this.sender.getConfig().setMaxBatchCount(3);
-        this.sender.enqueue(this.item);
+        this.queue.getConfig().setMaxBatchCount(3);
+        this.queue.enqueue(this.item);
 
         // enqueue one item and verify that it did not trigger a send
         try {
-            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
             Assert.assertEquals("batch was not sent before MaxIntervalMs",
-                    1, this.sender.sendSignal.getCount());
+                    1, this.queue.sendSignal.getCount());
             Assert.assertNotSame("queue is not empty prior to sending data",
-                    this.sender.getQueue().size(), 0);
+                    this.queue.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
 
         // enqueue two items (to reach maxBatchCount) and verify that data was flushed
-        this.sender.enqueue(this.item);
-        this.sender.enqueue(this.item);
+        this.queue.enqueue(this.item);
+        this.queue.enqueue(this.item);
         try {
-            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
             Assert.assertEquals("batch was sent before maxIntervalMs after reaching MaxBatchCount",
-                    0, this.sender.sendSignal.getCount());
+                    0, this.queue.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
-                    this.sender.getQueue().size(), 0);
+                    this.queue.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
     }
 
     public void testBatchingLimitExceed() {
-        this.sender.getConfig().setMaxBatchCount(3);
+        this.queue.getConfig().setMaxBatchCount(3);
 
         // send 4 items (exceeding maxBatchCount is supported) and verify that data was flushed
-        this.sender.enqueue(this.item);
-        this.sender.enqueue(this.item);
-        this.sender.enqueue(this.item);
-        this.sender.enqueue(this.item);
+        this.queue.enqueue(this.item);
+        this.queue.enqueue(this.item);
+        this.queue.enqueue(this.item);
+        this.queue.enqueue(this.item);
 
         try {
-            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
             Assert.assertEquals("second batch was sent before maxIntervalMs after reaching MaxBatchCount",
-                    0, this.sender.sendSignal.getCount());
+                    0, this.queue.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
-                    this.sender.getQueue().size(), 0);
+                    this.queue.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
     }
 
     public void testBatchingTimer() {
-        this.sender.getConfig().setMaxBatchCount(3);
+        this.queue.getConfig().setMaxBatchCount(3);
 
         // send one item and wait for the queue to flush via the timer
-        this.sender.enqueue(this.item);
+        this.queue.enqueue(this.item);
         try {
-            this.sender.sendSignal.await(batchMargin + this.sender.getConfig().getMaxBatchIntervalMs() + 1, TimeUnit.MILLISECONDS);
+            this.queue.sendSignal.await(batchMargin + this.queue.getConfig().getMaxBatchIntervalMs() + 1, TimeUnit.MILLISECONDS);
             Assert.assertEquals("single item was sent after reaching MaxInterval",
-                    0, this.sender.sendSignal.getCount());
+                    0, this.queue.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
-                    this.sender.getQueue().size(), 0);
+                    this.queue.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
     }
 
     public void testBatchingFlush() {
-        this.sender.getConfig().setMaxBatchCount(3);
+        this.queue.getConfig().setMaxBatchCount(3);
 
         // send one item and flush it to bypass the timer
-        this.sender.enqueue(this.item);
+        this.queue.enqueue(this.item);
         try {
 
-            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
             Assert.assertEquals("single item was not sent before reaching MaxInterval",
-                    1, this.sender.sendSignal.getCount());
+                    1, this.queue.sendSignal.getCount());
             Assert.assertNotSame("queue is not empty prior to sending data",
-                    this.sender.getQueue().size(), 0);
+                    this.queue.getQueue().size(), 0);
 
-            this.sender.flush();
-            this.sender.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
+            this.queue.flush();
+            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
             Assert.assertEquals("single item was sent after calling sender.flush",
-                    0, this.sender.sendSignal.getCount());
+                    0, this.queue.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
-                    this.sender.getQueue().size(), 0);
+                    this.queue.getQueue().size(), 0);
         } catch (InterruptedException e) {
             Assert.fail("Failed to validate API\n\n" + e.toString());
         }
     }
 
     public void testDisableTelemetry() {
-        this.sender.getConfig().setTelemetryDisabled(true);
+        this.queue.sender.getConfig().setTelemetryDisabled(true);
 
-        this.sender.enqueue(this.item);
-        long queueSize = this.sender.getQueue().size();
+        this.queue.enqueue(this.item);
+        long queueSize = this.queue.getQueue().size();
         Assert.assertEquals("item is not queued when telemetry is disabled", 0, queueSize);
 
-        this.sender.getConfig().setTelemetryDisabled(false);
+        this.queue.sender.getConfig().setTelemetryDisabled(false);
 
-        this.sender.enqueue(this.item);
-        queueSize = this.sender.getQueue().size();
+        this.queue.enqueue(this.item);
+        queueSize = this.queue.getQueue().size();
         Assert.assertEquals("item is queued when telemetry is enabled", 1, queueSize);
     }
 
-    private class TestSender extends Sender {
+    private class TestQueue extends TelemetryQueue {
 
         public CountDownLatch sendSignal;
         public CountDownLatch responseSignal;
         public StringWriter writer;
 
-        public TestSender() {
+        public TestQueue() {
             super();
             this.sendSignal = new CountDownLatch(1);
             this.responseSignal = new CountDownLatch(1);
+            this.sender = new TestSender(sendSignal);
         }
 
         public LinkedList<IJsonSerializable> getQueue() {
-            return this.queue;
+            return this.linkedList;
         }
 
         public Timer getTimer() {
             return this.timer;
+        }
+    }
+
+    private class TestSender extends Sender {
+        public CountDownLatch sendSignal;
+
+        public TestSender(CountDownLatch sendSignal) {
+            super();
+            this.sendSignal = sendSignal;
         }
 
         @Override
         protected void send(IJsonSerializable[] data) {
             this.sendSignal.countDown();
             super.send(data);
-        }
-
-        @Override
-        protected String onResponse(HttpURLConnection connection, int responseCode) {
-            this.responseSignal.countDown();
-            return null;
-        }
-
-        @Override
-        protected Writer getWriter(HttpURLConnection connection) throws IOException {
-            this.writer = new StringWriter();
-            return this.writer;
         }
     }
 }
