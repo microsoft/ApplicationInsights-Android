@@ -11,6 +11,9 @@ import android.test.ActivityTestCase;
 import android.test.ActivityUnitTestCase;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.mocks.MockActivity;
+import com.microsoft.mocks.MockApplication;
+import com.microsoft.mocks.MockTelemetryClient;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -18,28 +21,27 @@ import junit.framework.TestCase;
 import java.util.ArrayList;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<TestActivity> {
-    TestApplication testApp;
-    TestActivity testActivity;
+public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<MockActivity> {
+    MockApplication testApp;
     MockTelemetryClient tc;
     Intent intent;
 
     public ApplicationLifeCycleEventTrackingTest() {
-        super(TestActivity.class);
+        super(MockActivity.class);
 
     }
 
     public void setUp() throws Exception {
         super.setUp();
-        tc =  new MockTelemetryClient(this.getInstrumentation().getContext(), "TEST_IKEY");
-        testApp = new TestApplication(getInstrumentation().getContext());
+        Context context = this.getInstrumentation().getContext();
+        tc =  new MockTelemetryClient(context, "TEST_IKEY");
+        testApp = new MockApplication(getInstrumentation().getContext());
         setApplication(testApp);
-        testActivity = getActivity();
-        intent = new Intent(getInstrumentation().getTargetContext(), TestActivity.class);
+        intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
     }
 
     public void testOnActivityCreated() throws Exception {
-        startActivity(intent, null, null);
+        this.startActivity(intent, null, null);
         ArrayList<ITelemetry> messages = tc.getMessages();
         for (ITelemetry item: messages)
         {
@@ -67,68 +69,4 @@ public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<
     }
 */
 
-
-    private class MockTelemetryClient extends TelemetryClient {
-        ArrayList<ITelemetry> messages = new ArrayList<ITelemetry>(10);
-
-        public MockTelemetryClient (Context context, String iKey) {
-            super(new TelemetryClientConfig(iKey, context));
-        }
-
-        @Override
-        public void track(ITelemetry telemetry) {
-            messages.add(telemetry);
-        }
-
-        public ArrayList<ITelemetry> getMessages()
-        {
-            return messages;
-        }
-
-        public void clearMessages()
-        {
-            messages.clear();
-        }
-    }
-
-}
-
-class TestApplication extends Application {
-    Context context;
-    public TestApplication(Context ctx) {
-        this.context = ctx;
-    }
-
-    @Override
-    public Context getApplicationContext() {
-        return this.context;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        ApplicationLifeCycleEventTracking tracking = new ApplicationLifeCycleEventTracking();
-        registerActivityLifecycleCallbacks(tracking.getApplicationLifeCycleEventTracking());
-    }
-}
-
-class TestActivity extends Activity {
-    public Context context;
-    public Application app;
-    public TestActivity(Application app) {
-        this.context = app.getApplicationContext();
-        this.app = app;
-        Application application = this.getApplication();
-        application = this.app;
-    }
-
-    @Override
-    public Context getApplicationContext() {
-        return this.context;
-    }
-
-    @Override
-    public String getPackageName() {
-        return "com.microsoft.applicationinsights.test";
-    }
 }
