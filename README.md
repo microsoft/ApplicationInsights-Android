@@ -10,7 +10,7 @@ This project provides an Android SDK for Application Insights. [Application Insi
 
 **Add the repository and compile dependency**
 
-Top-level build file:
+Top-level build file
 ```java
 allprojects {
     repositories {
@@ -22,7 +22,7 @@ allprojects {
 }
 ```
 
-Per-module:
+Per-module
 ```java
 dependencies {
     compile 'com.microsoft.azure:applicationinsights-android:+'
@@ -33,6 +33,7 @@ dependencies {
 
 >Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
+AndroidManifest.xml
 ```xml
 <manifest>
     <uses-permission android:name="android.permission.INTERNET" />
@@ -45,13 +46,14 @@ dependencies {
     </application>
 </manifest>
 ```
-Optionally the instrumentation key can be loaded from gradle using manifestPlaceholders.
+**Optional: load instrumentation key from gradle**
+
+~/.gradle/gradle.properties
 ```java
-// ~/.gradle/gradle.properties
 ai_instrumentation_key=<KEY_PLACEHOLDER>
 ```
+Top-level build file
 ```java
-// Top-level build file
 android {
     buildTypes {
         all {
@@ -105,13 +107,13 @@ public void onStart() {
 ```
 
 
-## AutoCollection of Event ##
-Right now we can auto collect pageviews and the start and stop events for an application.
-You will need to enable this by adding the following code.
+## Automatic collection of life-cycle events ##
 
-***NOTE:  THIS ONLY WORKS WITH VERSION 15 (ICE_CREAM_SANDWICH) AND UP***
+> Note: this only works in Android SDK version 15 and up (Ice Cream Sandwich+)
 
-***1) In you application, add a new JavaClass that extends application***
+** Extend Application and register for life cycle callbacks**
+
+MyApplication.java
 ```java
 import com.microsoft.applicationinsights.ApplicationLifeCycleEventTracking;
 ```
@@ -127,13 +129,11 @@ public class MyApplication extends Application {
     }
 }
 ```
-
-***2) Add the Application name to your AndroidManifest.xml***
-```java
-<application
-...
-android:name="MyApplication"
-...>
+AndroidManifest.xml
+```xml
+<manifest>
+    <application android:name="MyApplication"></application>
+</manifest>
 ```
 
 
@@ -150,4 +150,5 @@ http://microsoft.github.io/AppInsights-Android/
 
 * Install <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank">JDK 1.8</a>
 * Install <a href="http://developer.android.com/sdk/index.html" target="_blank">Android studio</a>
+* [Get an instrumentation key](/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key) and set ai_instrumentation_key=&lt;iKey&gt; in ~/.gradle/gradle.properties
 * Run tests from android studio
