@@ -14,6 +14,11 @@ import com.microsoft.commonlogging.channel.TelemetryChannel;
 import com.microsoft.commonlogging.channel.TelemetryChannelConfig;
 import com.microsoft.commonlogging.channel.TelemetryQueue;
 import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.mocks.MockActivity;
+import com.microsoft.mocks.MockChannel;
+import com.microsoft.mocks.MockQueue;
+import com.microsoft.mocks.MockSender;
+import com.microsoft.mocks.MockTelemetryClient;
 
 import junit.framework.Assert;
 
@@ -27,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TelemetryClientTestE2E extends ActivityTestCase {
 
-    private TestClient client;
+    private MockTelemetryClient client;
     private LinkedHashMap<String, String> properties;
     private LinkedHashMap<String, Double> measurements;
 
@@ -35,7 +40,7 @@ public class TelemetryClientTestE2E extends ActivityTestCase {
         super.setUp();
 
         MockActivity activity = new MockActivity(getInstrumentation().getContext());
-        this.client = new TestClient(activity);
+        this.client = new MockTelemetryClient(activity);
         this.client.getChannel().getQueue().getConfig().setMaxBatchIntervalMs(20);
 
         this.properties = new LinkedHashMap<>();
@@ -92,7 +97,7 @@ public class TelemetryClientTestE2E extends ActivityTestCase {
     }
 
     public void testTrackAllRequests() throws Exception {
-        TestQueue queue = new TestQueue(5);
+        MockQueue queue = new MockQueue(5);
         String endpoint = queue.sender.getConfig().getEndpointUrl();
         queue.sender.getConfig().setEndpointUrl(endpoint.replace("https", "http"));
         this.client.getChannel().setQueue(queue);
@@ -121,7 +126,7 @@ public class TelemetryClientTestE2E extends ActivityTestCase {
 
     public void validate() throws Exception {
         try {
-            TestQueue queue = this.client.getChannel().getQueue();
+            MockQueue queue = this.client.getChannel().getQueue();
             CountDownLatch rspSignal = queue.sender.responseSignal;
             CountDownLatch sendSignal = queue.sender.sendSignal;
             rspSignal.await(30, TimeUnit.SECONDS);
@@ -142,187 +147,6 @@ public class TelemetryClientTestE2E extends ActivityTestCase {
             Assert.assertEquals("queue is empty", 0, queue.getQueueSize());
         } catch (InterruptedException e) {
             Assert.fail(e.toString());
-        }
-    }
-
-    private class TestClient extends TelemetryClient {
-        public TestClient(Activity activity) {
-            this(new TelemetryClientConfig(activity));
-        }
-
-        protected TestClient(TelemetryClientConfig config) {
-            this(config, new TestChannel(config));
-        }
-
-        protected TestClient(TelemetryClientConfig config, TestChannel channel) {
-            super(config,new TelemetryContext(config), channel);
-            channel.setQueue(new TestQueue(1));
-        }
-
-        public TestChannel getChannel() {
-            return (TestChannel)this.channel;
-        }
-    }
-
-    private class TestChannel extends TelemetryChannel{
-        public TestChannel(TelemetryClientConfig config) {
-            super(config);
-        }
-
-        @Override
-        public void setQueue(TelemetryQueue queue) {
-            super.setQueue(queue);
-        }
-
-        @Override
-        public TestQueue getQueue() {
-            return (TestQueue)super.getQueue();
-        }
-    }
-
-    private class TestQueue extends TelemetryQueue {
-
-        public int responseCode;
-        public CountDownLatch sendSignal;
-        public CountDownLatch responseSignal;
-        public TestSender sender;
-
-        public TestQueue(int expectedSendCount) {
-            super();
-            this.responseCode = 0;
-            this.sendSignal = new CountDownLatch(expectedSendCount);
-            this.responseSignal = new CountDownLatch(expectedSendCount);
-            this.sender = new TestSender(sendSignal, responseSignal);
-            super.sender = this.sender;
-        }
-
-        public long getQueueSize() {
-            return this.linkedList.size();
-        }
-    }
-
-    private class TestSender extends Sender {
-
-        public int responseCode;
-        public CountDownLatch sendSignal;
-        public CountDownLatch responseSignal;
-        private String lastResponse;
-
-        public TestSender(CountDownLatch sendSignal, CountDownLatch responseSignal) {
-            super();
-            this.responseCode = 0;
-            this.sendSignal = sendSignal;
-            this.responseSignal = responseSignal;
-            this.lastResponse = null;
-        }
-
-        public String getLastResponse() {
-            if (this.lastResponse == null) {
-                return "";
-            } else {
-                return this.lastResponse;
-            }
-        }
-
-        @Override
-        protected void send(IJsonSerializable[] data) {
-            this.sendSignal.countDown();
-            super.send(data);
-        }
-
-        @Override
-        protected String onResponse(HttpURLConnection connection, int responseCode) {
-            String response = super.onResponse(connection, responseCode);
-            this.lastResponse = prettyPrintJSON(response);
-            this.responseCode = responseCode;
-            this.responseSignal.countDown();
-            return response;
-        }
-
-        private String prettyPrintJSON(String payload) {
-            if (payload == null)
-                return "";
-
-            char[] chars = payload.toCharArray();
-            StringBuilder sb = new StringBuilder();
-            String tabs = "";
-
-            // logcat doesn't like leading spaces, so add '|' to the start of each line
-            String logCatNewLine = "\n|";
-            sb.append(logCatNewLine);
-            for (char c : chars) {
-                switch (c) {
-                    case '[':
-                    case '{':
-                        tabs += "\t";
-                        sb.append(" " + c + logCatNewLine + tabs);
-                        break;
-                    case ']':
-                    case '}':
-                        tabs = tabs.substring(0, tabs.length() - 1);
-                        sb.append(logCatNewLine + tabs + c);
-                        break;
-                    case ',':
-                        sb.append(c + logCatNewLine + tabs);
-                        break;
-                    default:
-                        sb.append(c);
-                }
-            }
-
-            String result = sb.toString();
-            result.replaceAll("\t", "  ");
-
-            return result;
-        }
-
-        private class WriterListener extends Writer {
-
-            private Writer baseWriter;
-            private StringBuilder stringBuilder;
-
-            public WriterListener(Writer baseWriter) {
-                this.baseWriter = baseWriter;
-                this.stringBuilder = new StringBuilder();
-            }
-
-            @Override
-            public void close() throws IOException {
-                baseWriter.close();
-            }
-
-            @Override
-            public void flush() throws IOException {
-                baseWriter.flush();
-            }
-
-            @Override
-            public void write(char[] buf, int offset, int count) throws IOException {
-                stringBuilder.append(buf);
-                baseWriter.write(buf);
-            }
-        }
-    }
-
-    private class MockActivity extends Activity {
-        public Context context;
-        public MockActivity(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        public Resources getResources() {
-            return this.context.getResources();
-        }
-
-        @Override
-        public Context getApplicationContext() {
-            return this.context;
-        }
-
-        @Override
-        public String getPackageName() {
-            return "com.microsoft.applicationinsights.test";
         }
     }
 }

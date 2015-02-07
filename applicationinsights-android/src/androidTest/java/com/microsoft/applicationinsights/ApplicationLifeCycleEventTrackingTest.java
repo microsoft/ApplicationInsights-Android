@@ -24,7 +24,6 @@ public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<
 
     public ApplicationLifeCycleEventTrackingTest() {
         super(MockActivity.class);
-
     }
 
     public void setUp() throws Exception {
