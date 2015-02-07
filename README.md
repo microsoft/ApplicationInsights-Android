@@ -29,26 +29,37 @@ dependencies {
 }
 ```
 
-**Configure the instrumentation key**
+**Configure the instrumentation key and add permissions**
 
 >Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
-
-Set the instrumentation key as a string resource _(somewhere under /res/values/*.xml)_
-```xml
-<resources>
-    <item name="ai_instrumentationKey" type="string">Instrumentation_Key_Goes_Here</item>
-</resources>
-```
-
-**Allow the following permissions in your AndroidManifest.xml**
 
 ```xml
 <manifest>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <application>
+        <meta-data
+            android:name="com.microsoft.applicationinsights.instrumentationKey"
+            android:value="${AI_INSTRUMENTATION_KEY}" />
+    </application>
 </manifest>
 ```
-
+Optionally the instrumentation key can be loaded from gradle using manifestPlaceholders.
+```java
+// ~/.gradle/gradle.properties
+ai_instrumentation_key=<KEY_PLACEHOLDER>
+```
+```java
+// Top-level build file
+android {
+    buildTypes {
+        all {
+            manifestPlaceholders = [AI_INSTRUMENTATION_KEY: ai_instrumentation_key]
+        }
+    }
+}
+```
 
 
 

@@ -2,7 +2,10 @@ package com.microsoft.commonlogging.channel;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.os.Bundle;
 
 import java.util.Queue;
 
@@ -60,32 +63,32 @@ public class TelemetryChannelConfig {
 
     /**
      * Constructs a new instance of TelemetryChannelConfig
-     * @param activity The android activity context
+     * @param context The android activity context
      */
-    public TelemetryChannelConfig(Activity activity){
-        Context context = activity.getApplicationContext();
+    public TelemetryChannelConfig(Context context) {
         this.persist = Persistence.getInstance();
         persist.setPersistenceContext(context);
         this.appContext = context;
-        this.instrumentationKey = TelemetryChannelConfig.readInstrumentationKey(activity);
+        this.instrumentationKey = TelemetryChannelConfig.readInstrumentationKey(context);
     }
 
     /**
      * Reads the instrumentation key from application resources if it is available
-     * @param activity the activity to check resources from
+     * @param context the application context to check the manifest from
      * @return the instrumentation key configured for the activity
      */
-    private static String readInstrumentationKey(Activity activity) {
-        Resources resources = activity.getResources();
-        int identifier = resources.getIdentifier("ai_instrumentationKey", "string",
-                activity.getPackageName());
+    private static String readInstrumentationKey(Context context) {
+        String iKey = "";
 
-        String iKey = null;
-        if(identifier != 0) {
-            iKey = resources.getString(identifier);
-        } else {
+        try {
+            Bundle bundle = context.getPackageManager()
+                    .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA)
+                    .metaData;
+
+            iKey = bundle.getString("com.microsoft.applicationinsights.instrumentationKey");
+        } catch (PackageManager.NameNotFoundException exception) {
             InternalLogging._warn("TelemetryClient",
-                    "set instrumentation key in res/values/application_insights.xml");
+                    "set instrumentation key in AndroidManifest.xml");
         }
 
         return iKey;

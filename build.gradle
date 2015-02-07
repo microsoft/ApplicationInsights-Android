@@ -52,6 +52,18 @@ subprojects {
                 minifyEnabled false
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             }
+
+            def iKey = "instrumentation_key_placeholder"
+
+            if (this.hasProperty('ai_instrumentation_key')) {
+                iKey = ai_instrumentation_key
+            } else {
+                println 'to enable E2E tests set ai_instrumentation_key'
+            }
+
+            all {
+                manifestPlaceholders = [AI_INSTRUMENTATION_KEY: iKey]
+            }
         }
 
         lintOptions {
@@ -62,38 +74,45 @@ subprojects {
     group = projectGroup
     version = projectVersion
 
-    ext.publish = true
-    bintray {
+    if (!this.hasProperty('bintray_user') ||
+        !this.hasProperty('bintray_key') ||
+        !this.hasProperty('bintray_gpg_passphrase')) {
 
-        user = bintray_user
-        key = bintray_key
+        println 'to enable bintray set bintray_user, bintray_key, and bintray_gpg_passphrase'
+    } else {
+        ext.publish = true
+        bintray {
 
-        dryRun = false
-        configurations = ['archives']
+            user = bintray_user
+            key = bintray_key
 
-        pkg {
-            repo = 'maven'
-            name = projectName
-            desc = 'Application Insights SDK for Android'
-            websiteUrl = projectRepo
-            issueTrackerUrl = projectRepo + '/issues'
-            vcsUrl = projectRepo + '.git'
-            licenses = ['MIT']
-            labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
-            publicDownloadNumbers = true
+            dryRun = false
+            configurations = ['archives']
 
-            version {
-                name = projectVersion
-                vcsTag = '0.0.2'
-                gpg {
-                    sign = true
-                    passphrase = bintray_gpg_passphrase
+            pkg {
+                repo = 'maven'
+                name = projectName
+                desc = 'Application Insights SDK for Android'
+                websiteUrl = projectRepo
+                issueTrackerUrl = projectRepo + '/issues'
+                vcsUrl = projectRepo + '.git'
+                licenses = ['MIT']
+                labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
+                publicDownloadNumbers = true
+
+                version {
+                    name = projectVersion
+                    vcsTag = '0.0.2'
+                    gpg {
+                        sign = true
+                        passphrase = bintray_gpg_passphrase
+                    }
+                    // mavenCentralSync {
+                    //     sync = true
+                    //     user = maven_user
+                    //     password = maven_password
+                    // }
                 }
-                // mavenCentralSync {
-                //     sync = true
-                //     user = maven_user
-                //     password = maven_password
-                // }
             }
         }
     }
