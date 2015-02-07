@@ -14,9 +14,8 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * The public API for auto collecting application insights telemetry.
  */
-
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class ApplicationLifeCycleEventTracking implements Application.ActivityLifecycleCallbacks {
+public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
 
     /**
      * The interval at which sessions are renewed; todo: move this to TelemetryClientConfig
@@ -26,8 +25,8 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
     /**
      * Singleton instance of this class
      */
-    public static final ApplicationLifeCycleEventTracking instance =
-            new ApplicationLifeCycleEventTracking();
+    public static final LifeCycleTracking instance =
+            new LifeCycleTracking();
 
     /**
      * The lock for initializing the telemetry client
@@ -52,7 +51,7 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
     /**
      * Hide the constructor to ensure singleton use
      */
-    protected ApplicationLifeCycleEventTracking() {
+    protected LifeCycleTracking() {
         this.activityCount = new AtomicInteger(0);
         this.lastBackground = new AtomicLong(0);
     }
@@ -64,7 +63,7 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
      */
     protected TelemetryClient getTelemetryClient(Activity activity) {
         if (this._telemetryClient == null) {
-            synchronized (ApplicationLifeCycleEventTracking.lock) {
+            synchronized (LifeCycleTracking.lock) {
                 this._telemetryClient = TelemetryClient.getInstance(activity);
             }
         }
@@ -88,7 +87,7 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
         long now = this.getTime();
         long then = this.lastBackground.get();
 
-        boolean shouldRenew = now - then > ApplicationLifeCycleEventTracking.SessionInterval;
+        boolean shouldRenew = now - then > LifeCycleTracking.SessionInterval;
         if(shouldRenew) {
             TelemetryClient tc = this.getTelemetryClient(activity);
             tc.getContext().renewSessionId();

@@ -2,10 +2,10 @@ package com.microsoft.mocks;
 
 import android.app.Activity;
 
-import com.microsoft.applicationinsights.ApplicationLifeCycleEventTracking;
+import com.microsoft.applicationinsights.LifeCycleTracking;
 import com.microsoft.applicationinsights.TelemetryClient;
 
-public class MockLifeCycleTracking extends ApplicationLifeCycleEventTracking {
+public class MockLifeCycleTracking extends LifeCycleTracking {
 
     public MockTelemetryClient tc;
 
@@ -37,6 +37,6 @@ public class MockLifeCycleTracking extends ApplicationLifeCycleEventTracking {
     }
 
     public long getSessionInterval() {
-        return ApplicationLifeCycleEventTracking.SessionInterval;
+        return LifeCycleTracking.SessionInterval;
     }
 }

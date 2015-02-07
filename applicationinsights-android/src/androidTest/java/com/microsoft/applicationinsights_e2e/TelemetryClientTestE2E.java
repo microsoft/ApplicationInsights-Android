@@ -2,8 +2,10 @@ package com.microsoft.applicationinsights_e2e;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.test.ActivityTestCase;
+import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
 import com.microsoft.applicationinsights.TelemetryClient;
@@ -30,7 +32,11 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class TelemetryClientTestE2E extends ActivityTestCase {
+public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
+
+    public TelemetryClientTestE2E() {
+        super(MockActivity.class);
+    }
 
     private MockTelemetryClient client;
     private LinkedHashMap<String, String> properties;
@@ -39,8 +45,11 @@ public class TelemetryClientTestE2E extends ActivityTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        MockActivity activity = new MockActivity(getInstrumentation().getContext());
-        this.client = new MockTelemetryClient(activity);
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
+        this.setActivity(this.startActivity(intent, null, null));
+
+        this.client = new MockTelemetryClient(this.getActivity());
+        this.client.mockTrackMethod = false;
         this.client.getChannel().getQueue().getConfig().setMaxBatchIntervalMs(20);
 
         this.properties = new LinkedHashMap<>();

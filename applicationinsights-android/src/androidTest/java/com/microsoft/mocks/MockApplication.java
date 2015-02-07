@@ -4,8 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
-import com.microsoft.applicationinsights.ApplicationLifeCycleEventTracking;
-
 public class MockApplication extends Application {
     Context context;
 

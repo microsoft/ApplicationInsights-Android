@@ -2,18 +2,26 @@ package com.microsoft.applicationinsights.channel;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.test.ActivityTestCase;
+import android.test.ActivityUnitTestCase;
 
 import com.microsoft.applicationinsights.TelemetryClientConfig;
+import com.microsoft.mocks.MockActivity;
+import com.microsoft.mocks.MockTelemetryClient;
 
 import junit.framework.Assert;
 
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
-public class TelemetryContextTest extends ActivityTestCase {
+public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
+
+    public TelemetryContextTest() {
+        super(com.microsoft.mocks.MockActivity.class);
+    }
 
     private final String userIdKey = "ai.user.id";
     private final String userAcqKey = "ai.user.accountAcquisitionDate";
@@ -22,9 +30,10 @@ public class TelemetryContextTest extends ActivityTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        MockActivity activity = new MockActivity(getInstrumentation().getContext());
-        this.setActivity(activity);
-        this.config = new TelemetryClientConfig(activity);
+
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), com.microsoft.mocks.MockActivity.class);
+        this.setActivity(this.startActivity(intent, null, null));
+        this.config = new TelemetryClientConfig(this.getActivity());
 
         SharedPreferences.Editor editor = this.getActivity().getApplicationContext()
                 .getSharedPreferences(TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();

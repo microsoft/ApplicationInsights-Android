@@ -18,11 +18,11 @@ import junit.framework.Assert;
 import java.util.ArrayList;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<MockActivity> {
+public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
     MockApplication testApp;
     Intent intent;
 
-    public ApplicationLifeCycleEventTrackingTest() {
+    public LifeCycleTrackingTest() {
         super(MockActivity.class);
     }
 

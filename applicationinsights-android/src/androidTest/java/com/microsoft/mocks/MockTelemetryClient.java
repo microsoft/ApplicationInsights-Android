@@ -30,7 +30,11 @@ public class MockTelemetryClient extends TelemetryClient {
 
     @Override
     public void track(ITelemetry telemetry) {
-        messages.add(telemetry);
+        if(this.mockTrackMethod) {
+            messages.add(telemetry);
+        } else {
+            super.track(telemetry);
+        }
     }
 
     public ArrayList<ITelemetry> getMessages()
