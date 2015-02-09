@@ -25,7 +25,7 @@ public class TelemetryQueueTest extends TestCase {
     private TestQueue queue;
     private IJsonSerializable item;
 
-    private final int batchMargin = 25;
+    private final int batchMargin = 50;
 
     public void setUp() throws Exception {
         super.setUp();

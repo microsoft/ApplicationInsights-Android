@@ -28,14 +28,6 @@ artifacts {
     archives sourcesJar
 }
 
-android {
-    buildTypes {
-        all {
-            manifestPlaceholders = [AI_INSTRUMENTATION_KEY: "ai_instrumentation_key"]
-        }
-    }
-}
-
 install {
     repositories.mavenInstaller {
         pom.project {

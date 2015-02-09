@@ -2,9 +2,4 @@
     package="com.microsoft.commonlogging">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <meta-data
-        android:name="com.microsoft.commonlogging.instrumentationKey"
-        android:value="${AI_INSTRUMENTATION_KEY}" />
-
 </manifest>
