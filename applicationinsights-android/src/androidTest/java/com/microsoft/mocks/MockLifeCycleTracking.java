@@ -1,33 +1,26 @@
 package com.microsoft.mocks;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.microsoft.applicationinsights.LifeCycleTracking;
 import com.microsoft.applicationinsights.TelemetryClient;
 
 public class MockLifeCycleTracking extends LifeCycleTracking {
 
+    public static MockLifeCycleTracking instance;
     public MockTelemetryClient tc;
-
     public long currentTime;
 
-    public static final MockLifeCycleTracking instance = new MockLifeCycleTracking();
-
-    private static final Object lock = new Object();
-
-    private MockLifeCycleTracking() {
+    public MockLifeCycleTracking(Context context) {
         super();
         currentTime = 0;
+        this.tc = new MockTelemetryClient(context);
+        MockLifeCycleTracking.instance = this;
     }
 
     @Override
     protected TelemetryClient getTelemetryClient(Activity activity) {
-        if(this.tc == null) {
-            synchronized (MockLifeCycleTracking.lock) {
-                this.tc = new MockTelemetryClient(activity);
-            }
-        }
-
         return this.tc;
     }
 

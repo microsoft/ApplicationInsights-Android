@@ -23,22 +23,6 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     protected static final int SessionInterval = 20 * 1000; // 20 seconds
 
     /**
-     * Singleton instance of this class
-     */
-    public static final LifeCycleTracking instance =
-            new LifeCycleTracking();
-
-    /**
-     * The lock for initializing the telemetry client
-     */
-    private static final Object lock = new Object();
-
-    /**
-     * The telemetry client for this instance
-     */
-    private TelemetryClient _telemetryClient;
-
-    /**
      * The activity counter
      */
     private final AtomicInteger activityCount;
@@ -49,81 +33,70 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     private final AtomicLong lastBackground;
 
     /**
-     * Hide the constructor to ensure singleton use
+     * Create a new instance of the lifecycle event tracking
      */
-    protected LifeCycleTracking() {
+    public LifeCycleTracking() {
         this.activityCount = new AtomicInteger(0);
         this.lastBackground = new AtomicLong(0);
     }
 
-    /**
-     * Gets the instance of telemetry client for this class or creates it
-     * @param activity the activity to use when creating the telemetry client
-     * @return a telemetry client
-     */
-    protected TelemetryClient getTelemetryClient(Activity activity) {
-        if (this._telemetryClient == null) {
-            synchronized (LifeCycleTracking.lock) {
-                this._telemetryClient = TelemetryClient.getInstance(activity);
-            }
-        }
-
-        return this._telemetryClient;
-    }
-
-    @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        activityCount.incrementAndGet();
-        this.getTelemetryClient(activity).trackEvent("Session Start Event");
     }
 
-    @Override
+    /**
+     * This is called each time an activity becomes visible
+     * @param activity the activity which entered the foreground
+     */
     public void onActivityStarted(Activity activity) {
-        this.getTelemetryClient(activity).trackPageView(activity.getClass().getName());
     }
 
-    @Override
+    /**
+     * This is called each time an activity leaves the foreground
+     * @param activity the activity which left the foreground
+     */
     public void onActivityResumed(Activity activity) {
-        long now = this.getTime();
-        long then = this.lastBackground.get();
+        TelemetryClient tc = this.getTelemetryClient(activity);
 
-        boolean shouldRenew = now - then > LifeCycleTracking.SessionInterval;
-        if(shouldRenew) {
-            TelemetryClient tc = this.getTelemetryClient(activity);
+        int count = this.activityCount.getAndIncrement();
+        long now = this.getTime();
+        long then = this.lastBackground.getAndSet(this.getTime());
+        boolean shouldRenew = now - then >= LifeCycleTracking.SessionInterval;
+        boolean isFirst = count == 0; // todo: switch this to this.isTaskRoot()?
+        if(shouldRenew || isFirst) {
             tc.getContext().renewSessionId();
             tc.trackEvent("Session Start Event");
         }
+
+        // track a page view for this activity
+        this.getTelemetryClient(activity).trackPageView(activity.getClass().getName());
     }
 
-    @Override
+    /**
+     * This is called each time an activity leaves the foreground
+     * @param activity the activity which was paused
+     */
     public void onActivityPaused(Activity activity) {
-        long now = this.getTime();
-        this.lastBackground.set(now);
-    }
-
-    @Override
-    public void onActivityStopped(Activity activity) {
-
-    }
-
-    @Override
-    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-    }
-
-    @Override
-    public void onActivityDestroyed(Activity activity) {
         int count = this.activityCount.decrementAndGet();
-
         if(count == 0) {
             TelemetryClient tc = this.getTelemetryClient(activity);
             tc.trackEvent("Session Stop Event");
 
-            // Try to send the data if we can
+            // Try to send the data (will be written to disk if the send fails)
             tc.flush();
-
-            // reset date timer
-            this.activityCount.set(0);
         }
+
+        // keep track of the last time the app was active
+        long now = this.getTime();
+        this.lastBackground.set(now);
+    }
+
+    public void onActivityStopped(Activity activity) {
+    }
+
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+    }
+
+    public void onActivityDestroyed(Activity activity) {
     }
 
     /**
@@ -132,5 +105,14 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
      */
     protected long getTime() {
         return new Date().getTime();
+    }
+
+    /**
+     * Test hook for injecting a mock telemetry client
+     * @param activity the activity to get a telemetry client for
+     * @return a telemetry client associated with the given activity
+     */
+    protected TelemetryClient getTelemetryClient(Activity activity) {
+        return TelemetryClient.getInstance(activity);
     }
 }
