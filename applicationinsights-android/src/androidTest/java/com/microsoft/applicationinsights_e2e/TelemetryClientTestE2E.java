@@ -1,33 +1,16 @@
 package com.microsoft.applicationinsights_e2e;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.test.ActivityTestCase;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.TelemetryClientConfig;
-import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.commonlogging.channel.Sender;
-import com.microsoft.commonlogging.channel.TelemetryChannel;
-import com.microsoft.commonlogging.channel.TelemetryChannelConfig;
-import com.microsoft.commonlogging.channel.TelemetryQueue;
-import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
 import com.microsoft.mocks.MockActivity;
-import com.microsoft.mocks.MockChannel;
 import com.microsoft.mocks.MockQueue;
-import com.microsoft.mocks.MockSender;
 import com.microsoft.mocks.MockTelemetryClient;
 
 import junit.framework.Assert;
 
-import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.Writer;
-import java.net.HttpURLConnection;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
