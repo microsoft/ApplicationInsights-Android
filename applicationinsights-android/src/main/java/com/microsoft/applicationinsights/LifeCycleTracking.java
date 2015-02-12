@@ -23,19 +23,34 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     protected static final int SessionInterval = 20 * 1000; // 20 seconds
 
     /**
+     * Private class to facilitate lazy singleton initialization
+     */
+    private static class LazyInitialization {
+        private static final LifeCycleTracking INSTANCE = new LifeCycleTracking();
+    }
+
+    /**
+     * Gets the singleton instance of LifeCycleTracking
+     * @return the singleton instance of LifeCycleTracking
+     */
+    public static LifeCycleTracking getInstance() {
+        return LazyInitialization.INSTANCE;
+    }
+
+    /**
      * The activity counter
      */
-    private final AtomicInteger activityCount;
+    protected final AtomicInteger activityCount;
 
     /**
      * The timestamp of the last activity
      */
-    private final AtomicLong lastBackground;
+    protected final AtomicLong lastBackground;
 
     /**
      * Create a new instance of the lifecycle event tracking
      */
-    public LifeCycleTracking() {
+    protected LifeCycleTracking() {
         this.activityCount = new AtomicInteger(0);
         this.lastBackground = new AtomicLong(0);
     }

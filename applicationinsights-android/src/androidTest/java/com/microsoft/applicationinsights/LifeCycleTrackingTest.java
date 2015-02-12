@@ -35,7 +35,8 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         super.setUp();
 
         Context context = this.getInstrumentation().getContext();
-        this.mockLifeCycleTracking = new MockLifeCycleTracking(context);
+        this.mockLifeCycleTracking = MockLifeCycleTracking.getInstance(context);
+        this.mockLifeCycleTracking.reset();
         this.telemetryClient = this.mockLifeCycleTracking.tc;
 
         this.mockApplication = new MockApplication(context);
@@ -59,7 +60,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity);
 
         // validation
-        ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
+        ArrayList<ITelemetry> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 2 messages", 2, messages.size());
         Assert.assertEquals("Received Event data", "Microsoft.ApplicationInsights.EventData", messages.get(0).getBaseType());
         Assert.assertEquals("Got the start session string", "Session Start Event", ((EventData)messages.get(0)).getName());
@@ -83,7 +84,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
 
         // validation
-        ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
+        ArrayList<ITelemetry> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 6 messages", 6, messages.size());
         Assert.assertEquals("Received Event data", "Microsoft.ApplicationInsights.EventData", messages.get(0).getBaseType());
         Assert.assertEquals("Got the start session string", "Session Start Event", ((EventData)messages.get(0)).getName());
@@ -102,7 +103,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity);
 
         // validation
-        ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
+        ArrayList<ITelemetry> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 2 messages", 2, messages.size());
         Assert.assertEquals("Received Event data", "Microsoft.ApplicationInsights.EventData", messages.get(0).getBaseType());
         Assert.assertEquals("Got the start session string", "Session Start Event", ((EventData)messages.get(0)).getName());
@@ -112,7 +113,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity);
 
         // validation
-        messages = MockLifeCycleTracking.instance.tc.getMessages();
+        messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 3 message2", 3, messages.size());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(2).getBaseType());
     }
@@ -137,7 +138,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
 
         // validation
-        ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
+        ArrayList<ITelemetry> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 7 messages", 7, messages.size());
         Assert.assertEquals("Received Event data", "Microsoft.ApplicationInsights.EventData", messages.get(5).getBaseType());
         Assert.assertEquals("Got the start session string", "Session Start Event", ((EventData)messages.get(5)).getName());
@@ -153,7 +154,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnPause(activity);
 
         // validation
-        ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
+        ArrayList<ITelemetry> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 3 messages", 3, messages.size());
         Assert.assertEquals("Received Event data", "Microsoft.ApplicationInsights.EventData", messages.get(0).getBaseType());
         Assert.assertEquals("Got the start session string", "Session Start Event", ((EventData)messages.get(0)).getName());
@@ -182,7 +183,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
 
         // validation
-        ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
+        ArrayList<ITelemetry> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 7 messages", 7, messages.size());
         Assert.assertEquals("Received Event data", "Microsoft.ApplicationInsights.EventData", messages.get(4).getBaseType());
         Assert.assertEquals("Got the stop session string", "Session Stop Event", ((EventData)messages.get(4)).getName());
@@ -215,7 +216,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
 
         // validation
-        ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
+        ArrayList<ITelemetry> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 8 messages", 8, messages.size());
         Assert.assertEquals("Got the start session string", "Session Start Event", ((EventData)messages.get(2)).getName());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.EventData", messages.get(2).getBaseType());

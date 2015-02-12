@@ -22,13 +22,13 @@ public class MockApplication extends Application {
     public void onCreate() {
         super.onCreate();
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            registerActivityLifecycleCallbacks(MockLifeCycleTracking.instance);
+            registerActivityLifecycleCallbacks(MockLifeCycleTracking.getInstance(this.context));
         }
     }
 
     public void unregister() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            unregisterActivityLifecycleCallbacks(MockLifeCycleTracking.instance);
+            unregisterActivityLifecycleCallbacks(MockLifeCycleTracking.getInstance(this.context));
         }
     }
 }
