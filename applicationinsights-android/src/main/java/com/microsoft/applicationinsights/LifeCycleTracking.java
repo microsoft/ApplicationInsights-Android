@@ -7,9 +7,9 @@ import android.os.Build;
 import android.os.Bundle;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
 
 /**
  * The public API for auto collecting application insights telemetry.
@@ -55,7 +55,18 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
         this.lastBackground = new AtomicLong(0);
     }
 
+    /**
+     * This is called each time an activity is created.
+     * @param activity
+     * @param savedInstanceState
+     */
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        int count = this.activityCount.getAndIncrement();
+        if(count == 0) {
+            TelemetryClient tc = this.getTelemetryClient(activity);
+            tc.getContext().renewSessionId();
+            tc.trackEvent("Session Start Event");
+        }
     }
 
     /**
@@ -70,20 +81,18 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
      * @param activity the activity which left the foreground
      */
     public void onActivityResumed(Activity activity) {
+        // track the page view
         TelemetryClient tc = this.getTelemetryClient(activity);
+        tc.trackPageView(activity.getClass().getName());
 
-        int count = this.activityCount.getAndIncrement();
+        // check if the session should be renewed
         long now = this.getTime();
         long then = this.lastBackground.getAndSet(this.getTime());
         boolean shouldRenew = now - then >= LifeCycleTracking.SessionInterval;
-        boolean isFirst = count == 0; // todo: switch this to this.isTaskRoot()?
-        if(shouldRenew || isFirst) {
+        if(shouldRenew) {
             tc.getContext().renewSessionId();
             tc.trackEvent("Session Start Event");
         }
-
-        // track a page view for this activity
-        this.getTelemetryClient(activity).trackPageView(activity.getClass().getName());
     }
 
     /**
@@ -91,18 +100,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
      * @param activity the activity which was paused
      */
     public void onActivityPaused(Activity activity) {
-        int count = this.activityCount.decrementAndGet();
-        if(count == 0) {
-            TelemetryClient tc = this.getTelemetryClient(activity);
-            tc.trackEvent("Session Stop Event");
-
-            // Try to send the data (will be written to disk if the send fails)
-            tc.flush();
-        }
-
-        // keep track of the last time the app was active
-        long now = this.getTime();
-        this.lastBackground.set(now);
+        this.lastBackground.set(this.getTime());
     }
 
     public void onActivityStopped(Activity activity) {

@@ -26,7 +26,6 @@ import java.util.UUID;
 public class TelemetryContext {
 
     protected static final String SHARED_PREFERENCES_KEY = "APP_INSIGHTS_CONTEXT";
-    protected static final String SESSION_ID_KEY = "SESSION_ID";
     protected static final String USER_ID_KEY = "USER_ID";
     protected static final String USER_ACQ_KEY = "USER_ACQ";
 
@@ -214,19 +213,13 @@ public class TelemetryContext {
      */
     public void renewSessionId() {
         String newId = UUID.randomUUID().toString();
-
         this.session.setId(newId);
-
-        SharedPreferences.Editor editor = this.settings.edit();
-        editor.putString(TelemetryContext.SESSION_ID_KEY, session.getId());
-        editor.apply();
     }
 
     /**
      * Sets the session context
      */
     private void setSessionContext() {
-        this.lastSessionId = this.settings.getString(TelemetryContext.SESSION_ID_KEY, null);
         if(this.lastSessionId == null) {
             this.renewSessionId();
         } else {
@@ -239,8 +232,6 @@ public class TelemetryContext {
      */
     private void setSessionFlags() {
         String currentId = this.session.getId();
-
-        // todo: make this detect app-restart and generate new sessions when the app restarts
 
         // default value of last sessionId in setSessionContext is null, so isFirst is true if null
         boolean isFirst = this.lastSessionId == null;
