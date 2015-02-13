@@ -41,8 +41,8 @@ public class MockSender extends Sender {
     }
 
     @Override
-    protected String onResponse(HttpURLConnection connection, int responseCode) {
-        String response = super.onResponse(connection, responseCode);
+    protected String onResponse(HttpURLConnection connection, int responseCode, String payload) {
+        String response = super.onResponse(connection, responseCode, payload);
         this.lastResponse = prettyPrintJSON(response);
         this.responseCode = responseCode;
         this.responseSignal.countDown();

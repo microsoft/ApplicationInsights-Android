@@ -31,8 +31,7 @@ public class SenderPersistenceTest extends AndroidTestCase {
             }
         };
         String expected = "THIS IS A TEST";
-        sender.serializedData = expected;
-        sender.onResponse(conn, 501);
+        sender.onResponse(conn, 501, expected);
 
         String data = persist.getData();
         Assert.assertEquals("Data was retrieved from persistence file", expected, data);
