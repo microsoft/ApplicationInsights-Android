@@ -2,18 +2,27 @@ package com.microsoft.applicationinsights.channel;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.test.ActivityTestCase;
+import android.test.ActivityUnitTestCase;
 
 import com.microsoft.applicationinsights.TelemetryClientConfig;
+import com.microsoft.mocks.MockActivity;
+import com.microsoft.mocks.MockTelemetryClient;
+import com.microsoft.mocks.MockTelemetryContext;
 
 import junit.framework.Assert;
 
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
-public class TelemetryContextTest extends ActivityTestCase {
+public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
+
+    public TelemetryContextTest() {
+        super(com.microsoft.mocks.MockActivity.class);
+    }
 
     private final String userIdKey = "ai.user.id";
     private final String userAcqKey = "ai.user.accountAcquisitionDate";
@@ -22,13 +31,13 @@ public class TelemetryContextTest extends ActivityTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        MockActivity activity = new MockActivity(getInstrumentation().getContext());
-        this.setActivity(activity);
-        this.config = new TelemetryClientConfig(activity);
+
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), com.microsoft.mocks.MockActivity.class);
+        this.setActivity(this.startActivity(intent, null, null));
+        this.config = new TelemetryClientConfig(this.getActivity());
 
         SharedPreferences.Editor editor = this.getActivity().getApplicationContext()
                 .getSharedPreferences(TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
-        editor.putString(TelemetryContext.SESSION_ID_KEY, null);
         editor.putString(TelemetryContext.USER_ID_KEY, null);
         editor.commit();
     }
@@ -38,7 +47,7 @@ public class TelemetryContextTest extends ActivityTestCase {
     }
 
     public void testUserContextInitialization() {
-        TelemetryContext tc = new TelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.config);
 
         String id = tc.getContextTags().get(userIdKey);
         try {
@@ -57,7 +66,7 @@ public class TelemetryContextTest extends ActivityTestCase {
         editor.commit();
 
         // this should load context from shared storage to match firstId
-        TelemetryContext tc = new TelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.config);
         LinkedHashMap<String, String> tags = tc.getContextTags();
         String newId = tags.get(userIdKey);
         String newAcq = tags.get(userAcqKey);
@@ -66,9 +75,9 @@ public class TelemetryContextTest extends ActivityTestCase {
     }
 
     public void testSessionContextInitialization() throws Exception {
-        TelemetryContext tc = new TelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.config);
 
-        String firstId = checkSessionTags(tc, "initial id", null, "true");
+        String firstId = checkSessionTags(tc);
         try {
             java.util.UUID.fromString(firstId);
         } catch (Exception e) {
@@ -76,37 +85,28 @@ public class TelemetryContextTest extends ActivityTestCase {
         }
 
         // this should load context from shared storage to match firstId
-        TelemetryContext newerTc = new TelemetryContext(this.config);
-        checkSessionTags(newerTc, "id was loaded from storage", firstId, "false");
+        TelemetryContext newerTc = new MockTelemetryContext(this.config);
+        checkSessionTags(newerTc);
     }
 
     public void testSessionContextRenewal() throws Exception {
-        TelemetryContext tc = new TelemetryContext(this.config);
-        String firstId = checkSessionTags(tc, "initial id", null, "true");
+        TelemetryContext tc = new MockTelemetryContext(this.config);
+        String firstId = checkSessionTags(tc);
 
         // trigger renewal
         tc.renewSessionId();
-        String secondId = checkSessionTags(tc, "session id is renewed", null, "false");
+        String secondId = checkSessionTags(tc);
         Assert.assertNotSame("session id is renewed", firstId, secondId);
 
         // check that it doesn't change when accessed a second time
-        String thirdId = checkSessionTags(tc, "session id is not renewed", secondId, "false");
+        String thirdId = checkSessionTags(tc);
         Assert.assertSame("session id is not renewed", secondId, thirdId);
     }
 
-    private String checkSessionTags(TelemetryContext tc, String message, String id, String isFirst) {
+    private String checkSessionTags(TelemetryContext tc) {
         LinkedHashMap<String, String> tags = tc.getContextTags();
         String sessionIdKey = "ai.session.id";
         String _id = tags.get(sessionIdKey);
-        String sessionIsFirstKey = "ai.session.isFirst";
-        String _isFirst = tags.get(sessionIsFirstKey);
-
-        if(id != null) {
-            assertEquals(message + " - id", id, _id);
-        }
-
-        assertEquals(message + " - isFirst", isFirst, _isFirst);
-
         return _id;
     }
 

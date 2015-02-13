@@ -1,6 +1,6 @@
 package com.microsoft.applicationinsights;
 
-import android.app.Activity;
+import android.content.Context;
 
 import com.microsoft.commonlogging.channel.TelemetryChannelConfig;
 
@@ -12,9 +12,9 @@ public class TelemetryClientConfig extends TelemetryChannelConfig {
     /**
      * Constructs a new instance of TelemetryClientConfig
      *
-     * @param activity The android app context
+     * @param context The android app context
      */
-    public TelemetryClientConfig(Activity activity) {
-        super(activity);
+    public TelemetryClientConfig(Context context) {
+        super(context);
     }
 }

@@ -1,24 +1,10 @@
 package com.microsoft.commonlogging.channel;
 
-import android.os.Build;
-import android.util.Log;
-
 import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
 
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * This singleton class sends data to the endpoint
@@ -67,7 +53,7 @@ public class TelemetryQueue {
         this.linkedList = new LinkedList<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = new TelemetryQueueConfig();
-        this.sender = new Sender();
+        this.sender = new Sender(this.config);
     }
 
     /**
@@ -84,7 +70,7 @@ public class TelemetryQueue {
      */
     public boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
-        if(item == null || this.sender.getConfig().isTelemetryDisabled())
+        if(item == null || this.config.isTelemetryDisabled())
             return false;
 
         boolean success;

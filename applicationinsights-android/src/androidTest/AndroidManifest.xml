@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.microsoft.applicationinsights">
+
+    <application>
+        <meta-data
+            android:name="com.microsoft.applicationinsights.instrumentationKey"
+            android:value="ec3014be-f0e2-48c7-98d6-39b28e897130" />
+    </application>
+
+</manifest>

@@ -1,24 +1,31 @@
 package com.microsoft.applicationinsights;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.Resources;
+import android.content.Intent;
 import android.test.ActivityTestCase;
+import android.test.ActivityUnitTestCase;
 
 import com.microsoft.applicationinsights.channel.contracts.EventData;
+import com.microsoft.mocks.MockActivity;
 
 import junit.framework.Assert;
 
 import java.io.InvalidObjectException;
 import java.util.LinkedHashMap;
 
-public class TelemetryClientTest extends ActivityTestCase {
+public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
 
     MockActivity mockActivity;
 
+    public TelemetryClientTest() {
+        super(MockActivity.class);
+    }
+
+
     public void setUp() throws Exception {
         super.setUp();
-        this.mockActivity = new MockActivity(getInstrumentation().getContext());
+
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
+        this.mockActivity = this.startActivity(intent, null, null);
     }
 
     public void testRegister() throws Exception {
@@ -132,27 +139,5 @@ public class TelemetryClientTest extends ActivityTestCase {
     public void testFlush() throws Exception {
         TelemetryClient client = TelemetryClient.getInstance(this.mockActivity);
         client.flush(); // todo: mock sender and verify that flush is called
-    }
-
-    private class MockActivity extends Activity {
-        public Context context;
-        public MockActivity(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        public Resources getResources() {
-            return this.context.getResources();
-        }
-
-        @Override
-        public Context getApplicationContext() {
-            return this.context;
-        }
-
-        @Override
-        public String getPackageName() {
-            return "com.microsoft.applicationinsights.test";
-        }
     }
 }

@@ -10,7 +10,7 @@ This project provides an Android SDK for Application Insights. [Application Insi
 
 **Add the repository and compile dependency**
 
-Top-level build file:
+Top-level build file
 ```java
 allprojects {
     repositories {
@@ -22,85 +22,78 @@ allprojects {
 }
 ```
 
-Per-module:
+Per-module
 ```java
 dependencies {
     compile 'com.microsoft.azure:applicationinsights-android:+'
 }
 ```
 
-**Configure the instrumentation key**
+**Configure the instrumentation key and add permissions**
 
 >Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
-Set the instrumentation key as a string resource _(somewhere under /res/values/*.xml)_
-```xml
-<resources>
-    <item name="ai_instrumentationKey" type="string">Instrumentation_Key_Goes_Here</item>
-</resources>
-```
-
-**Allow the following permissions in your AndroidManifest.xml**
-
+AndroidManifest.xml
 ```xml
 <manifest>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <application>
+        <meta-data
+            android:name="com.microsoft.applicationinsights.instrumentationKey"
+            android:value="${AI_INSTRUMENTATION_KEY}" />
+    </application>
 </manifest>
 ```
+**Optional: load instrumentation key from gradle**
 
+~/.gradle/gradle.properties
+```java
+ai_instrumentation_key=<KEY_PLACEHOLDER>
+```
+Top-level build file
+```java
+android {
+    buildTypes {
+        all {
+            manifestPlaceholders = [AI_INSTRUMENTATION_KEY: ai_instrumentation_key]
+        }
+    }
+}
+```
 
 
 
 
 ## Usage ##
 
-
-**Initialization**
 ```java
 import com.microsoft.applicationinsights.TelemetryClient;
 ```
 ```java
 public class MyActivity extends Activity {
 
-    private TelemetryClient client;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //... other initialization code ...//
 
-        client = TelemetryClient.getInstance(this);
-        client.trackEvent("onCreate");
+        TelemetryClient client = TelemetryClient.getInstance(this);
+        client.trackTrace("example trace");
+        client.trackEvent("example event");
+        client.trackException(new Exception("example error"));
+        client.trackMetric("example metric", 1);
     }
 }
 ```
 
-**Track events/metrics/traces/exceptions**
+## Automatic collection of life-cycle events ##
 
-```java
-client.trackTrace("example trace");
-client.trackEvent("example event");
-client.trackException(new Error("example error"), "handledAt");
-client.trackMetric("example metric", 1);
-```
+> Note: this only works in Android SDK version 15 and up (Ice Cream Sandwich+)
 
-**Track page views and user sessions**
-```java
-@Override
-public void onStart() {
-    super.onStart();
-    client.trackPageView("page name");
-}
-```
+** Extend Application and register for life cycle callbacks**
 
-
-## AutoCollection of Event ##
-Right now we can auto collect pageviews and the start and stop events for an application.
-You will need to enable this by adding the following code.
-
-***NOTE:  THIS ONLY WORKS WITH VERSION 15 (ICE_CREAM_SANDWICH) AND UP***
-
-***1) In you application, add a new JavaClass that extends application***
+MyApplication.java
 ```java
 import com.microsoft.applicationinsights.ApplicationLifeCycleEventTracking;
 ```
@@ -111,18 +104,16 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            registerActivityLifecycleCallbacks(MockLifeCycleTracking.instance);
+            registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
         }
     }
 }
 ```
-
-***2) Add the Application name to your AndroidManifest.xml***
-```java
-<application
-...
-android:name="MyApplication"
-...>
+AndroidManifest.xml
+```xml
+<manifest>
+    <application android:name="MyApplication"></application>
+</manifest>
 ```
 
 
@@ -139,4 +130,5 @@ http://microsoft.github.io/AppInsights-Android/
 
 * Install <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank">JDK 1.8</a>
 * Install <a href="http://developer.android.com/sdk/index.html" target="_blank">Android studio</a>
+* [Get an instrumentation key](/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key) and set it in the manifest
 * Run tests from android studio

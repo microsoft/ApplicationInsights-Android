@@ -28,7 +28,7 @@ public class Sender {
     /**
      * The configuration for this sender
      */
-    protected final SenderConfig config;
+    protected final TelemetryQueueConfig config;
 
     /**
      * Saves data to disk if there is a protocol error
@@ -36,23 +36,11 @@ public class Sender {
     private Persistence persist;
 
     /**
-     * Saves data to disk if there is a protocol error
-     */
-    protected String serializedData;
-
-    /**
      * Prevent external instantiation
      */
-    public Sender() {
-        this.config = new SenderConfig();
+    public Sender(TelemetryQueueConfig config) {
+        this.config = config;
         this.persist = Persistence.getInstance();
-    }
-
-    /**
-     * @return The configuration for this sender
-     */
-    public SenderConfig getConfig() {
-        return config;
     }
 
     /**
@@ -78,15 +66,16 @@ public class Sender {
             String persistedData = this.persist.getData();
             if (persistedData != "")
             {
+                this.info("adding persisted data", persistedData);
                 sendRequestWithPayload(persistedData);
                 this.persist.clearData();
             }
 
             // Send the new data
-            serializedData = buffer.toString();
+            String serializedData = buffer.toString();
             sendRequestWithPayload(serializedData);
         } catch (IOException e) {
-            this.log(e.toString());
+            this.warn(e.toString());
         }
     }
 
@@ -102,6 +91,7 @@ public class Sender {
         connection.setUseCaches(false);
 
         try {
+            this.info("writing payload", payload);
             writer = this.getWriter(connection);
             writer.write(payload);
             writer.flush();
@@ -109,18 +99,19 @@ public class Sender {
             // Starts the query
             connection.connect();
             int responseCode = connection.getResponseCode();
-            this.onResponse(connection, responseCode);
+            this.info("response code", Integer.toString(responseCode));
+            this.onResponse(connection, responseCode, payload);
         } catch (IOException e){
-            this.persist.saveData(this.serializedData);
+            this.persist.saveData(payload);
+            this.warn(e.toString());
         } finally {
             if(writer != null)
             {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    this.log(e.toString());
+                    this.warn(e.toString());
                 }
-
             }
         }
     }
@@ -129,9 +120,10 @@ public class Sender {
      * Handler for the http response from the sender
      * @param connection a connection containing a response
      * @param responseCode the response code from the connection
+     * @param payload the payload which generated this response
      * @return null if the request was successful, the server response otherwise
      */
-    protected String onResponse(HttpURLConnection connection, int responseCode) {
+    protected String onResponse(HttpURLConnection connection, int responseCode, String payload) {
         BufferedReader reader = null;
         String response = null;
         try {
@@ -144,13 +136,14 @@ public class Sender {
                 String message = String.format("Unexpected response code: %d", responseCode);
                 responseBuilder.append(message);
                 responseBuilder.append("\n");
-                this.log(message);
+                this.warn(message);
             }
 
             //If there was a server issue, persist the data
             if(responseCode >= 500 && responseCode != 529)
             {
-                persist.saveData(this.serializedData);
+                this.info("Server error, persisting data", payload);
+                persist.saveData(payload);
             }
 
             // If it isn't the usual success code (200), log the response from the server.
@@ -164,9 +157,7 @@ public class Sender {
                     InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
                     reader = new BufferedReader(streamReader);
                     String responseLine = reader.readLine();
-                    this.log("Error response:");
                     while (responseLine != null) {
-                        this.log(responseLine);
                         responseBuilder.append(responseLine);
                         responseLine = reader.readLine();
                     }
@@ -175,15 +166,17 @@ public class Sender {
                 } else {
                     response = connection.getResponseMessage();
                 }
+
+                this.info("Non-200 response", response);
             }
         } catch (IOException e) {
-            this.log(e.toString());
+            this.warn(e.toString());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    this.log(e.toString());
+                    this.warn(e.toString());
                 }
             }
         }
@@ -212,10 +205,18 @@ public class Sender {
 
     /**
      * Writes a log to the provided adapter (note: the adapter must be set by the consumer)
-     * @param message the message to be logged
+     * @param message the message to log
      */
-    private void log(String message) {
+    private void warn(String message) {
         InternalLogging._warn("Sender", message);
+    }
+
+    /**
+     * Writes info to the verbose logging channel
+     * @param message the message to log
+     */
+    private void info(String message, String payload) {
+        InternalLogging._info("Sender", message, payload);
     }
 }
 
