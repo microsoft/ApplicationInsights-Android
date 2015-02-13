@@ -68,44 +68,24 @@ android {
 
 ## Usage ##
 
-
-**Initialization**
 ```java
 import com.microsoft.applicationinsights.TelemetryClient;
 ```
 ```java
 public class MyActivity extends Activity {
 
-    private TelemetryClient client;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //... other initialization code ...//
 
-        client = TelemetryClient.getInstance(this);
-        client.trackEvent("onCreate");
+        TelemetryClient client = TelemetryClient.getInstance(this);
+        client.trackTrace("example trace");
+        client.trackEvent("example event");
+        client.trackException(new Exception("example error"));
+        client.trackMetric("example metric", 1);
     }
 }
 ```
-
-**Track events/metrics/traces/exceptions**
-
-```java
-client.trackTrace("example trace");
-client.trackEvent("example event");
-client.trackException(new Error("example error"), "handledAt");
-client.trackMetric("example metric", 1);
-```
-
-**Track page views and user sessions**
-```java
-@Override
-public void onStart() {
-    super.onStart();
-    client.trackPageView("page name");
-}
-```
-
 
 ## Automatic collection of life-cycle events ##
 
@@ -150,5 +130,5 @@ http://microsoft.github.io/AppInsights-Android/
 
 * Install <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank">JDK 1.8</a>
 * Install <a href="http://developer.android.com/sdk/index.html" target="_blank">Android studio</a>
-* [Get an instrumentation key](/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key) and set ai_instrumentation_key=&lt;iKey&gt; in ~/.gradle/gradle.properties
+* [Get an instrumentation key](/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key) and set it in the manifest
 * Run tests from android studio
