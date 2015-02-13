@@ -16,7 +16,7 @@ public class MockQueue extends TelemetryQueue {
         this.responseCode = 0;
         this.sendSignal = new CountDownLatch(expectedSendCount);
         this.responseSignal = new CountDownLatch(expectedSendCount);
-        this.sender = new MockSender(sendSignal, responseSignal);
+        this.sender = new MockSender(sendSignal, responseSignal, this.config);
         super.sender = this.sender;
     }
 

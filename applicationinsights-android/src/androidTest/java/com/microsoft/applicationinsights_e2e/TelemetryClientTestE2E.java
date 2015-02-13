@@ -90,8 +90,8 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
 
     public void testTrackAllRequests() throws Exception {
         MockQueue queue = new MockQueue(5);
-        String endpoint = queue.sender.getConfig().getEndpointUrl();
-        queue.sender.getConfig().setEndpointUrl(endpoint.replace("https", "http"));
+        String endpoint = queue.getConfig().getEndpointUrl();
+        queue.getConfig().setEndpointUrl(endpoint.replace("https", "http"));
         this.client.getChannel().setQueue(queue);
 
         Exception exception;

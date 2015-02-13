@@ -4,6 +4,8 @@ public class TelemetryQueueConfig {
 
     public static final int defaultMaxBatchCount = 100;
     public static final int defaultMaxBatchIntervalMs = 15 * 1000; // 15 seconds
+    public static final String defaultEndpointUrl = "https://dc.services.visualstudio.com/v2/track";
+    public static final boolean defaultDisableTelemetry = false;
 
     /**
      * Lock object to ensure thread safety of the configuration
@@ -19,6 +21,16 @@ public class TelemetryQueueConfig {
      * The maximum interval allowed between calls to batchInvoke
      */
     private int maxBatchIntervalMs;
+
+    /**
+     * The url to which payloads will be sent
+     */
+    private String endpointUrl;
+
+    /**
+     * The master off switch.  Do not send any data if set to TRUE
+     */
+    private boolean telemetryDisabled;
 
     /**
      * Gets the maximum size of a batch in bytes
@@ -53,11 +65,45 @@ public class TelemetryQueueConfig {
     }
 
     /**
+     * Gets the url to which payloads will be sent
+     */
+    public String getEndpointUrl() {
+        return endpointUrl;
+    }
+
+    /**
+     * Sets the url to which payloads will be sent
+     */
+    public void setEndpointUrl(String endpointUrl) {
+        synchronized (this.lock) {
+            this.endpointUrl = endpointUrl;
+        }
+    }
+
+    /**
+     * Gets the value of the master off switch. No data is queued when TRUE
+     */
+    public boolean isTelemetryDisabled() {
+        return telemetryDisabled;
+    }
+
+    /**
+     * Sets the master off switch.  Do not send any data if set to TRUE
+     */
+    public void setTelemetryDisabled(boolean disableTelemetry) {
+        synchronized (this.lock) {
+            this.telemetryDisabled = disableTelemetry;
+        }
+    }
+
+    /**
      * Constructs a new instance of the sender config
      */
     public TelemetryQueueConfig() {
         this.lock = new Object();
         this.maxBatchCount = TelemetryQueueConfig.defaultMaxBatchCount;
         this.maxBatchIntervalMs = TelemetryQueueConfig.defaultMaxBatchIntervalMs;
+        this.endpointUrl = TelemetryQueueConfig.defaultEndpointUrl;
+        this.telemetryDisabled = TelemetryQueueConfig.defaultDisableTelemetry;
     }
 }

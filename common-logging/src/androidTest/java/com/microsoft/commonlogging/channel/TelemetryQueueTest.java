@@ -156,13 +156,13 @@ public class TelemetryQueueTest extends TestCase {
     }
 
     public void testDisableTelemetry() {
-        this.queue.sender.getConfig().setTelemetryDisabled(true);
+        this.queue.getConfig().setTelemetryDisabled(true);
 
         this.queue.enqueue(this.item);
         long queueSize = this.queue.getQueue().size();
         Assert.assertEquals("item is not queued when telemetry is disabled", 0, queueSize);
 
-        this.queue.sender.getConfig().setTelemetryDisabled(false);
+        this.queue.getConfig().setTelemetryDisabled(false);
 
         this.queue.enqueue(this.item);
         queueSize = this.queue.getQueue().size();
@@ -177,9 +177,11 @@ public class TelemetryQueueTest extends TestCase {
 
         public TestQueue() {
             super();
+            TelemetryQueueConfig config = new TelemetryQueueConfig();
+
             this.sendSignal = new CountDownLatch(1);
             this.responseSignal = new CountDownLatch(1);
-            this.sender = new TestSender(sendSignal);
+            this.sender = new TestSender(sendSignal, config);
         }
 
         public LinkedList<IJsonSerializable> getQueue() {
@@ -194,8 +196,8 @@ public class TelemetryQueueTest extends TestCase {
     private class TestSender extends Sender {
         public CountDownLatch sendSignal;
 
-        public TestSender(CountDownLatch sendSignal) {
-            super();
+        public TestSender(CountDownLatch sendSignal, TelemetryQueueConfig config) {
+            super(config);
             this.sendSignal = sendSignal;
         }
 

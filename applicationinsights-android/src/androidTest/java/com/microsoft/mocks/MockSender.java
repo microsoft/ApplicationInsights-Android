@@ -1,6 +1,7 @@
 package com.microsoft.mocks;
 
 import com.microsoft.commonlogging.channel.Sender;
+import com.microsoft.commonlogging.channel.TelemetryQueueConfig;
 import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
 
 import java.io.IOException;
@@ -15,8 +16,10 @@ public class MockSender extends Sender {
     public CountDownLatch responseSignal;
     private String lastResponse;
 
-    public MockSender(CountDownLatch sendSignal, CountDownLatch responseSignal) {
-        super();
+    public MockSender(CountDownLatch sendSignal,
+                      CountDownLatch responseSignal,
+                      TelemetryQueueConfig config) {
+        super(config);
         this.responseCode = 0;
         this.sendSignal = sendSignal;
         this.responseSignal = responseSignal;

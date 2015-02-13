@@ -28,7 +28,7 @@ public class Sender {
     /**
      * The configuration for this sender
      */
-    protected final SenderConfig config;
+    protected final TelemetryQueueConfig config;
 
     /**
      * Saves data to disk if there is a protocol error
@@ -43,16 +43,9 @@ public class Sender {
     /**
      * Prevent external instantiation
      */
-    public Sender() {
-        this.config = new SenderConfig();
+    public Sender(TelemetryQueueConfig config) {
+        this.config = config;
         this.persist = Persistence.getInstance();
-    }
-
-    /**
-     * @return The configuration for this sender
-     */
-    public SenderConfig getConfig() {
-        return config;
     }
 
     /**
