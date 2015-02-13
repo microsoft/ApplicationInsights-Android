@@ -6,6 +6,8 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.microsoft.applicationinsights.channel.TelemetryContext;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,7 +54,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
      */
     protected LifeCycleTracking() {
         this.activityCount = new AtomicInteger(0);
-        this.lastBackground = new AtomicLong(0);
+        this.lastBackground = new AtomicLong(this.getTime());
     }
 
     /**
@@ -64,7 +66,6 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
         int count = this.activityCount.getAndIncrement();
         if(count == 0) {
             TelemetryClient tc = this.getTelemetryClient(activity);
-            tc.getContext().renewSessionId();
             tc.trackEvent("Session Start Event");
         }
     }

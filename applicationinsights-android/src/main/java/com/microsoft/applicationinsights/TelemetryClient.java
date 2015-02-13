@@ -1,6 +1,7 @@
 package com.microsoft.applicationinsights;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
@@ -20,6 +21,7 @@ import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -39,8 +41,6 @@ public class TelemetryClient {
      */
     public static TelemetryClient getInstance(Activity activity) {
         TelemetryClient client = null;
-
-        // attempt to read the iKey from resources if the client is null
         if(activity == null) {
             InternalLogging._warn("TelemetryClient.getInstance", "activity is null");
         } else {
