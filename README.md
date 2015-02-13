@@ -91,7 +91,7 @@ public class MyActivity extends Activity {
 
 > Note: this only works in Android SDK version 15 and up (Ice Cream Sandwich+)
 
-** Extend Application and register for life cycle callbacks**
+**Extend Application and register for life cycle callbacks**
 
 MyApplication.java
 ```java
