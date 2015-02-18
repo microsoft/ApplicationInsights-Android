@@ -1,14 +1,11 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import junit.framework.TestCase;
 import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /// <summary>
 /// Data contract test class CrashDataTests.
@@ -31,13 +28,13 @@ public class CrashDataTests extends TestCase
     
     public void testHeadersPropertyWorksAsExpected()
     {
-        AI.Client.Contracts.CrashDataHeaders expected = object();
+        CrashDataHeaders expected = new CrashDataHeaders();
         CrashData item = new CrashData();
         item.setHeaders(expected);
-        AI.Client.Contracts.CrashDataHeaders actual = item.getHeaders();
+        CrashDataHeaders actual = item.getHeaders();
         Assert.assertEquals(expected, actual);
         
-        expected = object();
+        expected = new CrashDataHeaders();
         item.setHeaders(expected);
         actual = item.getHeaders();
         Assert.assertEquals(expected, actual);
@@ -61,7 +58,7 @@ public class CrashDataTests extends TestCase
     {
         CrashData item = new CrashData();
         item.setVer(42);
-        item.setHeaders(object());
+        item.setHeaders(new CrashDataHeaders());
         for (CrashDataThread entry : new ArrayList<CrashDataThread>() {{add(new CrashDataThread());}})
         {
             item.getThreads().add(entry);

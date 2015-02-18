@@ -1,14 +1,10 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import junit.framework.TestCase;
 import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /// <summary>
 /// Data contract test class CrashDataHeadersTests.
