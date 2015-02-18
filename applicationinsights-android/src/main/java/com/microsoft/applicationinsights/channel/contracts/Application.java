@@ -42,6 +42,7 @@ public class Application implements
     public void setVer(String value) {
         this.ver = value;
     }
+    
 
     /**
      * Adds all members of this class to a hashmap
@@ -53,6 +54,7 @@ public class Application implements
             map.put("ai.application.ver", this.ver);
         }
     }
+    
 
     /**
      * Serializes the beginning of this object to the passed in writer.

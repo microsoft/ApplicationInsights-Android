@@ -33,12 +33,12 @@ public class CrashData extends Domain implements
     /**
      * Backing field for property Ver.
      */
-    private int ver = 1;
+    private int ver = 2;
     
     /**
      * Backing field for property Headers.
      */
-    private AI.Client.Contracts.CrashDataHeaders headers;
+    private CrashDataHeaders headers;
     
     /**
      * Backing field for property Threads.
@@ -75,14 +75,14 @@ public class CrashData extends Domain implements
     /**
      * Gets the Headers property.
      */
-    public AI.Client.Contracts.CrashDataHeaders getHeaders() {
+    public CrashDataHeaders getHeaders() {
         return this.headers;
     }
     
     /**
      * Sets the Headers property.
      */
-    public void setHeaders(AI.Client.Contracts.CrashDataHeaders value) {
+    public void setHeaders(CrashDataHeaders value) {
         this.headers = value;
     }
     
@@ -122,6 +122,21 @@ public class CrashData extends Domain implements
     
 
     /**
+    * Gets the Properties property.
+    */
+    public LinkedHashMap<String, String> getProperties() {
+        //Do nothing - Crash Data does not currently take properties
+        return null;
+    }
+
+    /**
+    * Sets the Properties property.
+    */
+    public void setProperties(LinkedHashMap<String, String> value) {
+        //Do nothing - Crash Data does not currently take properties
+    }
+
+    /**
      * Serializes the beginning of this object to the passed in writer.
      * @param writer The writer to serialize this object to.
      */
@@ -133,7 +148,7 @@ public class CrashData extends Domain implements
         prefix = ",";
         
         writer.write(prefix + "\"headers\":");
-        writer.write(JsonHelper.convert(this.headers));
+        JsonHelper.writeJsonSerializable(writer, this.headers);
         prefix = ",";
         
         if (!(this.threads == null))
