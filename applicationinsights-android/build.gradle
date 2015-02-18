@@ -1,35 +1,14 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group = projectGroup
-version = projectVersion
-
-android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
-
-    defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    lintOptions {
-        abortOnError false
-    }
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile project(':common-logging')
 }
 
 task docs(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
+    source = android.sourceSets.main.java.srcDirs + file('../common-logging/src/main/java')
     options.links("http://d.android.com/reference/")
 }
 
@@ -50,88 +29,32 @@ artifacts {
     archives sourcesJar
 }
 
-if (!this.hasProperty('bintray_user') ||
-    !this.hasProperty('bintray_key') ||
-    !this.hasProperty('bintray_gpg_passphrase')) {
-    println 'set bintray_user, bintray_key, and bintray_gpg_passphrase in ' +
-            '~/.gradle/gradle.properties to enable the bintray task'
-    bintray {
-        user = " "
-        key = " "
-        dryRun = true
-        pkg {
-            repo=" "
-            name=" "
-        }
-    }
-} else {
-    bintray {
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            packaging 'aar'
+            name project.name
+            url projectRepo
 
-        user = bintray_user
-        key = bintray_key
-
-        configurations = ['archives']
-
-        pkg {
-            repo = 'maven'
-            name = project.name
-            desc = 'Application Insights SDK for Android'
-            websiteUrl = projectRepo
-            issueTrackerUrl = projectRepo + '/issues'
-            vcsUrl = projectRepo + '.git'
-            licenses = ['MIT']
-            labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
-            publicDownloadNumbers = true
-
-            version {
-                name = project.version
-                vcsTag = '0.0.2'
-                gpg {
-                    sign = true
-                    passphrase = bintray_gpg_passphrase
+            licenses {
+                license {
+                    name 'MIT'
+                    url 'http://opensource.org/licenses/MIT'
                 }
-                // mavenCentralSync {
-                //     sync = true
-                //     user = maven_user
-                //     password = maven_password
-                // }
             }
-        }
-    }
 
-    install {
-        repositories.mavenInstaller {
-            pom.project {
-                packaging 'aar'
-                name project.name
+            developers {
+                developer {
+                    id 'appinsights-android'
+                    email 'appinsights-android@microsoft.com'
+                }
+            }
+
+            scm {
+                connection projectRepo + '.git'
+                developerConnection projectRepo + '.git'
                 url projectRepo
-
-                licenses {
-                    license {
-                        name 'MIT'
-                        url 'http://opensource.org/licenses/MIT'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'appinsights-android'
-                        email 'appinsights-android@microsoft.com'
-                    }
-                }
-
-                scm {
-                    connection projectRepo + '.git'
-                    developerConnection projectRepo + '.git'
-                    url projectRepo
-                }
             }
         }
     }
 }
-
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
-}
-

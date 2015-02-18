@@ -4,11 +4,11 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
-import com.microsoft.applicationinsights.channel.contracts.shared.IContext;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
+import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
+import com.microsoft.commonlogging.channel.contracts.shared.ITelemetryData;
+import com.microsoft.commonlogging.channel.contracts.shared.IContext;
+import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.commonlogging.channel.contracts.shared.JsonHelper;
 
 /**
  * Data contract class Application.
@@ -42,7 +42,6 @@ public class Application implements
     public void setVer(String value) {
         this.ver = value;
     }
-    
 
     /**
      * Adds all members of this class to a hashmap
@@ -54,7 +53,6 @@ public class Application implements
             map.put("ai.application.ver", this.ver);
         }
     }
-    
 
     /**
      * Serializes the beginning of this object to the passed in writer.

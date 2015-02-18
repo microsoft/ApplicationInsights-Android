@@ -1,12 +1,9 @@
 package com.microsoft.applicationinsights;
 
 import android.app.Activity;
-import android.content.res.Resources;
+import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.InternalLogging;
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.applicationinsights.channel.Util;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
@@ -17,10 +14,14 @@ import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 import com.microsoft.applicationinsights.channel.contracts.RequestData;
 import com.microsoft.applicationinsights.channel.contracts.StackFrame;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.commonlogging.channel.InternalLogging;
+import com.microsoft.commonlogging.channel.TelemetryChannel;
+import com.microsoft.commonlogging.channel.Util;
+import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -28,6 +29,8 @@ import java.util.UUID;
  * The public API for recording application insights telemetry.
  */
 public class TelemetryClient {
+
+    public static final int CONTRACT_VERSION = 2;
 
     /**
      * Get a TelemetryClient instance
@@ -38,13 +41,10 @@ public class TelemetryClient {
      */
     public static TelemetryClient getInstance(Activity activity) {
         TelemetryClient client = null;
-
-        // attempt to read the iKey from resources if the client is null
         if(activity == null) {
             InternalLogging._warn("TelemetryClient.getInstance", "activity is null");
         } else {
-            String iKey = TelemetryClient.getInstrumentationKey(activity);
-            TelemetryClientConfig config = new TelemetryClientConfig(iKey, activity);
+            TelemetryClientConfig config = new TelemetryClientConfig(activity);
             client = new TelemetryClient(config);
         }
 
@@ -110,7 +110,9 @@ public class TelemetryClient {
      * @param config the configuration for this client
      */
     protected TelemetryClient(TelemetryClientConfig config) {
-        this(config, new TelemetryContext(config), new TelemetryChannel(config));
+        this(config,
+                new TelemetryContext(config),
+                new TelemetryChannel<TelemetryClientConfig>(config));
     }
 
     /**
@@ -401,7 +403,7 @@ public class TelemetryClient {
     public void track(ITelemetry telemetry) {
 
         // set the version
-        telemetry.setVer(2);
+        telemetry.setVer(TelemetryClient.CONTRACT_VERSION);
 
         // add common properties to this telemetry object
         if(this.commonProperties != null) {
@@ -413,17 +415,18 @@ public class TelemetryClient {
             telemetry.setProperties(map);
         }
 
-        this.channel.send(context, telemetry);
+        // send to channel
+        this.channel.send(telemetry, context.getContextTags());
     }
 
     /**
      * Triggers an asynchronous flush of queued telemetry.
      * note: this will be called
-     * {@link com.microsoft.applicationinsights.channel.SenderConfig#maxBatchIntervalMs} after
+     * {@link com.microsoft.commonlogging.channel.TelemetryQueueConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public void flush() {
-        this.channel.getSender().flush();
+        this.channel.getQueue().flush();
     }
 
     /**
@@ -435,26 +438,5 @@ public class TelemetryClient {
         } else {
             return input;
         }
-    }
-
-    /**
-     * Reads the instrumentation key from application resources if it is available
-     * @param activity the activity to check resources from
-     * @return the instrumentation key configured for the activity
-     */
-    private static String getInstrumentationKey(Activity activity) {
-        Resources resources = activity.getResources();
-        int identifier = resources.getIdentifier("ai_instrumentationKey", "string",
-                activity.getPackageName());
-
-        String iKey = null;
-        if(identifier != 0) {
-            iKey = resources.getString(identifier);
-        } else {
-            InternalLogging._warn("TelemetryClient",
-                    "set instrumentation key in res/values/application_insights.xml");
-        }
-
-        return iKey;
     }
 }

@@ -1,5 +1,7 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
+import com.microsoft.commonlogging.channel.contracts.Base;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 

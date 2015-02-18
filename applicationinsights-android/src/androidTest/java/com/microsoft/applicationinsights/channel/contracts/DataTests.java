@@ -1,6 +1,7 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+import com.microsoft.commonlogging.channel.contracts.Data;
+import com.microsoft.commonlogging.channel.contracts.shared.ITelemetryData;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

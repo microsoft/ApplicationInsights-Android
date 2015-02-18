@@ -1,41 +1,39 @@
 package com.microsoft.applicationinsights_e2e;
 
-import android.app.Activity;
-import android.content.Context;
-import android.test.AndroidTestCase;
+import android.content.Intent;
+import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.TelemetryClientConfig;
-import com.microsoft.applicationinsights.channel.Sender;
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.mocks.MockActivity;
+import com.microsoft.mocks.MockQueue;
+import com.microsoft.mocks.MockTelemetryClient;
 
 import junit.framework.Assert;
 
-import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.Writer;
-import java.net.HttpURLConnection;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class TelemetryClientTestE2E extends AndroidTestCase {
+public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
 
-    private TestTelemetryClient client;
-    private TestSender sender;
+    public TelemetryClientTestE2E() {
+        super(MockActivity.class);
+    }
+
+    private MockTelemetryClient client;
     private LinkedHashMap<String, String> properties;
     private LinkedHashMap<String, Double> measurements;
 
     public void setUp() throws Exception {
         super.setUp();
-        String iKey = "2b240a15-4b1c-4c40-a4f0-0e8142116250";
 
-        this.client = new TestTelemetryClient(this.getContext(), iKey);
-        this.sender = new TestSender(1);
-        this.sender.getConfig().setMaxBatchIntervalMs(20);
-        this.client.getChannel().setSender(this.sender);
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
+        this.setActivity(this.startActivity(intent, null, null));
+
+        this.client = new MockTelemetryClient(this.getActivity());
+        this.client.mockTrackMethod = false;
+        this.client.getChannel().getQueue().getConfig().setMaxBatchIntervalMs(20);
 
         this.properties = new LinkedHashMap<>();
         this.properties.put("core property", "core value");
@@ -91,9 +89,11 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
     }
 
     public void testTrackAllRequests() throws Exception {
+        MockQueue queue = new MockQueue(5);
+        String endpoint = queue.getConfig().getEndpointUrl();
+        queue.getConfig().setEndpointUrl(endpoint.replace("https", "http"));
+        this.client.getChannel().setQueue(queue);
 
-        this.sender = new TestSender(5);
-        this.client.getChannel().setSender(this.sender);
         Exception exception;
         try {
             throw new Exception();
@@ -101,7 +101,7 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
             exception = e;
         }
 
-        this.sender.getConfig().setMaxBatchCount(10);
+        queue.getConfig().setMaxBatchCount(10);
         for (int i = 0; i < 10; i++) {
             this.client.trackEvent("android event");
             this.client.trackTrace("android trace");
@@ -111,150 +111,34 @@ public class TelemetryClientTestE2E extends AndroidTestCase {
             Thread.sleep(10);
         }
 
-        this.sender.flush();
+        queue.flush();
         Thread.sleep(10);
         this.validate();
     }
 
     public void validate() throws Exception {
         try {
-            CountDownLatch rspSignal = this.sender.responseSignal;
-            CountDownLatch sendSignal = this.sender.sendSignal;
+            MockQueue queue = this.client.getChannel().getQueue();
+            CountDownLatch rspSignal = queue.sender.responseSignal;
+            CountDownLatch sendSignal = queue.sender.sendSignal;
             rspSignal.await(30, TimeUnit.SECONDS);
 
-            Log.i("RESPONSE", this.sender.getLastResponse());
+            Log.i("RESPONSE", queue.sender.getLastResponse());
 
-            if(rspSignal.getCount() < sendSignal.getCount()) {
+            if (rspSignal.getCount() < sendSignal.getCount()) {
                 Log.w("BACKEND_ERROR", "response count is lower than send count");
-            } else if(sender.responseCode == 206) {
+            } else if (queue.sender.responseCode == 206) {
                 Log.w("BACKEND_ERROR", "response is 206, some telemetry was rejected");
             }
 
-            if(sender.responseCode != 200) {
-                Assert.fail("response rejected with: " + this.sender.getLastResponse());
+            if (queue.sender.responseCode != 200) {
+                Assert.fail("response rejected with: " + queue.sender.getLastResponse());
             }
 
             Assert.assertEquals("response was received", 0, rspSignal.getCount());
-            Assert.assertEquals("queue is empty", 0, this.sender.getQueueSize());
+            Assert.assertEquals("queue is empty", 0, queue.getQueueSize());
         } catch (InterruptedException e) {
             Assert.fail(e.toString());
-        }
-    }
-
-    protected class TestTelemetryClient extends TelemetryClient {
-        public TestTelemetryClient (Context context, String iKey) {
-            super(new TelemetryClientConfig(iKey, context));
-        }
-
-        public TelemetryChannel getChannel() {
-            return this.channel;
-        }
-    }
-
-    private class TestSender extends Sender {
-
-        public int responseCode;
-        public CountDownLatch sendSignal;
-        public CountDownLatch responseSignal;
-        private String lastResponse;
-
-        public TestSender(int expectedSendCount) {
-            super();
-            this.responseCode = 0;
-            this.sendSignal = new CountDownLatch(expectedSendCount);
-            this.responseSignal = new CountDownLatch(expectedSendCount);
-            this.lastResponse = null;
-        }
-
-        public String getLastResponse() {
-            if (this.lastResponse == null) {
-                return "";
-            } else {
-                return this.lastResponse;
-            }
-        }
-
-        public long getQueueSize() {
-            return this.queue.size();
-        }
-
-        @Override
-        protected void send(IJsonSerializable[] data) {
-            this.sendSignal.countDown();
-            super.send(data);
-        }
-
-        @Override
-        protected String onResponse(HttpURLConnection connection, int responseCode) {
-            String response = super.onResponse(connection, responseCode);
-            this.lastResponse = prettyPrintJSON(response);
-            this.responseCode = responseCode;
-            this.responseSignal.countDown();
-            return response;
-        }
-
-        private String prettyPrintJSON(String payload) {
-            if (payload == null)
-                return "";
-
-            char[] chars = payload.toCharArray();
-            StringBuilder sb = new StringBuilder();
-            String tabs = "";
-
-            // logcat doesn't like leading spaces, so add '|' to the start of each line
-            String logCatNewLine = "\n|";
-            sb.append(logCatNewLine);
-            for (char c : chars) {
-                switch (c) {
-                    case '[':
-                    case '{':
-                        tabs += "\t";
-                        sb.append(" " + c + logCatNewLine + tabs);
-                        break;
-                    case ']':
-                    case '}':
-                        tabs = tabs.substring(0, tabs.length() - 1);
-                        sb.append(logCatNewLine + tabs + c);
-                        break;
-                    case ',':
-                        sb.append(c + logCatNewLine + tabs);
-                        break;
-                    default:
-                        sb.append(c);
-                }
-            }
-
-            String result = sb.toString();
-            result.replaceAll("\t", "  ");
-
-            return result;
-        }
-
-        private class WriterListener extends Writer {
-
-            private Writer baseWriter;
-            private StringBuilder stringBuilder;
-
-            public WriterListener(Writer baseWriter) {
-                this.baseWriter = baseWriter;
-                this.stringBuilder = new StringBuilder();
-            }
-
-            @Override
-            public void close() throws IOException {
-                baseWriter.close();
-            }
-
-            @Override
-            public void flush() throws IOException {
-                baseWriter.flush();
-            }
-
-            @Override
-            public void write(char[] buf, int offset, int count) throws IOException {
-                stringBuilder.append(buf);
-                baseWriter.write(buf);
-            }
         }
     }
 }
