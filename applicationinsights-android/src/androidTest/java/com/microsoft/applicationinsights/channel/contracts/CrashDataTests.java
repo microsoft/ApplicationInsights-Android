@@ -69,7 +69,7 @@ public class CrashDataTests extends TestCase
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"ver\":42,\"headers\":{},\"threads\":[{}],\"binaries\":[{}]}";
+        String expected = "{\"ver\":42,\"headers\":{\"id\":null},\"threads\":[{\"id\":0}],\"binaries\":[{}]}";
         Assert.assertEquals(expected, writer.toString());
     }
 

@@ -43,7 +43,7 @@ public class CrashDataThreadTests extends TestCase
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"id\":42,\"frames\":[{}]}";
+        String expected = "{\"id\":42,\"frames\":[{\"address\":null}]}";
         Assert.assertEquals(expected, writer.toString());
     }
 
