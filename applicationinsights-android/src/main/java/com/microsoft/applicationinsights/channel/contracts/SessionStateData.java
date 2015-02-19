@@ -38,7 +38,7 @@ public class SessionStateData extends Domain implements
     /**
      * Backing field for property State.
      */
-    private SessionState state = SessionState.Start;
+    private int state = SessionState.Start;
     
     /**
      * Initializes a new instance of the <see cref="SessionStateData"/> class.
@@ -65,17 +65,32 @@ public class SessionStateData extends Domain implements
     /**
      * Gets the State property.
      */
-    public SessionState getState() {
+    public int getState() {
         return this.state;
     }
     
     /**
      * Sets the State property.
      */
-    public void setState(SessionState value) {
+    public void setState(int value) {
         this.state = value;
     }
     
+
+    /**
+    * Gets the Properties property.
+    */
+    public LinkedHashMap<String, String> getProperties() {
+        //Do nothing - does not currently take properties
+        return null;
+    }
+
+    /**
+    * Sets the Properties property.
+    */
+    public void setProperties(LinkedHashMap<String, String> value) {
+        //Do nothing - does not currently take properties
+    }
 
     /**
      * Serializes the beginning of this object to the passed in writer.
@@ -89,7 +104,7 @@ public class SessionStateData extends Domain implements
         prefix = ",";
         
         writer.write(prefix + "\"state\":");
-        JsonHelper.writeJsonSerializable(writer, this.state);
+        writer.write(JsonHelper.convert(this.state));
         prefix = ",";
         
         return prefix;

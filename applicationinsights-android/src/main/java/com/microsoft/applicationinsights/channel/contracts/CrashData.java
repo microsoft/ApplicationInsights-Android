@@ -125,7 +125,7 @@ public class CrashData extends Domain implements
     * Gets the Properties property.
     */
     public LinkedHashMap<String, String> getProperties() {
-        //Do nothing - Crash Data does not currently take properties
+        //Do nothing - does not currently take properties
         return null;
     }
 
@@ -133,7 +133,7 @@ public class CrashData extends Domain implements
     * Sets the Properties property.
     */
     public void setProperties(LinkedHashMap<String, String> value) {
-        //Do nothing - Crash Data does not currently take properties
+        //Do nothing - does not currently take properties
     }
 
     /**
