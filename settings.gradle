@@ -1,1 +1,1 @@
-include ':applicationinsights-android', ':common-logging'
+include ':applicationinsights-android', ':client-logging'

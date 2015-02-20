@@ -4,11 +4,11 @@ apply plugin: 'com.github.dcendents.android-maven'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
-    compile project(':common-logging')
+    compile project(':client-logging')
 }
 
 task docs(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs + file('../common-logging/src/main/java')
+    source = android.sourceSets.main.java.srcDirs + file('../client-logging/src/main/java')
     options.links("http://d.android.com/reference/")
 }
 

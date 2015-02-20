@@ -18,9 +18,6 @@ allprojects {
 
     apply plugin: 'idea'
     apply plugin: 'com.jfrog.bintray'
-    configure(subprojects.findAll { new File(it.projectDir, 'src').directory }) {
-        apply plugin: 'com.android.library'
-    }
 
     bintray {
         user = " "
@@ -36,6 +33,7 @@ allprojects {
 def projectName = project.name
 
 subprojects {
+    apply plugin: 'com.android.library'
     android {
         compileSdkVersion 21
         buildToolsVersion "21.1.2"

@@ -35,7 +35,7 @@ public class TelemetryContext {
     private static final Object lock = new Object();
 
     /**
-     * The common context already collected by common-logging
+     * The common context already collected by client-logging
      */
     protected static CommonContext commonContext;
 
