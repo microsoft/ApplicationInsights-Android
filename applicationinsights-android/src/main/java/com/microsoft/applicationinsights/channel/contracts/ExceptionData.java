@@ -51,6 +51,16 @@ public class ExceptionData extends Domain implements
     private int severityLevel;
     
     /**
+     * Backing field for property ProblemId.
+     */
+    private String problemId;
+    
+    /**
+     * Backing field for property CrashThreadId.
+     */
+    private int crashThreadId;
+    
+    /**
      * Backing field for property Properties.
      */
     private LinkedHashMap<String, String> properties;
@@ -128,6 +138,34 @@ public class ExceptionData extends Domain implements
     }
     
     /**
+     * Gets the ProblemId property.
+     */
+    public String getProblemId() {
+        return this.problemId;
+    }
+    
+    /**
+     * Sets the ProblemId property.
+     */
+    public void setProblemId(String value) {
+        this.problemId = value;
+    }
+    
+    /**
+     * Gets the CrashThreadId property.
+     */
+    public int getCrashThreadId() {
+        return this.crashThreadId;
+    }
+    
+    /**
+     * Sets the CrashThreadId property.
+     */
+    public void setCrashThreadId(int value) {
+        this.crashThreadId = value;
+    }
+    
+    /**
      * Gets the Properties property.
      */
     public LinkedHashMap<String, String> getProperties() {
@@ -185,6 +223,20 @@ public class ExceptionData extends Domain implements
         {
             writer.write(prefix + "\"severityLevel\":");
             writer.write(JsonHelper.convert(this.severityLevel));
+            prefix = ",";
+        }
+        
+        if (!(this.problemId == null))
+        {
+            writer.write(prefix + "\"problemId\":");
+            writer.write(JsonHelper.convert(this.problemId));
+            prefix = ",";
+        }
+        
+        if (!(this.crashThreadId == 0))
+        {
+            writer.write(prefix + "\"crashThreadId\":");
+            writer.write(JsonHelper.convert(this.crashThreadId));
             prefix = ",";
         }
         

@@ -63,6 +63,34 @@ public class ExceptionDataTests extends TestCase
         Assert.assertEquals(expected, actual);
     }
     
+    public void testProblem_idPropertyWorksAsExpected()
+    {
+        String expected = "Test string";
+        ExceptionData item = new ExceptionData();
+        item.setProblemId(expected);
+        String actual = item.getProblemId();
+        Assert.assertEquals(expected, actual);
+        
+        expected = "Other string";
+        item.setProblemId(expected);
+        actual = item.getProblemId();
+        Assert.assertEquals(expected, actual);
+    }
+    
+    public void testCrash_thread_idPropertyWorksAsExpected()
+    {
+        int expected = 42;
+        ExceptionData item = new ExceptionData();
+        item.setCrashThreadId(expected);
+        int actual = item.getCrashThreadId();
+        Assert.assertEquals(expected, actual);
+        
+        expected = 13;
+        item.setCrashThreadId(expected);
+        actual = item.getCrashThreadId();
+        Assert.assertEquals(expected, actual);
+    }
+    
     public void testPropertiesPropertyWorksAsExpected()
     {
         ExceptionData item = new ExceptionData();
@@ -87,6 +115,8 @@ public class ExceptionDataTests extends TestCase
             item.getExceptions().add(entry);
         }
         item.setSeverityLevel(5);
+        item.setProblemId("Test string");
+        item.setCrashThreadId(42);
         for (Map.Entry<String, String> entry : new LinkedHashMap<String, String>() {{put("key1", "test value 1"); put("key2", "test value 2"); }}.entrySet())
         {
             item.getProperties().put(entry.getKey(), entry.getValue());
@@ -97,7 +127,7 @@ public class ExceptionDataTests extends TestCase
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"ver\":42,\"handledAt\":\"Test string\",\"exceptions\":[{\"typeName\":null,\"message\":null,\"hasFullStack\":true}],\"severityLevel\":5,\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"},\"measurements\":{\"key1\":3.1415,\"key2\":42.2}}";
+        String expected = "{\"ver\":42,\"handledAt\":\"Test string\",\"exceptions\":[{\"typeName\":null,\"message\":null,\"hasFullStack\":true}],\"severityLevel\":5,\"problemId\":\"Test string\",\"crashThreadId\":42,\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"},\"measurements\":{\"key1\":3.1415,\"key2\":42.2}}";
         Assert.assertEquals(expected, writer.toString());
     }
 

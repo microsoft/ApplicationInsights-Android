@@ -1,8 +1,5 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
-import com.microsoft.commonlogging.channel.contracts.Base;
-import com.microsoft.commonlogging.channel.contracts.Envelope;
-
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -10,6 +7,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import com.microsoft.commonlogging.channel.contracts.Base;
+import com.microsoft.commonlogging.channel.contracts.Envelope;
 
 /// <summary>
 /// Data contract test class EnvelopeTests.

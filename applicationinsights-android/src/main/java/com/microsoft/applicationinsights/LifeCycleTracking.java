@@ -6,10 +6,10 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.microsoft.applicationinsights.channel.TelemetryContext;
+import com.microsoft.applicationinsights.channel.contracts.SessionState;
+import com.microsoft.applicationinsights.channel.contracts.SessionStateData;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -65,8 +65,10 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         int count = this.activityCount.getAndIncrement();
         if(count == 0) {
+            SessionStateData sessionData = new SessionStateData();
+            sessionData.setState(SessionState.Start);
             TelemetryClient tc = this.getTelemetryClient(activity);
-            tc.trackEvent("Session Start Event");
+            tc.track(sessionData);
         }
     }
 
@@ -82,9 +84,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
      * @param activity the activity which left the foreground
      */
     public void onActivityResumed(Activity activity) {
-        // track the page view
         TelemetryClient tc = this.getTelemetryClient(activity);
-        tc.trackPageView(activity.getClass().getName());
 
         // check if the session should be renewed
         long now = this.getTime();
@@ -92,8 +92,13 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
         boolean shouldRenew = now - then >= LifeCycleTracking.SessionInterval;
         if(shouldRenew) {
             tc.getContext().renewSessionId();
-            tc.trackEvent("Session Start Event");
+            SessionStateData sessionData = new SessionStateData();
+            sessionData.setState(SessionState.Start);
+            tc.track(sessionData);
         }
+
+        // track the page view
+        tc.trackPageView(activity.getClass().getName());
     }
 
     /**
