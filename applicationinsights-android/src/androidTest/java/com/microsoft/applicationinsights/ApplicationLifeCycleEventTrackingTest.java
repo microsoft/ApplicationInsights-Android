@@ -6,8 +6,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.channel.contracts.EventData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
+import com.microsoft.applicationinsights.channel.contracts.SessionState;
+import com.microsoft.applicationinsights.channel.contracts.SessionStateData;
 import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockApplication;
@@ -43,8 +44,8 @@ public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<
         ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
 
         Assert.assertEquals("Received 1 message", 1, messages.size());
-        Assert.assertEquals("Received Event data", "Microsoft.ApplicationInsights.EventData", messages.get(0).getBaseType());
-        Assert.assertEquals("Got the start session string", "Session Start Event", ((EventData)messages.get(0)).getName());
+        Assert.assertEquals("Received Session State data", "Microsoft.ApplicationInsights.SessionStateData", messages.get(0).getBaseType());
+        Assert.assertEquals("Got the start session", SessionState.Start, ((SessionStateData)messages.get(0)).getState());
         getInstrumentation().callActivityOnDestroy(activity);
     }
 
@@ -76,8 +77,8 @@ public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<
         ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
 
         Assert.assertEquals("Received 1 message", 1, messages.size());
-        Assert.assertEquals("Received Event data", "Microsoft.ApplicationInsights.EventData", messages.get(0).getBaseType());
-        Assert.assertEquals("Got the start session string", "Session Start Event", ((EventData)messages.get(0)).getName());
+        Assert.assertEquals("Received Session State data", "Microsoft.ApplicationInsights.SessionStateData", messages.get(0).getBaseType());
+        Assert.assertEquals("Got the start session", SessionState.Start, ((SessionStateData)messages.get(0)).getState());
         getInstrumentation().callActivityOnDestroy(activity);
     }
 
@@ -90,7 +91,7 @@ public class ApplicationLifeCycleEventTrackingTest extends ActivityUnitTestCase<
         ArrayList<ITelemetry> messages = MockLifeCycleTracking.instance.tc.getMessages();
 
         Assert.assertEquals("Received 1 message", 1, messages.size());
-        Assert.assertEquals("Received Event data", "Microsoft.ApplicationInsights.EventData", messages.get(0).getBaseType());
-        Assert.assertEquals("Got the start session string", "Session Stop Event", ((EventData)messages.get(0)).getName());
+        Assert.assertEquals("Received Session State data", "Microsoft.ApplicationInsights.SessionStateData", messages.get(0).getBaseType());
+        Assert.assertEquals("Got the start session", SessionState.End, ((SessionStateData)messages.get(0)).getState());
     }
 }

@@ -6,6 +6,9 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.microsoft.applicationinsights.channel.contracts.SessionState;
+import com.microsoft.applicationinsights.channel.contracts.SessionStateData;
+
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -75,7 +78,10 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         activityCount.incrementAndGet();
-        this.getTelemetryClient(activity).trackEvent("Session Start Event");
+        SessionStateData sessionData = new SessionStateData();
+        sessionData.setState(SessionState.Start);
+        TelemetryClient tc = this.getTelemetryClient(activity);
+        tc.track(sessionData);
     }
 
     @Override
@@ -92,7 +98,9 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
         if(shouldRenew) {
             TelemetryClient tc = this.getTelemetryClient(activity);
             tc.getContext().renewSessionId();
-            tc.trackEvent("Session Start Event");
+            SessionStateData sessionData = new SessionStateData();
+            sessionData.setState(SessionState.Start);
+            tc.track(sessionData);
         }
     }
 
@@ -116,8 +124,10 @@ public class ApplicationLifeCycleEventTracking implements Application.ActivityLi
         int count = this.activityCount.decrementAndGet();
 
         if(count == 0) {
+            SessionStateData sessionData = new SessionStateData();
+            sessionData.setState(SessionState.End);
             TelemetryClient tc = this.getTelemetryClient(activity);
-            tc.trackEvent("Session Stop Event");
+            tc.track(sessionData);
 
             // Try to send the data if we can
             tc.flush();
