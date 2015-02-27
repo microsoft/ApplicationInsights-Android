@@ -36,14 +36,10 @@ public class InternalLogging {
      * Log critical SDK misuse, throw if developer mode is enabled
      * @param tag the log context
      * @param message the log message
-     * @throws Exception
      */
-    public static void _throw(String tag, String message) throws Exception {
+    public static void _error(String tag, String message) {
 
-        // todo: track SDK misuse as an event
+        // todo: track SDK misuse as an event to the users channel
         Log.e(prefix + tag, message);
-        if(enableDebugMode) {
-            throw new Exception(tag + ": " + message);
-        }
     }
 }

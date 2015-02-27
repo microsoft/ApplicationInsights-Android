@@ -1,10 +1,8 @@
 package com.microsoft.commonlogging.channel;
 
 import android.os.Build;
-import android.util.Log;
 
 import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
-
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,9 +13,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -25,6 +20,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public class Sender {
 
+    private static final String TAG = "Sender";
     /**
      * The configuration for this sender
      */
@@ -60,13 +56,14 @@ public class Sender {
                 data[i].serialize(stringWriter);
                 buffer.append(stringWriter.toString());
             }
+
             buffer.append(']');
 
             // Send the persisted data
             String persistedData = this.persist.getData();
             if (persistedData != "")
             {
-                this.info("adding persisted data", persistedData);
+                InternalLogging._info(TAG, "adding persisted data", persistedData);
                 sendRequestWithPayload(persistedData);
                 this.persist.clearData();
             }
@@ -75,7 +72,7 @@ public class Sender {
             String serializedData = buffer.toString();
             sendRequestWithPayload(serializedData);
         } catch (IOException e) {
-            this.warn(e.toString());
+            InternalLogging._error(TAG, e.toString());
         }
     }
 
@@ -91,7 +88,7 @@ public class Sender {
         connection.setUseCaches(false);
 
         try {
-            this.info("writing payload", payload);
+            InternalLogging._info(TAG, "writing payload", payload);
             writer = this.getWriter(connection);
             writer.write(payload);
             writer.flush();
@@ -99,18 +96,17 @@ public class Sender {
             // Starts the query
             connection.connect();
             int responseCode = connection.getResponseCode();
-            this.info("response code", Integer.toString(responseCode));
+            InternalLogging._info(TAG, "response code", Integer.toString(responseCode));
             this.onResponse(connection, responseCode, payload);
         } catch (IOException e){
             this.persist.saveData(payload);
-            this.warn(e.toString());
+            InternalLogging._error(TAG, e.toString());
         } finally {
-            if(writer != null)
-            {
+            if(writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    this.warn(e.toString());
+                    // no-op
                 }
             }
         }
@@ -136,13 +132,13 @@ public class Sender {
                 String message = String.format("Unexpected response code: %d", responseCode);
                 responseBuilder.append(message);
                 responseBuilder.append("\n");
-                this.warn(message);
+                InternalLogging._warn(TAG, message);
             }
 
             //If there was a server issue, persist the data
             if(responseCode >= 500 && responseCode != 529)
             {
-                this.info("Server error, persisting data", payload);
+                InternalLogging._info(TAG, "Server error, persisting data", payload);
                 persist.saveData(payload);
             }
 
@@ -167,16 +163,16 @@ public class Sender {
                     response = connection.getResponseMessage();
                 }
 
-                this.info("Non-200 response", response);
+                InternalLogging._info(TAG, "Non-200 response", response);
             }
         } catch (IOException e) {
-            this.warn(e.toString());
+            InternalLogging._error(TAG, e.toString());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    this.warn(e.toString());
+                    InternalLogging._error(TAG, e.toString());
                 }
             }
         }
@@ -201,22 +197,6 @@ public class Sender {
             // no GZIP for older devices
             return new OutputStreamWriter(connection.getOutputStream());
         }
-    }
-
-    /**
-     * Writes a log to the provided adapter (note: the adapter must be set by the consumer)
-     * @param message the message to log
-     */
-    private void warn(String message) {
-        InternalLogging._warn("Sender", message);
-    }
-
-    /**
-     * Writes info to the verbose logging channel
-     * @param message the message to log
-     */
-    private void info(String message, String payload) {
-        InternalLogging._info("Sender", message, payload);
     }
 }
 

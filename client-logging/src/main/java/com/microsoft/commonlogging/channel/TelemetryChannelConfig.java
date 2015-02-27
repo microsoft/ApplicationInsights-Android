@@ -1,13 +1,8 @@
 package com.microsoft.commonlogging.channel;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.os.Bundle;
-
-import java.util.Queue;
 
 public class TelemetryChannelConfig {
 
@@ -110,16 +105,31 @@ public class TelemetryChannelConfig {
     private static String readInstrumentationKey(Context context) {
         String iKey = "";
         try {
-            iKey = context
+            Bundle bundle = context
                     .getPackageManager()
                     .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA)
-                    .metaData
-                    .getString("com.microsoft.applicationinsights.instrumentationKey");
+                    .metaData;
+            if(bundle != null) {
+                iKey = bundle.getString("com.microsoft.applicationinsights.instrumentationKey");
+            } else {
+                logInstrumentationInstructions();
+            }
         } catch (PackageManager.NameNotFoundException exception) {
-            InternalLogging._warn("TelemetryClient",
-                    "set instrumentation key in AndroidManifest.xml");
+            logInstrumentationInstructions();
         }
 
         return iKey;
+    }
+
+    /**
+     * Writes instructions on how to configure the instrumentation key.
+     */
+    private static void logInstrumentationInstructions() {
+        String instructions = "No instrumentation key found.\n" +
+                "Set the instrumentation key in AndroidManifest.xml";
+        String manifestSnippet = "<meta-data\n" +
+                "android:name=\"com.microsoft.applicationinsights.instrumentationKey\"\n" +
+                "android:value=\"${AI_INSTRUMENTATION_KEY}\" />";
+        InternalLogging._error("MissingInstrumentationkey", instructions + "\n" + manifestSnippet);
     }
 }
