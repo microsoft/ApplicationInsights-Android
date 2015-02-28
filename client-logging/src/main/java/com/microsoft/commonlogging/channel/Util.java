@@ -5,13 +5,14 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class Util {
 
     private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
     private static final DateFormat dateFormat =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ROOT);
     static {
         TimeZone timeZone = TimeZone.getTimeZone("UTC");
         dateFormat.setTimeZone(timeZone);
@@ -48,9 +49,9 @@ public class Util {
 
         String result;
         if (days == 0) {
-            result = String.format("%02d:%02d:%02d.%03d", hour, min, sec, ms);
+            result = String.format(Locale.ROOT, "%02d:%02d:%02d.%03d", hour, min, sec, ms);
         } else {
-            result = String.format("%d.%02d:%02d:%02d.%03d", days, hour, min, sec, ms);
+            result = String.format(Locale.ROOT, "%d.%02d:%02d:%02d.%03d", days, hour, min, sec, ms);
         }
 
         return result;

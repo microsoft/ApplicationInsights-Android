@@ -1,5 +1,7 @@
 package com.microsoft.commonlogging.channel;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.os.Build;
 
 import com.microsoft.commonlogging.channel.contracts.shared.IJsonSerializable;
@@ -13,6 +15,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Locale;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -129,7 +132,7 @@ public class Sender {
             if ((responseCode < 200)
                     || (responseCode >= 300 && responseCode < 400)
                     || (responseCode > 500 && responseCode != 529)) {
-                String message = String.format("Unexpected response code: %d", responseCode);
+                String message = String.format(Locale.ROOT, "Unexpected response code: %d", responseCode);
                 responseBuilder.append(message);
                 responseBuilder.append("\n");
                 InternalLogging._warn(TAG, message);
@@ -186,6 +189,7 @@ public class Sender {
      * @return a writer for the given connection stream
      * @throws java.io.IOException
      */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     protected Writer getWriter(HttpURLConnection connection) throws IOException {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // GZIP if we are running SDK 19 or higher

@@ -3,6 +3,7 @@
     android:layout_height="match_parent" android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp" android:baselineAligned="false"
     android:divider="?android:attr/dividerHorizontal" android:orientation="horizontal"
+    tools:ignore="UnusedAttribute"
     android:showDividers="middle" tools:context=".ItemListActivity">
 
     <!--

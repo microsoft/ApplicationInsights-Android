@@ -1,5 +1,7 @@
 package com.microsoft.applicationinsights.appsample;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -67,6 +69,8 @@ public class ItemListFragment extends ListFragment {
     public ItemListFragment() {
     }
 
+    @SuppressLint("InlinedApi")
+    @TargetApi(11)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
