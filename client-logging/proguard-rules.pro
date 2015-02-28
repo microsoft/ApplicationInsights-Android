@@ -15,3 +15,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keep public class * {
+    public protected <methods>;
+}
+
+-keepattributes SourceFile,Signature,MethodParameters,Exceptions,LineNumberTable,LocalVariableTable,LocalVariableTypeTable

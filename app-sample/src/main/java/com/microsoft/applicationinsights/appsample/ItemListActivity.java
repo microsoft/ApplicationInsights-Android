@@ -56,6 +56,7 @@ public class ItemListActivity extends FragmentActivity
         client.trackEvent("example event");
         client.trackException(new Exception("example error"));
         client.trackMetric("example metric", 1);
+        client.flush();
     }
 
     /**
