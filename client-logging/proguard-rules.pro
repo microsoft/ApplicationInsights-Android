@@ -18,6 +18,7 @@
 
 -keep public class * {
     public protected <methods>;
+    public protected <fields>;
 }
 
 -keepattributes SourceFile,Signature,MethodParameters,Exceptions,LineNumberTable,LocalVariableTable,LocalVariableTypeTable
