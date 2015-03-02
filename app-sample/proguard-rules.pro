@@ -1,6 +1,6 @@
 # Add project specific ProGuard rules here.
 # By default, the flags in this file are appended to flags specified
-# in /Users/applicationinsights/Library/Android/sdk/tools/proguard/proguard-android.txt
+# in /Users/scsouthw/Library/Android/sdk/tools/proguard/proguard-android.txt
 # You can edit the include path and order by changing the proguardFiles
 # directive in build.gradle.
 #
@@ -15,10 +15,3 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
-
--keep public class * {
-    public protected <methods>;
-    public protected <fields>;
-}
-
--keepattributes SourceFile,Signature,MethodParameters,Exceptions,LineNumberTable,LocalVariableTable,LocalVariableTypeTable

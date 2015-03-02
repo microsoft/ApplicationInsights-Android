@@ -33,41 +33,6 @@ allprojects {
 def projectName = project.name
 
 subprojects {
-    apply plugin: 'com.android.library'
-    android {
-        compileSdkVersion 21
-        buildToolsVersion "21.1.2"
-
-        defaultConfig {
-            minSdkVersion 9
-            targetSdkVersion 21
-            versionCode 1
-            versionName "1.0"
-        }
-
-        buildTypes {
-            release {
-                minifyEnabled false
-                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            }
-
-            def iKey = "instrumentation_key_placeholder"
-
-            if (this.hasProperty('ai_instrumentation_key')) {
-                iKey = ai_instrumentation_key
-            } else {
-                println 'to enable E2E tests set ai_instrumentation_key'
-            }
-
-            all {
-                manifestPlaceholders = [AI_INSTRUMENTATION_KEY: iKey]
-            }
-        }
-
-        lintOptions {
-            abortOnError false
-        }
-    }
 
     group = projectGroup
     version = projectVersion

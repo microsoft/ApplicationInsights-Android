@@ -101,6 +101,7 @@ import com.microsoft.applicationinsights.ApplicationLifeCycleEventTracking;
 public class MyApplication extends Application {
 
     @Override
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public void onCreate() {
         super.onCreate();
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
