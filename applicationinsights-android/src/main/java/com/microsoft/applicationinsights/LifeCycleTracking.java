@@ -20,11 +20,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
 
     /**
-     * The interval at which sessions are renewed; todo: move this to TelemetryClientConfig
-     */
-    protected static final int SessionInterval = 20 * 1000; // 20 seconds
-
-    /**
      * Private class to facilitate lazy singleton initialization
      */
     private static class LazyInitialization {
@@ -89,7 +84,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
         // check if the session should be renewed
         long now = this.getTime();
         long then = this.lastBackground.getAndSet(this.getTime());
-        boolean shouldRenew = now - then >= LifeCycleTracking.SessionInterval;
+        boolean shouldRenew = now - then >= tc.getConfig().getSessionIntervalMS();
         if(shouldRenew) {
             tc.getContext().renewSessionId();
             SessionStateData sessionData = new SessionStateData();

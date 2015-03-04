@@ -14,8 +14,6 @@ public class MockLifeCycleTracking extends LifeCycleTracking {
     public final MockTelemetryClient tc;
     public long currentTime;
 
-    protected static final int SessionInterval = 20 * 1000; // 20 seconds
-
     public static MockLifeCycleTracking getInstance(Context context) {
         synchronized (MockLifeCycleTracking.lock) {
             if(MockLifeCycleTracking.instance == null) {
@@ -40,10 +38,6 @@ public class MockLifeCycleTracking extends LifeCycleTracking {
     @Override
     protected long getTime() {
         return currentTime;
-    }
-
-    public long getSessionInterval() {
-        return LifeCycleTracking.SessionInterval;
     }
 
     public void reset() {
