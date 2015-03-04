@@ -17,7 +17,7 @@ public class InternalLogging {
      */
     public static void _info(String tag, String message, String payload) {
         if(enableVerboseMode) {
-            Log.i(prefix + tag, message + ":\n" + payload);
+            Log.i(prefix + tag, message + ":" + payload);
         }
     }
 

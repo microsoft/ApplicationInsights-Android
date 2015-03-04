@@ -133,9 +133,6 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
         getInstrumentation().callActivityOnResume(activity3);
-        getInstrumentation().callActivityOnPause(activity3);
-        getInstrumentation().callActivityOnPause(activity2);
-        getInstrumentation().callActivityOnPause(activity1);
         getInstrumentation().callActivityOnResume(activity1);
 
         // validation
@@ -161,8 +158,6 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         // test 3 activities starting/stopping then restarting the first
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
-        getInstrumentation().callActivityOnPause(activity2);
-        getInstrumentation().callActivityOnPause(activity1);
 
         this.mockLifeCycleTracking.currentTime += this.mockLifeCycleTracking.getSessionInterval();
         getInstrumentation().callActivityOnResume(activity1);
