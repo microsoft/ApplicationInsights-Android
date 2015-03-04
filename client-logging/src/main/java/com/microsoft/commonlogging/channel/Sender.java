@@ -1,6 +1,5 @@
 package com.microsoft.commonlogging.channel;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.os.Build;
 
@@ -64,7 +63,7 @@ public class Sender {
 
             // Send the persisted data
             String persistedData = this.persist.getData();
-            if (persistedData != "")
+            if (!persistedData.equals(""))
             {
                 InternalLogging._info(TAG, "adding persisted data", persistedData);
                 sendRequestWithPayload(persistedData);
@@ -83,8 +82,8 @@ public class Sender {
         Writer writer = null;
         URL url = new URL(this.config.getEndpointUrl());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setReadTimeout(10000 /* milliseconds */); // todo: move to config
-        connection.setConnectTimeout(15000 /* milliseconds */);
+        connection.setReadTimeout(this.config.getSenderReadTimeout());
+        connection.setConnectTimeout(this.config.getSenderConnectTimeout());
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
         connection.setDoInput(true);

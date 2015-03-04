@@ -3,10 +3,12 @@ package com.microsoft.commonlogging.channel;
 public class TelemetryQueueConfig {
 
     public static final int defaultMaxBatchCount = 100;
-    public static final int defaultMaxBatchIntervalMs = 15 * 1000; // 15 seconds
+    public static final int defaultMaxBatchIntervalMs = 15 * 1000;
     public static final String defaultEndpointUrl = "https://dc.services.visualstudio.com/v2/track";
     public static final boolean defaultDisableTelemetry = false;
     public static final boolean defaultDeveloperMode = false;
+    public static final int defaultSenderReadTimeout = 10 * 1000;
+    public static final int defaultsenderConnectTimeout = 15 * 1000;
 
     /**
      * Lock object to ensure thread safety of the configuration
@@ -37,6 +39,17 @@ public class TelemetryQueueConfig {
      * The flag to enable developer mode logging
      */
     private boolean developerMode;
+
+    /**
+     * The timeout for reading the response from the data collector endpoint
+     */
+
+    private int senderReadTimeoutMs;
+
+    /**
+     * The timeout for connecting to the data collector endpoint
+     */
+    private int senderConnectTimeoutMs;
 
     /**
      * Gets the maximum size of a batch in bytes
@@ -117,6 +130,20 @@ public class TelemetryQueueConfig {
     }
 
     /**
+     * Gets the timeout for reading the response from the data collector endpoint
+     */
+    public int getSenderReadTimeout() {
+        return this.senderReadTimeoutMs;
+    }
+
+    /**
+     * Gets the timeout for connecting to the data collector endpoint
+     */
+    public int getSenderConnectTimeout() {
+        return this.senderConnectTimeoutMs;
+    }
+
+    /**
      * Constructs a new instance of the sender config
      */
     public TelemetryQueueConfig() {
@@ -126,5 +153,7 @@ public class TelemetryQueueConfig {
         this.endpointUrl = TelemetryQueueConfig.defaultEndpointUrl;
         this.telemetryDisabled = TelemetryQueueConfig.defaultDisableTelemetry;
         this.developerMode = TelemetryQueueConfig.defaultDeveloperMode;
+        this.senderReadTimeoutMs = TelemetryQueueConfig.defaultSenderReadTimeout;
+        this.senderConnectTimeoutMs = TelemetryQueueConfig.defaultsenderConnectTimeout;
     }
 }
