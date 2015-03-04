@@ -3,9 +3,6 @@ package com.microsoft.commonlogging.channel;
 import android.util.Log;
 
 public class InternalLogging {
-    // todo: implement 'development mode' in config/common
-    public static boolean enableDebugMode = true;
-    public static boolean enableVerboseMode = true;
     private static final String prefix = InternalLogging.class.getPackage().getName();
 
     /**
@@ -16,7 +13,7 @@ public class InternalLogging {
      * @param payload the payload for the message
      */
     public static void _info(String tag, String message, String payload) {
-        if(enableVerboseMode) {
+        if(TelemetryQueue.instance.getConfig().isDeveloperMode()) {
             Log.i(prefix + tag, message + ":" + payload);
         }
     }
@@ -27,7 +24,7 @@ public class InternalLogging {
      * @param message the log message
      */
     public static void _warn(String tag, String message) {
-        if(enableDebugMode) {
+        if(TelemetryQueue.instance.getConfig().isDeveloperMode()) {
             Log.w(prefix + tag, message);
         }
     }
@@ -38,8 +35,11 @@ public class InternalLogging {
      * @param message the log message
      */
     public static void _error(String tag, String message) {
-
-        // todo: track SDK misuse as an event to the users channel
-        Log.e(prefix + tag, message);
+        if(TelemetryQueue.instance.getConfig().isDeveloperMode()) {
+            Log.e(prefix + tag, message);
+            throw new RuntimeException(prefix + tag + "\n" + message);
+        } else {
+            // todo: track SDK misuse as an event to the user's channel
+        }
     }
 }

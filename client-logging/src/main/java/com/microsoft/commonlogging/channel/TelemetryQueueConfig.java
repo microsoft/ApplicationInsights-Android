@@ -6,6 +6,7 @@ public class TelemetryQueueConfig {
     public static final int defaultMaxBatchIntervalMs = 15 * 1000; // 15 seconds
     public static final String defaultEndpointUrl = "https://dc.services.visualstudio.com/v2/track";
     public static final boolean defaultDisableTelemetry = false;
+    public static final boolean defaultDeveloperMode = false;
 
     /**
      * Lock object to ensure thread safety of the configuration
@@ -33,6 +34,11 @@ public class TelemetryQueueConfig {
     private boolean telemetryDisabled;
 
     /**
+     * The flag to enable developer mode logging
+     */
+    private boolean developerMode;
+
+    /**
      * Gets the maximum size of a batch in bytes
      */
     public int getMaxBatchCount() {
@@ -46,6 +52,20 @@ public class TelemetryQueueConfig {
         synchronized (this.lock) {
             this.maxBatchCount = maxBatchCount;
         }
+    }
+
+    /**
+     * Get the flag to enable developer mode logging
+     */
+    public boolean isDeveloperMode() {
+        return this.developerMode;
+    }
+
+    /**
+     * Set the flag to enable developer mode logging
+     */
+    public void setDeveloperMode(boolean enableDeveloperMode) {
+        this.developerMode = enableDeveloperMode;
     }
 
     /**
@@ -105,5 +125,6 @@ public class TelemetryQueueConfig {
         this.maxBatchIntervalMs = TelemetryQueueConfig.defaultMaxBatchIntervalMs;
         this.endpointUrl = TelemetryQueueConfig.defaultEndpointUrl;
         this.telemetryDisabled = TelemetryQueueConfig.defaultDisableTelemetry;
+        this.developerMode = TelemetryQueueConfig.defaultDeveloperMode;
     }
 }
