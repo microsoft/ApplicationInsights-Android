@@ -21,7 +21,6 @@ import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -35,17 +34,16 @@ public class TelemetryClient {
     /**
      * Get a TelemetryClient instance
      *
-     * @param   activity the activity to associate with this instance
+     * @param   context the activity to associate with this instance
      * @return  an instance of {@code TelemetryClient} associated with the activity, or null if the
-     *          activity is null and {@link InternalLogging#enableDebugMode} is {@code false}.
+     *          activity is null.
      */
-    public static TelemetryClient getInstance(Activity activity) {
+    public static TelemetryClient getInstance(Context context) {
         TelemetryClient client = null;
-        if(activity == null) {
+        if(context == null) {
             InternalLogging._warn("TelemetryClient.getInstance", "activity is null");
         } else {
-            TelemetryClientConfig config = new TelemetryClientConfig(activity);
-            client = new TelemetryClient(config);
+            client = new TelemetryClient(context);
         }
 
         return client;
@@ -107,12 +105,22 @@ public class TelemetryClient {
      * <p>
      *     Use {@code TelemetryClient.getInstance} to get an instance.
      * </p>
+     * @param context the application context for this client
+     */
+    protected TelemetryClient(Context context) {
+        this(new TelemetryClientConfig(context),  context);
+    }
+
+    /**
+     * Constructor of the class TelemetryClient.
+     * <p>
+     *     Use {@code TelemetryClient.getInstance} to get an instance.
+     * </p>
      * @param config the configuration for this client
      */
-    protected TelemetryClient(TelemetryClientConfig config) {
-        this(config,
-                new TelemetryContext(config),
-                new TelemetryChannel<TelemetryClientConfig>(config));
+    private TelemetryClient(TelemetryClientConfig config, Context context) {
+        this(config, new TelemetryContext(context),
+                new TelemetryChannel<TelemetryClientConfig>(config, context));
     }
 
     /**
@@ -229,9 +237,9 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackException(Exception, String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap, LinkedHashMap)
      */
-    public void trackException(Exception exception) {
+    public void trackException(Throwable exception) {
         this.trackException(exception, null);
     }
 
@@ -239,19 +247,19 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackException(Exception, String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap, LinkedHashMap)
      */
-    public void trackException(Exception exception, String handledAt) {
+    public void trackException(Throwable exception, String handledAt) {
         this.trackException(exception, handledAt, null);
     }
 
     /**
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackException(Exception, String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap, LinkedHashMap)
      */
     public void trackException(
-            Exception exception,
+            Throwable exception,
             String handledAt,
             LinkedHashMap<String, String> properties) {
         this.trackException(exception, handledAt, properties, null);
@@ -267,7 +275,7 @@ public class TelemetryClient {
      * @param measurements Custom measurements associated with the event.
      */
     public void trackException(
-            Exception exception,
+            Throwable exception,
             String handledAt,
             LinkedHashMap<String, String> properties,
             LinkedHashMap<String, Double> measurements) {

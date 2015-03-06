@@ -27,14 +27,14 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     private final String userIdKey = "ai.user.id";
     private final String userAcqKey = "ai.user.accountAcquisitionDate";
 
-    private TelemetryClientConfig config;
+    private Context context;
 
     public void setUp() throws Exception {
         super.setUp();
 
         Intent intent = new Intent(getInstrumentation().getTargetContext(), com.microsoft.mocks.MockActivity.class);
         this.setActivity(this.startActivity(intent, null, null));
-        this.config = new TelemetryClientConfig(this.getActivity());
+        this.context = this.getActivity();
 
         SharedPreferences.Editor editor = this.getActivity().getApplicationContext()
                 .getSharedPreferences(TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
@@ -47,7 +47,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testUserContextInitialization() {
-        TelemetryContext tc = new MockTelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.context);
 
         String id = tc.getContextTags().get(userIdKey);
         try {
@@ -66,7 +66,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
         editor.commit();
 
         // this should load context from shared storage to match firstId
-        TelemetryContext tc = new MockTelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.context);
         LinkedHashMap<String, String> tags = tc.getContextTags();
         String newId = tags.get(userIdKey);
         String newAcq = tags.get(userAcqKey);
@@ -75,7 +75,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testSessionContextInitialization() throws Exception {
-        TelemetryContext tc = new MockTelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.context);
 
         String firstId = checkSessionTags(tc);
         try {
@@ -85,12 +85,12 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
         }
 
         // this should load context from shared storage to match firstId
-        TelemetryContext newerTc = new MockTelemetryContext(this.config);
+        TelemetryContext newerTc = new MockTelemetryContext(this.context);
         checkSessionTags(newerTc);
     }
 
     public void testSessionContextRenewal() throws Exception {
-        TelemetryContext tc = new MockTelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.context);
         String firstId = checkSessionTags(tc);
 
         // trigger renewal

@@ -1,5 +1,7 @@
 package com.microsoft.commonlogging.channel;
 
+import android.content.Context;
+
 import com.microsoft.commonlogging.channel.contracts.Data;
 import com.microsoft.commonlogging.channel.contracts.Envelope;
 import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
@@ -23,7 +25,7 @@ public class TelemetryChannel<TConfig extends TelemetryChannelConfig> {
     /**
      * The context for this recorder
      */
-    private final CommonContext context;
+    private final CommonContext commonContext;
 
     /**
      * The id for this channel
@@ -44,10 +46,10 @@ public class TelemetryChannel<TConfig extends TelemetryChannelConfig> {
      * Instantiates a new instance of Sender
      * @param config The configuration for this channel
      */
-    public TelemetryChannel(TConfig config) {
+    public TelemetryChannel(TConfig config, Context context) {
         this.queue = TelemetryQueue.instance;
         this.config = config;
-        this.context = new CommonContext(config.getAppContext());
+        this.commonContext = new CommonContext(context);
 
         Random random = new Random();
         this.channelId = Math.abs(random.nextLong());
@@ -120,12 +122,12 @@ public class TelemetryChannel<TConfig extends TelemetryChannelConfig> {
         // TODO set flags
         //envelope.setFlags(SetFlags(persistence, latency));
 
-        envelope.setUserId(this.context.getUserId());
-        envelope.setDeviceId(this.context.getDeviceId());
-        envelope.setOsVer(this.context.getDeviceOsVersion());
-        envelope.setOs(this.context.getDeviceOs());
-        envelope.setAppId(this.context.getAppId());
-        envelope.setAppVer(this.context.getAppVersion());
+        envelope.setUserId(this.commonContext.getUserId());
+        envelope.setDeviceId(this.commonContext.getDeviceId());
+        envelope.setOsVer(this.commonContext.getDeviceOsVersion());
+        envelope.setOs(this.commonContext.getDeviceOs());
+        envelope.setAppId(this.commonContext.getAppId());
+        envelope.setAppVer(this.commonContext.getAppVersion());
 
         if(tags != null) {
             envelope.setTags(tags);

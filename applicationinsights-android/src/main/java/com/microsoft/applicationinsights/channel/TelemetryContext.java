@@ -40,9 +40,9 @@ public class TelemetryContext {
     protected static CommonContext commonContext;
 
     /**
-     * Android app telemetryContext.
+     * A flag indicating that the static context has been loaded
      */
-    private static Context androidAppContext;
+    protected static boolean isStaticContextLoaded;
 
     /**
      * Device telemetryContext.
@@ -116,30 +116,34 @@ public class TelemetryContext {
 
     /**
      * Constructs a new instance of the Telemetry telemetryContext tag keys
-     * @param config the configuration for this telemetryContext
+     * @param context the configuration for this telemetryContext
      */
-    public TelemetryContext(TelemetryClientConfig config) {
+    public TelemetryContext(Context context) {
 
-        if(TelemetryContext.androidAppContext == null) {
+        // skip the lock if there is no contention
+        if(!TelemetryContext.isStaticContextLoaded) {
             synchronized (TelemetryContext.lock) {
+                if (!TelemetryContext.isStaticContextLoaded) {
 
-                // get an instance of the shared preferences manager for persistent context fields
-                TelemetryContext.commonContext = new CommonContext(config.getAppContext());
-                TelemetryContext.androidAppContext = config.getAppContext();
+                    // get an instance of the shared preferences manager for persistent context fields
+                    TelemetryContext.commonContext = new CommonContext(context);
 
-                // initialize static context
-                TelemetryContext.device = new Device();
-                TelemetryContext.session = new Session();
-                TelemetryContext.user = new User();
-                TelemetryContext.internal = new Internal();
-                TelemetryContext.application = new Application();
-                TelemetryContext.lastSessionId = null;
+                    // initialize static context
+                    TelemetryContext.device = new Device();
+                    TelemetryContext.session = new Session();
+                    TelemetryContext.user = new User();
+                    TelemetryContext.internal = new Internal();
+                    TelemetryContext.application = new Application();
+                    TelemetryContext.lastSessionId = null;
 
-                TelemetryContext.setDeviceContext();
-                TelemetryContext.setSessionContext();
-                TelemetryContext.setUserContext();
-                TelemetryContext.setAppContext();
-                TelemetryContext.setInternalContext();
+                    TelemetryContext.setDeviceContext(context);
+                    TelemetryContext.setSessionContext();
+                    TelemetryContext.setUserContext();
+                    TelemetryContext.setAppContext();
+                    TelemetryContext.setInternalContext();
+
+                    TelemetryContext.isStaticContextLoaded = true;
+                }
             }
         }
 
@@ -210,7 +214,7 @@ public class TelemetryContext {
     /**
      * Sets the device telemetryContext tags
      */
-    protected static void setDeviceContext() {
+    protected static void setDeviceContext(Context appContext) {
         Device context = TelemetryContext.device;
 
         context.setId(TelemetryContext.commonContext.getDeviceId());
@@ -222,7 +226,7 @@ public class TelemetryContext {
 
         // check device type
         final TelephonyManager telephonyManager = (TelephonyManager)
-                TelemetryContext.androidAppContext.getSystemService(Context.TELEPHONY_SERVICE);
+                appContext.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE) {
             context.setType("Phone");
         } else {
@@ -231,7 +235,7 @@ public class TelemetryContext {
 
         // check network type
         final ConnectivityManager connectivityManager = (ConnectivityManager)
-                TelemetryContext.androidAppContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null) {
             int networkType = activeNetwork.getType();
