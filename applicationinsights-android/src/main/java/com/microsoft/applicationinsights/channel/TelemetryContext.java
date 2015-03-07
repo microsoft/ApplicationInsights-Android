@@ -6,7 +6,6 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
-import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.contracts.Application;
 import com.microsoft.applicationinsights.channel.contracts.Device;
 import com.microsoft.applicationinsights.channel.contracts.Internal;

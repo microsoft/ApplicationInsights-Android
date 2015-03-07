@@ -1,6 +1,5 @@
 package com.microsoft.applicationinsights;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.microsoft.applicationinsights.channel.TelemetryContext;

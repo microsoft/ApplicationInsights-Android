@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import com.microsoft.applicationinsights.ExceptionHandler;
 import com.microsoft.applicationinsights.TelemetryClient;
 
 
@@ -51,12 +52,16 @@ public class ItemListActivity extends FragmentActivity
                     .setActivateOnItemClick(true);
         }
 
+        // Track basic telemetry
         TelemetryClient client = TelemetryClient.getInstance(this);
         client.trackTrace("example trace");
         client.trackEvent("example event");
         client.trackException(new Exception("example error"));
         client.trackMetric("example metric", 1);
         client.flush();
+
+        // Track uncaught exceptions
+        ExceptionHandler.registerExceptionHandler(this);
     }
 
     /**
