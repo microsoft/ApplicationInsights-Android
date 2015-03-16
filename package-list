@@ -1,6 +1,4 @@
 com.microsoft.applicationinsights
 com.microsoft.applicationinsights.channel
 com.microsoft.applicationinsights.channel.contracts
-com.microsoft.commonlogging.channel
-com.microsoft.commonlogging.channel.contracts
-com.microsoft.commonlogging.channel.contracts.shared
+com.microsoft.applicationinsights.channel.contracts.shared
