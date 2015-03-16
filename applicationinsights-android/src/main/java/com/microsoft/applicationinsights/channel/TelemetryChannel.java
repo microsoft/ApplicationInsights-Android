@@ -13,17 +13,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * This class records telemetry for application insights.
  */
-public class TelemetryChannel<TConfig extends TelemetryChannelConfig> {
+public class TelemetryChannel {
 
     /**
      * The configuration for this recorder
      */
-    private final TConfig config;
+    private final TelemetryChannelConfig config;
 
     /**
      * The context for this recorder
      */
-    private final CommonContext context;
+    private final TelemetryContext context;
 
     /**
      * The id for this channel
@@ -44,10 +44,10 @@ public class TelemetryChannel<TConfig extends TelemetryChannelConfig> {
      * Instantiates a new instance of Sender
      * @param config The configuration for this channel
      */
-    public TelemetryChannel(TConfig config) {
+    public TelemetryChannel(TelemetryChannelConfig config) {
         this.queue = TelemetryQueue.instance;
         this.config = config;
-        this.context = new CommonContext(config.getAppContext());
+        this.context = new TelemetryContext(config);
 
         Random random = new Random();
         this.channelId = Math.abs(random.nextLong());
@@ -120,12 +120,12 @@ public class TelemetryChannel<TConfig extends TelemetryChannelConfig> {
         // TODO set flags
         //envelope.setFlags(SetFlags(persistence, latency));
 
-        envelope.setUserId(this.context.getUserId());
-        envelope.setDeviceId(this.context.getDeviceId());
-        envelope.setOsVer(this.context.getDeviceOsVersion());
-        envelope.setOs(this.context.getDeviceOs());
-        envelope.setAppId(this.context.getAppId());
-        envelope.setAppVer(this.context.getAppVersion());
+        envelope.setUserId(this.context.getUser().getId());
+        envelope.setDeviceId(this.context.getDevice().getId());
+        envelope.setOsVer(this.context.getDevice().getOsVersion());
+        envelope.setOs(this.context.getDevice().getOs());
+        envelope.setAppId(this.context.getPackageName());
+        envelope.setAppVer(this.context.getApplication().getVer());
 
         if(tags != null) {
             envelope.setTags(tags);

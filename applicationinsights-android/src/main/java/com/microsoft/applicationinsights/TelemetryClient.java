@@ -1,9 +1,11 @@
 package com.microsoft.applicationinsights;
 
 import android.app.Activity;
-import android.content.Context;
 
+import com.microsoft.applicationinsights.channel.InternalLogging;
+import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
+import com.microsoft.applicationinsights.channel.Util;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
@@ -14,14 +16,10 @@ import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 import com.microsoft.applicationinsights.channel.contracts.RequestData;
 import com.microsoft.applicationinsights.channel.contracts.StackFrame;
-import com.microsoft.applicationinsights.channel.InternalLogging;
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
-import com.microsoft.applicationinsights.channel.Util;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -37,7 +35,7 @@ public class TelemetryClient {
      *
      * @param   activity the activity to associate with this instance
      * @return  an instance of {@code TelemetryClient} associated with the activity, or null if the
-     *          activity is null and {@link InternalLogging#enableDebugMode} is {@code false}.
+     *          activity is null.
      */
     public static TelemetryClient getInstance(Activity activity) {
         TelemetryClient client = null;
@@ -112,7 +110,7 @@ public class TelemetryClient {
     protected TelemetryClient(TelemetryClientConfig config) {
         this(config,
                 new TelemetryContext(config),
-                new TelemetryChannel<TelemetryClientConfig>(config));
+                new TelemetryChannel(config));
     }
 
     /**
