@@ -1,6 +1,6 @@
 package com.microsoft.mocks;
 
-import com.microsoft.commonlogging.channel.TelemetryQueue;
+import com.microsoft.applicationinsights.channel.TelemetryQueue;
 
 import java.util.concurrent.CountDownLatch;
 

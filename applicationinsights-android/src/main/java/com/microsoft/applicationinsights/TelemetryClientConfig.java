@@ -2,7 +2,7 @@ package com.microsoft.applicationinsights;
 
 import android.content.Context;
 
-import com.microsoft.commonlogging.channel.TelemetryChannelConfig;
+import com.microsoft.applicationinsights.channel.TelemetryChannelConfig;
 
 /**
  * Configuration object when instantiating TelemetryClient

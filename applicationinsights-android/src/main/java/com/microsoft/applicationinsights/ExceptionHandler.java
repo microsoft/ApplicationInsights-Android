@@ -2,7 +2,7 @@ package com.microsoft.applicationinsights;
 
 import android.content.Context;
 
-import com.microsoft.commonlogging.channel.InternalLogging;
+import com.microsoft.applicationinsights.channel.InternalLogging;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedHashMap;
