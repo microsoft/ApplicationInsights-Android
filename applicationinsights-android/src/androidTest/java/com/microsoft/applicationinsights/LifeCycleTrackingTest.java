@@ -11,7 +11,7 @@ import android.test.ActivityUnitTestCase;
 
 import com.microsoft.applicationinsights.channel.contracts.SessionState;
 import com.microsoft.applicationinsights.channel.contracts.SessionStateData;
-import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockApplication;
 import com.microsoft.mocks.MockLifeCycleTracking;

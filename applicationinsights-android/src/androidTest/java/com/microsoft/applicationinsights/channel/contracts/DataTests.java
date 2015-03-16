@@ -5,8 +5,8 @@ import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import com.microsoft.commonlogging.channel.contracts.shared.ITelemetryData;
-import com.microsoft.commonlogging.channel.contracts.Data;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.channel.contracts.Data;
 
 /// <summary>
 /// Data contract test class DataTests.

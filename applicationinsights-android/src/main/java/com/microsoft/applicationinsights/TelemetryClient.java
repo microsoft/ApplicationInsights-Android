@@ -14,10 +14,10 @@ import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 import com.microsoft.applicationinsights.channel.contracts.RequestData;
 import com.microsoft.applicationinsights.channel.contracts.StackFrame;
-import com.microsoft.commonlogging.channel.InternalLogging;
-import com.microsoft.commonlogging.channel.TelemetryChannel;
-import com.microsoft.commonlogging.channel.Util;
-import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.InternalLogging;
+import com.microsoft.applicationinsights.channel.TelemetryChannel;
+import com.microsoft.applicationinsights.channel.Util;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -422,7 +422,7 @@ public class TelemetryClient {
     /**
      * Triggers an asynchronous flush of queued telemetry.
      * note: this will be called
-     * {@link com.microsoft.commonlogging.channel.TelemetryQueueConfig#maxBatchIntervalMs} after
+     * {@link com.microsoft.applicationinsights.channel.TelemetryQueueConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public void flush() {

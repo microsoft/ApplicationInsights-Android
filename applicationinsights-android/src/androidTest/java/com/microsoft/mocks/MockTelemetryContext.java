@@ -2,7 +2,7 @@ package com.microsoft.mocks;
 
 import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.commonlogging.channel.CommonContext;
+import com.microsoft.applicationinsights.channel.CommonContext;
 
 public class MockTelemetryContext extends TelemetryContext {
 

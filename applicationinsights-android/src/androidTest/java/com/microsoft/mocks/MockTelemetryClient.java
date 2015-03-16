@@ -5,7 +5,7 @@ import android.content.Context;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.commonlogging.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
 

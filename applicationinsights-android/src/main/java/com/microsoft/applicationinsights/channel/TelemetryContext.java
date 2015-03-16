@@ -13,7 +13,7 @@ import com.microsoft.applicationinsights.channel.contracts.Internal;
 import com.microsoft.applicationinsights.channel.contracts.Operation;
 import com.microsoft.applicationinsights.channel.contracts.Session;
 import com.microsoft.applicationinsights.channel.contracts.User;
-import com.microsoft.commonlogging.channel.CommonContext;
+import com.microsoft.applicationinsights.channel.CommonContext;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
