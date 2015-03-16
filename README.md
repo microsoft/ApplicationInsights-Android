@@ -8,19 +8,7 @@ This project provides an Android SDK for Application Insights. [Application Insi
 ## Setup ##
 
 
-**Add the repository and compile dependency**
-
-Top-level build file
-```java
-allprojects {
-    repositories {
-        jcenter()
-        maven {
-            url 'https://dl.bintray.com/appinsights-android/maven'
-        }
-    }
-}
-```
+**Add a compile dependency for the SDK**
 
 Per-module
 ```java
