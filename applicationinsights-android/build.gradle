@@ -93,6 +93,7 @@ if (!this.hasProperty('bintray_user') ||
                     passphrase = bintray_gpg_passphrase
                 }
                 mavenCentralSync {
+                    sync = false // todo: check if this is fixed; this part can't be automated yet due to bintray preventing automation of the publish step
                     user = sonatype_user
                     password = sonatype_key
                 }
