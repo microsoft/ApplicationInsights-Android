@@ -1,4 +1,5 @@
 package com.microsoft.applicationinsights.channel.contracts;
+
 /**
  * Enum SeverityLevel.
  */

@@ -5,12 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.test.ActivityTestCase;
 import android.test.ActivityUnitTestCase;
 
 import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.mocks.MockActivity;
-import com.microsoft.mocks.MockTelemetryClient;
 import com.microsoft.mocks.MockTelemetryContext;
 
 import junit.framework.Assert;
@@ -44,6 +42,20 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
 
     public void tearDown() throws Exception {
 
+    }
+
+    public void testInitialization() {
+        TelemetryContext telemetryContext = new TelemetryContext(this.config);
+
+        Assert.assertNotNull("app", telemetryContext.getApplication());
+        Assert.assertNotNull("appVer", telemetryContext.getApplication().getVer());
+        Assert.assertNotNull("appPackageName", telemetryContext.getPackageName());
+        Assert.assertNotNull("device", telemetryContext.getDevice());
+        Assert.assertNotNull("deviceId", telemetryContext.getDevice().getId());
+        Assert.assertNotNull("deviceOs", telemetryContext.getDevice().getOs());
+        Assert.assertNotNull("user", telemetryContext.getUser());
+        Assert.assertNotNull("userId", telemetryContext.getUser().getId());
+        Assert.assertNotNull("userAcquisition", telemetryContext.getUser().getAccountAcquisitionDate());
     }
 
     public void testUserContextInitialization() {
