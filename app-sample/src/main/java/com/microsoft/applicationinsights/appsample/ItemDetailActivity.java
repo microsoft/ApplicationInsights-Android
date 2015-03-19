@@ -47,8 +47,6 @@ public class ItemDetailActivity extends ActionBarActivity {
                     .add(R.id.item_detail_container, fragment)
                     .commit();
         }
-
-        throw new RuntimeException("oh no!");
     }
 
     @Override
