@@ -58,7 +58,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
             properties.put("threadPriority", Integer.toString(thread.getPriority()));
         }
 
-      this.telemetryClient.catchCrash(exception, properties);
+      this.telemetryClient.sendCrash(exception, properties);
         this.telemetryClient.flush();
 
         if (!this.ignoreDefaultHandler) {

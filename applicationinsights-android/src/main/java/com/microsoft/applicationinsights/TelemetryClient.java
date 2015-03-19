@@ -258,43 +258,6 @@ this(config,
         this.trackException(exception, handledAt, null);
     }
 
-
-  public void catchCrash(Throwable exception, LinkedHashMap<String, String> properties) {
-    if(exception == null) { //TODO we should not send anything?!
-      exception = new Exception();
-    }
-
-    // read stack frames
-    ArrayList<CrashDataThreadFrame> stackFrames = new ArrayList<>();
-    StackTraceElement[] stack = exception.getStackTrace();
-    for(int i = stack.length -1; i >= 0; i--) {
-      StackTraceElement rawFrame = stack[i];
-      CrashDataThreadFrame frame = new CrashDataThreadFrame();
-      frame.setSymbol(rawFrame.toString());
-      stackFrames.add(frame);
-      frame.setAddress("1234");
-    }
-
-    CrashDataThread crashDataThread = new CrashDataThread();
-    crashDataThread.setFrames(stackFrames);
-    ArrayList<CrashDataThread> threads = new ArrayList<>(1);
-    threads.add(crashDataThread);
-
-    CrashDataHeaders crashDataHeaders = new CrashDataHeaders();
-    crashDataHeaders.setId(UUID.randomUUID().toString());
-
-    String message = exception.getMessage();
-    crashDataHeaders.setExceptionReason(this.ensureValid(message));
-    crashDataHeaders.setExceptionType(exception.getClass().getName());
-
-    CrashData crashData = new CrashData();
-    crashData.setThreads(threads);
-    crashData.setHeaders(crashDataHeaders);
-    crashData.setProperties(properties);
-
-    track(crashData);
-  }
-
     /**
      * {@code measurements} defaults to {@code null}.
      *
@@ -358,6 +321,53 @@ this(config,
 
         track(telemetry);
     }
+
+
+  //TODO rename the method?
+  /**
+   * Sends information about a crash (unhandled exception) to Application Insights.
+   *
+   * @param exception    The unhandled exception that caused the crash.
+   * @param properties   Custom properties associated with the crash. Note: values set here will
+   *                     supersede values set in {@link TelemetryClient#setCommonProperties}.
+   */
+  public void sendCrash(Throwable exception, LinkedHashMap<String, String> properties) {
+    //TODO we should not send anything?!
+    if(exception == null) {
+      exception = new Exception();
+    }
+
+    // read stack frames
+    ArrayList<CrashDataThreadFrame> stackFrames = new ArrayList<>();
+    StackTraceElement[] stack = exception.getStackTrace();
+    for(int i = stack.length -1; i >= 0; i--) {
+      StackTraceElement rawFrame = stack[i];
+      CrashDataThreadFrame frame = new CrashDataThreadFrame();
+      frame.setSymbol(rawFrame.toString());
+      stackFrames.add(frame);
+      frame.setAddress("");
+    }
+
+    CrashDataThread crashDataThread = new CrashDataThread();
+    crashDataThread.setFrames(stackFrames);
+    ArrayList<CrashDataThread> threads = new ArrayList<>(1);
+    threads.add(crashDataThread);
+
+    CrashDataHeaders crashDataHeaders = new CrashDataHeaders();
+    crashDataHeaders.setId(UUID.randomUUID().toString());
+
+    String message = exception.getMessage();
+    crashDataHeaders.setExceptionReason(this.ensureValid(message));
+    crashDataHeaders.setExceptionType(exception.getClass().getName());
+
+    CrashData crashData = new CrashData();
+    crashData.setThreads(threads);
+    crashData.setHeaders(crashDataHeaders);
+    crashData.setProperties(properties);
+
+    track(crashData);
+  }
+
 
     /**
      * {@code properties} defaults to {@code null}.
