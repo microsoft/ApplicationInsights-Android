@@ -52,13 +52,13 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
     public void uncaughtException(Thread thread, Throwable exception) {
         LinkedHashMap<String, String> properties = null;
         if (thread != null) {
-            properties = new LinkedHashMap<String, String>();
+            properties = new LinkedHashMap<>();
             properties.put("threadName", thread.getName());
             properties.put("threadId", Long.toString(thread.getId()));
             properties.put("threadPriority", Integer.toString(thread.getPriority()));
         }
 
-        this.telemetryClient.trackException(exception, "uncaughtException", properties);
+      this.telemetryClient.catchCrash(exception, properties);
         this.telemetryClient.flush();
 
         if (!this.ignoreDefaultHandler) {
