@@ -1,5 +1,7 @@
 package com.microsoft.applicationinsights.channel;
 
+import android.content.Context;
+
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
