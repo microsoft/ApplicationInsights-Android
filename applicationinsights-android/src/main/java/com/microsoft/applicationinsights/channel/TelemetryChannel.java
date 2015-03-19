@@ -101,7 +101,7 @@ public class TelemetryChannel {
 
         if(telemetry.getClass().equals(CrashData.class)) {
           IJsonSerializable[] data = new IJsonSerializable[1];
-          data[0] = telemetry;
+          data[0] = envelope;
 
           StringBuilder buffer = new StringBuilder();
 
