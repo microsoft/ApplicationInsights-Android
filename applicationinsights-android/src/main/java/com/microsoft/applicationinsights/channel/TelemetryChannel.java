@@ -2,13 +2,18 @@ package com.microsoft.applicationinsights.channel;
 
 import android.content.Context;
 
+import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
+import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,7 +22,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TelemetryChannel {
 
-    /**
+  private static final String TAG = "TelemetryChannel";
+
+  /**
      * The configuration for this recorder
      */
     private final TelemetryChannelConfig config;
@@ -91,8 +98,39 @@ public class TelemetryChannel {
         // wrap the data in the common schema envelope
         Envelope envelope = this.getEnvelope(telemetry, tags);
 
-        // send to queue
-        this.queue.enqueue(envelope);
+
+        if(telemetry.getClass().equals(CrashData.class)) {
+          IJsonSerializable[] data = new IJsonSerializable[1];
+          data[0] = telemetry;
+
+          StringBuilder buffer = new StringBuilder();
+
+          try {
+            buffer.append('[');
+            for (int i = 0; i < data.length; i++) {
+              if (i > 0) {
+                buffer.append(',');
+              }
+              StringWriter stringWriter = new StringWriter();
+              data[i].serialize(stringWriter);
+              buffer.append(stringWriter.toString());
+            }
+
+            buffer.append(']');
+            String serializedData = buffer.toString();
+
+            Persistence persistence = Persistence.getInstance();
+            persistence.saveData(serializedData);
+          } catch (IOException e) {
+            InternalLogging._error(TAG, e.toString());
+          }
+
+
+        }
+        else {
+          // send to queue
+          this.queue.enqueue(envelope);
+        }
     }
 
     /**
