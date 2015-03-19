@@ -7,6 +7,10 @@ import com.microsoft.applicationinsights.channel.InternalLogging;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.Util;
+import com.microsoft.applicationinsights.channel.contracts.CrashData;
+import com.microsoft.applicationinsights.channel.contracts.CrashDataHeaders;
+import com.microsoft.applicationinsights.channel.contracts.CrashDataThread;
+import com.microsoft.applicationinsights.channel.contracts.CrashDataThreadFrame;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
@@ -253,6 +257,43 @@ this(config,
     public void trackException(Throwable exception, String handledAt) {
         this.trackException(exception, handledAt, null);
     }
+
+
+  public void catchCrash(Throwable exception, LinkedHashMap<String, String> properties) {
+    if(exception == null) { //TODO we should not send anything?!
+      exception = new Exception();
+    }
+
+    // read stack frames
+    ArrayList<CrashDataThreadFrame> stackFrames = new ArrayList<>();
+    StackTraceElement[] stack = exception.getStackTrace();
+    for(int i = stack.length -1; i >= 0; i--) {
+      StackTraceElement rawFrame = stack[i];
+      CrashDataThreadFrame frame = new CrashDataThreadFrame();
+      frame.setSymbol(rawFrame.toString());
+      stackFrames.add(frame);
+      frame.setAddress("1234");
+    }
+
+    CrashDataThread crashDataThread = new CrashDataThread();
+    crashDataThread.setFrames(stackFrames);
+    ArrayList<CrashDataThread> threads = new ArrayList<>(1);
+    threads.add(crashDataThread);
+
+    CrashDataHeaders crashDataHeaders = new CrashDataHeaders();
+    crashDataHeaders.setId(UUID.randomUUID().toString());
+
+    String message = exception.getMessage();
+    crashDataHeaders.setExceptionReason(this.ensureValid(message));
+    crashDataHeaders.setExceptionType(exception.getClass().getName());
+
+    CrashData crashData = new CrashData();
+    crashData.setThreads(threads);
+    crashData.setHeaders(crashDataHeaders);
+    crashData.setProperties(properties);
+
+    track(crashData);
+  }
 
     /**
      * {@code measurements} defaults to {@code null}.
