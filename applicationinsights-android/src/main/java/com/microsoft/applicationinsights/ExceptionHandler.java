@@ -25,7 +25,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 
             if (preexistingExceptionHandler instanceof ExceptionHandler) {
                 InternalLogging._error(TAG,
-                        "ExceptionHandler was already registered for this thread");
+                      "ExceptionHandler was already registered for this thread");
             } else {
                 ExceptionHandler handler = new ExceptionHandler(
                         context,

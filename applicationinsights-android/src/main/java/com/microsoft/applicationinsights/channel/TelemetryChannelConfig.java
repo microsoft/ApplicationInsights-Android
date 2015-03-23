@@ -22,6 +22,11 @@ public class TelemetryChannelConfig {
     private String instrumentationKey;
 
     /**
+     * The application context for this telemetry channel
+     */
+    private final Context appContext;
+
+    /**
      * The persisted data for this application
      */
     private final Persistence persist;
@@ -48,6 +53,13 @@ public class TelemetryChannelConfig {
     }
 
     /**
+     * The application telemetry channel for this recorder
+     */
+    public Context getAppContext() {
+        return appContext;
+    }
+
+    /**
      * The persisted data for the application
      */
     public Persistence getPersistence() {
@@ -61,6 +73,7 @@ public class TelemetryChannelConfig {
     public TelemetryChannelConfig(Context context) {
         this.persist = Persistence.getInstance();
         persist.setPersistenceContext(context);
+        this.appContext = context;
         this.instrumentationKey = TelemetryChannelConfig.readInstrumentationKey(context);
     }
 

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.test.ActivityUnitTestCase;
 
+import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockTelemetryContext;
 
@@ -24,14 +25,14 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     private final String userIdKey = "ai.user.id";
     private final String userAcqKey = "ai.user.accountAcquisitionDate";
 
-    private Context context;
+    private TelemetryClientConfig config;
 
     public void setUp() throws Exception {
         super.setUp();
 
         Intent intent = new Intent(getInstrumentation().getTargetContext(), com.microsoft.mocks.MockActivity.class);
         this.setActivity(this.startActivity(intent, null, null));
-        this.context = this.getActivity();
+        this.config = new TelemetryClientConfig(this.getActivity());
 
         SharedPreferences.Editor editor = this.getActivity().getApplicationContext()
                 .getSharedPreferences(TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();
@@ -44,7 +45,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testInitialization() {
-        TelemetryContext telemetryContext = new TelemetryContext(this.context);
+        TelemetryContext telemetryContext = new TelemetryContext(this.config.getAppContext());
 
         Assert.assertNotNull("app", telemetryContext.getApplication());
         Assert.assertNotNull("appVer", telemetryContext.getApplication().getVer());
@@ -58,7 +59,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testUserContextInitialization() {
-        TelemetryContext tc = new MockTelemetryContext(this.context);
+        TelemetryContext tc = new MockTelemetryContext(this.config.getAppContext());
 
         String id = tc.getContextTags().get(userIdKey);
         try {
@@ -77,7 +78,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
         editor.commit();
 
         // this should load context from shared storage to match firstId
-        TelemetryContext tc = new MockTelemetryContext(this.context);
+        TelemetryContext tc = new MockTelemetryContext(this.config.getAppContext());
         LinkedHashMap<String, String> tags = tc.getContextTags();
         String newId = tags.get(userIdKey);
         String newAcq = tags.get(userAcqKey);
@@ -86,7 +87,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testSessionContextInitialization() throws Exception {
-        TelemetryContext tc = new MockTelemetryContext(this.context);
+        TelemetryContext tc = new MockTelemetryContext(this.config.getAppContext());
 
         String firstId = checkSessionTags(tc);
         try {
@@ -96,12 +97,12 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
         }
 
         // this should load context from shared storage to match firstId
-        TelemetryContext newerTc = new MockTelemetryContext(this.context);
+        TelemetryContext newerTc = new MockTelemetryContext(this.config.getAppContext());
         checkSessionTags(newerTc);
     }
 
     public void testSessionContextRenewal() throws Exception {
-        TelemetryContext tc = new MockTelemetryContext(this.context);
+        TelemetryContext tc = new MockTelemetryContext(this.config.getAppContext());
         String firstId = checkSessionTags(tc);
 
         // trigger renewal

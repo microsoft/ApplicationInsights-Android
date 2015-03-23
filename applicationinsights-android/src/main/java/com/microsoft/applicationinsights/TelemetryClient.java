@@ -2,7 +2,10 @@ package com.microsoft.applicationinsights;
 
 import android.content.Context;
 
+import com.microsoft.applicationinsights.channel.InternalLogging;
+import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
+import com.microsoft.applicationinsights.channel.Util;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
@@ -13,9 +16,6 @@ import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 import com.microsoft.applicationinsights.channel.contracts.RequestData;
 import com.microsoft.applicationinsights.channel.contracts.StackFrame;
-import com.microsoft.applicationinsights.channel.InternalLogging;
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
-import com.microsoft.applicationinsights.channel.Util;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
@@ -118,8 +118,7 @@ public class TelemetryClient {
      * @param config the configuration for this client
      */
     private TelemetryClient(TelemetryClientConfig config, Context context) {
-        this(config, new TelemetryContext(context),
-                new TelemetryChannel(config, context));
+        this(config, new TelemetryContext(context), new TelemetryChannel(config));
     }
 
     /**

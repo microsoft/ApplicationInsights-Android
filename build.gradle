@@ -23,60 +23,10 @@ allprojects {
         user = " "
         key = " "
         dryRun = true
+        publish = false
         pkg {
             repo=" "
             name=" "
-        }
-    }
-}
-
-def projectName = project.name
-
-subprojects {
-
-    group = projectGroup
-    version = projectVersion
-
-    if (!this.hasProperty('bintray_user') ||
-        !this.hasProperty('bintray_key') ||
-        !this.hasProperty('bintray_gpg_passphrase')) {
-
-        println 'to enable bintray set bintray_user, bintray_key, and bintray_gpg_passphrase'
-    } else {
-        ext.publish = true
-        bintray {
-
-            user = bintray_user
-            key = bintray_key
-
-            dryRun = false
-            configurations = ['archives']
-
-            pkg {
-                repo = 'maven'
-                name = projectName
-                desc = 'Application Insights SDK for Android'
-                websiteUrl = projectRepo
-                issueTrackerUrl = projectRepo + '/issues'
-                vcsUrl = projectRepo + '.git'
-                licenses = ['MIT']
-                labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
-                publicDownloadNumbers = true
-
-                version {
-                    name = projectVersion
-                    vcsTag = '0.0.2'
-                    gpg {
-                        sign = true
-                        passphrase = bintray_gpg_passphrase
-                    }
-                    // mavenCentralSync {
-                    //     sync = true
-                    //     user = maven_user
-                    //     password = maven_password
-                    // }
-                }
-            }
         }
     }
 }
