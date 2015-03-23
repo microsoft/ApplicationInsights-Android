@@ -52,6 +52,7 @@ public class ItemListActivity extends FragmentActivity
         }
 
         TelemetryClient client = TelemetryClient.getInstance(this);
+        client.getConfig().getStaticConfig().setMaxBatchIntervalMs(1000);
         client.trackTrace("example trace");
         client.trackEvent("example event");
         client.trackException(new Exception("example error"));
