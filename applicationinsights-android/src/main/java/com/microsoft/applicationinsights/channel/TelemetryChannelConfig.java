@@ -48,7 +48,7 @@ public class TelemetryChannelConfig {
     /**
      * Gets the sender config instance for this channel.
      */
-    public TelemetryQueueConfig getGlobalQueueConfig() {
+    public TelemetryQueueConfig getStaticConfig() {
         return TelemetryQueue.instance.getConfig();
     }
 
