@@ -39,6 +39,11 @@ public class TelemetryContext {
     private static final Object lock = new Object();
 
     /**
+     * Volatile boolean for double checked synchronize block
+     */
+    private static volatile boolean isContextLoaded = false;
+
+    /**
      * Android app telemetryContext.
      */
     private static Context androidAppContext;
@@ -139,27 +144,32 @@ public class TelemetryContext {
      */
     public TelemetryContext(TelemetryChannelConfig config) {
 
-        if (TelemetryContext.androidAppContext == null) {
+        // note: isContextLoaded must be volatile for the double-checked lock to work
+        if (!TelemetryContext.isContextLoaded) {
             synchronized (TelemetryContext.lock) {
-                TelemetryContext.androidAppContext = config.getAppContext();
+                if (!TelemetryContext.isContextLoaded) {
+                    TelemetryContext.isContextLoaded = true;
 
-                // get an instance of the shared preferences manager for persistent context fields
-                TelemetryContext.settings = TelemetryContext.androidAppContext.getSharedPreferences(
-                        TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+                    TelemetryContext.androidAppContext = config.getAppContext();
 
-                // initialize static context
-                TelemetryContext.device = new Device();
-                TelemetryContext.session = new Session();
-                TelemetryContext.user = new User();
-                TelemetryContext.internal = new Internal();
-                TelemetryContext.application = new Application();
-                TelemetryContext.lastSessionId = null;
+                    // get an instance of the shared preferences manager for persistent context fields
+                    TelemetryContext.settings = TelemetryContext.androidAppContext.getSharedPreferences(
+                            TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
 
-                TelemetryContext.setDeviceContext();
-                TelemetryContext.setSessionContext();
-                TelemetryContext.setUserContext();
-                TelemetryContext.setAppContext();
-                TelemetryContext.setInternalContext();
+                    // initialize static context
+                    TelemetryContext.device = new Device();
+                    TelemetryContext.session = new Session();
+                    TelemetryContext.user = new User();
+                    TelemetryContext.internal = new Internal();
+                    TelemetryContext.application = new Application();
+                    TelemetryContext.lastSessionId = null;
+
+                    TelemetryContext.setDeviceContext();
+                    TelemetryContext.setSessionContext();
+                    TelemetryContext.setUserContext();
+                    TelemetryContext.setAppContext();
+                    TelemetryContext.setInternalContext();
+                }
             }
         }
 
