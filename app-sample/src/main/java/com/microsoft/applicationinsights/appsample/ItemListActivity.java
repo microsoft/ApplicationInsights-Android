@@ -57,7 +57,6 @@ public class ItemListActivity extends FragmentActivity
         client.getConfig().getStaticConfig().setMaxBatchIntervalMs(1000);
         client.trackTrace("example trace");
         client.trackEvent("example event");
-        client.trackException(new Exception("example error"));
         client.trackMetric("example metric", 1);
         client.flush();
 

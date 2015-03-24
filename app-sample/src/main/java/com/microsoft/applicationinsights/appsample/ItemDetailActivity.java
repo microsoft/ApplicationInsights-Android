@@ -47,8 +47,6 @@ public class ItemDetailActivity extends ActionBarActivity {
                     .add(R.id.item_detail_container, fragment)
                     .commit();
         }
-
-        throw new RuntimeException("oh no!");
     }
 
     @Override
@@ -63,8 +61,22 @@ public class ItemDetailActivity extends ActionBarActivity {
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
             NavUtils.navigateUpTo(this, new Intent(this, ItemListActivity.class));
+            method1();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void method1() {
+        method2();
+    }
+
+    private void method2() {
+        method3();
+    }
+
+    private void method3() {
+        int[] array = new int[3];
+        array[3] = 3; // crash
     }
 }
