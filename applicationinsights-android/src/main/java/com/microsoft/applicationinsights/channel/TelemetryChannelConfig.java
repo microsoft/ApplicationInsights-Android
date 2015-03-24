@@ -83,14 +83,10 @@ public class TelemetryChannelConfig {
      * @return the instrumentation key for the application or empty string if not available
      */
     private static String getInstrumentationKey(Context context) {
-        // bypass the sync block if the key is set
-        if(TelemetryChannelConfig.iKeyFromManifest == null) {
-            synchronized (TelemetryChannelConfig.lock) {
-                // re-check if it is set after taking the lock
-                if(TelemetryChannelConfig.iKeyFromManifest == null) {
-                    String iKey = TelemetryChannelConfig.readInstrumentationKey(context);
-                    TelemetryChannelConfig.iKeyFromManifest = iKey;
-                }
+        synchronized (TelemetryChannelConfig.lock) {
+            if (TelemetryChannelConfig.iKeyFromManifest == null) {
+                String iKey = TelemetryChannelConfig.readInstrumentationKey(context);
+                TelemetryChannelConfig.iKeyFromManifest = iKey;
             }
         }
 
