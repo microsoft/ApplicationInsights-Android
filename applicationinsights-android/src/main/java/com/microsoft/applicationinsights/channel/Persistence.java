@@ -9,6 +9,7 @@ public class Persistence {
     private static String filePath = "outtext.txt";
     private static Context ctx;
     private static Persistence instance;
+    private static String TAG = "Persistence";
 
     private Persistence() {
     }
@@ -41,6 +42,7 @@ public class Persistence {
                 outputStream.close();
             } catch (Exception e) {
                 //Do nothing
+              InternalLogging._error(TAG, "Error writing telemetry data to file");
             }
         }
     }
@@ -60,7 +62,9 @@ public class Persistence {
                 reader.close();
             } catch (Exception e) {
                 ctx.deleteFile(this.filePath);
-                return "";
+              InternalLogging._error(TAG, "Error reading telemetry data from file");
+
+              return "";
             }
         }
         return buffer.toString();
