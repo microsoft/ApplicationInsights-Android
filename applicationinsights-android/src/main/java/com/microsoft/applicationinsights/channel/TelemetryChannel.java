@@ -1,7 +1,5 @@
 package com.microsoft.applicationinsights.channel;
 
-import android.content.Context;
-
 import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
@@ -13,7 +11,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,152 +22,154 @@ public class TelemetryChannel {
   private static final String TAG = "TelemetryChannel";
 
   /**
-     * The configuration for this recorder
-     */
-    private final TelemetryChannelConfig config;
+   * The configuration for this recorder
+   */
+  private final TelemetryChannelConfig config;
 
-    /**
-     * The context for this recorder
-     */
-    private final TelemetryContext context;
+  /**
+   * The context for this recorder
+   */
+  private final TelemetryContext context;
 
-    /**
-     * The id for this channel
-     */
-    private final long channelId;
+  /**
+   * The id for this channel
+   */
+  private final long channelId;
 
-    /**
-     * The sequence counter for this channel
-     */
-    private final AtomicInteger seqCounter;
+  /**
+   * The sequence counter for this channel
+   */
+  private final AtomicInteger seqCounter;
 
-    /**
-     * Test hook to the sender
-     */
-    private TelemetryQueue queue;
+  /**
+   * Test hook to the sender
+   */
+  private TelemetryQueue queue;
 
-    /**
-     * Instantiates a new instance of Sender
-     * @param config The configuration for this channel
-     */
-    public TelemetryChannel(TelemetryChannelConfig config) {
-        this.queue = TelemetryQueue.instance;
-        this.config = config;
-        this.context = new TelemetryContext(config);
+  /**
+   * Instantiates a new instance of Sender
+   *
+   * @param config The configuration for this channel
+   */
+  public TelemetryChannel(TelemetryChannelConfig config) {
+    this.queue = TelemetryQueue.instance;
+    this.config = config;
+    this.context = new TelemetryContext(config);
 
-        Random random = new Random();
-        this.channelId = Math.abs(random.nextLong());
-        this.seqCounter = new AtomicInteger(0);
+    Random random = new Random();
+    this.channelId = Math.abs(random.nextLong());
+    this.seqCounter = new AtomicInteger(0);
+  }
+
+  /**
+   * @return the sender for this channel.
+   */
+  public TelemetryQueue getQueue() {
+    return this.queue;
+  }
+
+  /**
+   * Test hook to set the queue for this channel
+   *
+   * @param queue the queue to use for this channel
+   */
+  protected void setQueue(TelemetryQueue queue) {
+    this.queue = queue;
+  }
+
+  /**
+   * Records the passed in data.
+   *
+   * @param telemetry The telemetry to record
+   */
+  public void send(ITelemetry telemetry) {
+    this.send(telemetry, null);
+  }
+
+  /**
+   * Records the passed in data.
+   *
+   * @param telemetry The telemetry to record
+   * @param tags      The optional context tags for this telemetry
+   */
+  public void send(ITelemetry telemetry, LinkedHashMap<String, String> tags) {
+
+    // wrap the data in the common schema envelope
+    Envelope envelope = this.getEnvelope(telemetry, tags);
+
+    if (telemetry.getClass().equals(CrashData.class)) {
+      processCrash(envelope);
+    } else {
+      // send to queue
+      this.queue.enqueue(envelope);
     }
+  }
 
-    /**
-     * @return the sender for this channel.
-     */
-    public TelemetryQueue getQueue() {
-        return this.queue;
-    }
+  private void processCrash(Envelope envelope) {
+    IJsonSerializable[] data = new IJsonSerializable[1];
+    data[0] = envelope;
 
-    /**
-     * Test hook to set the queue for this channel
-     * @param queue the queue to use for this channel
-     */
-    protected void setQueue(TelemetryQueue queue) {
-        this.queue = queue;
-    }
+    StringBuilder buffer = new StringBuilder();
 
-    /**
-     * Records the passed in data.
-     *
-     * @param telemetry The telemetry to record
-     */
-    public void send(ITelemetry telemetry) {
-        this.send(telemetry, null);
-    }
-
-    /**
-     * Records the passed in data.
-     *
-     * @param telemetry The telemetry to record
-     * @param tags The optional context tags for this telemetry
-     */
-    public void send(ITelemetry telemetry, LinkedHashMap<String, String> tags) {
-
-        // wrap the data in the common schema envelope
-        Envelope envelope = this.getEnvelope(telemetry, tags);
-
-
-        if(telemetry.getClass().equals(CrashData.class)) {
-          IJsonSerializable[] data = new IJsonSerializable[1];
-          data[0] = envelope;
-
-          StringBuilder buffer = new StringBuilder();
-
-          try {
-            buffer.append('[');
-            for (int i = 0; i < data.length; i++) {
-              if (i > 0) {
-                buffer.append(',');
-              }
-              StringWriter stringWriter = new StringWriter();
-              data[i].serialize(stringWriter);
-              buffer.append(stringWriter.toString());
-            }
-
-            buffer.append(']');
-            String serializedData = buffer.toString();
-
-            Persistence persistence = Persistence.getInstance();
-            persistence.saveData(serializedData);
-          } catch (IOException e) {
-            InternalLogging._error(TAG, e.toString());
-          }
-
-
+    try {
+      buffer.append('[');
+      for (int i = 0; i < data.length; i++) {
+        if (i > 0) {
+          buffer.append(',');
         }
-        else {
-          // send to queue
-          this.queue.enqueue(envelope);
-        }
+        StringWriter stringWriter = new StringWriter();
+        data[i].serialize(stringWriter);
+        buffer.append(stringWriter.toString());
+      }
+
+      buffer.append(']');
+      String serializedData = buffer.toString();
+
+      Persistence persistence = Persistence.getInstance();
+      persistence.saveData(serializedData);
+    } catch (IOException e) {
+      InternalLogging._error(TAG, e.toString());
+    }
+  }
+
+  /**
+   * Wraps the telemetry item in a common schema envelope with context.
+   *
+   * @param telemetry The telemetry item to wrap.
+   * @param tags      The optional context tags for this telemetry
+   * @return a contextual Envelope containing the telemetry item.
+   */
+  protected Envelope getEnvelope(ITelemetry telemetry, LinkedHashMap<String, String> tags) {
+    Envelope envelope = new Envelope();
+
+    // wrap the telemetry data in the common schema data
+    Data<ITelemetryData> data = new Data<>();
+    data.setBaseData(telemetry);
+    data.setBaseType(telemetry.getBaseType());
+    envelope.setData(data);
+
+    envelope.setIKey(this.config.getInstrumentationKey());
+    envelope.setTime(Util.dateToISO8601(new Date()));
+    envelope.setName(telemetry.getEnvelopeName());
+    envelope.setSeq(this.channelId + ":" + this.seqCounter.incrementAndGet());
+
+    // TODO read sample rate event's metadata
+    //envelope.setSampleRate(sampleRate);
+
+    // TODO set flags
+    //envelope.setFlags(SetFlags(persistence, latency));
+
+    envelope.setUserId(this.context.getUser().getId());
+    envelope.setDeviceId(this.context.getDevice().getId());
+    envelope.setOsVer(this.context.getDevice().getOsVersion());
+    envelope.setOs(this.context.getDevice().getOs());
+    envelope.setAppId(this.context.getPackageName());
+    envelope.setAppVer(this.context.getApplication().getVer());
+
+    if (tags != null) {
+      envelope.setTags(tags);
     }
 
-    /**
-     * Wraps the telemetry item in a common schema envelope with context.
-     *
-     * @param telemetry The telemetry item to wrap.
-     * @param tags The optional context tags for this telemetry
-     * @return a contextual Envelope containing the telemetry item.
-     */
-    protected Envelope getEnvelope(ITelemetry telemetry, LinkedHashMap<String, String> tags) {
-        Envelope envelope = new Envelope();
-
-        // wrap the telemetry data in the common schema data
-        Data<ITelemetryData> data = new Data<>();
-        data.setBaseData(telemetry);
-        data.setBaseType(telemetry.getBaseType());
-        envelope.setData(data);
-
-        envelope.setIKey(this.config.getInstrumentationKey());
-        envelope.setTime(Util.dateToISO8601(new Date()));
-        envelope.setName(telemetry.getEnvelopeName());
-        envelope.setSeq(this.channelId + ":" + this.seqCounter.incrementAndGet());
-
-        // TODO read sample rate event's metadata
-        //envelope.setSampleRate(sampleRate);
-
-        // TODO set flags
-        //envelope.setFlags(SetFlags(persistence, latency));
-
-        envelope.setUserId(this.context.getUser().getId());
-        envelope.setDeviceId(this.context.getDevice().getId());
-        envelope.setOsVer(this.context.getDevice().getOsVersion());
-        envelope.setOs(this.context.getDevice().getOs());
-        envelope.setAppId(this.context.getPackageName());
-        envelope.setAppVer(this.context.getApplication().getVer());
-
-        if(tags != null) {
-            envelope.setTags(tags);
-        }
-
-        return envelope;
-    }
+    return envelope;
+  }
 }

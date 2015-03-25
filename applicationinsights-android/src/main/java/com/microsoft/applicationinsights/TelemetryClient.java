@@ -332,7 +332,6 @@ this(config,
    *                     supersede values set in {@link TelemetryClient#setCommonProperties}.
    */
   public void sendCrash(Throwable exception, LinkedHashMap<String, String> properties) {
-    //TODO we should not send anything?!
     if(exception == null) {
       exception = new Exception();
     }
