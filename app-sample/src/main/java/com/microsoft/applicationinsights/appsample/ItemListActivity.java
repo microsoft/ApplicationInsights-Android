@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-import com.microsoft.applicationinsights.ExceptionHandler;
 import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.channel.InternalLogging;
 
 /**
  * An activity representing a list of Items. This activity
@@ -61,7 +59,10 @@ public class ItemListActivity extends FragmentActivity
         client.flush();
 
         // Track uncaught exceptions
-        client.enableCrashHandling(this);
+        client.enableCrashTracking(this);
+
+        // track activity lifecycle (note this only needs to be done once per application)
+        client.enableActivityTracking(this.getApplication());
     }
 
     /**
