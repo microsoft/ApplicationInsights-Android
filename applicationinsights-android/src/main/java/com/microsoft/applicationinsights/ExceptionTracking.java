@@ -7,7 +7,7 @@ import com.microsoft.applicationinsights.channel.InternalLogging;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedHashMap;
 
-public class ExceptionHandler implements UncaughtExceptionHandler {
+public class ExceptionTracking implements UncaughtExceptionHandler {
     private static final Object lock = new Object();
     private static String TAG = "ExceptionHandler";
     private boolean ignoreDefaultHandler;
@@ -15,19 +15,19 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
     private UncaughtExceptionHandler preexistingExceptionHandler;
 
     public static void registerExceptionHandler(Context context) {
-        ExceptionHandler.registerExceptionHandler(context, false);
+        ExceptionTracking.registerExceptionHandler(context, false);
     }
 
     public static void registerExceptionHandler(Context context, boolean ignoreDefaultHandler) {
-        synchronized (ExceptionHandler.lock) {
+        synchronized (ExceptionTracking.lock) {
             UncaughtExceptionHandler preexistingExceptionHandler =
                     Thread.getDefaultUncaughtExceptionHandler();
 
-            if (preexistingExceptionHandler instanceof ExceptionHandler) {
+            if (preexistingExceptionHandler instanceof ExceptionTracking) {
                 InternalLogging._error(TAG,
-                      "ExceptionHandler was already registered for this thread");
+                        "ExceptionHandler was already registered for this thread");
             } else {
-                ExceptionHandler handler = new ExceptionHandler(
+                ExceptionTracking handler = new ExceptionTracking(
                         context,
                         preexistingExceptionHandler,
                         ignoreDefaultHandler);
@@ -37,9 +37,9 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
         }
     }
 
-    private ExceptionHandler(Context context,
-                             UncaughtExceptionHandler preexistingExceptionHandler,
-                             boolean ignoreDefaultHandler) {
+    private ExceptionTracking(Context context,
+                              UncaughtExceptionHandler preexistingExceptionHandler,
+                              boolean ignoreDefaultHandler) {
         this.preexistingExceptionHandler = preexistingExceptionHandler;
         if (context != null) {
             this.telemetryClient = TelemetryClient.getInstance(context);
@@ -58,7 +58,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
             properties.put("threadPriority", Integer.toString(thread.getPriority()));
         }
 
-      this.telemetryClient.sendCrash(exception, properties);
+        this.telemetryClient.sendCrash(exception, properties);
         this.telemetryClient.flush();
 
         if (!this.ignoreDefaultHandler) {

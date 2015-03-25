@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights;
 
+import android.app.Application;
 import android.content.Context;
 
 import com.microsoft.applicationinsights.channel.InternalLogging;
@@ -496,14 +497,26 @@ public class TelemetryClient {
      * @param context the application context used to register the exceptionHandler to catch unhandled
      *                exceptions
      */
-    public void enableCrashHandling(Context context) {
+    public void enableCrashTracking(Context context) {
         if (context != null) {
-            ExceptionHandler.registerExceptionHandler(context);
+            ExceptionTracking.registerExceptionHandler(context);
         } else {
             InternalLogging._warn(TAG, "Unable to register ExceptionHandler, context is null");
         }
     }
 
+    /**
+     * Registers an activity life cycle callback handler to track page views and sessions.
+     *
+     * @param application the application used to register the life cycle callbacks
+     */
+    public void enableActivityTracking(Application application) {
+        if(context != null) {
+            LifeCycleTracking.registerActivityLifecycleCallbacks(application);
+        } else {
+            InternalLogging._warn(TAG, "Unable to register activity lifecycle callbacks, context is null");
+        }
+    }
 
     /**
      * Ensures required string values are non-null

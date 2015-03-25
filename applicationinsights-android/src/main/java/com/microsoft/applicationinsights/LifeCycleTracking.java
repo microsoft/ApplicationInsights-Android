@@ -20,6 +20,17 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
 
     /**
+     * Enables lifecycle event tracking for the provided application
+     * @param application
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public static void registerActivityLifecycleCallbacks(Application application) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            application.registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
+        }
+    }
+
+    /**
      * Private class to facilitate lazy singleton initialization
      */
     private static class LazyInitialization {
@@ -30,7 +41,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
      * Gets the singleton instance of LifeCycleTracking
      * @return the singleton instance of LifeCycleTracking
      */
-    public static LifeCycleTracking getInstance() {
+    protected static LifeCycleTracking getInstance() {
         return LazyInitialization.INSTANCE;
     }
 
