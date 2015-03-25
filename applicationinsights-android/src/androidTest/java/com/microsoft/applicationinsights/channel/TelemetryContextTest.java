@@ -45,7 +45,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testInitialization() {
-        TelemetryContext telemetryContext = new TelemetryContext(this.config);
+        TelemetryContext telemetryContext = new TelemetryContext(this.config.getAppContext());
 
         Assert.assertNotNull("app", telemetryContext.getApplication());
         Assert.assertNotNull("appVer", telemetryContext.getApplication().getVer());
@@ -59,7 +59,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testUserContextInitialization() {
-        TelemetryContext tc = new MockTelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.config.getAppContext());
 
         String id = tc.getContextTags().get(userIdKey);
         try {
@@ -78,7 +78,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
         editor.commit();
 
         // this should load context from shared storage to match firstId
-        TelemetryContext tc = new MockTelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.config.getAppContext());
         LinkedHashMap<String, String> tags = tc.getContextTags();
         String newId = tags.get(userIdKey);
         String newAcq = tags.get(userAcqKey);
@@ -87,7 +87,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testSessionContextInitialization() throws Exception {
-        TelemetryContext tc = new MockTelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.config.getAppContext());
 
         String firstId = checkSessionTags(tc);
         try {
@@ -97,12 +97,12 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
         }
 
         // this should load context from shared storage to match firstId
-        TelemetryContext newerTc = new MockTelemetryContext(this.config);
+        TelemetryContext newerTc = new MockTelemetryContext(this.config.getAppContext());
         checkSessionTags(newerTc);
     }
 
     public void testSessionContextRenewal() throws Exception {
-        TelemetryContext tc = new MockTelemetryContext(this.config);
+        TelemetryContext tc = new MockTelemetryContext(this.config.getAppContext());
         String firstId = checkSessionTags(tc);
 
         // trigger renewal
