@@ -105,7 +105,7 @@ public class TelemetryChannel {
     }
   }
 
-  private void processCrash(Envelope envelope) {
+  protected void processCrash(Envelope envelope) {
     IJsonSerializable[] data = new IJsonSerializable[1];
     data[0] = envelope;
 
