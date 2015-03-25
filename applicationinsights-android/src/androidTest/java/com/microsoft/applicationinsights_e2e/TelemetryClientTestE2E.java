@@ -81,16 +81,24 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testCatchCrash() throws Exception {
-      this.client.sendCrash(null, null);
-      this.client.sendCrash(new Exception(), null);
-      try {
-        throw new InvalidObjectException("this is expected");
-      }
-      catch (InvalidObjectException exception) {
-        this.client.sendCrash(exception, null);
-      }
+        MockQueue queue = new MockQueue(5);
+        String endpoint = queue.getConfig().getEndpointUrl();
+        queue.getConfig().setEndpointUrl(endpoint.replace("https", "http"));
+        this.client.getChannel().setQueue(queue);
 
-      this.validate();
+
+        this.client.sendCrash(null, null);
+        this.client.sendCrash(new Exception(), null);
+        try {
+            throw new InvalidObjectException("this is expected");
+        } catch (InvalidObjectException exception) {
+            this.client.sendCrash(exception, null);
+        }
+
+        // send a second telemetry item to pull the persisted crash and flush
+        this.client.trackTrace("trace");
+        this.client.flush();
+        this.validate();
     }
 
     public void testTrackPageView() throws Exception {
