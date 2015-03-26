@@ -125,12 +125,24 @@ public class ItemListFragment extends ListFragment {
             client.trackEvent("example event");
             client.trackMetric("example metric", 1);
 
-            throw new RuntimeException("oh no!");
+            crashMe1();
         }
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+    }
+
+    private void crashMe1() {
+        crashMe2();
+    }
+
+    private void crashMe2() {
+        crashMe3();
+    }
+
+    private void crashMe3() {
+        throw new RuntimeException("oh no!");
     }
 
     @Override
