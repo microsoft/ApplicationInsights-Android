@@ -37,7 +37,7 @@ public class Persistence {
         if ( ctx != null) {
             FileOutputStream outputStream;
             try {
-                outputStream = ctx.openFileOutput(this.filePath, Context.MODE_PRIVATE);
+                outputStream = ctx.openFileOutput(this.filePath, Context.MODE_APPEND); //TODO MODE_APPEND isn't private
                 outputStream.write(saveThis.getBytes());
                 outputStream.close();
             } catch (Exception e) {
