@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-
+import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.appsample.dummy.DummyContent;
 
 /**
@@ -77,10 +77,10 @@ public class ItemListFragment extends ListFragment {
 
         // TODO: replace with a real list adapter.
         setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                DummyContent.ITEMS));
+              getActivity(),
+              android.R.layout.simple_list_item_activated_1,
+              android.R.id.text1,
+              DummyContent.ITEMS));
     }
 
     @Override
@@ -89,7 +89,7 @@ public class ItemListFragment extends ListFragment {
 
         // Restore the previously serialized activated item position.
         if (savedInstanceState != null
-                && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
+              && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
         }
     }
@@ -116,12 +116,17 @@ public class ItemListFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
-       super.onListItemClick(listView, view, position, id);
+        super.onListItemClick(listView, view, position, id);
 
-      //crash the app
-      if(position == 2) {
-        throw new RuntimeException("oh no!");
-      }
+        //crash the app
+        if (position == 2) {
+            TelemetryClient client = TelemetryClient.getInstance(getActivity());
+            client.trackTrace("example trace");
+            client.trackEvent("example event");
+            client.trackMetric("example metric", 1);
+
+            throw new RuntimeException("oh no!");
+        }
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
@@ -145,8 +150,8 @@ public class ItemListFragment extends ListFragment {
         // When setting CHOICE_MODE_SINGLE, ListView will automatically
         // give items the 'activated' state when touched.
         getListView().setChoiceMode(activateOnItemClick
-                ? ListView.CHOICE_MODE_SINGLE
-                : ListView.CHOICE_MODE_NONE);
+              ? ListView.CHOICE_MODE_SINGLE
+              : ListView.CHOICE_MODE_NONE);
     }
 
     private void setActivatedPosition(int position) {

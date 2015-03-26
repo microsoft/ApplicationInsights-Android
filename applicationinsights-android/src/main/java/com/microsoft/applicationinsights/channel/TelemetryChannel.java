@@ -147,7 +147,7 @@ public class TelemetryChannel {
     }
 
     private void processCrash(Envelope envelope) {
-        this.queue.persist();
+        getQueue().persist();
 
         IJsonSerializable[] data = new IJsonSerializable[1];
         data[0] = envelope;
