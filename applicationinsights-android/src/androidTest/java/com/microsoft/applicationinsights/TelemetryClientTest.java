@@ -1,7 +1,6 @@
 package com.microsoft.applicationinsights;
 
 import android.content.Intent;
-import android.test.ActivityTestCase;
 import android.test.ActivityUnitTestCase;
 
 import com.microsoft.applicationinsights.channel.contracts.EventData;
@@ -99,7 +98,6 @@ public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
             client.trackException(exception);
             client.trackException(exception, "core handler");
             client.trackException(exception, "core handler1", properties);
-            client.trackException(exception, "core handler2", properties, measurements);
         }
     }
 

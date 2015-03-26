@@ -14,13 +14,10 @@ import com.microsoft.applicationinsights.channel.contracts.CrashDataThreadFrame;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
-import com.microsoft.applicationinsights.channel.contracts.ExceptionData;
-import com.microsoft.applicationinsights.channel.contracts.ExceptionDetails;
 import com.microsoft.applicationinsights.channel.contracts.MessageData;
 import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 import com.microsoft.applicationinsights.channel.contracts.RequestData;
-import com.microsoft.applicationinsights.channel.contracts.StackFrame;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
@@ -46,7 +43,7 @@ public class TelemetryClient {
     public static TelemetryClient getInstance(Context context) {
         TelemetryClient client = null;
         if (context == null) {
-            InternalLogging._warn("TelemetryClient.getInstance", "activity is null");
+            InternalLogging._warn("TelemetryClient.getInstance", "context is null");
         } else {
             client = new TelemetryClient(context);
         }
@@ -78,7 +75,6 @@ public class TelemetryClient {
      * The telemetry telemetryContext object.
      */
     public TelemetryContext getContext() {
-        // todo: add cloneContext (possibly rename getContext to make it's scope clear)
         return this.context;
     }
 
@@ -128,7 +124,7 @@ public class TelemetryClient {
      * @param config the configuration for this client
      */
     private TelemetryClient(TelemetryClientConfig config, Context context) {
-        this(config, new TelemetryContext(context), new TelemetryChannel(config));
+        this(config, new TelemetryContext(context), new TelemetryChannel(config, context));
     }
 
     /**
@@ -301,6 +297,7 @@ public class TelemetryClient {
         String message = exception.getMessage();
         crashDataHeaders.setExceptionReason(this.ensureValid(message));
         crashDataHeaders.setExceptionType(exception.getClass().getName());
+        crashDataHeaders.setApplicationPath(this.context.getPackageName());
 
         CrashData crashData = new CrashData();
         crashData.setThreads(threads);
@@ -325,9 +322,7 @@ public class TelemetryClient {
      *
      * @see TelemetryClient#trackPageView(String, LinkedHashMap, LinkedHashMap)
      */
-    public void trackPageView(
-          String pageName,
-          LinkedHashMap<String, String> properties) {
+    public void trackPageView(String pageName, LinkedHashMap<String, String> properties) {
         this.trackPageView(pageName, properties, null);
     }
 

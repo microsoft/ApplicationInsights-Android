@@ -9,9 +9,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class SenderPersistenceTest extends AndroidTestCase {
+
+    public void setUp() throws Exception {
+        super.setUp();
+        Persistence.initialize(this.getContext());
+    }
+
     public void testOn500Response() throws Exception {
         Persistence persist = Persistence.getInstance();
-        persist.setPersistenceContext(this.getContext());
         Sender sender = new Sender(new TelemetryQueueConfig());
         URL url = new URL("http://www.android.com/");
         HttpURLConnection conn = new HttpURLConnection(url) {
@@ -33,7 +38,7 @@ public class SenderPersistenceTest extends AndroidTestCase {
         String expected = "THIS IS A TEST";
         sender.onResponse(conn, 501, expected);
 
-        String data = persist.getData();
+        String data = persist.getNextItemFromDisk();
         Assert.assertEquals("Data was retrieved from persistence file", expected, data);
     }
 }

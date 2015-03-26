@@ -27,11 +27,6 @@ public class TelemetryChannelConfig {
     private final Context appContext;
 
     /**
-     * The persisted data for this application
-     */
-    private final Persistence persist;
-
-    /**
      * Gets the instrumentation key for this telemetry channel
      */
     public String getInstrumentationKey() {
@@ -53,26 +48,12 @@ public class TelemetryChannelConfig {
     }
 
     /**
-     * The application telemetry channel for this recorder
-     */
-    public Context getAppContext() {
-        return appContext;
-    }
-
-    /**
-     * The persisted data for the application
-     */
-    public Persistence getPersistence() {
-        return persist;
-    }
-
-    /**
      * Constructs a new instance of TelemetryChannelConfig
      * @param context The android activity context
      */
     public TelemetryChannelConfig(Context context) {
-        this.persist = Persistence.getInstance();
-        persist.setPersistenceContext(context);
+        //this.persist = Persistence.getInstance();
+        //persist.setPersistenceContext(context);
         this.appContext = context;
         this.instrumentationKey = TelemetryChannelConfig.readInstrumentationKey(context);
     }
@@ -100,18 +81,20 @@ public class TelemetryChannelConfig {
      */
     private static String readInstrumentationKey(Context context) {
         String iKey = "";
-        try {
-            Bundle bundle = context
-                    .getPackageManager()
-                    .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA)
-                    .metaData;
-            if(bundle != null) {
-                iKey = bundle.getString("com.microsoft.applicationinsights.instrumentationKey");
-            } else {
+        if(context != null) {
+            try {
+                Bundle bundle = context
+                        .getPackageManager()
+                        .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA)
+                        .metaData;
+                if (bundle != null) {
+                    iKey = bundle.getString("com.microsoft.applicationinsights.instrumentationKey");
+                } else {
+                    logInstrumentationInstructions();
+                }
+            } catch (PackageManager.NameNotFoundException exception) {
                 logInstrumentationInstructions();
             }
-        } catch (PackageManager.NameNotFoundException exception) {
-            logInstrumentationInstructions();
         }
 
         return iKey;

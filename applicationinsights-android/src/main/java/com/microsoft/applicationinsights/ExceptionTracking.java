@@ -12,8 +12,8 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
     private static final Object lock = new Object();
     private static String TAG = "ExceptionHandler";
     private boolean ignoreDefaultHandler;
-    private TelemetryClient telemetryClient;
-    private UncaughtExceptionHandler preexistingExceptionHandler;
+    protected TelemetryClient telemetryClient;
+    protected UncaughtExceptionHandler preexistingExceptionHandler;
 
     public static void registerExceptionHandler(Context context) {
         ExceptionTracking.registerExceptionHandler(context, false);
@@ -38,7 +38,7 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
         }
     }
 
-    private ExceptionTracking(Context context,
+    protected ExceptionTracking(Context context,
                               UncaughtExceptionHandler preexistingExceptionHandler,
                               boolean ignoreDefaultHandler) {
         this.preexistingExceptionHandler = preexistingExceptionHandler;
@@ -68,12 +68,19 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
         // flush the queue to disk
         this.telemetryClient.flush();
 
-        // invoke the
-        if (!this.ignoreDefaultHandler) {
+        // invoke the existing handler if requested and if it exists
+        if (!this.ignoreDefaultHandler && this.preexistingExceptionHandler != null) {
             this.preexistingExceptionHandler.uncaughtException(thread, exception);
         } else {
-            android.os.Process.killProcess(android.os.Process.myPid());
-            System.exit(10);
+            this.killProcess();
         }
+    }
+
+    /**
+     * Test hook for killing the process
+     */
+    protected void killProcess() {
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(10);
     }
 }

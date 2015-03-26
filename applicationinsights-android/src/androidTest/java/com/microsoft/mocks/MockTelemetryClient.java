@@ -14,18 +14,14 @@ public class MockTelemetryClient extends TelemetryClient {
     public boolean mockTrackMethod;
 
     public MockTelemetryClient (Context context) {
-        this(new TelemetryClientConfig(context));
+        this(new TelemetryClientConfig(context), context);
         this.messages = new ArrayList<ITelemetry>(10);
         this.mockTrackMethod = true;
     }
 
-    protected MockTelemetryClient(TelemetryClientConfig config) {
-        this(config, new MockChannel(config));
-    }
-
-    protected MockTelemetryClient(TelemetryClientConfig config, MockChannel channel) {
-        super(config,new TelemetryContext(config.getAppContext()), channel);
-        channel.setQueue(new MockQueue(1));
+    protected MockTelemetryClient(TelemetryClientConfig config, Context context) {
+        super(config, new TelemetryContext(context), new MockChannel(config, context));
+        ((MockChannel)this.channel).setQueue(new MockQueue(1));
     }
 
     @Override

@@ -22,11 +22,6 @@ public class TelemetryQueue {
     private static final Object lock = new Object();
 
     /**
-     * The linked list for this queue
-     */
-    protected LinkedList<IJsonSerializable> linkedList;
-
-    /**
      * The configuration for this queue
      */
     protected final TelemetryQueueConfig config;
@@ -37,9 +32,19 @@ public class TelemetryQueue {
     protected final Timer timer;
 
     /**
+     * The linked list for this queue
+     */
+    protected LinkedList<IJsonSerializable> linkedList;
+
+    /**
      * The sender for this queue
      */
     protected Sender sender;
+
+    /**
+     * If true the app is crashing and data should be persisted instead of sent
+     */
+    protected volatile boolean isCrashing;
 
     /**
      * All tasks which have been scheduled and not cancelled
@@ -54,6 +59,15 @@ public class TelemetryQueue {
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = new TelemetryQueueConfig();
         this.sender = new Sender(this.config);
+        this.isCrashing = false;
+    }
+
+    /**
+     * Set the isCrashing flag
+     * @param isCrashing if true the app is assumed to be crashing and data will be written to disk
+     */
+    public void setIsCrashing(Boolean isCrashing) {
+        this.isCrashing = isCrashing;
     }
 
     /**
@@ -161,7 +175,16 @@ public class TelemetryQueue {
             }
 
             if(data != null) {
-                this.sender.send(data);
+                if(this.queue.isCrashing) {
+                    // persist the queue if the app is crashing
+                    Persistence persistence = Persistence.getInstance();
+                    if(persistence != null) {
+                        persistence.persist(data);
+                    }
+                } else {
+                    // otherwise send data
+                    this.sender.send(data);
+                }
             }
         }
     }
