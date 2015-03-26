@@ -81,13 +81,13 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testCatchCrash() throws Exception {
-      this.client.sendCrash(null, null);
-      this.client.sendCrash(new Exception(), null);
+      this.client.processUnhandledException(null, null);
+      this.client.processUnhandledException(new Exception(), null);
       try {
         throw new InvalidObjectException("this is expected");
       }
       catch (InvalidObjectException exception) {
-        this.client.sendCrash(exception, null);
+        this.client.processUnhandledException(exception, null);
       }
 
       this.validate();

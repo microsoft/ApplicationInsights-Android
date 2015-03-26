@@ -1,7 +1,11 @@
 package com.microsoft.applicationinsights.channel;
 
+import android.util.Log;
+
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,6 +14,8 @@ import java.util.TimerTask;
  * This singleton class sends data to the endpoint
  */
 public class TelemetryQueue {
+
+    private static final String TAG = "TelemetryQueue";
 
     /**
      * The singleton instance
@@ -108,6 +114,43 @@ public class TelemetryQueue {
         // cancel the scheduled send task if it exists
         if(this.sendTask != null) {
             this.sendTask.cancel();
+        }
+    }
+
+
+    /**
+     * Saves the queue to disk. This will be necessary in case we have an (unhandled) exception and
+     * the app crashes
+     */
+    public void persist() {
+        if(this.linkedList.size() > 0 ) {
+            IJsonSerializable[] data = new IJsonSerializable[this.linkedList.size()];
+            this.linkedList.toArray(data);
+            this.linkedList.clear();
+
+            StringBuilder buffer = new StringBuilder();
+
+            try {
+                buffer.append('[');
+                for (int i = 0; i < data.length; i++) {
+                    if (i > 0) {
+                        buffer.append(',');
+                    }
+                    StringWriter stringWriter = new StringWriter();
+                    data[i].serialize(stringWriter);
+                    buffer.append(stringWriter.toString());
+                }
+
+                buffer.append(']');
+                String serializedData = buffer.toString();
+                Log.v(TAG, serializedData);
+
+                Persistence persistence = Persistence.getInstance();
+                persistence.saveData(serializedData);
+            } catch (IOException e) {
+                InternalLogging._error(TAG, e.toString());
+            }
+
         }
     }
 

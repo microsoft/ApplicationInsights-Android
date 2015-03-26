@@ -1,5 +1,7 @@
 package com.microsoft.applicationinsights.channel;
 
+import android.util.Log;
+
 import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
@@ -145,6 +147,8 @@ public class TelemetryChannel {
     }
 
     private void processCrash(Envelope envelope) {
+        this.queue.persist();
+
         IJsonSerializable[] data = new IJsonSerializable[1];
         data[0] = envelope;
 
@@ -163,9 +167,12 @@ public class TelemetryChannel {
 
             buffer.append(']');
             String serializedData = buffer.toString();
+            Log.v(TAG, serializedData);
 
             Persistence persistence = Persistence.getInstance();
             persistence.saveData(serializedData);
+
+
         } catch (IOException e) {
             InternalLogging._error(TAG, e.toString());
         }

@@ -333,7 +333,7 @@ public class TelemetryClient {
      * @param properties   Custom properties associated with the crash. Note: values set here will
      *                     supersede values set in {@link TelemetryClient#setCommonProperties}.
      */
-    public void sendCrash(Throwable exception, LinkedHashMap<String, String> properties) {
+    public void processUnhandledException(Throwable exception, LinkedHashMap<String, String> properties) {
         if(exception == null) {
             exception = new Exception();
         }
