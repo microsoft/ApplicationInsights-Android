@@ -21,16 +21,16 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
     public static void registerExceptionHandler(Context context, boolean ignoreDefaultHandler) {
         synchronized (ExceptionHandler.lock) {
             UncaughtExceptionHandler preexistingExceptionHandler =
-                    Thread.getDefaultUncaughtExceptionHandler();
+                  Thread.getDefaultUncaughtExceptionHandler();
 
             if (preexistingExceptionHandler instanceof ExceptionHandler) {
                 InternalLogging._error(TAG,
                       "ExceptionHandler was already registered for this thread");
             } else {
                 ExceptionHandler handler = new ExceptionHandler(
-                        context,
-                        preexistingExceptionHandler,
-                        ignoreDefaultHandler);
+                      context,
+                      preexistingExceptionHandler,
+                      ignoreDefaultHandler);
 
                 Thread.setDefaultUncaughtExceptionHandler(handler);
             }
@@ -58,8 +58,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
             properties.put("threadPriority", Integer.toString(thread.getPriority()));
         }
 
-      this.telemetryClient.processUnhandledException(exception, properties);
-        this.telemetryClient.flush();
+        this.telemetryClient.processUnhandledException(exception, properties);
 
         if (!this.ignoreDefaultHandler) {
             this.preexistingExceptionHandler.uncaughtException(thread, exception);
