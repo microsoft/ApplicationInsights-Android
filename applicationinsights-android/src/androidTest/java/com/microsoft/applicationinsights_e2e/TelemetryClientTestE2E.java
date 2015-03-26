@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
+import com.microsoft.applicationinsights.channel.TelemetryQueueConfig;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockQueue;
 import com.microsoft.mocks.MockTelemetryClient;
@@ -33,7 +34,11 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
 
         this.client = new MockTelemetryClient(this.getActivity());
         this.client.mockTrackMethod = false;
-        this.client.getChannel().getQueue().getConfig().setMaxBatchIntervalMs(20);
+        TelemetryQueueConfig config = this.client.getChannel().getQueue().getConfig();
+        config.setMaxBatchIntervalMs(20);
+
+        // use http for tests
+        config.setEndpointUrl(config.getEndpointUrl().replace("https", "http"));
 
         this.properties = new LinkedHashMap<>();
         this.properties.put("core property", "core value");
@@ -74,23 +79,9 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             this.client.trackException(exception);
             this.client.trackException(exception, "core handler");
             this.client.trackException(exception, "core handler1", properties);
-            this.client.trackException(exception, "core handler2", properties, measurements);
         }
 
         this.validate();
-    }
-
-    public void testCatchCrash() throws Exception {
-      this.client.processUnhandledException(null, null);
-      this.client.processUnhandledException(new Exception(), null);
-      try {
-        throw new InvalidObjectException("this is expected");
-      }
-      catch (InvalidObjectException exception) {
-        this.client.processUnhandledException(exception, null);
-      }
-
-      this.validate();
     }
 
     public void testTrackPageView() throws Exception {
@@ -102,11 +93,6 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testTrackAllRequests() throws Exception {
-        MockQueue queue = new MockQueue(5);
-        String endpoint = queue.getConfig().getEndpointUrl();
-        queue.getConfig().setEndpointUrl(endpoint.replace("https", "http"));
-        this.client.getChannel().setQueue(queue);
-
         Exception exception;
         try {
             throw new Exception();
@@ -114,7 +100,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             exception = e;
         }
 
-        queue.getConfig().setMaxBatchCount(10);
+        this.client.getConfig().getStaticConfig().setMaxBatchCount(10);
         for (int i = 0; i < 10; i++) {
             this.client.trackEvent("android event");
             this.client.trackTrace("android trace");
@@ -124,7 +110,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             Thread.sleep(10);
         }
 
-        queue.flush();
+        this.client.flush();
         Thread.sleep(10);
         this.validate();
     }

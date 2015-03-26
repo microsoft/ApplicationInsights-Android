@@ -1,16 +1,12 @@
 package com.microsoft.applicationinsights.channel;
 
-import android.util.Log;
+import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Random;
@@ -50,12 +46,14 @@ public class TelemetryChannel {
 
     /**
      * Instantiates a new instance of Sender
+     *
      * @param config The configuration for this channel
+     * @param appContext The app context for this channel
      */
-    public TelemetryChannel(TelemetryChannelConfig config) {
+    public TelemetryChannel(TelemetryChannelConfig config, Context appContext) {
         this.queue = TelemetryQueue.instance;
         this.config = config;
-        this.context = new TelemetryContext(config.getAppContext());
+        this.context = new TelemetryContext(appContext);
 
         Random random = new Random();
         this.channelId = Math.abs(random.nextLong());
@@ -98,11 +96,7 @@ public class TelemetryChannel {
         Envelope envelope = this.getEnvelope(telemetry, tags);
 
         // send to queue
-        if (telemetry.getClass().equals(CrashData.class)) {
-            processCrash(envelope);
-        } else {
-            this.queue.enqueue(envelope);
-        }
+        this.queue.enqueue(envelope);
     }
 
     /**
@@ -144,37 +138,5 @@ public class TelemetryChannel {
         }
 
         return envelope;
-    }
-
-    private void processCrash(Envelope envelope) {
-        getQueue().persist();
-
-        IJsonSerializable[] data = new IJsonSerializable[1];
-        data[0] = envelope;
-
-        StringBuilder buffer = new StringBuilder();
-
-        try {
-            buffer.append('[');
-            for (int i = 0; i < data.length; i++) {
-                if (i > 0) {
-                    buffer.append(',');
-                }
-                StringWriter stringWriter = new StringWriter();
-                data[i].serialize(stringWriter);
-                buffer.append(stringWriter.toString());
-            }
-
-            buffer.append(']');
-            String serializedData = buffer.toString();
-            Log.v(TAG, serializedData);
-
-            Persistence persistence = Persistence.getInstance();
-            persistence.saveData(serializedData);
-
-
-        } catch (IOException e) {
-            InternalLogging._error(TAG, e.toString());
-        }
     }
 }

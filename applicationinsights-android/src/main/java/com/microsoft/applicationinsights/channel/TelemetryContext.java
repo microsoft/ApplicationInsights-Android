@@ -140,7 +140,7 @@ public class TelemetryContext {
     public TelemetryContext(Context appContext) {
 
         // note: isContextLoaded must be volatile for the double-checked lock to work
-        if (!TelemetryContext.isContextLoaded) {
+        if (!TelemetryContext.isContextLoaded && appContext != null) {
             synchronized (TelemetryContext.lock) {
                 if (!TelemetryContext.isContextLoaded) {
                     TelemetryContext.isContextLoaded = true;
@@ -162,6 +162,9 @@ public class TelemetryContext {
                     TelemetryContext.setUserContext();
                     TelemetryContext.setAppContext(appContext);
                     TelemetryContext.setInternalContext();
+
+                    // initialize persistence
+                    Persistence.initialize(appContext);
                 }
             }
         }

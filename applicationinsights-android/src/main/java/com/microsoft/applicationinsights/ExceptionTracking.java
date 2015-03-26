@@ -3,43 +3,44 @@ package com.microsoft.applicationinsights;
 import android.content.Context;
 
 import com.microsoft.applicationinsights.channel.InternalLogging;
+import com.microsoft.applicationinsights.channel.TelemetryQueue;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedHashMap;
 
-public class ExceptionHandler implements UncaughtExceptionHandler {
+public class ExceptionTracking implements UncaughtExceptionHandler {
     private static final Object lock = new Object();
     private static String TAG = "ExceptionHandler";
     private boolean ignoreDefaultHandler;
-    private TelemetryClient telemetryClient;
-    private UncaughtExceptionHandler preexistingExceptionHandler;
+    protected TelemetryClient telemetryClient;
+    protected UncaughtExceptionHandler preexistingExceptionHandler;
 
     public static void registerExceptionHandler(Context context) {
-        ExceptionHandler.registerExceptionHandler(context, false);
+        ExceptionTracking.registerExceptionHandler(context, false);
     }
 
     public static void registerExceptionHandler(Context context, boolean ignoreDefaultHandler) {
-        synchronized (ExceptionHandler.lock) {
+        synchronized (ExceptionTracking.lock) {
             UncaughtExceptionHandler preexistingExceptionHandler =
                   Thread.getDefaultUncaughtExceptionHandler();
 
-            if (preexistingExceptionHandler instanceof ExceptionHandler) {
+            if (preexistingExceptionHandler instanceof ExceptionTracking) {
                 InternalLogging._error(TAG,
-                      "ExceptionHandler was already registered for this thread");
+                        "ExceptionHandler was already registered for this thread");
             } else {
-                ExceptionHandler handler = new ExceptionHandler(
-                      context,
-                      preexistingExceptionHandler,
-                      ignoreDefaultHandler);
+                ExceptionTracking handler = new ExceptionTracking(
+                        context,
+                        preexistingExceptionHandler,
+                        ignoreDefaultHandler);
 
                 Thread.setDefaultUncaughtExceptionHandler(handler);
             }
         }
     }
 
-    private ExceptionHandler(Context context,
-                             UncaughtExceptionHandler preexistingExceptionHandler,
-                             boolean ignoreDefaultHandler) {
+    protected ExceptionTracking(Context context,
+                              UncaughtExceptionHandler preexistingExceptionHandler,
+                              boolean ignoreDefaultHandler) {
         this.preexistingExceptionHandler = preexistingExceptionHandler;
         if (context != null) {
             this.telemetryClient = TelemetryClient.getInstance(context);
@@ -58,13 +59,28 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
             properties.put("threadPriority", Integer.toString(thread.getPriority()));
         }
 
-        this.telemetryClient.processUnhandledException(exception, properties);
+        // track the crash
+        this.telemetryClient.trackException(exception, "uncaughtException", properties);
 
-        if (!this.ignoreDefaultHandler) {
+        // signal the queue that the app is crashing so future data should be persisted
+        TelemetryQueue.instance.setIsCrashing(true);
+
+        // flush the queue to disk
+        this.telemetryClient.flush();
+
+        // invoke the existing handler if requested and if it exists
+        if (!this.ignoreDefaultHandler && this.preexistingExceptionHandler != null) {
             this.preexistingExceptionHandler.uncaughtException(thread, exception);
         } else {
-            android.os.Process.killProcess(android.os.Process.myPid());
-            System.exit(10);
+            this.killProcess();
         }
+    }
+
+    /**
+     * Test hook for killing the process
+     */
+    protected void killProcess() {
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(10);
     }
 }
