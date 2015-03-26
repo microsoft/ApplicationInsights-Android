@@ -3,6 +3,7 @@ package com.microsoft.applicationinsights;
 import android.content.Context;
 
 import com.microsoft.applicationinsights.channel.InternalLogging;
+import com.microsoft.applicationinsights.channel.TelemetryQueue;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedHashMap;
@@ -58,9 +59,16 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
             properties.put("threadPriority", Integer.toString(thread.getPriority()));
         }
 
-        this.telemetryClient.sendCrash(exception, properties);
+        // track the crash
+        this.telemetryClient.trackException(exception, "uncaughtException", properties);
+
+        // signal the queue that the app is crashing so future data should be persisted
+        TelemetryQueue.instance.setIsCrashing(true);
+
+        // flush the queue to disk
         this.telemetryClient.flush();
 
+        // invoke the
         if (!this.ignoreDefaultHandler) {
             this.preexistingExceptionHandler.uncaughtException(thread, exception);
         } else {

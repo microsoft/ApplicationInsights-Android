@@ -79,24 +79,8 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             this.client.trackException(exception);
             this.client.trackException(exception, "core handler");
             this.client.trackException(exception, "core handler1", properties);
-            this.client.trackException(exception, "core handler2", properties, measurements);
         }
 
-        this.validate();
-    }
-
-    public void testCatchCrash() throws Exception {
-        this.client.sendCrash(null, null);
-        this.client.sendCrash(new Exception(), null);
-        try {
-            throw new InvalidObjectException("this is expected");
-        } catch (InvalidObjectException exception) {
-            this.client.sendCrash(exception, null);
-        }
-
-        // send a second telemetry item to pull the persisted crash and flush
-        this.client.trackTrace("trace");
-        this.client.flush();
         this.validate();
     }
 

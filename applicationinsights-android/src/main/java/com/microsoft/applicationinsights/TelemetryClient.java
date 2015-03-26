@@ -246,7 +246,7 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap)
      */
     public void trackException(Throwable exception) {
         this.trackException(exception, null);
@@ -256,22 +256,10 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap)
      */
     public void trackException(Throwable exception, String handledAt) {
         this.trackException(exception, handledAt, null);
-    }
-
-    /**
-     * {@code measurements} defaults to {@code null}.
-     *
-     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap, LinkedHashMap)
-     */
-    public void trackException(
-          Throwable exception,
-          String handledAt,
-          LinkedHashMap<String, String> properties) {
-        this.trackException(exception, handledAt, properties, null);
     }
 
     /**
@@ -281,60 +269,12 @@ public class TelemetryClient {
      * @param handledAt    The location at which this exception was handled (null if unhandled)
      * @param properties   Custom properties associated with the event. Note: values set here will
      *                     supersede values set in {@link TelemetryClient#setCommonProperties}.
-     * @param measurements Custom measurements associated with the event.
      */
     public void trackException(
           Throwable exception,
           String handledAt,
-          LinkedHashMap<String, String> properties,
-          LinkedHashMap<String, Double> measurements) {
+          LinkedHashMap<String, String> properties) {
 
-        if (exception == null) {
-            exception = new Exception();
-        }
-
-        // read stack frames
-        ArrayList<StackFrame> stackFrames = new ArrayList<StackFrame>();
-        StackTraceElement[] stack = exception.getStackTrace();
-        for (int i = stack.length - 1; i >= 0; i--) {
-            StackTraceElement rawFrame = stack[i];
-            StackFrame frame = new StackFrame();
-            frame.setFileName(rawFrame.getFileName());
-            frame.setLine(rawFrame.getLineNumber());
-            frame.setMethod(rawFrame.getClassName() + "." + rawFrame.getMethodName());
-            frame.setLevel(i);
-            stackFrames.add(frame);
-        }
-
-        // read exception detail
-        ExceptionDetails detail = new ExceptionDetails();
-        String message = exception.getMessage();
-        detail.setMessage(this.ensureValid(message));
-        detail.setTypeName(exception.getClass().getName());
-        detail.setHasFullStack(true);
-        detail.setParsedStack(stackFrames);
-        ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
-        exceptions.add(detail);
-
-        // populate ExceptionData
-        ExceptionData telemetry = new ExceptionData();
-        telemetry.setHandledAt(this.ensureValid(handledAt));
-        telemetry.setExceptions(exceptions);
-        telemetry.setProperties(properties);
-        telemetry.setMeasurements(measurements);
-
-        track(telemetry);
-    }
-
-    //TODO rename the method?
-    /**
-     * Sends information about a crash (unhandled exception) to Application Insights.
-     *
-     * @param exception    The unhandled exception that caused the crash.
-     * @param properties   Custom properties associated with the crash. Note: values set here will
-     *                     supersede values set in {@link TelemetryClient#setCommonProperties}.
-     */
-    public void sendCrash(Throwable exception, LinkedHashMap<String, String> properties) {
         if(exception == null) {
             exception = new Exception();
         }
