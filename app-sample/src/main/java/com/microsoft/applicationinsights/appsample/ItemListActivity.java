@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.TelemetryClient;
-
+import com.microsoft.applicationinsights.channel.TelemetryQueueConfig;
 
 /**
  * An activity representing a list of Items. This activity
@@ -51,13 +51,22 @@ public class ItemListActivity extends FragmentActivity
                     .setActivateOnItemClick(true);
         }
 
+        // update endpoint to make traffic visible in the proxy
         TelemetryClient client = TelemetryClient.getInstance(this);
-        client.getConfig().getStaticConfig().setMaxBatchIntervalMs(1000);
+        TelemetryQueueConfig config = client.getConfig().getStaticConfig();
+        config.setEndpointUrl(config.getEndpointUrl().replace("https", "http"));
+
+        // Track basic telemetry
         client.trackTrace("example trace");
         client.trackEvent("example event");
-        client.trackException(new Exception("example error"));
         client.trackMetric("example metric", 1);
         client.flush();
+
+        // Track uncaught exceptions
+        client.enableCrashTracking(this);
+
+        // track activity lifecycle (note this only needs to be done once per application)
+        client.enableActivityTracking(this.getApplication());
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.microsoft.applicationinsights.channel;
 
+import android.content.Context;
+
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
@@ -14,6 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * This class records telemetry for application insights.
  */
 public class TelemetryChannel {
+
+    private static final String TAG = "TelemetryChannel";
 
     /**
      * The configuration for this recorder
@@ -42,12 +46,14 @@ public class TelemetryChannel {
 
     /**
      * Instantiates a new instance of Sender
+     *
      * @param config The configuration for this channel
+     * @param appContext The app context for this channel
      */
-    public TelemetryChannel(TelemetryChannelConfig config) {
+    public TelemetryChannel(TelemetryChannelConfig config, Context appContext) {
         this.queue = TelemetryQueue.instance;
         this.config = config;
-        this.context = new TelemetryContext(config);
+        this.context = new TelemetryContext(appContext);
 
         Random random = new Random();
         this.channelId = Math.abs(random.nextLong());

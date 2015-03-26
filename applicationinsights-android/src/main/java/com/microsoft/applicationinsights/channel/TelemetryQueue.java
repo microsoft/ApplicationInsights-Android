@@ -1,7 +1,11 @@
 package com.microsoft.applicationinsights.channel;
 
+import android.util.Log;
+
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,6 +14,8 @@ import java.util.TimerTask;
  * This singleton class sends data to the endpoint
  */
 public class TelemetryQueue {
+
+    private static final String TAG = "TelemetryQueue";
 
     /**
      * The singleton instance
@@ -22,11 +28,6 @@ public class TelemetryQueue {
     private static final Object lock = new Object();
 
     /**
-     * The linked list for this queue
-     */
-    protected LinkedList<IJsonSerializable> linkedList;
-
-    /**
      * The configuration for this queue
      */
     protected final TelemetryQueueConfig config;
@@ -37,9 +38,19 @@ public class TelemetryQueue {
     protected final Timer timer;
 
     /**
+     * The linked list for this queue
+     */
+    protected LinkedList<IJsonSerializable> linkedList;
+
+    /**
      * The sender for this queue
      */
     protected Sender sender;
+
+    /**
+     * If true the app is crashing and data should be persisted instead of sent
+     */
+    protected volatile boolean isCrashing;
 
     /**
      * All tasks which have been scheduled and not cancelled
@@ -54,6 +65,15 @@ public class TelemetryQueue {
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = new TelemetryQueueConfig();
         this.sender = new Sender(this.config);
+        this.isCrashing = false;
+    }
+
+    /**
+     * Set the isCrashing flag
+     * @param isCrashing if true the app is assumed to be crashing and data will be written to disk
+     */
+    public void setIsCrashing(Boolean isCrashing) {
+        this.isCrashing = isCrashing;
     }
 
     /**
@@ -111,6 +131,43 @@ public class TelemetryQueue {
         }
     }
 
+
+    /**
+     * Saves the queue to disk. This will be necessary in case we have an (unhandled) exception and
+     * the app crashes
+     */
+    public void persist() {
+        if(this.linkedList.size() > 0 ) {
+            IJsonSerializable[] data = new IJsonSerializable[this.linkedList.size()];
+            this.linkedList.toArray(data);
+            this.linkedList.clear();
+
+            StringBuilder buffer = new StringBuilder();
+
+            try {
+                buffer.append('[');
+                for (int i = 0; i < data.length; i++) {
+                    if (i > 0) {
+                        buffer.append(',');
+                    }
+                    StringWriter stringWriter = new StringWriter();
+                    data[i].serialize(stringWriter);
+                    buffer.append(stringWriter.toString());
+                }
+
+                buffer.append(']');
+                String serializedData = buffer.toString();
+                Log.v(TAG, serializedData);
+
+                Persistence persistence = Persistence.getInstance();
+                //persistence.saveData(serializedData);
+            } catch (IOException e) {
+                InternalLogging._error(TAG, e.toString());
+            }
+
+        }
+    }
+
     /**
      * A task to initiate queue flush on another thread
      */
@@ -161,7 +218,16 @@ public class TelemetryQueue {
             }
 
             if(data != null) {
-                this.sender.send(data);
+                if(this.queue.isCrashing) {
+                    // persist the queue if the app is crashing
+                    Persistence persistence = Persistence.getInstance();
+                    if(persistence != null) {
+                        persistence.persist(data);
+                    }
+                } else {
+                    // otherwise send data
+                    this.sender.send(data);
+                }
             }
         }
     }

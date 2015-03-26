@@ -29,16 +29,10 @@ public class Sender {
     protected final TelemetryQueueConfig config;
 
     /**
-     * Saves data to disk if there is a protocol error
-     */
-    private Persistence persist;
-
-    /**
      * Prevent external instantiation
      */
     public Sender(TelemetryQueueConfig config) {
         this.config = config;
-        this.persist = Persistence.getInstance();
     }
 
     /**
@@ -62,12 +56,13 @@ public class Sender {
             buffer.append(']');
 
             // Send the persisted data
-            String persistedData = this.persist.getData();
-            if (!persistedData.equals(""))
-            {
-                InternalLogging._info(TAG, "adding persisted data", persistedData);
-                sendRequestWithPayload(persistedData);
-                this.persist.clearData();
+            Persistence persistence = Persistence.getInstance();
+            if(persistence != null) {
+                String persistedData = persistence.getNextItemFromDisk();
+                if (!persistedData.equals("")) {
+                    InternalLogging._info(TAG, "adding persisted data", persistedData);
+                    sendRequestWithPayload(persistedData);
+                }
             }
 
             // Send the new data
@@ -101,8 +96,11 @@ public class Sender {
             InternalLogging._info(TAG, "response code", Integer.toString(responseCode));
             this.onResponse(connection, responseCode, payload);
         } catch (IOException e){
-            this.persist.saveData(payload);
             InternalLogging._error(TAG, e.toString());
+            Persistence persistence = Persistence.getInstance();
+            if(persistence != null) {
+                persistence.persist(payload);
+            }
         } finally {
             if(writer != null) {
                 try {
@@ -141,7 +139,10 @@ public class Sender {
             if(responseCode >= 500 && responseCode != 529)
             {
                 InternalLogging._info(TAG, "Server error, persisting data", payload);
-                persist.saveData(payload);
+                Persistence persistence = Persistence.getInstance();
+                if(persistence != null) {
+                    persistence.persist(payload);
+                }
             }
 
             // If it isn't the usual success code (200), log the response from the server.

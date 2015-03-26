@@ -3,7 +3,7 @@ package com.microsoft.applicationinsights.channel;
 public class TelemetryQueueConfig {
 
     public static final int defaultMaxBatchCount = 100;
-    public static final int defaultMaxBatchIntervalMs = 15 * 1000;
+    public static final int defaultMaxBatchIntervalMs = 1000;
     public static final String defaultEndpointUrl = "https://dc.services.visualstudio.com/v2/track";
     public static final boolean defaultDisableTelemetry = false;
     public static final boolean defaultDeveloperMode = false;
