@@ -97,8 +97,7 @@ public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
             throw new InvalidObjectException("this is expected");
         } catch (InvalidObjectException exception) {
             client.trackException(exception);
-            client.trackException(exception, "core handler");
-            client.trackException(exception, "core handler1", properties);
+            client.trackException(exception, properties);
         }
     }
 

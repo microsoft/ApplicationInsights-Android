@@ -77,8 +77,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             throw new InvalidObjectException("this is expected");
         } catch (InvalidObjectException exception) {
             this.client.trackException(exception);
-            this.client.trackException(exception, "core handler");
-            this.client.trackException(exception, "core handler1", properties);
+            this.client.trackException(exception, properties);
         }
 
         this.validate();
@@ -105,7 +104,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             this.client.trackEvent("android event");
             this.client.trackTrace("android trace");
             this.client.trackMetric("android metric", 0.0);
-            this.client.trackException(exception, "android handler");
+            this.client.trackException(exception);
             this.client.trackPageView("android page");
             Thread.sleep(10);
         }
