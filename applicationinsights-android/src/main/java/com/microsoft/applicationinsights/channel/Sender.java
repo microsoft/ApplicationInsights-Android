@@ -3,6 +3,7 @@ package com.microsoft.applicationinsights.channel;
 import android.annotation.TargetApi;
 import android.os.Build;
 
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
 import java.io.BufferedReader;
@@ -93,8 +94,11 @@ public class Sender {
 
             // Starts the query
             connection.connect();
+
+            // read the response code while we're ready to catch the IO exception
             int responseCode = connection.getResponseCode();
-            InternalLogging.info(TAG, "response code", Integer.toString(responseCode));
+
+            // process the response
             this.onResponse(connection, responseCode, payload);
         } catch (IOException e) {
             InternalLogging.error(TAG, e.toString());
@@ -122,52 +126,99 @@ public class Sender {
      * @return null if the request was successful, the server response otherwise
      */
     protected String onResponse(HttpURLConnection connection, int responseCode, String payload) {
+        StringBuilder builder = new StringBuilder();
+
+        InternalLogging.info(TAG, "response code", Integer.toString(responseCode));
+        boolean isExpected = responseCode == 200;
+        boolean isRecoverableError = responseCode > 500 && responseCode != 529;
+
+        // If this was expected and developer mode is enabled, read the response
+        if(isExpected) {
+            this.onExpected(connection, builder);
+        }
+
+        // If there was a server issue, persist the data
+        if (isRecoverableError) {
+            this.onRecoverable(payload);
+        }
+
+        // If it isn't the usual success code (200), log the response from the server.
+        if (!isExpected) {
+            this.onUnexpected(connection, responseCode, builder);
+        }
+
+        return builder.toString();
+    }
+
+    /**
+     * Process the expected response. If {code:TelemetryChannelConfig.isDeveloperMode}, read the
+     * response and log it.
+     *
+     * @param connection a connection containing a response
+     * @param builder    a string builder for storing the response
+     */
+    protected void onExpected(HttpURLConnection connection, StringBuilder builder) {
+        if (this.config.isDeveloperMode()) {
+            this.readResponse(connection, builder);
+        }
+    }
+
+    /**
+     *
+     * @param connection   a connection containing a response
+     * @param responseCode the response code from the connection
+     * @param builder      a string builder for storing the response
+     */
+    protected void onUnexpected(HttpURLConnection connection, int responseCode, StringBuilder builder) {
+        String message = String.format(Locale.ROOT, "Unexpected response code: %d", responseCode);
+        builder.append(message);
+        builder.append("\n");
+
+        // log the unexpected response
+        InternalLogging.warn(TAG, message);
+
+        // attempt to read the response stream
+        this.readResponse(connection, builder);
+    }
+
+    /**
+     * Writes the payload to disk if the response code indicates that the server or network caused
+     * the failure instead of the client.
+     *
+     * @param payload the payload which generated this response
+     */
+    protected void onRecoverable(String payload) {
+        InternalLogging.info(TAG, "Server error, persisting data", payload);
+        Persistence persistence = Persistence.getInstance();
+        if (persistence != null) {
+            persistence.persist(payload);
+        }
+    }
+
+    /**
+     * Reads the response from a connection.
+     *
+     * @param connection the connection which will read the response
+     * @param builder a string builder for storing the response
+     */
+    private void readResponse(HttpURLConnection connection, StringBuilder builder) {
         BufferedReader reader = null;
-        String response = null;
         try {
-
-            StringBuilder responseBuilder = new StringBuilder();
-
-            if ((responseCode < 200)
-                    || (responseCode >= 300 && responseCode < 400)
-                    || (responseCode > 500 && responseCode != 529)) {
-                String message = String.format(Locale.ROOT, "Unexpected response code: %d", responseCode);
-                responseBuilder.append(message);
-                responseBuilder.append("\n");
-                InternalLogging.warn(TAG, message);
+            InputStream inputStream = connection.getErrorStream();
+            if (inputStream == null) {
+                inputStream = connection.getInputStream();
             }
 
-            //If there was a server issue, persist the data
-            if (responseCode >= 500 && responseCode != 529) {
-                InternalLogging.info(TAG, "Server error, persisting data", payload);
-                Persistence persistence = Persistence.getInstance();
-                if (persistence != null) {
-                    persistence.persist(payload);
+            if (inputStream != null) {
+                InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
+                reader = new BufferedReader(streamReader);
+                String responseLine = reader.readLine();
+                while (responseLine != null) {
+                    builder.append(responseLine);
+                    responseLine = reader.readLine();
                 }
-            }
-
-            // If it isn't the usual success code (200), log the response from the server.
-            if (responseCode != 200) {
-                InputStream inputStream = connection.getErrorStream();
-                if (inputStream == null) {
-                    inputStream = connection.getInputStream();
-                }
-
-                if (inputStream != null) {
-                    InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
-                    reader = new BufferedReader(streamReader);
-                    String responseLine = reader.readLine();
-                    while (responseLine != null) {
-                        responseBuilder.append(responseLine);
-                        responseLine = reader.readLine();
-                    }
-
-                    response = responseBuilder.toString();
-                } else {
-                    response = connection.getResponseMessage();
-                }
-
-                InternalLogging.info(TAG, "Non-200 response", response);
+            } else {
+                builder.append(connection.getResponseMessage());
             }
         } catch (IOException e) {
             InternalLogging.error(TAG, e.toString());
@@ -180,8 +231,6 @@ public class Sender {
                 }
             }
         }
-
-        return response;
     }
 
     /**
