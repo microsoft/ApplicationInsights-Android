@@ -5,7 +5,6 @@ import android.content.Context;
 
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.applicationinsights.channel.Util;
 import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.CrashDataHeaders;
 import com.microsoft.applicationinsights.channel.contracts.CrashDataThread;
@@ -16,12 +15,10 @@ import com.microsoft.applicationinsights.channel.contracts.EventData;
 import com.microsoft.applicationinsights.channel.contracts.MessageData;
 import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
-import com.microsoft.applicationinsights.channel.contracts.RequestData;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -348,47 +345,6 @@ public class TelemetryClient {
 
         // todo: measure page-load duration and set telemetry.setDuration
 
-        telemetry.setProperties(properties);
-        telemetry.setMeasurements(measurements);
-
-        track(telemetry);
-    }
-
-    /**
-     * Sends information about a request to Application Insights.
-     *
-     * @param name         the name of this request
-     * @param url          the url for this request
-     * @param httpMethod   the http method for this request
-     * @param startTime    the start time of this request
-     * @param durationMs   the duration of this request in milliseconds
-     * @param responseCode the response code for this request
-     * @param isSuccess    the success status of this request
-     * @param properties   custom properties
-     * @param measurements custom measurements
-     */
-    protected void trackRequest(
-            String name,
-            String url,
-            String httpMethod,
-            Date startTime,
-            long durationMs,
-            int responseCode,
-            boolean isSuccess,
-            Map<String, String> properties,
-            Map<String, Double> measurements) {
-
-        // todo: expose this publicly via a method that instruments a RequestQueue
-        RequestData telemetry = new RequestData();
-
-        telemetry.setId(UUID.randomUUID().toString());
-        telemetry.setName(this.ensureValid(name));
-        telemetry.setUrl(this.ensureValid(url));
-        telemetry.setHttpMethod(this.ensureValid(httpMethod));
-        telemetry.setStartTime(Util.dateToISO8601(startTime));
-        telemetry.setDuration(Util.msToTimeSpan(durationMs));
-        telemetry.setResponseCode(String.valueOf(responseCode));
-        telemetry.setSuccess(isSuccess);
         telemetry.setProperties(properties);
         telemetry.setMeasurements(measurements);
 
