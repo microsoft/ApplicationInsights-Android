@@ -138,7 +138,7 @@ public class TelemetryClient {
     /**
      * Sets properties which are common to all telemetry sent form this client.
      *
-     * @param commonProperties a dictionary of properties to send with all telemetry.
+     * @param commonProperties a dictionary of properties to enqueue with all telemetry.
      */
     public void setCommonProperties(Map<String, String> commonProperties) {
         this.commonProperties = commonProperties;
@@ -212,7 +212,7 @@ public class TelemetryClient {
 
     /**
      * Sends information about an aggregated metric to Application Insights. Note: all data sent via
-     * this method will be aggregated. To send non-aggregated data use
+     * this method will be aggregated. To enqueue non-aggregated data use
      * {@link TelemetryClient#trackEvent(String, Map, Map)} with measurements.
      *
      * @param name  The name of the metric
@@ -358,8 +358,8 @@ public class TelemetryClient {
             telemetry.setProperties(map);
         }
 
-        // send to channel
-        this.channel.send(telemetry, context.getContextTags());
+        // enqueue to channel
+        this.channel.enqueue(telemetry, context.getContextTags());
     }
 
     /**

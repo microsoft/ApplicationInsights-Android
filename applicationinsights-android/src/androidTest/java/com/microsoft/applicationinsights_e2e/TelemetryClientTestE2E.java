@@ -124,7 +124,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             Log.i("RESPONSE", queue.sender.getLastResponse());
 
             if (rspSignal.getCount() < sendSignal.getCount()) {
-                Log.w("BACKEND_ERROR", "response count is lower than send count");
+                Log.w("BACKEND_ERROR", "response count is lower than enqueue count");
             } else if (queue.sender.responseCode == 206) {
                 Log.w("BACKEND_ERROR", "response is 206, some telemetry was rejected");
             }

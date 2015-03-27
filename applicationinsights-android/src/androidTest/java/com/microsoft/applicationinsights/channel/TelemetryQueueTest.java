@@ -62,7 +62,7 @@ public class TelemetryQueueTest extends TestCase {
         this.queue.getConfig().setMaxBatchCount(3);
         this.queue.enqueue(this.item);
 
-        // enqueue one item and verify that it did not trigger a send
+        // enqueue one item and verify that it did not trigger a enqueue
         try {
             this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
             Assert.assertEquals("batch was not sent before MaxIntervalMs",
@@ -90,7 +90,7 @@ public class TelemetryQueueTest extends TestCase {
     public void testBatchingLimitExceed() {
         this.queue.getConfig().setMaxBatchCount(3);
 
-        // send 4 items (exceeding maxBatchCount is supported) and verify that data was flushed
+        // enqueue 4 items (exceeding maxBatchCount is supported) and verify that data was flushed
         this.queue.enqueue(this.item);
         this.queue.enqueue(this.item);
         this.queue.enqueue(this.item);
@@ -110,7 +110,7 @@ public class TelemetryQueueTest extends TestCase {
     public void testBatchingTimer() {
         this.queue.getConfig().setMaxBatchCount(3);
 
-        // send one item and wait for the queue to flush via the timer
+        // enqueue one item and wait for the queue to flush via the timer
         this.queue.enqueue(this.item);
         try {
             this.queue.sendSignal.await(batchMargin + this.queue.getConfig().getMaxBatchIntervalMs() + 1, TimeUnit.MILLISECONDS);
@@ -126,7 +126,7 @@ public class TelemetryQueueTest extends TestCase {
     public void testBatchingFlush() {
         this.queue.getConfig().setMaxBatchCount(3);
 
-        // send one item and flush it to bypass the timer
+        // enqueue one item and flush it to bypass the timer
         this.queue.enqueue(this.item);
         try {
 

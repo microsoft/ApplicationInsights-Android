@@ -31,7 +31,7 @@ public class TelemetryQueueConfig {
     private String endpointUrl;
 
     /**
-     * The master off switch.  Do not send any data if set to TRUE
+     * The master off switch.  Do not enqueue any data if set to TRUE
      */
     private boolean telemetryDisabled;
 
@@ -135,7 +135,7 @@ public class TelemetryQueueConfig {
     }
 
     /**
-     * Sets the master off switch.  Do not send any data if set to TRUE
+     * Sets the master off switch.  Do not enqueue any data if set to TRUE
      */
     public void setTelemetryDisabled(boolean disableTelemetry) {
         synchronized (this.lock) {

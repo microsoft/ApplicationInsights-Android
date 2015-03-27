@@ -82,8 +82,8 @@ public class TelemetryChannel {
      *
      * @param telemetry The telemetry to record
      */
-    public void send(ITelemetry telemetry) {
-        this.send(telemetry, null);
+    public void enqueue(ITelemetry telemetry) {
+        this.enqueue(telemetry, null);
     }
 
     /**
@@ -92,12 +92,12 @@ public class TelemetryChannel {
      * @param telemetry The telemetry to record
      * @param tags      The optional context tags for this telemetry
      */
-    public void send(ITelemetry telemetry, Map<String, String> tags) {
+    public void enqueue(ITelemetry telemetry, Map<String, String> tags) {
 
         // wrap the data in the common schema envelope
         Envelope envelope = this.getEnvelope(telemetry, tags);
 
-        // send to queue
+        // enqueue to queue
         this.queue.enqueue(envelope);
 
         InternalLogging.info(TAG, "enqueued telemetry", telemetry.getBaseType());

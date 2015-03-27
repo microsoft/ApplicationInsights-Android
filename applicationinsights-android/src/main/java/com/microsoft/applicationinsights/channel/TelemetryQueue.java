@@ -88,7 +88,7 @@ public class TelemetryQueue {
     /**
      * Adds an item to the sender queue
      *
-     * @param item a telemetry item to send
+     * @param item a telemetry item to enqueue
      * @return true if the item was successfully added to the queue
      */
     public boolean enqueue(IJsonSerializable item) {
@@ -130,7 +130,7 @@ public class TelemetryQueue {
         flushThread.setDaemon(false);
         flushThread.start();
 
-        // cancel the scheduled send task if it exists
+        // cancel the scheduled enqueue task if it exists
         if (this.sendTask != null) {
             this.sendTask.cancel();
         }
@@ -179,7 +179,7 @@ public class TelemetryQueue {
         public void run() {
             IJsonSerializable[] data = null;
             synchronized (TelemetryQueue.LOCK) {
-                // send if more than one item is in the queue
+                // enqueue if more than one item is in the queue
                 if (!this.queue.list.isEmpty()) {
                     data = new IJsonSerializable[this.queue.list.size()];
                     this.queue.list.toArray(data);
@@ -195,7 +195,7 @@ public class TelemetryQueue {
                         persistence.persist(data);
                     }
                 } else {
-                    // otherwise send data
+                    // otherwise enqueue data
                     this.sender.send(data);
                 }
             }
