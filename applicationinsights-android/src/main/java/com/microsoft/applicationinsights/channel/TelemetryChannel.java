@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.channel;
 
 import android.content.Context;
 
+import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
@@ -83,7 +84,7 @@ public class TelemetryChannel {
      * @param telemetry The telemetry to record
      */
     public void enqueue(ITelemetry telemetry) {
-        this.enqueue(telemetry, null);
+        this.enqueue(telemetry, null, false);
     }
 
     /**
@@ -92,7 +93,8 @@ public class TelemetryChannel {
      * @param telemetry The telemetry to record
      * @param tags      The optional context tags for this telemetry
      */
-    public void enqueue(ITelemetry telemetry, Map<String, String> tags) {
+    public void enqueue(ITelemetry telemetry, Map<String, String> tags, Boolean isUnhandledException) {
+        this.queue.isCrashing = isUnhandledException;
 
         // wrap the data in the common schema envelope
         Envelope envelope = this.getEnvelope(telemetry, tags);
@@ -140,4 +142,6 @@ public class TelemetryChannel {
 
         return envelope;
     }
+
+
 }

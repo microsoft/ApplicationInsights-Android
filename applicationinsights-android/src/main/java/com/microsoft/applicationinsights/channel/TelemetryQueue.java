@@ -93,7 +93,7 @@ public class TelemetryQueue {
      */
     public boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
-        if (item == null || this.config.isTelemetryDisabled())
+        if (item == null || this.config.isTelemetryDisabled()) //TODO what about crashes?!
             return false;
 
         boolean success;
@@ -102,7 +102,7 @@ public class TelemetryQueue {
             success = this.list.add(item);
 
             if (success) {
-                if (this.list.size() >= this.config.getMaxBatchCount()) {
+                if ((this.list.size() >= this.config.getMaxBatchCount()) || isCrashing) {
                     // flush if the queue is full
                     this.flush();
                 } else if (this.list.size() == 1) {

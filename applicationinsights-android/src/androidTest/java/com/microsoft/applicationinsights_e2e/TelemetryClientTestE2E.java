@@ -77,7 +77,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             throw new InvalidObjectException("this is expected");
         } catch (InvalidObjectException exception) {
             this.client.trackException(exception);
-            this.client.trackException(exception, properties);
+            this.client.trackException(exception, properties, false);
         }
 
         this.validate();

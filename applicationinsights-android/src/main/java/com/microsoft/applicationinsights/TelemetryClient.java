@@ -242,7 +242,7 @@ public class TelemetryClient {
      * @see TelemetryClient#trackException(Throwable, Map)
      */
     public void trackException(Throwable exception) {
-        this.trackException(exception, null);
+        this.trackException(exception, null, false);
     }
 
     /**
@@ -252,9 +252,7 @@ public class TelemetryClient {
      * @param properties Custom properties associated with the event. Note: values set here will
      *                   supersede values set in {@link TelemetryClient#setCommonProperties}.
      */
-    public void trackException(
-            Throwable exception,
-            Map<String, String> properties) {
+    public void trackException(Throwable exception, Map<String, String> properties, Boolean isUnhandledException) {
 
         Throwable localException = exception;
         if (localException == null) {
@@ -290,7 +288,7 @@ public class TelemetryClient {
         crashData.setHeaders(crashDataHeaders);
         crashData.setProperties(properties);
 
-        track(crashData);
+        track(crashData, isUnhandledException);
     }
 
     /**
@@ -344,7 +342,17 @@ public class TelemetryClient {
      * @param telemetry The telemetry object to enqueue.
      */
     public void track(ITelemetry telemetry) {
+        track(telemetry, false);
+    }
 
+    /**
+     * Sends telemetry to the queue for transmission to Application Insights.
+     * If isUnhandledException is true, the queue will persist instead of send the data.
+     *
+     * @param telemetry The telemetry object to enqueue.
+     * @param isUnhandledException flag to indicate that we have an unhandled exception
+     */
+    private void track(ITelemetry telemetry, Boolean isUnhandledException) {
         // set the version
         telemetry.setVer(TelemetryClient.CONTRACT_VERSION);
 
@@ -359,7 +367,7 @@ public class TelemetryClient {
         }
 
         // enqueue to channel
-        this.channel.enqueue(telemetry, context.getContextTags());
+        this.channel.enqueue(telemetry, context.getContextTags(), isUnhandledException);
     }
 
     /**
