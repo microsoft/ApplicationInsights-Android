@@ -17,20 +17,20 @@ public class TelemetryClientConfig extends TelemetryChannelConfig {
     /**
      * The interval at which sessions are renewed
      */
-    private long sessionIntervalMS;
+    private long sessionIntervalMs;
 
     /**
      * Gets the interval at which sessions are renewed
      */
-    public long getSessionIntervalMS() {
-        return sessionIntervalMS;
+    public long getSessionIntervalMs() {
+        return sessionIntervalMs;
     }
 
     /**
      * Sets the interval at which sessions are renewed
      */
-    public void setSessionIntervalMS(long sessionIntervalMS) {
-        sessionIntervalMS = sessionIntervalMS;
+    public void setSessionIntervalMs(long sessionIntervalMs) {
+        this.sessionIntervalMs = sessionIntervalMs;
     }
 
     /**
@@ -40,6 +40,6 @@ public class TelemetryClientConfig extends TelemetryChannelConfig {
      */
     public TelemetryClientConfig(Context context) {
         super(context);
-        this.sessionIntervalMS = TelemetryClientConfig.SESSION_INTERVAL;
+        this.sessionIntervalMs = TelemetryClientConfig.SESSION_INTERVAL;
     }
 }

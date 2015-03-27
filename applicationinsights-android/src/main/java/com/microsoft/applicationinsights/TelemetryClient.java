@@ -260,13 +260,11 @@ public class TelemetryClient {
      * Sends information about an exception to Application Insights.
      *
      * @param exception  The exception to track.
-     * @param handledAt  The location at which this exception was handled (null if unhandled)
      * @param properties Custom properties associated with the event. Note: values set here will
      *                   supersede values set in {@link TelemetryClient#setCommonProperties}.
      */
     public void trackException(
             Throwable exception,
-            String handledAt,
             Map<String, String> properties) {
 
         Throwable localException = exception;

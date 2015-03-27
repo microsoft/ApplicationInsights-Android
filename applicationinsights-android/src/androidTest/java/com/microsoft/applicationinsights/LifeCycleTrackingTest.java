@@ -158,7 +158,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
 
-        this.mockLifeCycleTracking.currentTime += this.telemetryClient.getConfig().getSessionIntervalMS();
+        this.mockLifeCycleTracking.currentTime += this.telemetryClient.getConfig().getSessionIntervalMs();
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
 

@@ -30,11 +30,12 @@ public class Util {
      * @return an ISO 8601 string representation of the date
      */
     public static String dateToISO8601(Date date) {
-        if (date == null) {
-            date = new Date();
+        Date localDate = date;
+        if (localDate == null) {
+            localDate = new Date();
         }
 
-        return DATE_FORMAT.format(date);
+        return DATE_FORMAT.format(localDate);
     }
 
     /**
@@ -44,15 +45,16 @@ public class Util {
      * @return a string representation of the time span
      */
     public static String msToTimeSpan(long durationMs) {
-        if (durationMs <= 0) {
-            durationMs = 0;
+        long localDurationMs = durationMs;
+        if (localDurationMs <= 0) {
+            localDurationMs = 0;
         }
 
-        long ms = durationMs % 1000;
-        long sec = (durationMs / 1000) % 60;
-        long min = (durationMs / (1000 * 60)) % 60;
-        long hour = (durationMs / (1000 * 60 * 60)) % 24;
-        long days = durationMs / (1000 * 60 * 60 * 24);
+        long ms = localDurationMs % 1000;
+        long sec = (localDurationMs / 1000) % 60;
+        long min = (localDurationMs / (1000 * 60)) % 60;
+        long hour = (localDurationMs / (1000 * 60 * 60)) % 24;
+        long days = localDurationMs / (1000 * 60 * 60 * 24);
 
         String result;
         if (days == 0) {

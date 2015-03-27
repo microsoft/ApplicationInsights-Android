@@ -105,7 +105,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
         // check if the session should be renewed
         long now = this.getTime();
         long then = this.lastBackground.getAndSet(this.getTime());
-        boolean shouldRenew = now - then >= tc.getConfig().getSessionIntervalMS();
+        boolean shouldRenew = now - then >= tc.getConfig().getSessionIntervalMs();
         if (shouldRenew) {
             tc.getContext().renewSessionId();
             SessionStateData sessionData = new SessionStateData();
