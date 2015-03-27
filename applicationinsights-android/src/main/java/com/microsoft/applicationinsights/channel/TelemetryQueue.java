@@ -1,7 +1,7 @@
 package com.microsoft.applicationinsights.channel;
 
-import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,17 +13,20 @@ import java.util.TimerTask;
  */
 public class TelemetryQueue {
 
-    private static final String TAG = "TelemetryQueue";
-
     /**
-     * The singleton INSTANCE
+     * Logging tag for this class
      */
-    public final static TelemetryQueue INSTANCE = new TelemetryQueue();
+    private static final String TAG = "TelemetryQueue";
 
     /**
      * The synchronization LOCK for queueing items
      */
     private static final Object LOCK = new Object();
+
+    /**
+     * The singleton INSTANCE
+     */
+    public static final TelemetryQueue INSTANCE = new TelemetryQueue();
 
     /**
      * The configuration for this queue

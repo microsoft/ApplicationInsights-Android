@@ -1,3 +1,6 @@
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
 package com.microsoft.applicationinsights.channel.contracts;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
@@ -14,20 +17,6 @@ import java.util.Map;
 public class MessageData extends Domain implements
     ITelemetry
 {
-    /**
-     * Envelope Name for this telemetry.
-     */
-    public String getEnvelopeName() {
-        return "Microsoft.ApplicationInsights.Message";
-    }
-    
-    /**
-     * Base Type for this telemetry.
-     */
-    public String getBaseType() {
-        return "Microsoft.ApplicationInsights.MessageData";
-    }
-    
     /**
      * Backing field for property Ver.
      */
@@ -54,6 +43,20 @@ public class MessageData extends Domain implements
     public MessageData()
     {
         this.InitializeFields();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Message";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.MessageData";
     }
     
     /**

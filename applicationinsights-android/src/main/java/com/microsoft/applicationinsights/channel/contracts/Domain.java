@@ -1,3 +1,6 @@
+/*
+ * Generated from Telemetry.bond (https://github.com/Microsoft/bond)
+*/
 package com.microsoft.applicationinsights.channel.contracts;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
@@ -12,6 +15,14 @@ public class Domain implements
     IJsonSerializable
 {
     /**
+     * Initializes a new instance of the <see cref="Domain"/> class.
+     */
+    public Domain()
+    {
+        this.InitializeFields();
+    }
+    
+    /**
      * Envelope Name for this telemetry.
      */
     public String getEnvelopeName() {
@@ -23,14 +34,6 @@ public class Domain implements
      */
     public String getBaseType() {
         return "Microsoft.ApplicationInsights.Domain";
-    }
-    
-    /**
-     * Initializes a new instance of the <see cref="Domain"/> class.
-     */
-    public Domain()
-    {
-        this.InitializeFields();
     }
     
 

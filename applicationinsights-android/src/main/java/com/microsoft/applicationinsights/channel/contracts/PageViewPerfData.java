@@ -1,3 +1,6 @@
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
 package com.microsoft.applicationinsights.channel.contracts;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
@@ -12,20 +15,6 @@ import java.io.Writer;
 public class PageViewPerfData extends PageViewData implements
     ITelemetry
 {
-    /**
-     * Envelope Name for this telemetry.
-     */
-    public String getEnvelopeName() {
-        return "Microsoft.ApplicationInsights.PageViewPerf";
-    }
-    
-    /**
-     * Base Type for this telemetry.
-     */
-    public String getBaseType() {
-        return "Microsoft.ApplicationInsights.PageViewPerfData";
-    }
-    
     /**
      * Backing field for property PerfTotal.
      */
@@ -57,6 +46,20 @@ public class PageViewPerfData extends PageViewData implements
     public PageViewPerfData()
     {
         this.InitializeFields();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.PageViewPerf";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.PageViewPerfData";
     }
     
     /**

@@ -1,3 +1,6 @@
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
 package com.microsoft.applicationinsights.channel.contracts;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
@@ -14,20 +17,6 @@ import java.util.Map;
 public class RemoteDependencyData extends Domain implements
     ITelemetry
 {
-    /**
-     * Envelope Name for this telemetry.
-     */
-    public String getEnvelopeName() {
-        return "Microsoft.ApplicationInsights.RemoteDependency";
-    }
-    
-    /**
-     * Base Type for this telemetry.
-     */
-    public String getBaseType() {
-        return "Microsoft.ApplicationInsights.RemoteDependencyData";
-    }
-    
     /**
      * Backing field for property Ver.
      */
@@ -109,6 +98,20 @@ public class RemoteDependencyData extends Domain implements
     public RemoteDependencyData()
     {
         this.InitializeFields();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.RemoteDependency";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.RemoteDependencyData";
     }
     
     /**

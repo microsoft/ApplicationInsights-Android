@@ -28,6 +28,15 @@ public class TelemetryChannelConfig {
     private String instrumentationKey;
 
     /**
+     * Constructs a new INSTANCE of TelemetryChannelConfig
+     *
+     * @param context The android activity context
+     */
+    public TelemetryChannelConfig(Context context) {
+        this.instrumentationKey = TelemetryChannelConfig.readInstrumentationKey(context);
+    }
+
+    /**
      * Gets the instrumentation key for this telemetry channel
      */
     public String getInstrumentationKey() {
@@ -46,15 +55,6 @@ public class TelemetryChannelConfig {
      */
     public TelemetryQueueConfig getStaticConfig() {
         return TelemetryQueue.INSTANCE.getConfig();
-    }
-
-    /**
-     * Constructs a new INSTANCE of TelemetryChannelConfig
-     *
-     * @param context The android activity context
-     */
-    public TelemetryChannelConfig(Context context) {
-        this.instrumentationKey = TelemetryChannelConfig.readInstrumentationKey(context);
     }
 
     /**

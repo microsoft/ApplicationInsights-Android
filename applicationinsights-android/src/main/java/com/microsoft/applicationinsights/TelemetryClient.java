@@ -32,24 +32,6 @@ public class TelemetryClient {
     public static final int CONTRACT_VERSION = 2;
 
     /**
-     * Get a TelemetryClient INSTANCE
-     *
-     * @param context the activity to associate with this INSTANCE
-     * @return an INSTANCE of {@code TelemetryClient} associated with the activity, or null if the
-     * activity is null.
-     */
-    public static TelemetryClient getInstance(Context context) {
-        TelemetryClient client = null;
-        if (context == null) {
-            InternalLogging.warn("TelemetryClient.getInstance", "context is null");
-        } else {
-            client = new TelemetryClient(context);
-        }
-
-        return client;
-    }
-
-    /**
      * The configuration for this telemetry client.
      */
     protected final TelemetryClientConfig config;
@@ -68,38 +50,6 @@ public class TelemetryClient {
      * Properties associated with this telemetryContext.
      */
     private Map<String, String> commonProperties;
-
-    /**
-     * The telemetry telemetryContext object.
-     */
-    public TelemetryContext getContext() {
-        return this.context;
-    }
-
-    /**
-     * The telemetry channel for this client.
-     */
-    public TelemetryClientConfig getConfig() {
-        return config;
-    }
-
-    /**
-     * Gets the properties which are common to all telemetry sent from this client.
-     *
-     * @return common properties for this telemetry client
-     */
-    public Map<String, String> getCommonProperties() {
-        return commonProperties;
-    }
-
-    /**
-     * Sets properties which are common to all telemetry sent form this client.
-     *
-     * @param commonProperties a dictionary of properties to send with all telemetry.
-     */
-    public void setCommonProperties(Map<String, String> commonProperties) {
-        this.commonProperties = commonProperties;
-    }
 
     /**
      * Constructor of the class TelemetryClient.
@@ -142,6 +92,56 @@ public class TelemetryClient {
         this.config = config;
         this.context = context;
         this.channel = channel;
+    }
+
+    /**
+     * Get a TelemetryClient INSTANCE
+     *
+     * @param context the activity to associate with this INSTANCE
+     * @return an INSTANCE of {@code TelemetryClient} associated with the activity, or null if the
+     * activity is null.
+     */
+    public static TelemetryClient getInstance(Context context) {
+        TelemetryClient client = null;
+        if (context == null) {
+            InternalLogging.warn("TelemetryClient.getInstance", "context is null");
+        } else {
+            client = new TelemetryClient(context);
+        }
+
+        return client;
+    }
+
+    /**
+     * The telemetry telemetryContext object.
+     */
+    public TelemetryContext getContext() {
+        return this.context;
+    }
+
+    /**
+     * The telemetry channel for this client.
+     */
+    public TelemetryClientConfig getConfig() {
+        return config;
+    }
+
+    /**
+     * Gets the properties which are common to all telemetry sent from this client.
+     *
+     * @return common properties for this telemetry client
+     */
+    public Map<String, String> getCommonProperties() {
+        return commonProperties;
+    }
+
+    /**
+     * Sets properties which are common to all telemetry sent form this client.
+     *
+     * @param commonProperties a dictionary of properties to send with all telemetry.
+     */
+    public void setCommonProperties(Map<String, String> commonProperties) {
+        this.commonProperties = commonProperties;
     }
 
     /**
@@ -236,24 +236,13 @@ public class TelemetryClient {
     }
 
     /**
-     * {@code handledAt} defaults to {@code null}.
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackException(Throwable, String, Map)
+     * @see TelemetryClient#trackException(Throwable, Map)
      */
     public void trackException(Throwable exception) {
         this.trackException(exception, null);
-    }
-
-    /**
-     * {@code properties} defaults to {@code null}.
-     * {@code measurements} defaults to {@code null}.
-     *
-     * @see TelemetryClient#trackException(Throwable, String, Map)
-     */
-    public void trackException(Throwable exception, String handledAt) {
-        this.trackException(exception, handledAt, null);
     }
 
     /**

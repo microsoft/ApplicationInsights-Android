@@ -1,3 +1,6 @@
+/*
+ * Generated from SessionStateData.bond (https://github.com/Microsoft/bond)
+*/
 package com.microsoft.applicationinsights.channel.contracts;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
@@ -14,20 +17,6 @@ public class SessionStateData extends Domain implements
     ITelemetry
 {
     /**
-     * Envelope Name for this telemetry.
-     */
-    public String getEnvelopeName() {
-        return "Microsoft.ApplicationInsights.SessionState";
-    }
-    
-    /**
-     * Base Type for this telemetry.
-     */
-    public String getBaseType() {
-        return "Microsoft.ApplicationInsights.SessionStateData";
-    }
-    
-    /**
      * Backing field for property Ver.
      */
     private int ver = 2;
@@ -43,6 +32,20 @@ public class SessionStateData extends Domain implements
     public SessionStateData()
     {
         this.InitializeFields();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.SessionState";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.SessionStateData";
     }
     
     /**

@@ -1,5 +1,7 @@
+/*
+ * Generated from CrashData.bond (https://github.com/Microsoft/bond)
+*/
 package com.microsoft.applicationinsights.channel.contracts;
-
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
@@ -15,20 +17,6 @@ import java.util.Map;
 public class CrashData extends Domain implements
     ITelemetry
 {
-    /**
-     * Envelope Name for this telemetry.
-     */
-    public String getEnvelopeName() {
-        return "Microsoft.ApplicationInsights.Crash";
-    }
-    
-    /**
-     * Base Type for this telemetry.
-     */
-    public String getBaseType() {
-        return "Microsoft.ApplicationInsights.CrashData";
-    }
-    
     /**
      * Backing field for property Ver.
      */
@@ -55,6 +43,20 @@ public class CrashData extends Domain implements
     public CrashData()
     {
         this.InitializeFields();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Crash";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.CrashData";
     }
     
     /**

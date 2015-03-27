@@ -20,38 +20,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
 
     /**
-     * Enables lifecycle event tracking for the provided application
-     *
-     * @param application
-     */
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public static void registerActivityLifecycleCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            application.registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
-        }
-    }
-
-    /**
-     * Private class to facilitate lazy singleton initialization
-     */
-    private static class LazyInitialization {
-        private static final LifeCycleTracking INSTANCE = new LifeCycleTracking();
-
-        private LazyInitialization() {
-            // hide default constructor
-        }
-    }
-
-    /**
-     * Gets the singleton INSTANCE of LifeCycleTracking
-     *
-     * @return the singleton INSTANCE of LifeCycleTracking
-     */
-    protected static LifeCycleTracking getInstance() {
-        return LazyInitialization.INSTANCE;
-    }
-
-    /**
      * The activity counter
      */
     protected final AtomicInteger activityCount;
@@ -67,6 +35,38 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     protected LifeCycleTracking() {
         this.activityCount = new AtomicInteger(0);
         this.lastBackground = new AtomicLong(this.getTime());
+    }
+
+    /**
+     * Enables lifecycle event tracking for the provided application
+     *
+     * @param application
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public static void registerActivityLifecycleCallbacks(Application application) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            application.registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
+        }
+    }
+
+    /**
+     * Gets the singleton INSTANCE of LifeCycleTracking
+     *
+     * @return the singleton INSTANCE of LifeCycleTracking
+     */
+    protected static LifeCycleTracking getInstance() {
+        return LazyInitialization.INSTANCE;
+    }
+
+    /**
+     * Private class to facilitate lazy singleton initialization
+     */
+    private static class LazyInitialization {
+        private static final LifeCycleTracking INSTANCE = new LifeCycleTracking();
+
+        private LazyInitialization() {
+            // hide default constructor
+        }
     }
 
     /**

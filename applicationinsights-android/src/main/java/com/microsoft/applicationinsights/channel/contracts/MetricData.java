@@ -1,3 +1,6 @@
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
 package com.microsoft.applicationinsights.channel.contracts;
 
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
@@ -16,20 +19,6 @@ import java.util.Map;
 public class MetricData extends Domain implements
     ITelemetry
 {
-    /**
-     * Envelope Name for this telemetry.
-     */
-    public String getEnvelopeName() {
-        return "Microsoft.ApplicationInsights.Metric";
-    }
-    
-    /**
-     * Base Type for this telemetry.
-     */
-    public String getBaseType() {
-        return "Microsoft.ApplicationInsights.MetricData";
-    }
-    
     /**
      * Backing field for property Ver.
      */
@@ -51,6 +40,20 @@ public class MetricData extends Domain implements
     public MetricData()
     {
         this.InitializeFields();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Metric";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.MetricData";
     }
     
     /**

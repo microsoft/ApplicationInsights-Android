@@ -11,13 +11,13 @@ import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
-import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import com.microsoft.applicationinsights.channel.contracts.Application;
 import com.microsoft.applicationinsights.channel.contracts.Device;
 import com.microsoft.applicationinsights.channel.contracts.Internal;
 import com.microsoft.applicationinsights.channel.contracts.Operation;
 import com.microsoft.applicationinsights.channel.contracts.Session;
 import com.microsoft.applicationinsights.channel.contracts.User;
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -92,6 +92,46 @@ public class TelemetryContext {
     private Operation operation;
 
     /**
+     * Constructs a new INSTANCE of the Telemetry telemetryContext tag keys
+     *
+     * @param appContext the context for this telemetryContext
+     */
+    public TelemetryContext(Context appContext) {
+
+        // note: isContextLoaded must be volatile for the double-checked LOCK to work
+        if (!TelemetryContext.isContextLoaded && appContext != null) {
+            synchronized (TelemetryContext.LOCK) {
+                if (!TelemetryContext.isContextLoaded) {
+                    TelemetryContext.isContextLoaded = true;
+
+                    // get an INSTANCE of the shared preferences manager for persistent context fields
+                    TelemetryContext.settings = appContext.getSharedPreferences(
+                            TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+
+                    // initialize static context
+                    TelemetryContext.device = new Device();
+                    TelemetryContext.session = new Session();
+                    TelemetryContext.user = new User();
+                    TelemetryContext.internal = new Internal();
+                    TelemetryContext.application = new Application();
+                    TelemetryContext.lastSessionId = null;
+
+                    TelemetryContext.setDeviceContext(appContext);
+                    TelemetryContext.setSessionContext();
+                    TelemetryContext.setUserContext();
+                    TelemetryContext.setAppContext(appContext);
+                    TelemetryContext.setInternalContext();
+
+                    // initialize persistence
+                    Persistence.initialize(appContext);
+                }
+            }
+        }
+
+        this.operation = new Operation();
+    }
+
+    /**
      * Get user telemetryContext.
      */
     public User getUser() {
@@ -133,46 +173,6 @@ public class TelemetryContext {
      */
     public String getPackageName() {
         return appIdForEnvelope;
-    }
-
-    /**
-     * Constructs a new INSTANCE of the Telemetry telemetryContext tag keys
-     *
-     * @param appContext the context for this telemetryContext
-     */
-    public TelemetryContext(Context appContext) {
-
-        // note: isContextLoaded must be volatile for the double-checked LOCK to work
-        if (!TelemetryContext.isContextLoaded && appContext != null) {
-            synchronized (TelemetryContext.LOCK) {
-                if (!TelemetryContext.isContextLoaded) {
-                    TelemetryContext.isContextLoaded = true;
-
-                    // get an INSTANCE of the shared preferences manager for persistent context fields
-                    TelemetryContext.settings = appContext.getSharedPreferences(
-                            TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-
-                    // initialize static context
-                    TelemetryContext.device = new Device();
-                    TelemetryContext.session = new Session();
-                    TelemetryContext.user = new User();
-                    TelemetryContext.internal = new Internal();
-                    TelemetryContext.application = new Application();
-                    TelemetryContext.lastSessionId = null;
-
-                    TelemetryContext.setDeviceContext(appContext);
-                    TelemetryContext.setSessionContext();
-                    TelemetryContext.setUserContext();
-                    TelemetryContext.setAppContext(appContext);
-                    TelemetryContext.setInternalContext();
-
-                    // initialize persistence
-                    Persistence.initialize(appContext);
-                }
-            }
-        }
-
-        this.operation = new Operation();
     }
 
     /**

@@ -52,6 +52,20 @@ public class TelemetryQueueConfig {
     private int senderConnectTimeoutMs;
 
     /**
+     * Constructs a new INSTANCE of the sender config
+     */
+    public TelemetryQueueConfig() {
+        this.lock = new Object();
+        this.maxBatchCount = TelemetryQueueConfig.DEFAULT_MAX_BATCH_COUNT;
+        this.maxBatchIntervalMs = TelemetryQueueConfig.DEFAULT_MAX_BATCH_INTERVAL_MS;
+        this.endpointUrl = TelemetryQueueConfig.DEFAULT_ENDPOINT_URL;
+        this.telemetryDisabled = TelemetryQueueConfig.DEFAULT_DISABLE_TELEMETRY;
+        this.developerMode = TelemetryQueueConfig.DEFAULT_DEVELOPER_MODE;
+        this.senderReadTimeoutMs = TelemetryQueueConfig.DEFAULT_SENDER_READ_TIMEOUT;
+        this.senderConnectTimeoutMs = TelemetryQueueConfig.DEFAULTSENDER_CONNECT_TIMEOUT;
+    }
+
+    /**
      * Gets the maximum size of a batch in bytes
      */
     public int getMaxBatchCount() {
@@ -141,19 +155,5 @@ public class TelemetryQueueConfig {
      */
     public int getSenderConnectTimeout() {
         return this.senderConnectTimeoutMs;
-    }
-
-    /**
-     * Constructs a new INSTANCE of the sender config
-     */
-    public TelemetryQueueConfig() {
-        this.lock = new Object();
-        this.maxBatchCount = TelemetryQueueConfig.DEFAULT_MAX_BATCH_COUNT;
-        this.maxBatchIntervalMs = TelemetryQueueConfig.DEFAULT_MAX_BATCH_INTERVAL_MS;
-        this.endpointUrl = TelemetryQueueConfig.DEFAULT_ENDPOINT_URL;
-        this.telemetryDisabled = TelemetryQueueConfig.DEFAULT_DISABLE_TELEMETRY;
-        this.developerMode = TelemetryQueueConfig.DEFAULT_DEVELOPER_MODE;
-        this.senderReadTimeoutMs = TelemetryQueueConfig.DEFAULT_SENDER_READ_TIMEOUT;
-        this.senderConnectTimeoutMs = TelemetryQueueConfig.DEFAULTSENDER_CONNECT_TIMEOUT;
     }
 }

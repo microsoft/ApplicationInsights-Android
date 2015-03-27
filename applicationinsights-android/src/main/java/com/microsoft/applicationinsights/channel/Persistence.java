@@ -1,8 +1,9 @@
 package com.microsoft.applicationinsights.channel;
+
 import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -117,19 +118,17 @@ public class Persistence {
      */
     public boolean persist(String data) {
         Boolean isSuccess = false;
-        if (weakContext != null) {
-            Context context = weakContext.get();
-            if (context != null) {
-                FileOutputStream outputStream;
-                try {
-                    outputStream = context.openFileOutput(FILE_PATH, Context.MODE_PRIVATE);
-                    outputStream.write(data.getBytes());
-                    outputStream.close();
-                    isSuccess = true;
-                } catch (Exception e) {
-                    //Do nothing
-                    InternalLogging.error(TAG, "Error writing telemetry data to file");
-                }
+        Context context = this.getContext();
+        if (context != null) {
+            FileOutputStream outputStream;
+            try {
+                outputStream = context.openFileOutput(FILE_PATH, Context.MODE_PRIVATE);
+                outputStream.write(data.getBytes());
+                outputStream.close();
+                isSuccess = true;
+            } catch (Exception e) {
+                //Do nothing
+                InternalLogging.error(TAG, "Error writing telemetry data to file");
             }
         }
 
@@ -143,29 +142,40 @@ public class Persistence {
      */
     public String getNextItemFromDisk() {
         StringBuilder buffer = new StringBuilder();
-        if (weakContext != null) {
-            Context context = weakContext.get();
-            if (context != null) {
-                try {
-                    FileInputStream inputStream = context.openFileInput(FILE_PATH);
-                    InputStreamReader streamReader = new InputStreamReader(inputStream);
+        Context context = this.getContext();
+        if (context != null) {
+            try {
+                FileInputStream inputStream = context.openFileInput(FILE_PATH);
+                InputStreamReader streamReader = new InputStreamReader(inputStream);
 
-                    BufferedReader reader = new BufferedReader(streamReader);
-                    String str;
-                    while ((str = reader.readLine()) != null) {
-                        buffer.append(str);
-                    }
-
-                    reader.close();
-                } catch (Exception e) {
-                    InternalLogging.error(TAG, "Error reading telemetry data from file");
+                BufferedReader reader = new BufferedReader(streamReader);
+                String str;
+                while ((str = reader.readLine()) != null) {
+                    buffer.append(str);
                 }
 
-                // always delete the file
-                context.deleteFile(FILE_PATH);
+                reader.close();
+            } catch (Exception e) {
+                InternalLogging.error(TAG, "Error reading telemetry data from file");
             }
+
+            // always delete the file
+            context.deleteFile(FILE_PATH);
         }
 
         return buffer.toString();
+    }
+
+    /**
+     * Retrieves the weak context reference
+     * @return the context object for this instance
+     */
+    private Context getContext() {
+        Context context = null;
+        if(weakContext != null) {
+            context = weakContext.get();
+        }
+
+        return context;
     }
 }

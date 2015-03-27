@@ -3,8 +3,8 @@ package com.microsoft.applicationinsights.channel;
 import android.annotation.TargetApi;
 import android.os.Build;
 
-import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 
 import java.io.BufferedReader;
 import java.io.IOException;

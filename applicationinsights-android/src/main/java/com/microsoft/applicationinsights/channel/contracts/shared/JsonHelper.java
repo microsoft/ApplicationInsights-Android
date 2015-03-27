@@ -32,6 +32,17 @@ public final class JsonHelper {
         CONTROL_CHARACTERS['\t'] = "\\t";
     }
 
+    /**
+     * prevent caller to construct this object.
+     */
+    private JsonHelper() {
+    }
+
+    /**
+     * Escapes all characters in a string per JSON specification
+     * @param input the string to escape
+     * @return the input with all characters JSON escaped
+     */
     private static String escapeJSON(String input) {
         StringBuilder builder = new StringBuilder();
         builder.append("\"");
@@ -57,13 +68,6 @@ public final class JsonHelper {
 
         builder.append("\"");
         return builder.toString();
-    }
-
-
-    /**
-     * prevent caller to construct this object.
-     */
-    private JsonHelper() {
     }
 
     /**

@@ -20,6 +20,16 @@ public class TelemetryClientConfig extends TelemetryChannelConfig {
     private long sessionIntervalMs;
 
     /**
+     * Constructs a new INSTANCE of TelemetryClientConfig
+     *
+     * @param context The android app context
+     */
+    public TelemetryClientConfig(Context context) {
+        super(context);
+        this.sessionIntervalMs = TelemetryClientConfig.SESSION_INTERVAL;
+    }
+
+    /**
      * Gets the interval at which sessions are renewed
      */
     public long getSessionIntervalMs() {
@@ -31,15 +41,5 @@ public class TelemetryClientConfig extends TelemetryChannelConfig {
      */
     public void setSessionIntervalMs(long sessionIntervalMs) {
         this.sessionIntervalMs = sessionIntervalMs;
-    }
-
-    /**
-     * Constructs a new INSTANCE of TelemetryClientConfig
-     *
-     * @param context The android app context
-     */
-    public TelemetryClientConfig(Context context) {
-        super(context);
-        this.sessionIntervalMs = TelemetryClientConfig.SESSION_INTERVAL;
     }
 }
