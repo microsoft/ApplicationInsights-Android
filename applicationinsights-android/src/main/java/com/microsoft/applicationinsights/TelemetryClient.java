@@ -3,7 +3,6 @@ package com.microsoft.applicationinsights;
 import android.app.Application;
 import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.InternalLogging;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.Util;
@@ -19,6 +18,7 @@ import com.microsoft.applicationinsights.channel.contracts.MetricData;
 import com.microsoft.applicationinsights.channel.contracts.PageViewData;
 import com.microsoft.applicationinsights.channel.contracts.RequestData;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -346,7 +346,7 @@ public class TelemetryClient {
         telemetry.setName(this.ensureValid(pageName));
         telemetry.setUrl(null);
 
-        // todo: measure page-load duration telemetry.setDuration(Util.msToTimeSpan(pageLoadDurationMs));
+        // todo: measure page-load duration and set telemetry.setDuration
 
         telemetry.setProperties(properties);
         telemetry.setMeasurements(measurements);

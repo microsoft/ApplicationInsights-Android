@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights.channel;
 
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
 import java.util.LinkedList;

@@ -2,7 +2,7 @@ package com.microsoft.applicationinsights;
 
 import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.InternalLogging;
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import com.microsoft.applicationinsights.channel.TelemetryQueue;
 
 import java.lang.Thread.UncaughtExceptionHandler;

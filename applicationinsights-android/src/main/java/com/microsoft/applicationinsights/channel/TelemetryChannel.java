@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.channel;
 
 import android.content.Context;
 
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
@@ -123,8 +124,8 @@ public class TelemetryChannel {
         envelope.setName(telemetry.getEnvelopeName());
         envelope.setSeq(this.channelId + ":" + this.seqCounter.incrementAndGet());
 
-        // todo: read sample rate from settings store: envelope.setSampleRate(sampleRate);
-        // todo: set flags from settings store: envelope.setFlags(SetFlags(persistence, latency));
+        // todo: read sample rate from settings store and set sampleRate(percentThrottled)
+        // todo: set flags from settings store and set flags(persistence, latency)
 
         envelope.setUserId(this.context.getUser().getId());
         envelope.setDeviceId(this.context.getDevice().getId());

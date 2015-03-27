@@ -1,6 +1,7 @@
 package com.microsoft.applicationinsights.channel;
 import android.content.Context;
 
+import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 
 import java.io.BufferedReader;

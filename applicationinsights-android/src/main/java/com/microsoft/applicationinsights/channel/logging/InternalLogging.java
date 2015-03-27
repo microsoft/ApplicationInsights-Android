@@ -1,6 +1,8 @@
-package com.microsoft.applicationinsights.channel;
+package com.microsoft.applicationinsights.channel.logging;
 
 import android.util.Log;
+
+import com.microsoft.applicationinsights.channel.TelemetryQueue;
 
 public class InternalLogging {
     private static final String PREFIX = InternalLogging.class.getPackage().getName();
@@ -44,9 +46,10 @@ public class InternalLogging {
     public static void error(String tag, String message) {
         if (TelemetryQueue.INSTANCE.getConfig().isDeveloperMode()) {
             Log.e(PREFIX + tag, message);
-            throw new RuntimeException(PREFIX + tag + "\n" + message);
+            throw new UserActionableSDKException(PREFIX + tag + "\n" + message);
         } else {
             // todo: track SDK misuse as an event to the user's channel
         }
     }
 }
+
