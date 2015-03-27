@@ -1,9 +1,7 @@
 package com.microsoft.mocks;
 
 import android.app.Application;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 
 public class MockApplication extends Application {

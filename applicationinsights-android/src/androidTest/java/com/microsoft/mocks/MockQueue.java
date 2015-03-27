@@ -21,6 +21,6 @@ public class MockQueue extends TelemetryQueue {
     }
 
     public long getQueueSize() {
-        return this.linkedList.size();
+        return this.list.size();
     }
 }

@@ -10,6 +10,7 @@ import junit.framework.Assert;
 
 import java.io.InvalidObjectException;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
 
@@ -51,7 +52,7 @@ public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
         client.setCommonProperties(properties1);
 
         // check that it exists
-        LinkedHashMap<String, String> properties2 = client.getCommonProperties();
+        Map<String, String> properties2 = client.getCommonProperties();
         Assert.assertEquals("Property 1 matches", "v1", properties2.get("p1"));
     }
 

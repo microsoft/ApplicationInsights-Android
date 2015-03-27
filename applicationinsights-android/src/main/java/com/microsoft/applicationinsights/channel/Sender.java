@@ -37,6 +37,7 @@ public class Sender {
 
     /**
      * Sends data to the configured URL
+     *
      * @param data a collection of serializable data
      */
     protected void send(IJsonSerializable[] data) {
@@ -57,10 +58,10 @@ public class Sender {
 
             // Send the persisted data
             Persistence persistence = Persistence.getInstance();
-            if(persistence != null) {
+            if (persistence != null) {
                 String persistedData = persistence.getNextItemFromDisk();
-                if (!persistedData.equals("")) {
-                    InternalLogging._info(TAG, "adding persisted data", persistedData);
+                if (!persistedData.isEmpty()) {
+                    InternalLogging.info(TAG, "adding persisted data", persistedData);
                     sendRequestWithPayload(persistedData);
                 }
             }
@@ -69,7 +70,7 @@ public class Sender {
             String serializedData = buffer.toString();
             sendRequestWithPayload(serializedData);
         } catch (IOException e) {
-            InternalLogging._error(TAG, e.toString());
+            InternalLogging.error(TAG, e.toString());
         }
     }
 
@@ -85,7 +86,7 @@ public class Sender {
         connection.setUseCaches(false);
 
         try {
-            InternalLogging._info(TAG, "writing payload", payload);
+            InternalLogging.info(TAG, "writing payload", payload);
             writer = this.getWriter(connection);
             writer.write(payload);
             writer.flush();
@@ -93,16 +94,16 @@ public class Sender {
             // Starts the query
             connection.connect();
             int responseCode = connection.getResponseCode();
-            InternalLogging._info(TAG, "response code", Integer.toString(responseCode));
+            InternalLogging.info(TAG, "response code", Integer.toString(responseCode));
             this.onResponse(connection, responseCode, payload);
-        } catch (IOException e){
-            InternalLogging._error(TAG, e.toString());
+        } catch (IOException e) {
+            InternalLogging.error(TAG, e.toString());
             Persistence persistence = Persistence.getInstance();
-            if(persistence != null) {
+            if (persistence != null) {
                 persistence.persist(payload);
             }
         } finally {
-            if(writer != null) {
+            if (writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
@@ -114,9 +115,10 @@ public class Sender {
 
     /**
      * Handler for the http response from the sender
-     * @param connection a connection containing a response
+     *
+     * @param connection   a connection containing a response
      * @param responseCode the response code from the connection
-     * @param payload the payload which generated this response
+     * @param payload      the payload which generated this response
      * @return null if the request was successful, the server response otherwise
      */
     protected String onResponse(HttpURLConnection connection, int responseCode, String payload) {
@@ -132,15 +134,14 @@ public class Sender {
                 String message = String.format(Locale.ROOT, "Unexpected response code: %d", responseCode);
                 responseBuilder.append(message);
                 responseBuilder.append("\n");
-                InternalLogging._warn(TAG, message);
+                InternalLogging.warn(TAG, message);
             }
 
             //If there was a server issue, persist the data
-            if(responseCode >= 500 && responseCode != 529)
-            {
-                InternalLogging._info(TAG, "Server error, persisting data", payload);
+            if (responseCode >= 500 && responseCode != 529) {
+                InternalLogging.info(TAG, "Server error, persisting data", payload);
                 Persistence persistence = Persistence.getInstance();
-                if(persistence != null) {
+                if (persistence != null) {
                     persistence.persist(payload);
                 }
             }
@@ -148,11 +149,11 @@ public class Sender {
             // If it isn't the usual success code (200), log the response from the server.
             if (responseCode != 200) {
                 InputStream inputStream = connection.getErrorStream();
-                if(inputStream == null) {
+                if (inputStream == null) {
                     inputStream = connection.getInputStream();
                 }
 
-                if(inputStream != null) {
+                if (inputStream != null) {
                     InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
                     reader = new BufferedReader(streamReader);
                     String responseLine = reader.readLine();
@@ -166,16 +167,16 @@ public class Sender {
                     response = connection.getResponseMessage();
                 }
 
-                InternalLogging._info(TAG, "Non-200 response", response);
+                InternalLogging.info(TAG, "Non-200 response", response);
             }
         } catch (IOException e) {
-            InternalLogging._error(TAG, e.toString());
+            InternalLogging.error(TAG, e.toString());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    InternalLogging._error(TAG, e.toString());
+                    InternalLogging.error(TAG, e.toString());
                 }
             }
         }
@@ -185,13 +186,14 @@ public class Sender {
 
     /**
      * Gets a writer from the connection stream (allows for test hooks into the write stream)
+     *
      * @param connection the connection to which the stream will be flushed
      * @return a writer for the given connection stream
      * @throws java.io.IOException
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
     protected Writer getWriter(HttpURLConnection connection) throws IOException {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // GZIP if we are running SDK 19 or higher
             connection.addRequestProperty("Content-Encoding", "gzip");
             connection.setRequestProperty("Content-Type", "application/json");

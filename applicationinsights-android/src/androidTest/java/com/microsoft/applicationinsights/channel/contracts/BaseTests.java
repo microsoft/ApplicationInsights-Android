@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import com.microsoft.applicationinsights.channel.contracts.Base;
 
 /// <summary>
 /// Data contract test class BaseTests.

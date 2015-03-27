@@ -10,29 +10,36 @@ import java.util.TimeZone;
 
 public class Util {
 
-    private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
-    private static final DateFormat dateFormat =
+    private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+    private static final DateFormat DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ROOT);
+
     static {
         TimeZone timeZone = TimeZone.getTimeZone("UTC");
-        dateFormat.setTimeZone(timeZone);
+        DATE_FORMAT.setTimeZone(timeZone);
+    }
+
+    private Util() {
+        // hide default constructor
     }
 
     /**
      * Convert a date object to an ISO 8601 formatted string
+     *
      * @param date the date object to be formatted
      * @return an ISO 8601 string representation of the date
      */
     public static String dateToISO8601(Date date) {
-        if(date == null) {
+        if (date == null) {
             date = new Date();
         }
 
-        return dateFormat.format(date);
+        return DATE_FORMAT.format(date);
     }
 
     /**
      * Convert a duration in milliseconds to the Application Insights serialized duration format
+     *
      * @param durationMs the duration in milliseconds
      * @return a string representation of the time span
      */
@@ -77,8 +84,8 @@ public class Util {
             char[] hexChars = new char[hashedBytes.length * 2];
             for (int j = 0; j < hashedBytes.length; j++) {
                 int v = hashedBytes[j] & 0xFF;
-                hexChars[j * 2] = hexArray[v >>> 4];
-                hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+                hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+                hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
             }
 
             return new String(hexChars);

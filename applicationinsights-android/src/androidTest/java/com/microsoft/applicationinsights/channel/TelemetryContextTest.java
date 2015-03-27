@@ -13,7 +13,7 @@ import com.microsoft.mocks.MockTelemetryContext;
 
 import junit.framework.Assert;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
@@ -79,7 +79,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
 
         // this should load context from shared storage to match firstId
         TelemetryContext tc = new MockTelemetryContext(this.getActivity());
-        LinkedHashMap<String, String> tags = tc.getContextTags();
+        Map<String, String> tags = tc.getContextTags();
         String newId = tags.get(userIdKey);
         String newAcq = tags.get(userAcqKey);
         Assert.assertEquals("ID persists in local storage", "test value", newId);
@@ -116,7 +116,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     private String checkSessionTags(TelemetryContext tc) {
-        LinkedHashMap<String, String> tags = tc.getContextTags();
+        Map<String, String> tags = tc.getContextTags();
         String sessionIdKey = "ai.session.id";
         String _id = tags.get(sessionIdKey);
         return _id;

@@ -21,11 +21,12 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
 
     /**
      * Enables lifecycle event tracking for the provided application
+     *
      * @param application
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerActivityLifecycleCallbacks(Application application) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             application.registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
         }
     }
@@ -35,11 +36,16 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
      */
     private static class LazyInitialization {
         private static final LifeCycleTracking INSTANCE = new LifeCycleTracking();
+
+        private LazyInitialization() {
+            // hide default constructor
+        }
     }
 
     /**
-     * Gets the singleton instance of LifeCycleTracking
-     * @return the singleton instance of LifeCycleTracking
+     * Gets the singleton INSTANCE of LifeCycleTracking
+     *
+     * @return the singleton INSTANCE of LifeCycleTracking
      */
     protected static LifeCycleTracking getInstance() {
         return LazyInitialization.INSTANCE;
@@ -56,7 +62,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     protected final AtomicLong lastBackground;
 
     /**
-     * Create a new instance of the lifecycle event tracking
+     * Create a new INSTANCE of the lifecycle event tracking
      */
     protected LifeCycleTracking() {
         this.activityCount = new AtomicInteger(0);
@@ -65,12 +71,13 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
 
     /**
      * This is called each time an activity is created.
+     *
      * @param activity
      * @param savedInstanceState
      */
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         int count = this.activityCount.getAndIncrement();
-        if(count == 0) {
+        if (count == 0) {
             SessionStateData sessionData = new SessionStateData();
             sessionData.setState(SessionState.Start);
             TelemetryClient tc = this.getTelemetryClient(activity);
@@ -80,13 +87,16 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
 
     /**
      * This is called each time an activity becomes visible
+     *
      * @param activity the activity which entered the foreground
      */
     public void onActivityStarted(Activity activity) {
+        // unused but required to implement ActivityLifecycleCallbacks
     }
 
     /**
      * This is called each time an activity leaves the foreground
+     *
      * @param activity the activity which left the foreground
      */
     public void onActivityResumed(Activity activity) {
@@ -96,7 +106,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
         long now = this.getTime();
         long then = this.lastBackground.getAndSet(this.getTime());
         boolean shouldRenew = now - then >= tc.getConfig().getSessionIntervalMS();
-        if(shouldRenew) {
+        if (shouldRenew) {
             tc.getContext().renewSessionId();
             SessionStateData sessionData = new SessionStateData();
             sessionData.setState(SessionState.Start);
@@ -109,6 +119,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
 
     /**
      * This is called each time an activity leaves the foreground
+     *
      * @param activity the activity which was paused
      */
     public void onActivityPaused(Activity activity) {
@@ -116,16 +127,20 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     }
 
     public void onActivityStopped(Activity activity) {
+        // unused but required to implement ActivityLifecycleCallbacks
     }
 
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+        // unused but required to implement ActivityLifecycleCallbacks
     }
 
     public void onActivityDestroyed(Activity activity) {
+        // unused but required to implement ActivityLifecycleCallbacks
     }
 
     /**
      * Test hook to get the current time
+     *
      * @return the current time in milliseconds
      */
     protected long getTime() {
@@ -134,6 +149,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
 
     /**
      * Test hook for injecting a mock telemetry client
+     *
      * @param activity the activity to get a telemetry client for
      * @return a telemetry client associated with the given activity
      */

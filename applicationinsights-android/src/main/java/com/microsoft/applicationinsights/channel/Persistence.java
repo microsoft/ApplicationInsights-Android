@@ -14,19 +14,19 @@ import java.lang.ref.WeakReference;
 public class Persistence {
 
     /**
-     * Synchronization lock for setting static context
-     */
-    private static final Object lock = new Object();
-
-    /**
      * Volatile boolean for double checked synchronize block
      */
     private static volatile boolean isPersistenceLoaded = false;
 
     /**
+     * Synchronization LOCK for setting static context
+     */
+    private static final Object LOCK = new Object();
+
+    /**
      * The file path for persisted data
      */
-    private static final String filePath = "appInsightsData.json";
+    private static final String FILE_PATH = "appInsightsData.json";
 
     /**
      * The tag for logging
@@ -34,7 +34,7 @@ public class Persistence {
     private static final String TAG = "Persistence";
 
     /**
-     * The singleton instance of this class
+     * The singleton INSTANCE of this class
      */
     private static Persistence instance;
 
@@ -51,13 +51,14 @@ public class Persistence {
     }
 
     /**
-     * Initialize the instance of persistence
-     * @param context the app context for the instance
+     * Initialize the INSTANCE of persistence
+     *
+     * @param context the app context for the INSTANCE
      */
     public static void initialize(Context context) {
-        // note: isPersistenceLoaded must be volatile for the double-checked lock to work
+        // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
         if (!Persistence.isPersistenceLoaded) {
-            synchronized (Persistence.lock) {
+            synchronized (Persistence.LOCK) {
                 if (!Persistence.isPersistenceLoaded) {
                     Persistence.isPersistenceLoaded = true;
                     Persistence.instance = new Persistence(context);
@@ -67,11 +68,11 @@ public class Persistence {
     }
 
     /**
-     * @return the instance of persistence or null if not yet initialized
+     * @return the INSTANCE of persistence or null if not yet initialized
      */
     public static Persistence getInstance() {
-        if(Persistence.instance == null) {
-            InternalLogging._error(TAG, "getInstance was called before initialization");
+        if (Persistence.instance == null) {
+            InternalLogging.error(TAG, "getInstance was called before initialization");
         }
 
         return Persistence.instance;
@@ -100,7 +101,7 @@ public class Persistence {
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData);
         } catch (IOException e) {
-            InternalLogging._error(TAG, e.toString());
+            InternalLogging.error(TAG, e.toString());
             return false;
         }
 
@@ -109,6 +110,7 @@ public class Persistence {
 
     /**
      * Saves a collection of IJsonSerializable objects to disk
+     *
      * @param data the serializable collection to save
      * @return true if the operation was successful, false otherwise
      */
@@ -119,13 +121,13 @@ public class Persistence {
             if (context != null) {
                 FileOutputStream outputStream;
                 try {
-                    outputStream = context.openFileOutput(filePath, Context.MODE_PRIVATE);
+                    outputStream = context.openFileOutput(FILE_PATH, Context.MODE_PRIVATE);
                     outputStream.write(data.getBytes());
                     outputStream.close();
                     isSuccess = true;
                 } catch (Exception e) {
                     //Do nothing
-                    InternalLogging._error(TAG, "Error writing telemetry data to file");
+                    InternalLogging.error(TAG, "Error writing telemetry data to file");
                 }
             }
         }
@@ -135,6 +137,7 @@ public class Persistence {
 
     /**
      * Retrieves and deletes the next item from disk todo: support multiple items on disk
+     *
      * @return the next item from disk or empty string if anything goes wrong
      */
     public String getNextItemFromDisk() {
@@ -143,7 +146,7 @@ public class Persistence {
             Context context = weakContext.get();
             if (context != null) {
                 try {
-                    FileInputStream inputStream = context.openFileInput(filePath);
+                    FileInputStream inputStream = context.openFileInput(FILE_PATH);
                     InputStreamReader streamReader = new InputStreamReader(inputStream);
 
                     BufferedReader reader = new BufferedReader(streamReader);
@@ -154,11 +157,11 @@ public class Persistence {
 
                     reader.close();
                 } catch (Exception e) {
-                    InternalLogging._error(TAG, "Error reading telemetry data from file");
+                    InternalLogging.error(TAG, "Error reading telemetry data from file");
                 }
 
                 // always delete the file
-                context.deleteFile(filePath);
+                context.deleteFile(FILE_PATH);
             }
         }
 

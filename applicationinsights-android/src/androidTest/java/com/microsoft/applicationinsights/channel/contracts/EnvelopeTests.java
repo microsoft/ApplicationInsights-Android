@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import com.microsoft.applicationinsights.channel.contracts.Base;
-import com.microsoft.applicationinsights.channel.contracts.Envelope;
 
 /// <summary>
 /// Data contract test class EnvelopeTests.

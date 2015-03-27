@@ -5,8 +5,6 @@ import android.test.ActivityUnitTestCase;
 
 import com.microsoft.mocks.MockActivity;
 
-import junit.framework.Assert;
-
 public class TelemetryClientConfigTest extends ActivityUnitTestCase<MockActivity> {
 
     public TelemetryClientConfigTest() {

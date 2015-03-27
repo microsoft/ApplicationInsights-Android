@@ -3,13 +3,17 @@ package com.microsoft.applicationinsights.channel;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 
 public class TelemetryChannelConfig {
 
+
+    private static final String TAG = "TelemetryChannelConfig";
+
     /**
-     * Synchronization lock for setting the iKey
+     * Synchronization LOCK for setting the iKey
      */
-    private static final Object lock = new Object();
+    private static final Object LOCK = new Object();
 
     /**
      * The instrumentationKey from AndroidManifest.xml
@@ -20,11 +24,6 @@ public class TelemetryChannelConfig {
      * The instrumentation key for this telemetry channel
      */
     private String instrumentationKey;
-
-    /**
-     * The application context for this telemetry channel
-     */
-    private final Context appContext;
 
     /**
      * Gets the instrumentation key for this telemetry channel
@@ -41,30 +40,29 @@ public class TelemetryChannelConfig {
     }
 
     /**
-     * Gets the sender config instance for this channel.
+     * Gets the sender config INSTANCE for this channel.
      */
     public TelemetryQueueConfig getStaticConfig() {
-        return TelemetryQueue.instance.getConfig();
+        return TelemetryQueue.INSTANCE.getConfig();
     }
 
     /**
-     * Constructs a new instance of TelemetryChannelConfig
+     * Constructs a new INSTANCE of TelemetryChannelConfig
+     *
      * @param context The android activity context
      */
     public TelemetryChannelConfig(Context context) {
-        //this.persist = Persistence.getInstance();
-        //persist.setPersistenceContext(context);
-        this.appContext = context;
         this.instrumentationKey = TelemetryChannelConfig.readInstrumentationKey(context);
     }
 
     /**
      * Gets the static instrumentation key from AndroidManifest.xml if it is available
+     *
      * @param context the application context to check the manifest from
      * @return the instrumentation key for the application or empty string if not available
      */
     private static String getInstrumentationKey(Context context) {
-        synchronized (TelemetryChannelConfig.lock) {
+        synchronized (TelemetryChannelConfig.LOCK) {
             if (TelemetryChannelConfig.iKeyFromManifest == null) {
                 String iKey = TelemetryChannelConfig.readInstrumentationKey(context);
                 TelemetryChannelConfig.iKeyFromManifest = iKey;
@@ -76,12 +74,13 @@ public class TelemetryChannelConfig {
 
     /**
      * Reads the instrumentation key from AndroidManifest.xml if it is available
+     *
      * @param context the application context to check the manifest from
      * @return the instrumentation key configured for the application
      */
     private static String readInstrumentationKey(Context context) {
         String iKey = "";
-        if(context != null) {
+        if (context != null) {
             try {
                 Bundle bundle = context
                         .getPackageManager()
@@ -94,6 +93,7 @@ public class TelemetryChannelConfig {
                 }
             } catch (PackageManager.NameNotFoundException exception) {
                 logInstrumentationInstructions();
+                Log.v(TAG, exception.toString());
             }
         }
 
@@ -109,6 +109,6 @@ public class TelemetryChannelConfig {
         String manifestSnippet = "<meta-data\n" +
                 "android:name=\"com.microsoft.applicationinsights.instrumentationKey\"\n" +
                 "android:value=\"${AI_INSTRUMENTATION_KEY}\" />";
-        InternalLogging._error("MissingInstrumentationkey", instructions + "\n" + manifestSnippet);
+        InternalLogging.error("MissingInstrumentationkey", instructions + "\n" + manifestSnippet);
     }
 }

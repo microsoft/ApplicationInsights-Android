@@ -2,13 +2,13 @@ package com.microsoft.applicationinsights.channel;
 
 public class TelemetryQueueConfig {
 
-    public static final int defaultMaxBatchCount = 100;
-    public static final int defaultMaxBatchIntervalMs = 1000;
-    public static final String defaultEndpointUrl = "https://dc.services.visualstudio.com/v2/track";
-    public static final boolean defaultDisableTelemetry = false;
-    public static final boolean defaultDeveloperMode = false;
-    public static final int defaultSenderReadTimeout = 10 * 1000;
-    public static final int defaultsenderConnectTimeout = 15 * 1000;
+    public static final int DEFAULT_MAX_BATCH_COUNT = 100;
+    public static final int DEFAULT_MAX_BATCH_INTERVAL_MS = 3 * 1000;
+    public static final String DEFAULT_ENDPOINT_URL = "https://dc.services.visualstudio.com/v2/track";
+    public static final boolean DEFAULT_DISABLE_TELEMETRY = false;
+    public static final boolean DEFAULT_DEVELOPER_MODE = false;
+    public static final int DEFAULT_SENDER_READ_TIMEOUT = 10 * 1000;
+    public static final int DEFAULTSENDER_CONNECT_TIMEOUT = 15 * 1000;
 
     /**
      * Lock object to ensure thread safety of the configuration
@@ -144,16 +144,16 @@ public class TelemetryQueueConfig {
     }
 
     /**
-     * Constructs a new instance of the sender config
+     * Constructs a new INSTANCE of the sender config
      */
     public TelemetryQueueConfig() {
         this.lock = new Object();
-        this.maxBatchCount = TelemetryQueueConfig.defaultMaxBatchCount;
-        this.maxBatchIntervalMs = TelemetryQueueConfig.defaultMaxBatchIntervalMs;
-        this.endpointUrl = TelemetryQueueConfig.defaultEndpointUrl;
-        this.telemetryDisabled = TelemetryQueueConfig.defaultDisableTelemetry;
-        this.developerMode = TelemetryQueueConfig.defaultDeveloperMode;
-        this.senderReadTimeoutMs = TelemetryQueueConfig.defaultSenderReadTimeout;
-        this.senderConnectTimeoutMs = TelemetryQueueConfig.defaultsenderConnectTimeout;
+        this.maxBatchCount = TelemetryQueueConfig.DEFAULT_MAX_BATCH_COUNT;
+        this.maxBatchIntervalMs = TelemetryQueueConfig.DEFAULT_MAX_BATCH_INTERVAL_MS;
+        this.endpointUrl = TelemetryQueueConfig.DEFAULT_ENDPOINT_URL;
+        this.telemetryDisabled = TelemetryQueueConfig.DEFAULT_DISABLE_TELEMETRY;
+        this.developerMode = TelemetryQueueConfig.DEFAULT_DEVELOPER_MODE;
+        this.senderReadTimeoutMs = TelemetryQueueConfig.DEFAULT_SENDER_READ_TIMEOUT;
+        this.senderConnectTimeoutMs = TelemetryQueueConfig.DEFAULTSENDER_CONNECT_TIMEOUT;
     }
 }

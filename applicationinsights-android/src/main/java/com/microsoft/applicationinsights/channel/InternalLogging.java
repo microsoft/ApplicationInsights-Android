@@ -3,41 +3,48 @@ package com.microsoft.applicationinsights.channel;
 import android.util.Log;
 
 public class InternalLogging {
-    private static final String prefix = InternalLogging.class.getPackage().getName();
+    private static final String PREFIX = InternalLogging.class.getPackage().getName();
+
+    private InternalLogging() {
+        // hide default constructor
+    }
 
     /**
      * Inform SDK users about SDK activities. This has 3 parameters to avoid the string
      * concatenation then verbose mode is disabled.
-     * @param tag the log context
+     *
+     * @param tag     the log context
      * @param message the log message
      * @param payload the payload for the message
      */
-    public static void _info(String tag, String message, String payload) {
-        if(TelemetryQueue.instance.getConfig().isDeveloperMode()) {
-            Log.i(prefix + tag, message + ":" + payload);
+    public static void info(String tag, String message, String payload) {
+        if (TelemetryQueue.INSTANCE.getConfig().isDeveloperMode()) {
+            Log.i(PREFIX + tag, message + ":" + payload);
         }
     }
 
     /**
      * Warn SDK users about non-critical SDK misuse
-     * @param tag the log context
+     *
+     * @param tag     the log context
      * @param message the log message
      */
-    public static void _warn(String tag, String message) {
-        if(TelemetryQueue.instance.getConfig().isDeveloperMode()) {
-            Log.w(prefix + tag, message);
+    public static void warn(String tag, String message) {
+        if (TelemetryQueue.INSTANCE.getConfig().isDeveloperMode()) {
+            Log.w(PREFIX + tag, message);
         }
     }
 
     /**
      * Log critical SDK misuse, throw if developer mode is enabled
-     * @param tag the log context
+     *
+     * @param tag     the log context
      * @param message the log message
      */
-    public static void _error(String tag, String message) {
-        if(TelemetryQueue.instance.getConfig().isDeveloperMode()) {
-            Log.e(prefix + tag, message);
-            throw new RuntimeException(prefix + tag + "\n" + message);
+    public static void error(String tag, String message) {
+        if (TelemetryQueue.INSTANCE.getConfig().isDeveloperMode()) {
+            Log.e(PREFIX + tag, message);
+            throw new RuntimeException(PREFIX + tag + "\n" + message);
         } else {
             // todo: track SDK misuse as an event to the user's channel
         }

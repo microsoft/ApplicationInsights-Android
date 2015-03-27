@@ -22,7 +22,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,16 +35,16 @@ public class TelemetryClient {
     public static final int CONTRACT_VERSION = 2;
 
     /**
-     * Get a TelemetryClient instance
+     * Get a TelemetryClient INSTANCE
      *
-     * @param context the activity to associate with this instance
-     * @return an instance of {@code TelemetryClient} associated with the activity, or null if the
+     * @param context the activity to associate with this INSTANCE
+     * @return an INSTANCE of {@code TelemetryClient} associated with the activity, or null if the
      * activity is null.
      */
     public static TelemetryClient getInstance(Context context) {
         TelemetryClient client = null;
         if (context == null) {
-            InternalLogging._warn("TelemetryClient.getInstance", "context is null");
+            InternalLogging.warn("TelemetryClient.getInstance", "context is null");
         } else {
             client = new TelemetryClient(context);
         }
@@ -70,7 +70,7 @@ public class TelemetryClient {
     /**
      * Properties associated with this telemetryContext.
      */
-    private LinkedHashMap<String, String> commonProperties;
+    private Map<String, String> commonProperties;
 
     /**
      * The telemetry telemetryContext object.
@@ -91,7 +91,7 @@ public class TelemetryClient {
      *
      * @return common properties for this telemetry client
      */
-    public LinkedHashMap<String, String> getCommonProperties() {
+    public Map<String, String> getCommonProperties() {
         return commonProperties;
     }
 
@@ -100,14 +100,14 @@ public class TelemetryClient {
      *
      * @param commonProperties a dictionary of properties to send with all telemetry.
      */
-    public void setCommonProperties(LinkedHashMap<String, String> commonProperties) {
+    public void setCommonProperties(Map<String, String> commonProperties) {
         this.commonProperties = commonProperties;
     }
 
     /**
      * Constructor of the class TelemetryClient.
      * <p>
-     * Use {@code TelemetryClient.getInstance} to get an instance.
+     * Use {@code TelemetryClient.getInstance} to get an INSTANCE.
      * </p>
      *
      * @param context the application context for this client
@@ -119,7 +119,7 @@ public class TelemetryClient {
     /**
      * Constructor of the class TelemetryClient.
      * <p>
-     * Use {@code TelemetryClient.getInstance} to get an instance.
+     * Use {@code TelemetryClient.getInstance} to get an INSTANCE.
      * </p>
      *
      * @param config the configuration for this client
@@ -131,7 +131,7 @@ public class TelemetryClient {
     /**
      * Constructor of the class TelemetryClient.
      * <p>
-     * Use {@code TelemetryClient.getInstance} to get an instance.
+     * Use {@code TelemetryClient.getInstance} to get an INSTANCE.
      * </p>
      *
      * @param config  the configuration for this client
@@ -139,9 +139,9 @@ public class TelemetryClient {
      * @param channel the channel for this client
      */
     protected TelemetryClient(
-          TelemetryClientConfig config,
-          TelemetryContext context,
-          TelemetryChannel channel) {
+            TelemetryClientConfig config,
+            TelemetryContext context,
+            TelemetryChannel channel) {
         this.config = config;
         this.context = context;
         this.channel = channel;
@@ -151,7 +151,7 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackEvent(String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackEvent(String, Map, Map)
      */
     public void trackEvent(String eventName) {
         trackEvent(eventName, null, null);
@@ -160,9 +160,9 @@ public class TelemetryClient {
     /**
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackEvent(String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackEvent(String, Map, Map)
      */
-    public void trackEvent(String eventName, LinkedHashMap<String, String> properties) {
+    public void trackEvent(String eventName, Map<String, String> properties) {
         trackEvent(eventName, properties, null);
     }
 
@@ -175,9 +175,9 @@ public class TelemetryClient {
      * @param measurements Custom measurements associated with the event.
      */
     public void trackEvent(
-          String eventName,
-          LinkedHashMap<String, String> properties,
-          LinkedHashMap<String, Double> measurements) {
+            String eventName,
+            Map<String, String> properties,
+            Map<String, Double> measurements) {
 
         EventData telemetry = new EventData();
 
@@ -191,7 +191,7 @@ public class TelemetryClient {
     /**
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackEvent(String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackTrace(String, Map)
      */
     public void trackTrace(String message) {
         trackTrace(message, null);
@@ -204,7 +204,7 @@ public class TelemetryClient {
      * @param properties Custom properties associated with the event. Note: values set here will
      *                   supersede values set in {@link TelemetryClient#setCommonProperties}.
      */
-    public void trackTrace(String message, LinkedHashMap<String, String> properties) {
+    public void trackTrace(String message, Map<String, String> properties) {
         MessageData telemetry = new MessageData();
 
         telemetry.setMessage(this.ensureValid(message));
@@ -216,7 +216,7 @@ public class TelemetryClient {
     /**
      * Sends information about an aggregated metric to Application Insights. Note: all data sent via
      * this method will be aggregated. To send non-aggregated data use
-     * {@link TelemetryClient#trackEvent(String, LinkedHashMap, LinkedHashMap)} with measurements.
+     * {@link TelemetryClient#trackEvent(String, Map, Map)} with measurements.
      *
      * @param name  The name of the metric
      * @param value The value of the metric
@@ -231,7 +231,7 @@ public class TelemetryClient {
         data.setMax(value);
         data.setName(this.ensureValid(name));
         data.setValue(value);
-        ArrayList<DataPoint> metricsList = new ArrayList<DataPoint>();
+        List<DataPoint> metricsList = new ArrayList<DataPoint>();
         metricsList.add(data);
 
         telemetry.setMetrics(metricsList);
@@ -243,7 +243,7 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap)
+     * @see TelemetryClient#trackException(Throwable, String, Map)
      */
     public void trackException(Throwable exception) {
         this.trackException(exception, null);
@@ -253,7 +253,7 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackException(Throwable, String, LinkedHashMap)
+     * @see TelemetryClient#trackException(Throwable, String, Map)
      */
     public void trackException(Throwable exception, String handledAt) {
         this.trackException(exception, handledAt, null);
@@ -262,24 +262,25 @@ public class TelemetryClient {
     /**
      * Sends information about an exception to Application Insights.
      *
-     * @param exception    The exception to track.
-     * @param handledAt    The location at which this exception was handled (null if unhandled)
-     * @param properties   Custom properties associated with the event. Note: values set here will
-     *                     supersede values set in {@link TelemetryClient#setCommonProperties}.
+     * @param exception  The exception to track.
+     * @param handledAt  The location at which this exception was handled (null if unhandled)
+     * @param properties Custom properties associated with the event. Note: values set here will
+     *                   supersede values set in {@link TelemetryClient#setCommonProperties}.
      */
     public void trackException(
-          Throwable exception,
-          String handledAt,
-          LinkedHashMap<String, String> properties) {
+            Throwable exception,
+            String handledAt,
+            Map<String, String> properties) {
 
-        if(exception == null) {
-            exception = new Exception();
+        Throwable localException = exception;
+        if (localException == null) {
+            localException = new Exception();
         }
 
         // read stack frames
-        ArrayList<CrashDataThreadFrame> stackFrames = new ArrayList<>();
-        StackTraceElement[] stack = exception.getStackTrace();
-        for(int i = stack.length -1; i >= 0; i--) {
+        List<CrashDataThreadFrame> stackFrames = new ArrayList<>();
+        StackTraceElement[] stack = localException.getStackTrace();
+        for (int i = stack.length - 1; i >= 0; i--) {
             StackTraceElement rawFrame = stack[i];
             CrashDataThreadFrame frame = new CrashDataThreadFrame();
             frame.setSymbol(rawFrame.toString());
@@ -289,15 +290,15 @@ public class TelemetryClient {
 
         CrashDataThread crashDataThread = new CrashDataThread();
         crashDataThread.setFrames(stackFrames);
-        ArrayList<CrashDataThread> threads = new ArrayList<>(1);
+        List<CrashDataThread> threads = new ArrayList<>(1);
         threads.add(crashDataThread);
 
         CrashDataHeaders crashDataHeaders = new CrashDataHeaders();
         crashDataHeaders.setId(UUID.randomUUID().toString());
 
-        String message = exception.getMessage();
+        String message = localException.getMessage();
         crashDataHeaders.setExceptionReason(this.ensureValid(message));
-        crashDataHeaders.setExceptionType(exception.getClass().getName());
+        crashDataHeaders.setExceptionType(localException.getClass().getName());
         crashDataHeaders.setApplicationPath(this.context.getPackageName());
 
         CrashData crashData = new CrashData();
@@ -312,7 +313,7 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackPageView(String, Map, Map)
      */
     public void trackPageView(String pageName) {
         this.trackPageView(pageName, null, null);
@@ -321,9 +322,9 @@ public class TelemetryClient {
     /**
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, LinkedHashMap, LinkedHashMap)
+     * @see TelemetryClient#trackPageView(String, Map, Map)
      */
-    public void trackPageView(String pageName, LinkedHashMap<String, String> properties) {
+    public void trackPageView(String pageName, Map<String, String> properties) {
         this.trackPageView(pageName, properties, null);
     }
 
@@ -336,15 +337,17 @@ public class TelemetryClient {
      * @param measurements Custom measurements associated with the event.
      */
     public void trackPageView(
-          String pageName,
-          LinkedHashMap<String, String> properties,
-          LinkedHashMap<String, Double> measurements) {
+            String pageName,
+            Map<String, String> properties,
+            Map<String, Double> measurements) {
 
         PageViewData telemetry = new PageViewData();
 
         telemetry.setName(this.ensureValid(pageName));
         telemetry.setUrl(null);
-        //telemetry.setDuration(Util.msToTimeSpan(pageLoadDurationMs));
+
+        // todo: measure page-load duration telemetry.setDuration(Util.msToTimeSpan(pageLoadDurationMs));
+
         telemetry.setProperties(properties);
         telemetry.setMeasurements(measurements);
 
@@ -365,15 +368,15 @@ public class TelemetryClient {
      * @param measurements custom measurements
      */
     protected void trackRequest(
-          String name,
-          String url,
-          String httpMethod,
-          Date startTime,
-          long durationMs,
-          int responseCode,
-          boolean isSuccess,
-          LinkedHashMap<String, String> properties,
-          LinkedHashMap<String, Double> measurements) {
+            String name,
+            String url,
+            String httpMethod,
+            Date startTime,
+            long durationMs,
+            int responseCode,
+            boolean isSuccess,
+            Map<String, String> properties,
+            Map<String, Double> measurements) {
 
         // todo: expose this publicly via a method that instruments a RequestQueue
         RequestData telemetry = new RequestData();
@@ -437,7 +440,7 @@ public class TelemetryClient {
         if (context != null) {
             ExceptionTracking.registerExceptionHandler(context);
         } else {
-            InternalLogging._warn(TAG, "Unable to register ExceptionHandler, context is null");
+            InternalLogging.warn(TAG, "Unable to register ExceptionHandler, context is null");
         }
     }
 
@@ -447,10 +450,10 @@ public class TelemetryClient {
      * @param application the application used to register the life cycle callbacks
      */
     public void enableActivityTracking(Application application) {
-        if(context != null) {
+        if (context != null) {
             LifeCycleTracking.registerActivityLifecycleCallbacks(application);
         } else {
-            InternalLogging._warn(TAG, "Unable to register activity lifecycle callbacks, context is null");
+            InternalLogging.warn(TAG, "Unable to register activity lifecycle callbacks, context is null");
         }
     }
 

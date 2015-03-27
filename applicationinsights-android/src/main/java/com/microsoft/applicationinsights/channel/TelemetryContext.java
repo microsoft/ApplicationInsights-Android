@@ -21,6 +21,7 @@ import com.microsoft.applicationinsights.channel.contracts.User;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -32,11 +33,12 @@ public class TelemetryContext {
     protected static final String USER_ID_KEY = "USER_ID";
     protected static final String USER_ACQ_KEY = "USER_ACQ";
     protected static final String SDK_VERSION = "1.0-a.2";
+    private static final String TAG = "TelemetryContext";
 
     /**
-     * Synchronization lock for setting static context
+     * Synchronization LOCK for setting static context
      */
-    private static final Object lock = new Object();
+    private static final Object LOCK = new Object();
 
     /**
      * Volatile boolean for double checked synchronize block
@@ -44,7 +46,7 @@ public class TelemetryContext {
     private static volatile boolean isContextLoaded = false;
 
     /**
-     * The shared preferences instance for reading persistent context
+     * The shared preferences INSTANCE for reading persistent context
      */
     private static SharedPreferences settings;
 
@@ -133,21 +135,21 @@ public class TelemetryContext {
     }
 
     /**
-     * Constructs a new instance of the Telemetry telemetryContext tag keys
+     * Constructs a new INSTANCE of the Telemetry telemetryContext tag keys
      *
      * @param appContext the context for this telemetryContext
      */
     public TelemetryContext(Context appContext) {
 
-        // note: isContextLoaded must be volatile for the double-checked lock to work
+        // note: isContextLoaded must be volatile for the double-checked LOCK to work
         if (!TelemetryContext.isContextLoaded && appContext != null) {
-            synchronized (TelemetryContext.lock) {
+            synchronized (TelemetryContext.LOCK) {
                 if (!TelemetryContext.isContextLoaded) {
                     TelemetryContext.isContextLoaded = true;
 
-                    // get an instance of the shared preferences manager for persistent context fields
+                    // get an INSTANCE of the shared preferences manager for persistent context fields
                     TelemetryContext.settings = appContext.getSharedPreferences(
-                        TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+                            TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
 
                     // initialize static context
                     TelemetryContext.device = new Device();
@@ -175,10 +177,10 @@ public class TelemetryContext {
     /**
      * @return a map of the context tags assembled in the required data contract format.
      */
-    public LinkedHashMap<String, String> getContextTags() {
+    public Map<String, String> getContextTags() {
 
         // create a new hash map and add all context to it
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        Map<String, String> map = new LinkedHashMap<>();
         TelemetryContext.application.addToHashMap(map);
         TelemetryContext.device.addToHashMap(map);
         TelemetryContext.session.addToHashMap(map);
@@ -233,7 +235,7 @@ public class TelemetryContext {
             Application context = TelemetryContext.application;
             context.setVer(ver);
         } catch (PackageManager.NameNotFoundException e) {
-            InternalLogging._warn("TelemetryContext", "Could not collect application context");
+            InternalLogging.warn("TelemetryContext", "Could not collect application context");
         }
     }
 
@@ -300,6 +302,11 @@ public class TelemetryContext {
                     break;
                 case ConnectivityManager.TYPE_MOBILE:
                     context.setNetwork("Mobile");
+                    break;
+                default:
+                    context.setNetwork("Unknown");
+                    InternalLogging.warn(TAG, "Unknown network type:" + networkType);
+                    break;
             }
         }
 
@@ -314,6 +321,8 @@ public class TelemetryContext {
      */
     protected static void setInternalContext() {
         Internal context = TelemetryContext.internal;
+
+        // todo: pull version from gradle.properties
         context.setSdkVersion("Android:" + TelemetryContext.SDK_VERSION);
     }
 }

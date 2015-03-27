@@ -1,20 +1,12 @@
 package com.microsoft.applicationinsights.channel;
 
-import android.app.Activity;
-import android.test.AndroidTestCase;
-
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
 import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
@@ -185,7 +177,7 @@ public class TelemetryQueueTest extends TestCase {
         }
 
         public LinkedList<IJsonSerializable> getQueue() {
-            return this.linkedList;
+            return (LinkedList) this.list;
         }
 
         public Timer getTimer() {
@@ -208,4 +200,3 @@ public class TelemetryQueueTest extends TestCase {
         }
     }
 }
-

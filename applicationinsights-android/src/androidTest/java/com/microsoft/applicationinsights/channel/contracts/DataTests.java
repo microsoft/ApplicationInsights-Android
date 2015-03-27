@@ -1,12 +1,12 @@
 package com.microsoft.applicationinsights.channel.contracts;
 
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
-import com.microsoft.applicationinsights.channel.contracts.Data;
 
 /// <summary>
 /// Data contract test class DataTests.
