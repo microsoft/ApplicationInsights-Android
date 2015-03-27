@@ -6,6 +6,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data contract class RemoteDependencyData.
@@ -88,9 +89,19 @@ public class RemoteDependencyData extends Domain implements
     private int dependencySource = DependencySourceType.Undefined;
     
     /**
+     * Backing field for property CommandName.
+     */
+    private String commandName;
+    
+    /**
+     * Backing field for property DependencyTypeName.
+     */
+    private String dependencyTypeName;
+    
+    /**
      * Backing field for property Properties.
      */
-    private LinkedHashMap<String, String> properties;
+    private Map<String, String> properties;
     
     /**
      * Initializes a new instance of the <see cref="RemoteDependencyData"/> class.
@@ -269,9 +280,37 @@ public class RemoteDependencyData extends Domain implements
     }
     
     /**
+     * Gets the CommandName property.
+     */
+    public String getCommandName() {
+        return this.commandName;
+    }
+    
+    /**
+     * Sets the CommandName property.
+     */
+    public void setCommandName(String value) {
+        this.commandName = value;
+    }
+    
+    /**
+     * Gets the DependencyTypeName property.
+     */
+    public String getDependencyTypeName() {
+        return this.dependencyTypeName;
+    }
+    
+    /**
+     * Sets the DependencyTypeName property.
+     */
+    public void setDependencyTypeName(String value) {
+        this.dependencyTypeName = value;
+    }
+    
+    /**
      * Gets the Properties property.
      */
-    public LinkedHashMap<String, String> getProperties() {
+    public Map<String, String> getProperties() {
         if (this.properties == null) {
             this.properties = new LinkedHashMap<String, String>();
         }
@@ -281,7 +320,7 @@ public class RemoteDependencyData extends Domain implements
     /**
      * Sets the Properties property.
      */
-    public void setProperties(LinkedHashMap<String, String> value) {
+    public void setProperties(Map<String, String> value) {
         this.properties = value;
     }
     
@@ -365,6 +404,20 @@ public class RemoteDependencyData extends Domain implements
             prefix = ",";
         }
         
+        if (!(this.commandName == null))
+        {
+            writer.write(prefix + "\"commandName\":");
+            writer.write(JsonHelper.convert(this.commandName));
+            prefix = ",";
+        }
+        
+        if (!(this.dependencyTypeName == null))
+        {
+            writer.write(prefix + "\"dependencyTypeName\":");
+            writer.write(JsonHelper.convert(this.dependencyTypeName));
+            prefix = ",";
+        }
+        
         if (!(this.properties == null))
         {
             writer.write(prefix + "\"properties\":");
@@ -379,6 +432,6 @@ public class RemoteDependencyData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

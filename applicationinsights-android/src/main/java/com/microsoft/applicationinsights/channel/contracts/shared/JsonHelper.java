@@ -12,24 +12,24 @@ import java.util.Set;
  * converting.
  */
 public final class JsonHelper {
-    private static final int controlCharacterRange = 0x80;
-    private static final String[] controlCharacters;
+    private static final int CONTROL_CHARACTER_RANGE = 0x80;
+    private static final String[] CONTROL_CHARACTERS;
     static {
-        controlCharacters = new String[controlCharacterRange];
+        CONTROL_CHARACTERS = new String[CONTROL_CHARACTER_RANGE];
 
         // per RFC 4627 (JSON specification) section 2.5; escape control characters U+0000 -> U+001F
         for(int i = 0; i <= 0x1f; i++) {
-            controlCharacters[i] = String.format("\\u%04X", i);
+            CONTROL_CHARACTERS[i] = String.format("\\u%04X", i);
         }
 
         // additionally escape quotation mark, reverse solidus, line breaks and whitespace
-        controlCharacters['\"'] = "\\\"";
-        controlCharacters['\\'] = "\\\\";
-        controlCharacters['\b'] = "\\b";
-        controlCharacters['\f'] = "\\f";
-        controlCharacters['\n'] = "\\n";
-        controlCharacters['\r'] = "\\r";
-        controlCharacters['\t'] = "\\t";
+        CONTROL_CHARACTERS['\"'] = "\\\"";
+        CONTROL_CHARACTERS['\\'] = "\\\\";
+        CONTROL_CHARACTERS['\b'] = "\\b";
+        CONTROL_CHARACTERS['\f'] = "\\f";
+        CONTROL_CHARACTERS['\n'] = "\\n";
+        CONTROL_CHARACTERS['\r'] = "\\r";
+        CONTROL_CHARACTERS['\t'] = "\\t";
     }
 
     private static String escapeJSON(String input) {
@@ -37,8 +37,8 @@ public final class JsonHelper {
         builder.append("\"");
         for(int i = 0; i < input.length(); i++) {
             char charIndex = input.charAt(i);
-            if(charIndex < controlCharacterRange) {
-                String replacement = controlCharacters[charIndex];
+            if(charIndex < CONTROL_CHARACTER_RANGE) {
+                String replacement = CONTROL_CHARACTERS[charIndex];
                 if (replacement == null) {
                     builder.append(charIndex);
                 } else {
@@ -154,7 +154,7 @@ public final class JsonHelper {
      * @throws IOException
      */
     public static <T> void writeDictionary(Writer writer, Map<String, T> map) throws IOException {
-        if (map == null || map.size() < 1) {
+        if (map == null || map.isEmpty()) {
             writer.write("null");
         } else {
             Set<String> keys = map.keySet();
@@ -194,7 +194,7 @@ public final class JsonHelper {
      * @throws IOException
      */
     public static <T extends IJsonSerializable> void writeList(Writer writer, List<T> list) throws IOException {
-        if (list == null || list.size() < 1) {
+        if (list == null || list.isEmpty()) {
             writer.write("null");
         } else {
             Iterator<T> iterator = list.iterator();

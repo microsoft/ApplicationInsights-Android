@@ -58,6 +58,6 @@ public class Data<TDomain extends ITelemetryData> extends Base implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

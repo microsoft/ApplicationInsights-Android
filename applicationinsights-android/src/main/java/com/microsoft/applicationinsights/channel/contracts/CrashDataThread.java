@@ -6,6 +6,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data contract class CrashDataThread.
@@ -21,7 +22,7 @@ public class CrashDataThread implements
     /**
      * Backing field for property Frames.
      */
-    private ArrayList<CrashDataThreadFrame> frames;
+    private List<CrashDataThreadFrame> frames;
     
     /**
      * Initializes a new instance of the <see cref="CrashDataThread"/> class.
@@ -48,7 +49,7 @@ public class CrashDataThread implements
     /**
      * Gets the Frames property.
      */
-    public ArrayList<CrashDataThreadFrame> getFrames() {
+    public List<CrashDataThreadFrame> getFrames() {
         if (this.frames == null) {
             this.frames = new ArrayList<CrashDataThreadFrame>();
         }
@@ -58,7 +59,7 @@ public class CrashDataThread implements
     /**
      * Sets the Frames property.
      */
-    public void setFrames(ArrayList<CrashDataThreadFrame> value) {
+    public void setFrames(List<CrashDataThreadFrame> value) {
         this.frames = value;
     }
     
@@ -105,6 +106,6 @@ public class CrashDataThread implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

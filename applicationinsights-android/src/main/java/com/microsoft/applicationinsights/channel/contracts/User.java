@@ -5,7 +5,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data contract class User.
@@ -32,6 +32,11 @@ public class User implements
      * Backing field for property Id.
      */
     private String id;
+    
+    /**
+     * Backing field for property StoreRegion.
+     */
+    private String storeRegion;
     
     /**
      * Initializes a new instance of the <see cref="User"/> class.
@@ -97,12 +102,26 @@ public class User implements
         this.id = value;
     }
     
+    /**
+     * Gets the StoreRegion property.
+     */
+    public String getStoreRegion() {
+        return this.storeRegion;
+    }
+    
+    /**
+     * Sets the StoreRegion property.
+     */
+    public void setStoreRegion(String value) {
+        this.storeRegion = value;
+    }
+    
 
     /**
      * Adds all members of this class to a hashmap
      * @param map to which the members of this class will be added.
      */
-    public void addToHashMap(LinkedHashMap<String, String> map)
+    public void addToHashMap(Map<String, String> map)
     {
         if (!(this.accountAcquisitionDate == null)) {
             map.put("ai.user.accountAcquisitionDate", this.accountAcquisitionDate);
@@ -115,6 +134,9 @@ public class User implements
         }
         if (!(this.id == null)) {
             map.put("ai.user.id", this.id);
+        }
+        if (!(this.storeRegion == null)) {
+            map.put("ai.user.storeRegion", this.storeRegion);
         }
     }
     
@@ -171,6 +193,13 @@ public class User implements
             prefix = ",";
         }
         
+        if (!(this.storeRegion == null))
+        {
+            writer.write(prefix + "\"ai.user.storeRegion\":");
+            writer.write(JsonHelper.convert(this.storeRegion));
+            prefix = ",";
+        }
+        
         return prefix;
     }
     
@@ -178,6 +207,6 @@ public class User implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

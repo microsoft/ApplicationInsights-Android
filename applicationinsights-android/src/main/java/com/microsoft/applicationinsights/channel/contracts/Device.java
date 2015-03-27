@@ -5,7 +5,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data contract class Device.
@@ -292,7 +292,7 @@ public class Device implements
      * Adds all members of this class to a hashmap
      * @param map to which the members of this class will be added.
      */
-    public void addToHashMap(LinkedHashMap<String, String> map)
+    public void addToHashMap(Map<String, String> map)
     {
         if (!(this.id == null)) {
             map.put("ai.device.id", this.id);
@@ -468,6 +468,6 @@ public class Device implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

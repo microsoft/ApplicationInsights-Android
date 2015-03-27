@@ -1,10 +1,14 @@
 package com.microsoft.applicationinsights.channel.contracts;
-
 /**
  * Enum SessionState.
  */
 public class SessionState
 {
-    public static int Start = 0;
-    public static int End = 1;
+    
+    private SessionState() {
+        // hide default constructor
+    }
+    
+    public static final int Start = 0;
+    public static final int End = 1;
 }

@@ -23,6 +23,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -403,7 +404,7 @@ public class TelemetryClient {
 
         // add common properties to this telemetry object
         if (this.commonProperties != null) {
-            LinkedHashMap<String, String> map = telemetry.getProperties();
+            Map<String, String> map = telemetry.getProperties();
             if (map != null) {
                 map.putAll(this.commonProperties);
             }

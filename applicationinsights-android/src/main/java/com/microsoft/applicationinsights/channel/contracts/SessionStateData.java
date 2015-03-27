@@ -5,7 +5,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data contract class SessionStateData.
@@ -77,7 +77,7 @@ public class SessionStateData extends Domain implements
     /**
     * Gets the Properties property.
     */
-    public LinkedHashMap<String, String> getProperties() {
+    public Map<String, String> getProperties() {
         //Do nothing - does not currently take properties
         return null;
     }
@@ -85,7 +85,7 @@ public class SessionStateData extends Domain implements
     /**
     * Sets the Properties property.
     */
-    public void setProperties(LinkedHashMap<String, String> value) {
+    public void setProperties(Map<String, String> value) {
         //Do nothing - does not currently take properties
     }
 
@@ -111,6 +111,6 @@ public class SessionStateData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

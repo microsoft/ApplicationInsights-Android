@@ -6,6 +6,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data contract class ExceptionDetails.
@@ -46,7 +47,7 @@ public class ExceptionDetails implements
     /**
      * Backing field for property ParsedStack.
      */
-    private ArrayList<StackFrame> parsedStack;
+    private List<StackFrame> parsedStack;
     
     /**
      * Initializes a new instance of the <see cref="ExceptionDetails"/> class.
@@ -143,7 +144,7 @@ public class ExceptionDetails implements
     /**
      * Gets the ParsedStack property.
      */
-    public ArrayList<StackFrame> getParsedStack() {
+    public List<StackFrame> getParsedStack() {
         if (this.parsedStack == null) {
             this.parsedStack = new ArrayList<StackFrame>();
         }
@@ -153,7 +154,7 @@ public class ExceptionDetails implements
     /**
      * Sets the ParsedStack property.
      */
-    public void setParsedStack(ArrayList<StackFrame> value) {
+    public void setParsedStack(List<StackFrame> value) {
         this.parsedStack = value;
     }
     
@@ -232,6 +233,6 @@ public class ExceptionDetails implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

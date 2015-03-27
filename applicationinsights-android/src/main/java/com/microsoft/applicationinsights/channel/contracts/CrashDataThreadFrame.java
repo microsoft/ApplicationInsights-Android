@@ -6,6 +6,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data contract class CrashDataThreadFrame.
@@ -26,7 +27,7 @@ public class CrashDataThreadFrame implements
     /**
      * Backing field for property Registers.
      */
-    private LinkedHashMap<String, String> registers;
+    private Map<String, String> registers;
     
     /**
      * Initializes a new instance of the <see cref="CrashDataThreadFrame"/> class.
@@ -67,7 +68,7 @@ public class CrashDataThreadFrame implements
     /**
      * Gets the Registers property.
      */
-    public LinkedHashMap<String, String> getRegisters() {
+    public Map<String, String> getRegisters() {
         if (this.registers == null) {
             this.registers = new LinkedHashMap<String, String>();
         }
@@ -77,7 +78,7 @@ public class CrashDataThreadFrame implements
     /**
      * Sets the Registers property.
      */
-    public void setRegisters(LinkedHashMap<String, String> value) {
+    public void setRegisters(Map<String, String> value) {
         this.registers = value;
     }
     
@@ -131,6 +132,6 @@ public class CrashDataThreadFrame implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

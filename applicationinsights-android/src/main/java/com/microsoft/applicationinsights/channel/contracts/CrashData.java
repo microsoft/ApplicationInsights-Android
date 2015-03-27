@@ -6,7 +6,8 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data contract class CrashData.
@@ -41,12 +42,12 @@ public class CrashData extends Domain implements
     /**
      * Backing field for property Threads.
      */
-    private ArrayList<CrashDataThread> threads;
+    private List<CrashDataThread> threads;
     
     /**
      * Backing field for property Binaries.
      */
-    private ArrayList<CrashDataBinary> binaries;
+    private List<CrashDataBinary> binaries;
     
     /**
      * Initializes a new instance of the <see cref="CrashData"/> class.
@@ -87,7 +88,7 @@ public class CrashData extends Domain implements
     /**
      * Gets the Threads property.
      */
-    public ArrayList<CrashDataThread> getThreads() {
+    public List<CrashDataThread> getThreads() {
         if (this.threads == null) {
             this.threads = new ArrayList<CrashDataThread>();
         }
@@ -97,14 +98,14 @@ public class CrashData extends Domain implements
     /**
      * Sets the Threads property.
      */
-    public void setThreads(ArrayList<CrashDataThread> value) {
+    public void setThreads(List<CrashDataThread> value) {
         this.threads = value;
     }
     
     /**
      * Gets the Binaries property.
      */
-    public ArrayList<CrashDataBinary> getBinaries() {
+    public List<CrashDataBinary> getBinaries() {
         if (this.binaries == null) {
             this.binaries = new ArrayList<CrashDataBinary>();
         }
@@ -114,7 +115,7 @@ public class CrashData extends Domain implements
     /**
      * Sets the Binaries property.
      */
-    public void setBinaries(ArrayList<CrashDataBinary> value) {
+    public void setBinaries(List<CrashDataBinary> value) {
         this.binaries = value;
     }
     
@@ -122,7 +123,7 @@ public class CrashData extends Domain implements
     /**
     * Gets the Properties property.
     */
-    public LinkedHashMap<String, String> getProperties() {
+    public Map<String, String> getProperties() {
         //Do nothing - does not currently take properties
         return null;
     }
@@ -130,7 +131,7 @@ public class CrashData extends Domain implements
     /**
     * Sets the Properties property.
     */
-    public void setProperties(LinkedHashMap<String, String> value) {
+    public void setProperties(Map<String, String> value) {
         //Do nothing - does not currently take properties
     }
 
@@ -170,6 +171,6 @@ public class CrashData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

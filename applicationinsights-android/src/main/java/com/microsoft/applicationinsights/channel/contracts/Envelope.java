@@ -6,6 +6,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data contract class Envelope.
@@ -81,7 +82,7 @@ public class Envelope implements
     /**
      * Backing field for property Tags.
      */
-    private LinkedHashMap<String, String> tags;
+    private Map<String, String> tags;
     
     /**
      * Backing field for property Data.
@@ -281,7 +282,7 @@ public class Envelope implements
     /**
      * Gets the Tags property.
      */
-    public LinkedHashMap<String, String> getTags() {
+    public Map<String, String> getTags() {
         if (this.tags == null) {
             this.tags = new LinkedHashMap<String, String>();
         }
@@ -291,7 +292,7 @@ public class Envelope implements
     /**
      * Sets the Tags property.
      */
-    public void setTags(LinkedHashMap<String, String> value) {
+    public void setTags(Map<String, String> value) {
         this.tags = value;
     }
     
@@ -349,7 +350,7 @@ public class Envelope implements
         writer.write(JsonHelper.convert(this.time));
         prefix = ",";
         
-        if (!(this.sampleRate == 0.0d))
+        if (this.sampleRate > 0.0d)
         {
             writer.write(prefix + "\"sampleRate\":");
             writer.write(JsonHelper.convert(this.sampleRate));
@@ -440,6 +441,6 @@ public class Envelope implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

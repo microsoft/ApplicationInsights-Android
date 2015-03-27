@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data contract class ExceptionData.
@@ -41,7 +43,7 @@ public class ExceptionData extends Domain implements
     /**
      * Backing field for property Exceptions.
      */
-    private ArrayList<ExceptionDetails> exceptions;
+    private List<ExceptionDetails> exceptions;
     
     /**
      * Backing field for property SeverityLevel.
@@ -61,12 +63,12 @@ public class ExceptionData extends Domain implements
     /**
      * Backing field for property Properties.
      */
-    private LinkedHashMap<String, String> properties;
+    private Map<String, String> properties;
     
     /**
      * Backing field for property Measurements.
      */
-    private LinkedHashMap<String, Double> measurements;
+    private Map<String, Double> measurements;
     
     /**
      * Initializes a new instance of the <see cref="ExceptionData"/> class.
@@ -107,7 +109,7 @@ public class ExceptionData extends Domain implements
     /**
      * Gets the Exceptions property.
      */
-    public ArrayList<ExceptionDetails> getExceptions() {
+    public List<ExceptionDetails> getExceptions() {
         if (this.exceptions == null) {
             this.exceptions = new ArrayList<ExceptionDetails>();
         }
@@ -117,7 +119,7 @@ public class ExceptionData extends Domain implements
     /**
      * Sets the Exceptions property.
      */
-    public void setExceptions(ArrayList<ExceptionDetails> value) {
+    public void setExceptions(List<ExceptionDetails> value) {
         this.exceptions = value;
     }
     
@@ -166,7 +168,7 @@ public class ExceptionData extends Domain implements
     /**
      * Gets the Properties property.
      */
-    public LinkedHashMap<String, String> getProperties() {
+    public Map<String, String> getProperties() {
         if (this.properties == null) {
             this.properties = new LinkedHashMap<String, String>();
         }
@@ -176,14 +178,14 @@ public class ExceptionData extends Domain implements
     /**
      * Sets the Properties property.
      */
-    public void setProperties(LinkedHashMap<String, String> value) {
+    public void setProperties(Map<String, String> value) {
         this.properties = value;
     }
     
     /**
      * Gets the Measurements property.
      */
-    public LinkedHashMap<String, Double> getMeasurements() {
+    public Map<String, Double> getMeasurements() {
         if (this.measurements == null) {
             this.measurements = new LinkedHashMap<String, Double>();
         }
@@ -193,7 +195,7 @@ public class ExceptionData extends Domain implements
     /**
      * Sets the Measurements property.
      */
-    public void setMeasurements(LinkedHashMap<String, Double> value) {
+    public void setMeasurements(Map<String, Double> value) {
         this.measurements = value;
     }
     
@@ -259,6 +261,6 @@ public class ExceptionData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

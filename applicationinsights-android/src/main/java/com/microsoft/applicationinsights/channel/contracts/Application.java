@@ -5,7 +5,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data contract class Application.
@@ -17,6 +17,11 @@ public class Application implements
      * Backing field for property Ver.
      */
     private String ver;
+    
+    /**
+     * Backing field for property Build.
+     */
+    private String build;
     
     /**
      * Initializes a new instance of the <see cref="Application"/> class.
@@ -40,15 +45,32 @@ public class Application implements
         this.ver = value;
     }
     
+    /**
+     * Gets the Build property.
+     */
+    public String getBuild() {
+        return this.build;
+    }
+    
+    /**
+     * Sets the Build property.
+     */
+    public void setBuild(String value) {
+        this.build = value;
+    }
+    
 
     /**
      * Adds all members of this class to a hashmap
      * @param map to which the members of this class will be added.
      */
-    public void addToHashMap(LinkedHashMap<String, String> map)
+    public void addToHashMap(Map<String, String> map)
     {
         if (!(this.ver == null)) {
             map.put("ai.application.ver", this.ver);
+        }
+        if (!(this.build == null)) {
+            map.put("ai.application.build", this.build);
         }
     }
     
@@ -84,6 +106,13 @@ public class Application implements
             prefix = ",";
         }
         
+        if (!(this.build == null))
+        {
+            writer.write(prefix + "\"ai.application.build\":");
+            writer.write(JsonHelper.convert(this.build));
+            prefix = ",";
+        }
+        
         return prefix;
     }
     
@@ -91,6 +120,6 @@ public class Application implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

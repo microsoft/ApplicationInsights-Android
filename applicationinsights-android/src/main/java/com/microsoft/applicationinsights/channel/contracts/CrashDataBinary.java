@@ -234,6 +234,6 @@ public class CrashDataBinary implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

@@ -5,7 +5,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.JsonHelper;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data contract class Operation.
@@ -32,6 +32,16 @@ public class Operation implements
      * Backing field for property RootId.
      */
     private String rootId;
+    
+    /**
+     * Backing field for property SyntheticSource.
+     */
+    private String syntheticSource;
+    
+    /**
+     * Backing field for property IsSynthetic.
+     */
+    private String isSynthetic;
     
     /**
      * Initializes a new instance of the <see cref="Operation"/> class.
@@ -97,12 +107,40 @@ public class Operation implements
         this.rootId = value;
     }
     
+    /**
+     * Gets the SyntheticSource property.
+     */
+    public String getSyntheticSource() {
+        return this.syntheticSource;
+    }
+    
+    /**
+     * Sets the SyntheticSource property.
+     */
+    public void setSyntheticSource(String value) {
+        this.syntheticSource = value;
+    }
+    
+    /**
+     * Gets the IsSynthetic property.
+     */
+    public String getIsSynthetic() {
+        return this.isSynthetic;
+    }
+    
+    /**
+     * Sets the IsSynthetic property.
+     */
+    public void setIsSynthetic(String value) {
+        this.isSynthetic = value;
+    }
+    
 
     /**
      * Adds all members of this class to a hashmap
      * @param map to which the members of this class will be added.
      */
-    public void addToHashMap(LinkedHashMap<String, String> map)
+    public void addToHashMap(Map<String, String> map)
     {
         if (!(this.id == null)) {
             map.put("ai.operation.id", this.id);
@@ -115,6 +153,12 @@ public class Operation implements
         }
         if (!(this.rootId == null)) {
             map.put("ai.operation.rootId", this.rootId);
+        }
+        if (!(this.syntheticSource == null)) {
+            map.put("ai.operation.syntheticSource", this.syntheticSource);
+        }
+        if (!(this.isSynthetic == null)) {
+            map.put("ai.operation.isSynthetic", this.isSynthetic);
         }
     }
     
@@ -171,6 +215,20 @@ public class Operation implements
             prefix = ",";
         }
         
+        if (!(this.syntheticSource == null))
+        {
+            writer.write(prefix + "\"ai.operation.syntheticSource\":");
+            writer.write(JsonHelper.convert(this.syntheticSource));
+            prefix = ",";
+        }
+        
+        if (!(this.isSynthetic == null))
+        {
+            writer.write(prefix + "\"ai.operation.isSynthetic\":");
+            writer.write(JsonHelper.convert(this.isSynthetic));
+            prefix = ",";
+        }
+        
         return prefix;
     }
     
@@ -178,6 +236,6 @@ public class Operation implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }
