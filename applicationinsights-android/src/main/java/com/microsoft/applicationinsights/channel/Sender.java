@@ -104,7 +104,7 @@ public class Sender {
             InternalLogging.error(TAG, e.toString());
             Persistence persistence = Persistence.getInstance();
             if (persistence != null) {
-                persistence.persist(payload);
+                persistence.persist(payload, false); //TODO refactor to support different priorities
             }
         } finally {
             if (writer != null) {
@@ -191,7 +191,7 @@ public class Sender {
         InternalLogging.info(TAG, "Server error, persisting data", payload);
         Persistence persistence = Persistence.getInstance();
         if (persistence != null) {
-            persistence.persist(payload);
+            persistence.persist(payload, false); //TODO refactor to correct priority
         }
     }
 

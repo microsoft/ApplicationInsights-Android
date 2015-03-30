@@ -6,6 +6,7 @@ import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializa
 import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,9 +27,14 @@ public class Persistence {
     private static final Object LOCK = new Object();
 
     /**
-     * The file path for persisted data
+     * The file path for persisted crash data
      */
-    private static final String FILE_PATH = "appInsightsData.json";
+    private static final String HIGH_PRIO_FILE_NAME = "highPrioAppInsightsData.json";
+
+    /**
+     * The file path for persisted telemetry data
+     */
+    private static final String REGULAR_PRIO_FILE_NAME = "regularPrioAppInsightsData.json";
 
     /**
      * The tag for logging
@@ -85,7 +91,7 @@ public class Persistence {
      *
      * @see Persistence#persist(String)
      */
-    public boolean persist(IJsonSerializable[] data) {
+    public boolean persist(IJsonSerializable[] data, Boolean highPriority) {
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess = false;
         try {
@@ -101,7 +107,7 @@ public class Persistence {
 
             buffer.append(']');
             String serializedData = buffer.toString();
-            isSuccess = this.persist(serializedData);
+            isSuccess = this.persist(serializedData, highPriority);
         } catch (IOException e) {
             InternalLogging.error(TAG, e.toString());
             return false;
@@ -116,13 +122,18 @@ public class Persistence {
      * @param data the serializable collection to save
      * @return true if the operation was successful, false otherwise
      */
-    public boolean persist(String data) {
+    public boolean persist(String data, Boolean highPriority) {
         Boolean isSuccess = false;
         Context context = this.getContext();
         if (context != null) {
             FileOutputStream outputStream;
             try {
-                outputStream = context.openFileOutput(FILE_PATH, Context.MODE_PRIVATE);
+                if(highPriority) {
+                    outputStream = context.openFileOutput(HIGH_PRIO_FILE_NAME, Context.MODE_PRIVATE);
+                }
+                else {
+                    outputStream = context.openFileOutput(REGULAR_PRIO_FILE_NAME, Context.MODE_PRIVATE);
+                }
                 outputStream.write(data.getBytes());
                 outputStream.close();
                 isSuccess = true;
@@ -136,16 +147,25 @@ public class Persistence {
     }
 
     /**
-     * Retrieves and deletes the next item from disk todo: support multiple items on disk
+     * Retrieves and deletes the next item from disk. Will return a crash if available.
      *
      * @return the next item from disk or empty string if anything goes wrong
      */
     public String getNextItemFromDisk() {
         StringBuilder buffer = new StringBuilder();
         Context context = this.getContext();
+        String fileName = HIGH_PRIO_FILE_NAME;
+
         if (context != null) {
             try {
-                FileInputStream inputStream = context.openFileInput(FILE_PATH);
+                File highPrioFile = context.getFileStreamPath(HIGH_PRIO_FILE_NAME);
+
+                //if we don't have a highPrio-File available, use the regular prio one
+                if(!highPrioFile.exists()) {
+                    fileName = REGULAR_PRIO_FILE_NAME;
+                }
+
+                FileInputStream inputStream = context.openFileInput(fileName);
                 InputStreamReader streamReader = new InputStreamReader(inputStream);
 
                 BufferedReader reader = new BufferedReader(streamReader);
@@ -160,7 +180,7 @@ public class Persistence {
             }
 
             // always delete the file
-            context.deleteFile(FILE_PATH);
+            context.deleteFile(REGULAR_PRIO_FILE_NAME);
         }
 
         return buffer.toString();
