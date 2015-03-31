@@ -18,9 +18,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * This class records telemetry for application insights.
  */
-public class TelemetryChannel {
+public class Channel {
 
-    private static final String TAG = "TelemetryChannel";
+    private static final String TAG = "Channel";
 
     /**
      * The configuration for this recorder
@@ -53,7 +53,7 @@ public class TelemetryChannel {
      * @param config     The configuration for this channel
      * @param appContext The app context for this channel
      */
-    public TelemetryChannel(TelemetryChannelConfig config, Context appContext) {
+    public Channel(TelemetryChannelConfig config, Context appContext) {
         this.queue = TelemetryQueue.INSTANCE;
         this.config = config;
         this.context = new TelemetryContext(appContext);

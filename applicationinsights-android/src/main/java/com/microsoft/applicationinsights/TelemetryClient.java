@@ -3,7 +3,7 @@ package com.microsoft.applicationinsights;
 import android.app.Application;
 import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
+import com.microsoft.applicationinsights.channel.Channel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
@@ -40,7 +40,7 @@ public class TelemetryClient {
     /**
      * The telemetry channel for this client.
      */
-    protected final TelemetryChannel channel;
+    protected final Channel channel;
 
     /**
      * Properties associated with this telemetryContext.
@@ -68,7 +68,7 @@ public class TelemetryClient {
      * @param config the configuration for this client
      */
     private TelemetryClient(TelemetryClientConfig config, Context context) {
-        this(config, new TelemetryContext(context), new TelemetryChannel(config, context));
+        this(config, new TelemetryContext(context), new Channel(config, context));
     }
 
     /**
@@ -84,7 +84,7 @@ public class TelemetryClient {
     protected TelemetryClient(
             TelemetryClientConfig config,
             TelemetryContext context,
-            TelemetryChannel channel) {
+            Channel channel) {
         this.config = config;
         this.context = context;
         this.channel = channel;
