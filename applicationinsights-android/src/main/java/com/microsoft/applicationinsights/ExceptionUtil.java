@@ -25,6 +25,7 @@ public class ExceptionUtil {
             localException = new Exception();
         }
 
+        // TODO: set handletAt
         // read stack frames
         List<CrashDataThreadFrame> stackFrames = new ArrayList<>();
         StackTraceElement[] stack = localException.getStackTrace();

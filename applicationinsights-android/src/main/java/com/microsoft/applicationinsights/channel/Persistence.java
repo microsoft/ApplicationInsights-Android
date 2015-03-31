@@ -158,6 +158,7 @@ public class Persistence {
 
         if (context != null) {
             try {
+                // TODO: Use multiple files rather than a single one; otherwise payload might be too big
                 File highPrioFile = context.getFileStreamPath(HIGH_PRIO_FILE_NAME);
 
                 //if we don't have a highPrio-File available, use the regular prio one
@@ -179,6 +180,7 @@ public class Persistence {
                 InternalLogging.error(TAG, "Error reading telemetry data from file");
             }
 
+            // TODO: Do not delete the file before it has been successfully sent
             // always delete the file
             context.deleteFile(fileName);
         }

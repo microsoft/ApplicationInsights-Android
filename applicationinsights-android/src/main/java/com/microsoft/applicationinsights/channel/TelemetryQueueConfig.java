@@ -55,6 +55,7 @@ public class TelemetryQueueConfig {
      * Constructs a new INSTANCE of the sender config
      */
     public TelemetryQueueConfig() {
+        // TODO: Create several configs for queue and sender
         this.lock = new Object();
         this.maxBatchCount = TelemetryQueueConfig.DEFAULT_MAX_BATCH_COUNT;
         this.maxBatchIntervalMs = TelemetryQueueConfig.DEFAULT_MAX_BATCH_INTERVAL_MS;

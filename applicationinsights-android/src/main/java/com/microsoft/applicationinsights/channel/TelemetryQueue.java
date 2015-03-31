@@ -188,6 +188,7 @@ public class TelemetryQueue {
             }
 
             if (data != null) {
+                // TODO: Persist items before sending them (otherwise they'll get lost in case of app crash)
                 if (this.queue.isCrashing) {
                     // persist the queue if the app is crashing
                     Persistence persistence = Persistence.getInstance();

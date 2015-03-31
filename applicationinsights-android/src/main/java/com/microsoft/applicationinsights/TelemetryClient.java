@@ -82,10 +82,12 @@ public class TelemetryClient {
      * @param channel the channel for this client
      */
     protected TelemetryClient(
+            // TODO: TelemetryClientConfig should be member of LifecycleTracking
             TelemetryClientConfig config,
             TelemetryContext context,
             Channel channel) {
         this.config = config;
+        // TODO: Maybe the context should be owned by the factory, which creates envelops.
         this.context = context;
         this.channel = channel;
     }
@@ -198,6 +200,7 @@ public class TelemetryClient {
      *                   supersede values set in {@link TelemetryClient#setCommonProperties}.
      */
     public void trackTrace(String message, Map<String, String> properties) {
+        // TODO: Create objects in background, since this will block the main thread
         MessageData telemetry = new MessageData();
 
         telemetry.setMessage(this.ensureNotNull(message));
@@ -338,6 +341,7 @@ public class TelemetryClient {
             telemetry.setProperties(map);
         }
 
+        // TODO: Check if persistence is busy (max file size reached) before enqueuing another item -> app crash
         // enqueue to channel
         this.channel.enqueue(telemetry, context.getContextTags());
     }
@@ -361,6 +365,7 @@ public class TelemetryClient {
      */
     public void enableCrashTracking(Context context) {
         if (context != null) {
+            // TODO: In case of multiple client instance, this should be done somewhere else + only once
             ExceptionTracking.registerExceptionHandler(context);
         } else {
             InternalLogging.warn(TAG, "Unable to register ExceptionHandler, context is null");

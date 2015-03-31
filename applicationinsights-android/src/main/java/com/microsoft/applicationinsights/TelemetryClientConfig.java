@@ -7,6 +7,7 @@ import com.microsoft.applicationinsights.channel.TelemetryChannelConfig;
 /**
  * Configuration object when instantiating TelemetryClient
  */
+// TODO: Rename class to something like SessionConfig
 public class TelemetryClientConfig extends TelemetryChannelConfig {
 
     /**
