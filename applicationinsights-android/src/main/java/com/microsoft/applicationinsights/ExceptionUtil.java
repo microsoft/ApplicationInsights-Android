@@ -10,13 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Created by benny on 31.03.15.
- */
 public class ExceptionUtil {
 
-    //TODO get method signature from somewhere else
-    protected static CrashData createCrashData(Throwable exception, Map<String, String> properties, String packageName) {
+    //TODO get packageName from somewhere else
+    public static CrashData createCrashData(Throwable exception, Map<String, String> properties, String packageName) {
         Throwable localException = exception;
         if (localException == null) {
             localException = new Exception();

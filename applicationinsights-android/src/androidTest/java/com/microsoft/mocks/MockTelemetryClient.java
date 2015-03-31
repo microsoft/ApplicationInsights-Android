@@ -2,12 +2,15 @@ package com.microsoft.mocks;
 
 import android.content.Context;
 
+import com.microsoft.applicationinsights.ExceptionUtil;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryClientConfig;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
+import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MockTelemetryClient extends TelemetryClient {
     public ArrayList<ITelemetry> messages;
@@ -30,6 +33,17 @@ public class MockTelemetryClient extends TelemetryClient {
             messages.add(telemetry);
         } else {
             super.track(telemetry);
+        }
+    }
+
+    @Override
+    public void trackUnhandledException(Throwable unhandledException, Map<String, String> properties) {
+        if(this.mockTrackMethod) {
+            CrashData data = ExceptionUtil.createCrashData(unhandledException, properties, context.getPackageName()); //TODO mock this one for real
+            messages.add(data);
+        }
+        else {
+            super.trackUnhandledException(unhandledException, properties);
         }
     }
 
