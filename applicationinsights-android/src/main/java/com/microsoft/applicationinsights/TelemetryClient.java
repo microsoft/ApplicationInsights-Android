@@ -6,9 +6,6 @@ import android.content.Context;
 import com.microsoft.applicationinsights.channel.TelemetryChannel;
 import com.microsoft.applicationinsights.channel.TelemetryContext;
 import com.microsoft.applicationinsights.channel.contracts.CrashData;
-import com.microsoft.applicationinsights.channel.contracts.CrashDataHeaders;
-import com.microsoft.applicationinsights.channel.contracts.CrashDataThread;
-import com.microsoft.applicationinsights.channel.contracts.CrashDataThreadFrame;
 import com.microsoft.applicationinsights.channel.contracts.DataPoint;
 import com.microsoft.applicationinsights.channel.contracts.DataPointType;
 import com.microsoft.applicationinsights.channel.contracts.EventData;
@@ -21,7 +18,6 @@ import com.microsoft.applicationinsights.channel.logging.InternalLogging;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * The public API for recording application insights telemetry.
@@ -178,7 +174,7 @@ public class TelemetryClient {
 
         EventData telemetry = new EventData();
 
-        telemetry.setName(this.ensureValid(eventName));
+        telemetry.setName(this.ensureNotNull(eventName));
         telemetry.setProperties(properties);
         telemetry.setMeasurements(measurements);
 
@@ -204,7 +200,7 @@ public class TelemetryClient {
     public void trackTrace(String message, Map<String, String> properties) {
         MessageData telemetry = new MessageData();
 
-        telemetry.setMessage(this.ensureValid(message));
+        telemetry.setMessage(this.ensureNotNull(message));
         telemetry.setProperties(properties);
 
         track(telemetry);
@@ -226,7 +222,7 @@ public class TelemetryClient {
         data.setKind(DataPointType.Measurement);
         data.setMax(value);
         data.setMax(value);
-        data.setName(this.ensureValid(name));
+        data.setName(this.ensureNotNull(name));
         data.setValue(value);
         List<DataPoint> metricsList = new ArrayList<DataPoint>();
         metricsList.add(data);
@@ -239,56 +235,41 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackException(Throwable, Map)
+     * @see TelemetryClient#trackHandledException(Throwable, Map)
      */
-    public void trackException(Throwable exception) {
-        this.trackException(exception, null, false);
+    public void trackHandledException(Throwable handledException) {
+        this.trackHandledException(handledException, null);
     }
 
     /**
-     * Sends information about an exception to Application Insights.
+     * Sends information about an handledException to Application Insights.
      *
-     * @param exception  The exception to track.
+     * @param handledException  The handledException to track.
      * @param properties Custom properties associated with the event. Note: values set here will
      *                   supersede values set in {@link TelemetryClient#setCommonProperties}.
      */
-    public void trackException(Throwable exception, Map<String, String> properties, Boolean isUnhandledException) {
+    public void trackHandledException(Throwable handledException, Map<String, String> properties) {
+        CrashData crashData = ExceptionUtil.createCrashData(handledException, properties, this.context.getPackageName());
+        track(crashData);
+    }
 
-        Throwable localException = exception;
-        if (localException == null) {
-            localException = new Exception();
+    public void trackUnhandledException(Throwable unhandledException, Map<String, String> properties) {
+        CrashData crashData = ExceptionUtil.createCrashData(unhandledException, properties, this.context.getPackageName());
+
+        // set the version
+        crashData.setVer(TelemetryClient.CONTRACT_VERSION);
+
+        // add common properties to this telemetry object
+        if (this.commonProperties != null) {
+            Map<String, String> map = crashData.getProperties();
+            if (map != null) {
+                map.putAll(this.commonProperties);
+            }
+
+            crashData.setProperties(map);
         }
 
-        // read stack frames
-        List<CrashDataThreadFrame> stackFrames = new ArrayList<>();
-        StackTraceElement[] stack = localException.getStackTrace();
-        for (int i = stack.length - 1; i >= 0; i--) {
-            StackTraceElement rawFrame = stack[i];
-            CrashDataThreadFrame frame = new CrashDataThreadFrame();
-            frame.setSymbol(rawFrame.toString());
-            stackFrames.add(frame);
-            frame.setAddress("");
-        }
-
-        CrashDataThread crashDataThread = new CrashDataThread();
-        crashDataThread.setFrames(stackFrames);
-        List<CrashDataThread> threads = new ArrayList<>(1);
-        threads.add(crashDataThread);
-
-        CrashDataHeaders crashDataHeaders = new CrashDataHeaders();
-        crashDataHeaders.setId(UUID.randomUUID().toString());
-
-        String message = localException.getMessage();
-        crashDataHeaders.setExceptionReason(this.ensureValid(message));
-        crashDataHeaders.setExceptionType(localException.getClass().getName());
-        crashDataHeaders.setApplicationPath(this.context.getPackageName());
-
-        CrashData crashData = new CrashData();
-        crashData.setThreads(threads);
-        crashData.setHeaders(crashDataHeaders);
-        crashData.setProperties(properties);
-
-        track(crashData, isUnhandledException);
+        this.channel.processUnhandledException(crashData, context.getContextTags());
     }
 
     /**
@@ -325,7 +306,7 @@ public class TelemetryClient {
 
         PageViewData telemetry = new PageViewData();
 
-        telemetry.setName(this.ensureValid(pageName));
+        telemetry.setName(this.ensureNotNull(pageName));
         telemetry.setUrl(null);
 
         // todo: measure page-load duration and set telemetry.setDuration
@@ -336,23 +317,14 @@ public class TelemetryClient {
         track(telemetry);
     }
 
-    /**
-     * Sends telemetry to the queue for transmission to Application Insights.
-     *
-     * @param telemetry The telemetry object to enqueue.
-     */
-    public void track(ITelemetry telemetry) {
-        track(telemetry, false);
-    }
 
     /**
      * Sends telemetry to the queue for transmission to Application Insights.
      * If isUnhandledException is true, the queue will persist instead of send the data.
      *
      * @param telemetry The telemetry object to enqueue.
-     * @param isUnhandledException flag to indicate that we have an unhandled exception
      */
-    protected void track(ITelemetry telemetry, Boolean isUnhandledException) {
+    public void track(ITelemetry telemetry) {
         // set the version
         telemetry.setVer(TelemetryClient.CONTRACT_VERSION);
 
@@ -367,7 +339,7 @@ public class TelemetryClient {
         }
 
         // enqueue to channel
-        this.channel.enqueue(telemetry, context.getContextTags(), isUnhandledException);
+        this.channel.enqueue(telemetry, context.getContextTags());
     }
 
     /**
@@ -376,7 +348,7 @@ public class TelemetryClient {
      * {@link com.microsoft.applicationinsights.channel.TelemetryQueueConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
-    public void flush() {
+    public void flush() { //TODO remove this because the client shouldn't have to deal with flushing the queue!
         this.channel.getQueue().flush();
     }
 
@@ -411,7 +383,7 @@ public class TelemetryClient {
     /**
      * Ensures required string values are non-null
      */
-    private String ensureValid(String input) {
+    private String ensureNotNull(String input) {
         if (input == null) {
             return "";
         } else {

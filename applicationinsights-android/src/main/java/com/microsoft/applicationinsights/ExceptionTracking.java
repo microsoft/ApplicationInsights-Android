@@ -91,7 +91,7 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
         }
 
         // track the crash
-        this.telemetryClient.trackException(exception, properties, true);
+        this.telemetryClient.trackUnhandledException(exception, properties);
 
         // invoke the existing handler if requested and if it exists
         if (!this.ignoreDefaultHandler && this.preexistingExceptionHandler != null) {

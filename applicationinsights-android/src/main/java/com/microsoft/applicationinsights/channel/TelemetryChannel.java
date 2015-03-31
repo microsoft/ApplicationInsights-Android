@@ -5,6 +5,7 @@ import android.content.Context;
 import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.Data;
 import com.microsoft.applicationinsights.channel.contracts.Envelope;
+import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.channel.logging.InternalLogging;
@@ -84,7 +85,7 @@ public class TelemetryChannel {
      * @param telemetry The telemetry to record
      */
     public void enqueue(ITelemetry telemetry) {
-        this.enqueue(telemetry, null, false);
+        this.enqueue(telemetry, null);
     }
 
     /**
@@ -93,8 +94,8 @@ public class TelemetryChannel {
      * @param telemetry The telemetry to record
      * @param tags      The optional context tags for this telemetry
      */
-    public void enqueue(ITelemetry telemetry, Map<String, String> tags, Boolean isUnhandledException) {
-        this.queue.isCrashing = isUnhandledException;
+    public void enqueue(ITelemetry telemetry, Map<String, String> tags) {
+        this.queue.isCrashing = false;
 
         // wrap the data in the common schema envelope
         Envelope envelope = this.getEnvelope(telemetry, tags);
@@ -103,6 +104,26 @@ public class TelemetryChannel {
         this.queue.enqueue(envelope);
 
         InternalLogging.info(TAG, "enqueued telemetry", telemetry.getBaseType());
+    }
+
+    public void processUnhandledException(CrashData crashData, Map<String, String> tags) {
+        this.queue.isCrashing = true;
+
+        Envelope envelope = this.getEnvelope(crashData, tags);
+
+        IJsonSerializable[] data = new IJsonSerializable[1];
+        data[0] = envelope;
+
+        Persistence persistence = Persistence.getInstance();
+        if (persistence != null) {
+            persistence.persist(data, true);
+        }
+        else {
+            InternalLogging.info(TAG, "error persisting crash", crashData.toString());
+        }
+
+        this.queue.isCrashing = true;
+        this.queue.flush();
     }
 
     /**

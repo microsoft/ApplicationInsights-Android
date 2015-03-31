@@ -91,13 +91,13 @@ public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
         LinkedHashMap<String, String> properties = new LinkedHashMap<>();
         LinkedHashMap<String, Double> measurements = new LinkedHashMap<>();
 
-        client.trackException(null);
-        client.trackException(new Exception());
+        client.trackHandledException(null);
+        client.trackHandledException(new Exception());
         try {
             throw new InvalidObjectException("this is expected");
         } catch (InvalidObjectException exception) {
-            client.trackException(exception);
-            client.trackException(exception, properties, true);
+            client.trackHandledException(exception);
+            client.trackHandledException(exception, properties);
         }
     }
 
