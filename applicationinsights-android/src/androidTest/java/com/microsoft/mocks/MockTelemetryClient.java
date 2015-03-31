@@ -29,7 +29,16 @@ public class MockTelemetryClient extends TelemetryClient {
         if(this.mockTrackMethod) {
             messages.add(telemetry);
         } else {
-            super.track(telemetry);
+            this.track(telemetry, false);
+        }
+    }
+
+    @Override
+    protected void track(ITelemetry telemetry, Boolean isUnhandledException) {
+        if(this.mockTrackMethod) {
+            messages.add(telemetry);
+        } else {
+            super.track(telemetry, isUnhandledException);
         }
     }
 

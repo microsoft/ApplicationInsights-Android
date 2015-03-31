@@ -180,7 +180,7 @@ public class Persistence {
             }
 
             // always delete the file
-            context.deleteFile(REGULAR_PRIO_FILE_NAME);
+            context.deleteFile(fileName);
         }
 
         return buffer.toString();

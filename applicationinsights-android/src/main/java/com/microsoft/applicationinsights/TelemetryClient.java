@@ -352,7 +352,7 @@ public class TelemetryClient {
      * @param telemetry The telemetry object to enqueue.
      * @param isUnhandledException flag to indicate that we have an unhandled exception
      */
-    private void track(ITelemetry telemetry, Boolean isUnhandledException) {
+    protected void track(ITelemetry telemetry, Boolean isUnhandledException) {
         // set the version
         telemetry.setVer(TelemetryClient.CONTRACT_VERSION);
 
