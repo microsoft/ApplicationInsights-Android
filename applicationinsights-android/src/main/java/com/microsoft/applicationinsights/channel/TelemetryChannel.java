@@ -126,6 +126,8 @@ public class TelemetryChannel {
         this.queue.flush();
     }
 
+
+    //TODOMove this somewhere else ("EnvelopeManager")?
     /**
      * Wraps the telemetry item in a common schema envelope with context.
      *
@@ -163,6 +165,5 @@ public class TelemetryChannel {
 
         return envelope;
     }
-
 
 }

@@ -249,12 +249,12 @@ public class TelemetryClient {
      *                   supersede values set in {@link TelemetryClient#setCommonProperties}.
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
-        CrashData crashData = ExceptionUtil.createCrashData(handledException, properties, this.context.getPackageName());
+        CrashData crashData = ExceptionUtil.getCrashData(handledException, properties, this.context.getPackageName());
         track(crashData);
     }
 
     public void trackUnhandledException(Throwable unhandledException, Map<String, String> properties) {
-        CrashData crashData = ExceptionUtil.createCrashData(unhandledException, properties, this.context.getPackageName());
+        CrashData crashData = ExceptionUtil.getCrashData(unhandledException, properties, this.context.getPackageName());
 
         // set the version
         crashData.setVer(TelemetryClient.CONTRACT_VERSION);
@@ -263,7 +263,7 @@ public class TelemetryClient {
         if (this.commonProperties != null) {
             Map<String, String> map = crashData.getProperties();
             if (map != null) {
-                map.putAll(this.commonProperties);
+                map.putAll(this.commonProperties); //TODO do this somewhere else?
             }
 
             crashData.setProperties(map);
@@ -348,7 +348,7 @@ public class TelemetryClient {
      * {@link com.microsoft.applicationinsights.channel.TelemetryQueueConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
-    public void flush() { //TODO remove this because the client shouldn't have to deal with flushing the queue!
+    public void flush() { //TODO remove this because the client shouldn't have to deal with flushing the queue?
         this.channel.getQueue().flush();
     }
 

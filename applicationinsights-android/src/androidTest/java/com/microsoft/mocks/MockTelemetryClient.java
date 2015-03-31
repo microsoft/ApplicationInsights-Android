@@ -39,7 +39,7 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackUnhandledException(Throwable unhandledException, Map<String, String> properties) {
         if(this.mockTrackMethod) {
-            CrashData data = ExceptionUtil.createCrashData(unhandledException, properties, context.getPackageName()); //TODO mock this one for real
+            CrashData data = ExceptionUtil.getCrashData(unhandledException, properties, context.getPackageName()); //TODO mock this one for real
             messages.add(data);
         }
         else {

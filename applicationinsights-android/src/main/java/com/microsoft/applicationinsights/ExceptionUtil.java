@@ -1,11 +1,17 @@
 package com.microsoft.applicationinsights;
 
+import com.microsoft.applicationinsights.channel.Util;
 import com.microsoft.applicationinsights.channel.contracts.CrashData;
 import com.microsoft.applicationinsights.channel.contracts.CrashDataHeaders;
 import com.microsoft.applicationinsights.channel.contracts.CrashDataThread;
 import com.microsoft.applicationinsights.channel.contracts.CrashDataThreadFrame;
+import com.microsoft.applicationinsights.channel.contracts.Data;
+import com.microsoft.applicationinsights.channel.contracts.Envelope;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -13,7 +19,7 @@ import java.util.UUID;
 public class ExceptionUtil {
 
     //TODO get packageName from somewhere else
-    public static CrashData createCrashData(Throwable exception, Map<String, String> properties, String packageName) {
+    public static CrashData getCrashData(Throwable exception, Map<String, String> properties, String packageName) {
         Throwable localException = exception;
         if (localException == null) {
             localException = new Exception();
@@ -50,6 +56,7 @@ public class ExceptionUtil {
 
         return crashData;
     }
+
 
     /**
      * Ensures required string values are non-null
