@@ -108,6 +108,8 @@ public class TelemetryContext {
      */
     public TelemetryContext(Context appContext, String instrumentationKey) {
 
+        this.operation = new Operation();
+
         // note: isContextLoaded must be volatile for the double-checked LOCK to work
         if (!TelemetryContext.isContextLoaded && appContext != null) {
             synchronized (TelemetryContext.LOCK) {
@@ -138,8 +140,6 @@ public class TelemetryContext {
                 }
             }
         }
-
-        this.operation = new Operation();
     }
 
     /**
