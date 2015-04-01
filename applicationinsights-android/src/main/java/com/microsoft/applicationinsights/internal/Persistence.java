@@ -63,6 +63,7 @@ public class Persistence {
      */
     protected Persistence(Context context) {
         this.weakContext = new WeakReference<Context>(context);
+        createDirectoriesIfNecessary();
     }
 
     /**
@@ -77,6 +78,7 @@ public class Persistence {
                 if (!Persistence.isPersistenceLoaded) {
                     Persistence.isPersistenceLoaded = true;
                     Persistence.instance = new Persistence(context);
+
                 }
             }
         }
@@ -96,7 +98,7 @@ public class Persistence {
     /**
      * Serializes the input and calls:
      *
-     * @see Persistence#persist(String)
+     * @see Persistence#persist(String, Boolean)
      */
     public boolean persist(IJsonSerializable[] data, Boolean highPriority) {
         StringBuilder buffer = new StringBuilder();
@@ -130,9 +132,8 @@ public class Persistence {
      * @return true if the operation was successful, false otherwise
      */
     public boolean persist(String data, Boolean highPriority) {
-        this.createDirectoriesIfNecessary();
-
         if(!this.isFreeSpaceAvailable()) {
+            InternalLogging.warn(TAG, "No free space on disk to persist data.");
             return false;
         }
 
@@ -142,13 +143,17 @@ public class Persistence {
             FileOutputStream outputStream;
             try {
                 File filesDir = getContext().getFilesDir();
-                String path = filesDir.getPath();
+                //String path = filesDir.getPath();
                 //TODO writing doesn't work as we now have path seperators
                 if(highPriority) {
-                    outputStream = context.openFileOutput(path + HIGH_PRIO_DIRECTORY + HIGH_PRIO_FILE_NAME, Context.MODE_PRIVATE);
+                    filesDir = new File(filesDir + HIGH_PRIO_DIRECTORY + HIGH_PRIO_FILE_NAME);
+                    outputStream = new FileOutputStream(filesDir, true);
+                    //outputStream = context.openFileOutput(path + HIGH_PRIO_DIRECTORY + HIGH_PRIO_FILE_NAME, Context.MODE_PRIVATE);
                 }
                 else {
-                    outputStream = context.openFileOutput(path + REGULAR_PRIO_DIRECTORY + REGULAR_PRIO_FILE_NAME, Context.MODE_PRIVATE);
+                    filesDir = new File(filesDir + REGULAR_PRIO_DIRECTORY + REGULAR_PRIO_FILE_NAME);
+                    outputStream = new FileOutputStream(filesDir, true);
+                    //outputStream = context.openFileOutput(path + REGULAR_PRIO_DIRECTORY + REGULAR_PRIO_FILE_NAME, Context.MODE_PRIVATE);
                 }
                 outputStream.write(data.getBytes());
                 outputStream.close();
