@@ -34,21 +34,32 @@ public class TelemetryContext {
     protected static final String USER_ID_KEY = "USER_ID";
     protected static final String USER_ACQ_KEY = "USER_ACQ";
     protected static final String SDK_VERSION = "1.0-a.2";
+    private static final String TAG = "TelemetryContext";
 
     /**
-     * Synchronization lock for setting static context
+     * Synchronization LOCK for setting static context
      */
-    private static final Object lock = new Object();
+    private static final Object LOCK = new Object();
 
     /**
-     * Android app telemetryContext.
+     * Volatile boolean for double checked synchronize block
      */
-    private static Context androidAppContext;
+    private static volatile boolean isContextLoaded = false;
 
     /**
-     * The shared preferences instance for reading persistent context
+     * The shared preferences INSTANCE for reading persistent context
      */
     private static SharedPreferences settings;
+
+    /**
+     * Content for tags field of an envelope
+     */
+    private static Map<String, String> cachedTags;
+
+    /**
+     * Device telemetryContext.
+     */
+    private static String instrumentationKey;
 
     /**
      * Device telemetryContext.
@@ -89,6 +100,55 @@ public class TelemetryContext {
      * Operation telemetryContext.
      */
     private Operation operation;
+
+    /**
+     * Constructs a new INSTANCE of the Telemetry telemetryContext tag keys
+     *
+     * @param appContext the context for this telemetryContext
+     */
+    public TelemetryContext(Context appContext, String instrumentationKey) {
+
+        // note: isContextLoaded must be volatile for the double-checked LOCK to work
+        if (!TelemetryContext.isContextLoaded && appContext != null) {
+            synchronized (TelemetryContext.LOCK) {
+                if (!TelemetryContext.isContextLoaded) {
+                    TelemetryContext.isContextLoaded = true;
+
+                    // get an INSTANCE of the shared preferences manager for persistent context fields
+                    TelemetryContext.settings = appContext.getSharedPreferences(
+                            TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+
+                    // initialize static context
+                    TelemetryContext.device = new Device();
+                    TelemetryContext.session = new Session();
+                    TelemetryContext.user = new User();
+                    TelemetryContext.internal = new Internal();
+                    TelemetryContext.application = new Application();
+                    TelemetryContext.lastSessionId = null;
+                    TelemetryContext.instrumentationKey = instrumentationKey;
+                    TelemetryContext.cachedTags = getCachedTags();
+                    TelemetryContext.setDeviceContext(appContext);
+                    TelemetryContext.setSessionContext();
+                    TelemetryContext.setUserContext();
+                    TelemetryContext.setAppContext(appContext);
+                    TelemetryContext.setInternalContext();
+
+                    // initialize persistence
+                    Persistence.initialize(appContext);
+                }
+            }
+        }
+
+        this.operation = new Operation();
+    }
+
+    /**
+     * Get user the instrumentationKey.
+     */
+    public String getInstrumentationKey() {
+        return instrumentationKey;
+    }
+
 
     /**
      * Get user telemetryContext.
@@ -135,55 +195,27 @@ public class TelemetryContext {
     }
 
     /**
-     * Constructs a new instance of the Telemetry telemetryContext tag keys
-     *
-     * @param config the configuration for this telemetryContext
-     */
-    public TelemetryContext(TelemetryChannelConfig config) {
-
-        if (TelemetryContext.androidAppContext == null) {
-            synchronized (TelemetryContext.lock) {
-                TelemetryContext.androidAppContext = config.getAppContext();
-
-                // get an instance of the shared preferences manager for persistent context fields
-                TelemetryContext.settings = TelemetryContext.androidAppContext.getSharedPreferences(
-                        TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-
-                // initialize static context
-                TelemetryContext.device = new Device();
-                TelemetryContext.session = new Session();
-                TelemetryContext.user = new User();
-                TelemetryContext.internal = new Internal();
-                TelemetryContext.application = new Application();
-                TelemetryContext.lastSessionId = null;
-
-                TelemetryContext.setDeviceContext();
-                TelemetryContext.setSessionContext();
-                TelemetryContext.setUserContext();
-                TelemetryContext.setAppContext();
-                TelemetryContext.setInternalContext();
-            }
-        }
-
-        this.operation = new Operation();
-    }
-
-    /**
      * @return a map of the context tags assembled in the required data contract format.
      */
-    public LinkedHashMap<String, String> getContextTags() {
+    private Map<String, String> getCachedTags() {
 
-        // create a new hash map and add all context to it
-        LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        TelemetryContext.application.addToHashMap(map);
-        TelemetryContext.device.addToHashMap(map);
-        TelemetryContext.session.addToHashMap(map);
-        TelemetryContext.user.addToHashMap(map);
-        TelemetryContext.internal.addToHashMap(map);
+        if(cachedTags == null) {
+            // create a new hash map and add all context to it
+            cachedTags = new LinkedHashMap<>();
+            TelemetryContext.application.addToHashMap(cachedTags);
+            TelemetryContext.user.addToHashMap(cachedTags);
+            TelemetryContext.internal.addToHashMap(cachedTags);
+            this.operation.addToHashMap(cachedTags);
+        }
+        return cachedTags;
+    }
 
-        this.operation.addToHashMap(map);
-
-        return map;
+    public Map<String, String> getContextTags() {
+        Map<String, String> contextTags = new LinkedHashMap<>();
+        TelemetryContext.cachedTags.putAll(contextTags);
+        TelemetryContext.device.addToHashMap(contextTags);
+        TelemetryContext.session.addToHashMap(contextTags);
+        return cachedTags;
     }
 
     /**
@@ -212,13 +244,13 @@ public class TelemetryContext {
     /**
      * Sets the application telemetryContext tags
      */
-    protected static void setAppContext() {
+    protected static void setAppContext(Context appContext) {
         TelemetryContext.appIdForEnvelope = "";
 
         try {
-            final PackageManager manager = TelemetryContext.androidAppContext.getPackageManager();
+            final PackageManager manager = appContext.getPackageManager();
             final PackageInfo info = manager
-                    .getPackageInfo(TelemetryContext.androidAppContext.getPackageName(), 0);
+                    .getPackageInfo(appContext.getPackageName(), 0);
 
             if (info.packageName != null) {
                 TelemetryContext.appIdForEnvelope = info.packageName;
@@ -229,7 +261,7 @@ public class TelemetryContext {
             Application context = TelemetryContext.application;
             context.setVer(ver);
         } catch (PackageManager.NameNotFoundException e) {
-            InternalLogging._warn("TelemetryContext", "Could not collect application context");
+            InternalLogging.warn("TelemetryContext", "Could not collect application context");
         }
     }
 
@@ -259,7 +291,7 @@ public class TelemetryContext {
     /**
      * Sets the device telemetryContext tags
      */
-    protected static void setDeviceContext() {
+    protected static void setDeviceContext(Context appContext) {
         Device context = TelemetryContext.device;
 
         context.setOsVersion(Build.VERSION.RELEASE);
@@ -269,7 +301,7 @@ public class TelemetryContext {
         context.setLocale(Locale.getDefault().toString());
 
         // get device ID
-        ContentResolver resolver = TelemetryContext.androidAppContext.getContentResolver();
+        ContentResolver resolver = appContext.getContentResolver();
         String deviceIdentifier = Settings.Secure.getString(resolver, Settings.Secure.ANDROID_ID);
         if (deviceIdentifier != null) {
             context.setId(Util.tryHashStringSha256(deviceIdentifier));
@@ -277,7 +309,7 @@ public class TelemetryContext {
 
         // check device type
         final TelephonyManager telephonyManager = (TelephonyManager)
-                TelemetryContext.androidAppContext.getSystemService(Context.TELEPHONY_SERVICE);
+                appContext.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE) {
             context.setType("Phone");
         } else {
@@ -286,7 +318,7 @@ public class TelemetryContext {
 
         // check network type
         final ConnectivityManager connectivityManager = (ConnectivityManager)
-                TelemetryContext.androidAppContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null) {
             int networkType = activeNetwork.getType();
@@ -296,6 +328,11 @@ public class TelemetryContext {
                     break;
                 case ConnectivityManager.TYPE_MOBILE:
                     context.setNetwork("Mobile");
+                    break;
+                default:
+                    context.setNetwork("Unknown");
+                    InternalLogging.warn(TAG, "Unknown network type:" + networkType);
+                    break;
             }
         }
 
@@ -310,7 +347,8 @@ public class TelemetryContext {
      */
     protected static void setInternalContext() {
         Internal context = TelemetryContext.internal;
+
+        // todo: pull version from gradle.properties
         context.setSdkVersion("Android:" + TelemetryContext.SDK_VERSION);
     }
 }
-

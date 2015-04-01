@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.internal.Channel;
+import com.microsoft.applicationinsights.internal.EnvelopeFactory;
 import com.microsoft.applicationinsights.internal.TelemetryContext;
 import com.microsoft.applicationinsights.contracts.CrashData;
 import com.microsoft.applicationinsights.contracts.DataPoint;
@@ -69,7 +70,7 @@ public class TelemetryClient {
      * @param config the configuration for this client
      */
     private TelemetryClient(TelemetryClientConfig config, Context context) {
-        this(config, new TelemetryContext(context), new Channel(config, context));
+        this(config, new TelemetryContext(context, config.getInstrumentationKey()), new Channel());
     }
 
     /**
@@ -272,8 +273,9 @@ public class TelemetryClient {
 
             crashData.setProperties(map);
         }
+        Envelope envelope = EnvelopeFactory.INSTANCE.createEnvelope(crashData);
 
-        this.channel.processUnhandledException(crashData, context.getContextTags());
+        this.channel.processUnhandledException(envelope);
     }
 
     /**
@@ -338,13 +340,13 @@ public class TelemetryClient {
             if (map != null) {
                 map.putAll(this.commonProperties);
             }
-
             telemetry.setProperties(map);
         }
 
+        Envelope envelope = EnvelopeFactory.INSTANCE.createEnvelope(telemetry);
         // TODO: Check if persistence is busy (max file size reached) before enqueuing another item -> app crash
         // enqueue to channel
-        this.channel.enqueue(telemetry, context.getContextTags());
+        this.channel.enqueue(envelope);
     }
 
     /**
