@@ -92,6 +92,7 @@ public class TelemetryClient {
         // TODO: Maybe the context should be owned by the factory, which creates envelops.
         this.context = context;
         this.channel = channel;
+        EnvelopeFactory.INSTANCE.configureWithTelemetryContext(this.context);
     }
 
     /**
