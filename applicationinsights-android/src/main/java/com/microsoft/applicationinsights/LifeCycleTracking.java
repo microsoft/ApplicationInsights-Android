@@ -6,8 +6,8 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.microsoft.applicationinsights.channel.contracts.SessionState;
-import com.microsoft.applicationinsights.channel.contracts.SessionStateData;
+import com.microsoft.applicationinsights.contracts.SessionState;
+import com.microsoft.applicationinsights.contracts.SessionStateData;
 
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;

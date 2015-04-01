@@ -3,17 +3,18 @@ package com.microsoft.applicationinsights;
 import android.app.Application;
 import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.Channel;
-import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.applicationinsights.channel.contracts.CrashData;
-import com.microsoft.applicationinsights.channel.contracts.DataPoint;
-import com.microsoft.applicationinsights.channel.contracts.DataPointType;
-import com.microsoft.applicationinsights.channel.contracts.EventData;
-import com.microsoft.applicationinsights.channel.contracts.MessageData;
-import com.microsoft.applicationinsights.channel.contracts.MetricData;
-import com.microsoft.applicationinsights.channel.contracts.PageViewData;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.channel.logging.InternalLogging;
+import com.microsoft.applicationinsights.contracts.Envelope;
+import com.microsoft.applicationinsights.internal.Channel;
+import com.microsoft.applicationinsights.internal.TelemetryContext;
+import com.microsoft.applicationinsights.contracts.CrashData;
+import com.microsoft.applicationinsights.contracts.DataPoint;
+import com.microsoft.applicationinsights.contracts.DataPointType;
+import com.microsoft.applicationinsights.contracts.EventData;
+import com.microsoft.applicationinsights.contracts.MessageData;
+import com.microsoft.applicationinsights.contracts.MetricData;
+import com.microsoft.applicationinsights.contracts.PageViewData;
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -349,7 +350,7 @@ public class TelemetryClient {
     /**
      * Triggers an asynchronous flush of queued telemetry.
      * note: this will be called
-     * {@link com.microsoft.applicationinsights.channel.TelemetryQueueConfig#maxBatchIntervalMs} after
+     * {@link com.microsoft.applicationinsights.internal.TelemetryQueueConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public void flush() { //TODO call flus() on the channel and not on the queue!

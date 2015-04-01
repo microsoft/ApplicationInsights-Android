@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.channel.TelemetryQueueConfig;
+import com.microsoft.applicationinsights.internal.TelemetryQueueConfig;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockQueue;
 import com.microsoft.mocks.MockTelemetryClient;

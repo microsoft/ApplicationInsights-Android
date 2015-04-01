@@ -9,9 +9,9 @@ import android.os.Build;
 import android.os.IBinder;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.channel.contracts.SessionState;
-import com.microsoft.applicationinsights.channel.contracts.SessionStateData;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.contracts.SessionState;
+import com.microsoft.applicationinsights.contracts.SessionStateData;
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockApplication;
 import com.microsoft.mocks.MockLifeCycleTracking;

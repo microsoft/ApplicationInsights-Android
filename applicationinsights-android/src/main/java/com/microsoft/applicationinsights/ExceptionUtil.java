@@ -1,17 +1,11 @@
 package com.microsoft.applicationinsights;
 
-import com.microsoft.applicationinsights.channel.Util;
-import com.microsoft.applicationinsights.channel.contracts.CrashData;
-import com.microsoft.applicationinsights.channel.contracts.CrashDataHeaders;
-import com.microsoft.applicationinsights.channel.contracts.CrashDataThread;
-import com.microsoft.applicationinsights.channel.contracts.CrashDataThreadFrame;
-import com.microsoft.applicationinsights.channel.contracts.Data;
-import com.microsoft.applicationinsights.channel.contracts.Envelope;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.contracts.CrashData;
+import com.microsoft.applicationinsights.contracts.CrashDataHeaders;
+import com.microsoft.applicationinsights.contracts.CrashDataThread;
+import com.microsoft.applicationinsights.contracts.CrashDataThreadFrame;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
