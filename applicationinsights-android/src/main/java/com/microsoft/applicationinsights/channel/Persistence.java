@@ -36,6 +36,13 @@ public class Persistence {
      */
     private static final String REGULAR_PRIO_FILE_NAME = "regularPrioAppInsightsData.json";
 
+
+    private static final String HIGH_PRIO_DIRECTORY = "/highpriority/";
+
+    private static final String REGULAR_PRIO_DIRECTORY = "/regularpriority/";
+
+    private static final Integer MAX_FILE_COUNT = 50;
+
     /**
      * The tag for logging
      */
@@ -93,7 +100,7 @@ public class Persistence {
      */
     public boolean persist(IJsonSerializable[] data, Boolean highPriority) {
         StringBuilder buffer = new StringBuilder();
-        Boolean isSuccess = false;
+        Boolean isSuccess;
         try {
             buffer.append('[');
             for (int i = 0; i < data.length; i++) {
@@ -123,16 +130,25 @@ public class Persistence {
      * @return true if the operation was successful, false otherwise
      */
     public boolean persist(String data, Boolean highPriority) {
+        this.createDirectoriesIfNecessary();
+
+        if(!this.isFreeSpaceAvailable()) {
+            return false;
+        }
+
         Boolean isSuccess = false;
         Context context = this.getContext();
         if (context != null) {
             FileOutputStream outputStream;
             try {
+                File filesDir = getContext().getFilesDir();
+                String path = filesDir.getPath();
+                //TODO writing doesn't work as we now have path seperators
                 if(highPriority) {
-                    outputStream = context.openFileOutput(HIGH_PRIO_FILE_NAME, Context.MODE_PRIVATE);
+                    outputStream = context.openFileOutput(path + HIGH_PRIO_DIRECTORY + HIGH_PRIO_FILE_NAME, Context.MODE_PRIVATE);
                 }
                 else {
-                    outputStream = context.openFileOutput(REGULAR_PRIO_FILE_NAME, Context.MODE_PRIVATE);
+                    outputStream = context.openFileOutput(path + REGULAR_PRIO_DIRECTORY + REGULAR_PRIO_FILE_NAME, Context.MODE_PRIVATE);
                 }
                 outputStream.write(data.getBytes());
                 outputStream.close();
@@ -186,6 +202,31 @@ public class Persistence {
         }
 
         return buffer.toString();
+    }
+
+    private Boolean isFreeSpaceAvailable() {
+        String regularPrioPath = getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY;
+        File dir = new File(regularPrioPath);
+        if(dir.listFiles().length < MAX_FILE_COUNT) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    private void createDirectoriesIfNecessary() {
+        String filesDirPath = getContext().getFilesDir().getPath();
+        //create high prio directory
+        File dir = new File(filesDirPath + HIGH_PRIO_DIRECTORY);
+        if(!dir.exists()) {
+            dir.mkdirs();
+        }
+        //create high prio directory
+        dir = new File(filesDirPath + REGULAR_PRIO_DIRECTORY);
+        if(!dir.exists()) {
+            dir.mkdirs();
+        }
     }
 
     /**
