@@ -75,6 +75,8 @@ public class Sender {
         }
     }
 
+    //TODO: keep track of the data we sent (like on iOS)
+    //TODO: handle failed sending and persist depending on priority
     private void sendRequestWithPayload(String payload) throws IOException {
         Writer writer = null;
         URL url = new URL(this.config.getEndpointUrl());
@@ -104,7 +106,7 @@ public class Sender {
             InternalLogging.error(TAG, e.toString());
             Persistence persistence = Persistence.getInstance();
             if (persistence != null) {
-                persistence.persist(payload, false); //TODO refactor to support different priorities
+                persistence.persist(payload, false); //TODO we should differentiate between crashes and telemetry here
             }
         } finally {
             if (writer != null) {

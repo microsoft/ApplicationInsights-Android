@@ -93,8 +93,9 @@ public class TelemetryQueue {
      */
     public boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
-        if (item == null || this.config.isTelemetryDisabled()) //TODO what about crashes?!
+        if (item == null || this.config.isTelemetryDisabled()) {
             return false;
+        }
 
         boolean success;
         synchronized (TelemetryQueue.LOCK) {
@@ -188,7 +189,6 @@ public class TelemetryQueue {
             }
 
             if (data != null) {
-                // TODO: Persist items before sending them (otherwise they'll get lost in case of app crash)
                 if (this.queue.isCrashing) {
                     // persist the queue if the app is crashing
                     Persistence persistence = Persistence.getInstance();
@@ -197,6 +197,7 @@ public class TelemetryQueue {
                     }
                 } else {
                     // otherwise enqueue data
+                    // TODO: Persist items before sending them (otherwise they'll get lost in case of app crash)
                     this.sender.send(data);
                 }
             }

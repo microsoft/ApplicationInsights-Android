@@ -158,7 +158,7 @@ public class Persistence {
 
         if (context != null) {
             try {
-                // TODO: Use multiple files rather than a single one; otherwise payload might be too big
+                //TODO: Use multiple files rather than a single one; otherwise payload might be too big
                 File highPrioFile = context.getFileStreamPath(HIGH_PRIO_FILE_NAME);
 
                 //if we don't have a highPrio-File available, use the regular prio one

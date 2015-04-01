@@ -127,7 +127,7 @@ public class Channel {
     }
 
 
-    //TODOMove this somewhere else ("EnvelopeManager")?
+    //TODO Move this somewhere else ("EnvelopeManager")?
     /**
      * Wraps the telemetry item in a common schema envelope with context.
      *
