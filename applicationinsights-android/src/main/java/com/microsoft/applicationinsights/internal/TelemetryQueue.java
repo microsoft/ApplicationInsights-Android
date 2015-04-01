@@ -193,7 +193,7 @@ public class TelemetryQueue {
                     // persist the queue if the app is crashing
                     Persistence persistence = Persistence.getInstance();
                     if (persistence != null) {
-                        persistence.persist(data, true);
+                        persistence.persist(data, false);
                     }
                 } else {
                     // otherwise enqueue data
