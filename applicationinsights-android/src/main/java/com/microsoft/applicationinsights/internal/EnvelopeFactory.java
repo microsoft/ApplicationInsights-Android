@@ -26,7 +26,10 @@ public enum EnvelopeFactory {
         this.context = context;
     }
 
-    public Envelope createEnvelope() {
+    /**
+     * Create an envelope template
+     */
+    private Envelope createEnvelope() {
         Envelope envelope = new Envelope();
         envelope.setAppId(this.context.getPackageName());
         envelope.setAppVer(this.context.getApplication().getVer());
@@ -44,6 +47,9 @@ public enum EnvelopeFactory {
         return envelope;
     }
 
+    /**
+     * Create an envelope with the given object as its base data
+     */
     public Envelope createEnvelope(ITelemetry telemetryData){
         telemetryData.setVer(schemaVersion);
 
