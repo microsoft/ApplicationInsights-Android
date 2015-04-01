@@ -22,6 +22,12 @@ public enum EnvelopeFactory {
      */
     private TelemetryContext context;
 
+    /**
+     * Configures the shared instance with a telemetry context, which is needed to create envelops.
+     * Warning: Method should be called before creating envelops.
+     *
+     * @param context the telemetry context, which is used to create envelops with proper context information.
+     */
     public void configureWithTelemetryContext(TelemetryContext context){
         this.context = context;
     }
@@ -29,7 +35,7 @@ public enum EnvelopeFactory {
     /**
      * Create an envelope template
      */
-    private Envelope createEnvelope() {
+    public Envelope createEnvelope() {
         Envelope envelope = new Envelope();
         envelope.setAppId(this.context.getPackageName());
         envelope.setAppVer(this.context.getApplication().getVer());
