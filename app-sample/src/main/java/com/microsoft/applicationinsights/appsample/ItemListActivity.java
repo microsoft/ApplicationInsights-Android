@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.channel.TelemetryQueueConfig;
+import com.microsoft.applicationinsights.internal.TelemetryQueueConfig;
 
 /**
  * An activity representing a list of Items. This activity

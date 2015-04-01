@@ -1,8 +1,8 @@
 package com.microsoft.mocks;
 
-import com.microsoft.applicationinsights.channel.Sender;
-import com.microsoft.applicationinsights.channel.TelemetryQueueConfig;
-import com.microsoft.applicationinsights.channel.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.internal.Sender;
+import com.microsoft.applicationinsights.internal.TelemetryQueueConfig;
+import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 
 import java.io.IOException;
 import java.io.Writer;

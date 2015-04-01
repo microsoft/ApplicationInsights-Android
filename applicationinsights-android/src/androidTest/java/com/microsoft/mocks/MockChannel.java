@@ -3,8 +3,8 @@ package com.microsoft.mocks;
 import android.content.Context;
 
 import com.microsoft.applicationinsights.TelemetryClientConfig;
-import com.microsoft.applicationinsights.channel.Channel;
-import com.microsoft.applicationinsights.channel.TelemetryQueue;
+import com.microsoft.applicationinsights.internal.Channel;
+import com.microsoft.applicationinsights.internal.TelemetryQueue;
 
 public class MockChannel extends Channel {
     public MockChannel(TelemetryClientConfig config, Context context) {

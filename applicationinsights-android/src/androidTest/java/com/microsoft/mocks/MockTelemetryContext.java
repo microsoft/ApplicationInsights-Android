@@ -2,7 +2,7 @@ package com.microsoft.mocks;
 
 import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.TelemetryContext;
+import com.microsoft.applicationinsights.internal.TelemetryContext;
 
 public class MockTelemetryContext extends TelemetryContext {
 

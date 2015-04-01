@@ -3,7 +3,7 @@ package com.microsoft.applicationinsights;
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.channel.contracts.EventData;
+import com.microsoft.applicationinsights.contracts.EventData;
 import com.microsoft.mocks.MockActivity;
 
 import junit.framework.Assert;

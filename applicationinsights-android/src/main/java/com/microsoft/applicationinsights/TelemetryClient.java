@@ -3,17 +3,19 @@ package com.microsoft.applicationinsights;
 import android.app.Application;
 import android.content.Context;
 
-import com.microsoft.applicationinsights.channel.Channel;
-import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.applicationinsights.channel.contracts.CrashData;
-import com.microsoft.applicationinsights.channel.contracts.DataPoint;
-import com.microsoft.applicationinsights.channel.contracts.DataPointType;
-import com.microsoft.applicationinsights.channel.contracts.EventData;
-import com.microsoft.applicationinsights.channel.contracts.MessageData;
-import com.microsoft.applicationinsights.channel.contracts.MetricData;
-import com.microsoft.applicationinsights.channel.contracts.PageViewData;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.channel.logging.InternalLogging;
+import com.microsoft.applicationinsights.contracts.Envelope;
+import com.microsoft.applicationinsights.internal.Channel;
+import com.microsoft.applicationinsights.internal.EnvelopeFactory;
+import com.microsoft.applicationinsights.internal.TelemetryContext;
+import com.microsoft.applicationinsights.contracts.CrashData;
+import com.microsoft.applicationinsights.contracts.DataPoint;
+import com.microsoft.applicationinsights.contracts.DataPointType;
+import com.microsoft.applicationinsights.contracts.EventData;
+import com.microsoft.applicationinsights.contracts.MessageData;
+import com.microsoft.applicationinsights.contracts.MetricData;
+import com.microsoft.applicationinsights.contracts.PageViewData;
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +70,7 @@ public class TelemetryClient {
      * @param config the configuration for this client
      */
     private TelemetryClient(TelemetryClientConfig config, Context context) {
-        this(config, new TelemetryContext(context), new Channel(config, context));
+        this(config, new TelemetryContext(context, config.getInstrumentationKey()), new Channel());
     }
 
     /**
@@ -90,6 +92,7 @@ public class TelemetryClient {
         // TODO: Maybe the context should be owned by the factory, which creates envelops.
         this.context = context;
         this.channel = channel;
+        EnvelopeFactory.INSTANCE.configureWithTelemetryContext(this.context);
     }
 
     /**
@@ -271,8 +274,9 @@ public class TelemetryClient {
 
             crashData.setProperties(map);
         }
+        Envelope envelope = EnvelopeFactory.INSTANCE.createEnvelope(crashData);
 
-        this.channel.processUnhandledException(crashData, context.getContextTags());
+        this.channel.processUnhandledException(envelope);
     }
 
     /**
@@ -337,19 +341,19 @@ public class TelemetryClient {
             if (map != null) {
                 map.putAll(this.commonProperties);
             }
-
             telemetry.setProperties(map);
         }
 
+        Envelope envelope = EnvelopeFactory.INSTANCE.createEnvelope(telemetry);
         // TODO: Check if persistence is busy (max file size reached) before enqueuing another item -> app crash
         // enqueue to channel
-        this.channel.enqueue(telemetry, context.getContextTags());
+        this.channel.enqueue(envelope);
     }
 
     /**
      * Triggers an asynchronous flush of queued telemetry.
      * note: this will be called
-     * {@link com.microsoft.applicationinsights.channel.TelemetryQueueConfig#maxBatchIntervalMs} after
+     * {@link com.microsoft.applicationinsights.internal.TelemetryQueueConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public void flush() { //TODO call flus() on the channel and not on the queue!

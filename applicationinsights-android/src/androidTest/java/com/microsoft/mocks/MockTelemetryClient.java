@@ -5,9 +5,9 @@ import android.content.Context;
 import com.microsoft.applicationinsights.ExceptionUtil;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryClientConfig;
-import com.microsoft.applicationinsights.channel.TelemetryContext;
-import com.microsoft.applicationinsights.channel.contracts.CrashData;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.internal.TelemetryContext;
+import com.microsoft.applicationinsights.contracts.CrashData;
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 
 import java.util.ArrayList;
 import java.util.Map;

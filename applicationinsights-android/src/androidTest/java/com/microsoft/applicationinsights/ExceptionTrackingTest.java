@@ -2,9 +2,9 @@ package com.microsoft.applicationinsights;
 
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.channel.TelemetryQueue;
-import com.microsoft.applicationinsights.channel.contracts.CrashData;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.internal.TelemetryQueue;
+import com.microsoft.applicationinsights.contracts.CrashData;
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockExceptionTracking;
 import com.microsoft.mocks.MockTelemetryClient;
