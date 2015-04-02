@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.internal;
 
 import android.content.Context;
 
+import com.microsoft.applicationinsights.contracts.Internal;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
+import java.util.UUID;
 
 public class Persistence {
 
@@ -25,17 +27,6 @@ public class Persistence {
      * Synchronization LOCK for setting static context
      */
     private static final Object LOCK = new Object();
-
-    /**
-     * The file path for persisted crash data
-     */
-    private static final String HIGH_PRIO_FILE_NAME = "highPrioAppInsightsData.json";
-
-    /**
-     * The file path for persisted telemetry data
-     */
-    private static final String REGULAR_PRIO_FILE_NAME = "regularPrioAppInsightsData.json";
-
 
     private static final String HIGH_PRIO_DIRECTORY = "/highpriority/";
 
@@ -62,7 +53,7 @@ public class Persistence {
      * Restrict access to the default constructor
      */
     protected Persistence(Context context) {
-        this.weakContext = new WeakReference<Context>(context);
+        this.weakContext = new WeakReference<>(context);
         createDirectoriesIfNecessary();
     }
 
@@ -137,6 +128,7 @@ public class Persistence {
             return false;
         }
 
+        String uuid = UUID.randomUUID().toString();
         Boolean isSuccess = false;
         Context context = this.getContext();
         if (context != null) {
@@ -144,11 +136,11 @@ public class Persistence {
             try {
                 File filesDir = getContext().getFilesDir();
                 if(highPriority) {
-                    filesDir = new File(filesDir + HIGH_PRIO_DIRECTORY + HIGH_PRIO_FILE_NAME);
+                    filesDir = new File(filesDir + HIGH_PRIO_DIRECTORY + uuid);
                     outputStream = new FileOutputStream(filesDir, true);
                 }
                 else {
-                    filesDir = new File(filesDir + REGULAR_PRIO_DIRECTORY + REGULAR_PRIO_FILE_NAME);
+                    filesDir = new File(filesDir + REGULAR_PRIO_DIRECTORY + uuid);
                     outputStream = new FileOutputStream(filesDir, true);
                 }
                 outputStream.write(data.getBytes());
@@ -170,20 +162,11 @@ public class Persistence {
      */
     public String getNextItemFromDisk() {
         StringBuilder buffer = new StringBuilder();
-        Context context = this.getContext();
-        String fileName = HIGH_PRIO_FILE_NAME;
+        File nextFile = this.nextFile();
 
-        if (context != null) {
+        if (nextFile != null) {
             try {
-                //TODO: Use multiple files rather than a single one; otherwise payload might be too big
-                File highPrioFile = context.getFileStreamPath(HIGH_PRIO_FILE_NAME);
-
-                //if we don't have a highPrio-File available, use the regular prio one
-                if(!highPrioFile.exists()) {
-                    fileName = REGULAR_PRIO_FILE_NAME;
-                }
-
-                FileInputStream inputStream = context.openFileInput(fileName);
+                FileInputStream inputStream = new FileInputStream(nextFile);
                 InputStreamReader streamReader = new InputStreamReader(inputStream);
 
                 BufferedReader reader = new BufferedReader(streamReader);
@@ -199,10 +182,31 @@ public class Persistence {
 
             // TODO: Do not delete the file before it has been successfully sent
             // always delete the file
-            context.deleteFile(fileName);
+            boolean deletedFile = nextFile.delete();
+            if(!deletedFile) {
+                InternalLogging.error(TAG, "Error deleting telemetry file " + nextFile.toString());
+            }
         }
 
         return buffer.toString();
+    }
+
+    private File nextFile() {
+        String path = getContext().getFilesDir() + HIGH_PRIO_DIRECTORY;
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+        if(files.length > 0) {
+            return files[0];
+        }
+        else {
+            path = getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY;
+            directory = new File(path);
+            files = directory.listFiles();
+            if(files.length > 0) {
+                return files[0];
+            }
+        }
+        return null;
     }
 
     private Boolean isFreeSpaceAvailable() {
