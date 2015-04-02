@@ -340,17 +340,17 @@ public class TelemetryClient {
         private double metric;
         private Throwable exception;
 
-        public CreateTelemetryDataTask(TelemetryType type){
+        private CreateTelemetryDataTask(TelemetryType type){
             this.type = type;
         }
 
-        public CreateTelemetryDataTask(TelemetryType type, String metricName, double metric){
+        private CreateTelemetryDataTask(TelemetryType type, String metricName, double metric){
             this.type = type;
             this.name = metricName;
             this.metric = metric;
         }
 
-        public CreateTelemetryDataTask(TelemetryType type,
+        private CreateTelemetryDataTask(TelemetryType type,
                                        String name,
                                        Map<String,String> properties,
                                        Map<String, Double> measurements){
@@ -360,7 +360,7 @@ public class TelemetryClient {
             this.measurements = measurements;
         }
 
-        public CreateTelemetryDataTask(TelemetryType type,
+        private CreateTelemetryDataTask(TelemetryType type,
                                        Throwable exception,
                                        Map<String,String> properties){
             this.type = type;
