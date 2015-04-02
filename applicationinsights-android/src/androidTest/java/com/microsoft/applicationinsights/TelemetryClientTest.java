@@ -112,28 +112,6 @@ public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
         client.trackPageView("android page", properties, measurements);
     }
 
-    public void testTrack() throws Exception {
-        TelemetryClient client = TelemetryClient.getInstance(this.mockActivity);
-        EventData event = new EventData();
-
-        try {
-            client.track(event);
-        } catch (Exception exception) {
-            Assert.fail(exception.toString());
-        }
-
-        LinkedHashMap<String, String> properties1 = new LinkedHashMap<>();
-        properties1.put("p", "v1");
-        client.setCommonProperties(properties1);
-
-        LinkedHashMap<String, String> properties2 = new LinkedHashMap<>();
-        properties1.put("p", "v2");
-        event.setProperties(properties2);
-
-        // todo: mock channel and verify that property "p" has value "v2"
-        client.track(event);
-    }
-
     public void testFlush() throws Exception {
         TelemetryClient client = TelemetryClient.getInstance(this.mockActivity);
         client.flush(); // todo: mock sender and verify that flush is called

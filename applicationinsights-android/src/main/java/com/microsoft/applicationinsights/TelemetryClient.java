@@ -95,7 +95,7 @@ public class TelemetryClient {
      * @param context the context for this client
      * @param channel the channel for this client
      */
-    protected TelemetryClient(
+    protected   TelemetryClient(
             // TODO: TelemetryClientConfig should be member of LifecycleTracking
             TelemetryClientConfig config,
             TelemetryContext context,
@@ -289,7 +289,6 @@ public class TelemetryClient {
      */
     public void trackNewSession() {
         new CreateTelemetryDataTask(TelemetryType.NEW_SESSION).execute();
-
     }
 
     /**

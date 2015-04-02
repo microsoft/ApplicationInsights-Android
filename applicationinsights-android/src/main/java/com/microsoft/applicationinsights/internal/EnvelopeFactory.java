@@ -64,19 +64,20 @@ public enum EnvelopeFactory {
      */
     public Envelope createEnvelope() {
         Envelope envelope = new Envelope();
-        envelope.setAppId(this.context.getPackageName());
-        envelope.setAppVer(this.context.getApplication().getVer());
-        envelope.setTime(Util.dateToISO8601(new Date()));
-        envelope.setIKey(this.context.getInstrumentationKey());
-        envelope.setUserId(this.context.getUser().getId());
-        envelope.setDeviceId(this.context.getDevice().getId());
-        envelope.setOsVer(this.context.getDevice().getOsVersion());
-        envelope.setOs(this.context.getDevice().getOs());
+            envelope.setAppId(this.context.getPackageName());
+            envelope.setAppVer(this.context.getApplication().getVer());
+            envelope.setTime(Util.dateToISO8601(new Date()));
+            envelope.setIKey(this.context.getInstrumentationKey());
+            envelope.setUserId(this.context.getUser().getId());
+            envelope.setDeviceId(this.context.getDevice().getId());
+            envelope.setOsVer(this.context.getDevice().getOsVersion());
+            envelope.setOs(this.context.getDevice().getOs());
 
-        Map<String, String> tags = this.context.getContextTags();
-        if (tags != null) {
-            envelope.setTags(tags);
-        }
+            Map<String, String> tags = this.context.getContextTags();
+            if (tags != null) {
+                envelope.setTags(tags);
+            }
+
         return envelope;
     }
 
