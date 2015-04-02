@@ -1,26 +1,42 @@
 package com.microsoft.applicationinsights.internal;
 
 
+import com.microsoft.applicationinsights.ExceptionUtil;
 import com.microsoft.applicationinsights.contracts.CrashData;
 import com.microsoft.applicationinsights.contracts.Data;
+import com.microsoft.applicationinsights.contracts.DataPoint;
+import com.microsoft.applicationinsights.contracts.DataPointType;
 import com.microsoft.applicationinsights.contracts.Envelope;
+import com.microsoft.applicationinsights.contracts.EventData;
+import com.microsoft.applicationinsights.contracts.MessageData;
+import com.microsoft.applicationinsights.contracts.MetricData;
+import com.microsoft.applicationinsights.contracts.PageViewData;
+import com.microsoft.applicationinsights.contracts.SessionState;
+import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public enum EnvelopeFactory {
     INSTANCE;
 
-    static final int schemaVersion = 2;
+    public static final int CONTRACT_VERSION = 2;
 
     /**
      * The context for this recorder
      */
     private TelemetryContext context;
+
+    /**
+     * Map of properties, which should be set for each envelope
+     */
+    private Map<String,String> commonProperties;
 
     /**
      * Configures the shared instance with a telemetry context, which is needed to create envelops.
@@ -29,7 +45,18 @@ public enum EnvelopeFactory {
      * @param context the telemetry context, which is used to create envelops with proper context information.
      */
     public void configureWithTelemetryContext(TelemetryContext context){
+        this.configureWithTelemetryContext(context, null);
+    }
+
+    /**
+     * Configures the shared instance with a telemetry context, which is needed to create envelops.
+     * Warning: Method should be called before creating envelops.
+     *
+     * @param context the telemetry context, which is used to create envelops with proper context information.
+     */
+    public void configureWithTelemetryContext(TelemetryContext context, Map<String,String>commonProperties){
         this.context = context;
+        this.commonProperties = commonProperties;
     }
 
     /**
@@ -57,7 +84,7 @@ public enum EnvelopeFactory {
      * Create an envelope with the given object as its base data
      */
     public Envelope createEnvelope(ITelemetry telemetryData){
-        telemetryData.setVer(schemaVersion);
+        addCommonProperties(telemetryData);
 
         Data<ITelemetryData> data = new Data<>();
         data.setBaseData(telemetryData);
@@ -72,5 +99,162 @@ public enum EnvelopeFactory {
         //envelope.setSeq(this.channelId + ":" + this.seqCounter.incrementAndGet());
 
         return envelope;
+    }
+
+    /**
+     * Creates information about an event for Application Insights. This method gets called by a
+     * CreateTelemetryDataTask in order to create and forward data on a background thread.
+     *
+     * @param eventName    The name of the event
+     * @param properties   Custom properties associated with the event
+     * @param measurements Custom measurements associated with the event
+     *
+     * @return an Envelope object, which contains an event
+     */
+    public Envelope createEventEnvelope(String eventName,
+                                  Map<String, String> properties,
+                                  Map<String, Double> measurements) {
+        EventData telemetry = new EventData();
+        telemetry.setName(ensureNotNull(eventName));
+        telemetry.setProperties(properties);
+        telemetry.setMeasurements(measurements);
+
+        Envelope envelope = createEnvelope(telemetry);
+        return envelope;
+    }
+
+    /**
+     * Creates tracing information for Application Insights. This method gets called by a
+     * CreateTelemetryDataTask in order to create and forward data on a background thread.
+     *
+     * @param message    The message associated with this trace
+     * @param properties Custom properties associated with the event
+     *
+     * @return an Envelope object, which contains a trace
+     */
+    public Envelope createTraceEnvelope(String message, Map<String, String> properties) {
+        MessageData telemetry = new MessageData();
+        telemetry.setMessage(this.ensureNotNull(message));
+        telemetry.setProperties(properties);
+
+        Envelope envelope = createEnvelope(telemetry);
+        return envelope;
+    }
+
+    /**
+     * Creates information about an aggregated metric for Application Insights. This method gets
+     * called by a CreateTelemetryDataTask in order to create and forward data on a background thread.
+     *
+     * @param name  The name of the metric
+     * @param value The value of the metric
+     *
+     * @return an Envelope object, which contains a metric
+     */
+    public Envelope createMetricEnvelope(String name, double value) {
+        MetricData telemetry = new MetricData();
+        DataPoint data = new DataPoint();
+        data.setCount(1);
+        data.setKind(DataPointType.Measurement);
+        data.setMax(value);
+        data.setMax(value);
+        data.setName(ensureNotNull(name));
+        data.setValue(value);
+        List<DataPoint> metricsList = new ArrayList<DataPoint>();
+        metricsList.add(data);
+        telemetry.setMetrics(metricsList);
+
+        Envelope envelope = createEnvelope(telemetry);
+        return envelope;
+    }
+
+    /**
+     * Creates information about an handled or unhandled exception to Application Insights. This
+     * method gets called by a CreateTelemetryDataTask in order to create and forward data on a
+     * background thread.
+     *
+     * @param exception  The exception to track
+     * @param properties Custom properties associated with the event
+     *
+     * @return an Envelope object, which contains a handled or unhandled exception
+     */
+    public Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
+        CrashData telemetry = ExceptionUtil.getCrashData(exception, properties, this.context.getPackageName());
+
+        Envelope envelope = createEnvelope(telemetry);
+        return envelope;
+    }
+
+    /**
+     * Creates information about a page view for Application Insights. This method gets called by a
+     * CreateTelemetryDataTask in order to create and forward data on a background thread.
+     *
+     * @param pageName     The name of the page
+     * @param properties   Custom properties associated with the event
+     * @param measurements Custom measurements associated with the event
+     *
+     * @return an Envelope object, which contains a page view
+     */
+    public Envelope createPageViewEnvelope(
+            String pageName,
+            Map<String, String> properties,
+            Map<String, Double> measurements) {
+        PageViewData telemetry = new PageViewData();
+        telemetry.setName(ensureNotNull(pageName));
+        telemetry.setUrl(null);
+        telemetry.setProperties(properties);
+        telemetry.setMeasurements(measurements);
+
+        Envelope envelope = createEnvelope(telemetry);
+        return envelope;
+    }
+
+    /**
+     * Creates information about a new session view for Application Insights. This method gets
+     * called by a CreateTelemetryDataTask in order to create and forward data on a background thread.
+     *
+     * @return an Envelope object, which contains a session
+     */
+    public Envelope createNewSessionEnvelope() {
+        SessionStateData telemetry = new SessionStateData();
+        telemetry.setState(SessionState.Start);
+
+        Envelope envelope = createEnvelope(telemetry);
+        return envelope;
+    }
+
+    /**
+     * Adds common properties to the given telemetry data.
+     *
+     * @param telemetry The telemetry data
+     */
+    private void addCommonProperties(ITelemetry telemetry){
+        telemetry.setVer(CONTRACT_VERSION);
+        if (this.commonProperties != null) {
+            Map<String, String> map = telemetry.getProperties();
+            if (map != null) {
+                map.putAll(this.commonProperties);
+            }
+            telemetry.setProperties(map);
+        }
+    }
+
+    /**
+     * Ensures required string values are non-null
+     */
+    private String ensureNotNull(String input) {
+        if (input == null) {
+            return "";
+        } else {
+            return input;
+        }
+    }
+
+    /**
+     * Set properties, which should be set for each envelope.
+     *
+     * @param commonProperties a map with properties, which should be set for each envelope
+     */
+    public void setCommonProperties(Map<String, String> commonProperties) {
+        this.commonProperties = commonProperties;
     }
 }

@@ -40,7 +40,6 @@ public class TelemetryClient {
         NEW_SESSION
     };
     public static final String TAG = "TelemetryClient";
-    public static final int CONTRACT_VERSION = 2;
 
     /**
      * The configuration for this telemetry client.
@@ -156,6 +155,7 @@ public class TelemetryClient {
      */
     public void setCommonProperties(Map<String, String> commonProperties) {
         this.commonProperties = commonProperties;
+        EnvelopeFactory.INSTANCE.setCommonProperties(this.commonProperties);
     }
 
     /**
@@ -331,145 +331,6 @@ public class TelemetryClient {
         }
     }
 
-    /**
-     * Ensures required string values are non-null
-     */
-    private String ensureNotNull(String input) {
-        if (input == null) {
-            return "";
-        } else {
-            return input;
-        }
-    }
-
-    /**
-     * Creates information about an event for Application Insights. This method gets called by a
-     * CreateTelemetryDataTask in order to create and forward data on a background thread.
-     *
-     * @param eventName    The name of the event
-     * @param properties   Custom properties associated with the event
-     * @param measurements Custom measurements associated with the event
-     *
-     * @return a EventData object
-     */
-    private EventData createEvent(String eventName,
-                                   Map<String, String> properties,
-                                   Map<String, Double> measurements) {
-        EventData telemetry = new EventData();
-        telemetry.setName(ensureNotNull(eventName));
-        telemetry.setProperties(properties);
-        telemetry.setMeasurements(measurements);
-        return telemetry;
-    }
-
-    /**
-     * Creates tracing information for Application Insights. This method gets called by a
-     * CreateTelemetryDataTask in order to create and forward data on a background thread.
-     *
-     * @param message    The message associated with this trace
-     * @param properties Custom properties associated with the event
-     *
-     * @return a MessageData object
-     */
-    private MessageData createTrace(String message, Map<String, String> properties) {
-        MessageData telemetry = new MessageData();
-        telemetry.setMessage(this.ensureNotNull(message));
-        telemetry.setProperties(properties);
-        return telemetry;
-    }
-
-    /**
-     * Creates information about an aggregated metric for Application Insights. This method gets
-     * called by a CreateTelemetryDataTask in order to create and forward data on a background thread.
-     *
-     * @param name  The name of the metric
-     * @param value The value of the metric
-     *
-     * @return a MetricData object
-     */
-    private MetricData createMetric(String name, double value) {
-        MetricData telemetry = new MetricData();
-        DataPoint data = new DataPoint();
-        data.setCount(1);
-        data.setKind(DataPointType.Measurement);
-        data.setMax(value);
-        data.setMax(value);
-        data.setName(ensureNotNull(name));
-        data.setValue(value);
-        List<DataPoint> metricsList = new ArrayList<DataPoint>();
-        metricsList.add(data);
-        telemetry.setMetrics(metricsList);
-        return telemetry;
-    }
-
-    /**
-     * Creates information about an handled or unhandled exception to Application Insights. This
-     * method gets called by a CreateTelemetryDataTask in order to create and forward data on a
-     * background thread.
-     *
-     * @param exception  The exception to track
-     * @param properties Custom properties associated with the event
-     *
-     * @return a CrashData object
-     */
-    private CrashData createException(Throwable exception, Map<String, String> properties) {
-        CrashData telemetry = ExceptionUtil.getCrashData(exception, properties, this.context.getPackageName());
-        return telemetry;
-    }
-
-    /**
-     * Creates information about a page view for Application Insights. This method gets called by a
-     * CreateTelemetryDataTask in order to create and forward data on a background thread.
-     *
-     * @param pageName     The name of the page
-     * @param properties   Custom properties associated with the event
-     * @param measurements Custom measurements associated with the event
-     *
-     * @return a PageViewData object
-     */
-    private ITelemetry createPageView(
-            String pageName,
-            Map<String, String> properties,
-            Map<String, Double> measurements) {
-        PageViewData telemetry = new PageViewData();
-        telemetry.setName(ensureNotNull(pageName));
-        telemetry.setUrl(null);
-        telemetry.setProperties(properties);
-        telemetry.setMeasurements(measurements);
-        return telemetry;
-    }
-
-    /**
-     * Creates information about a new session view for Application Insights. This method gets
-     * called by a CreateTelemetryDataTask in order to create and forward data on a background thread.
-     *
-     * @return a SessionData object
-     */
-    private ITelemetry createNewSession() {
-        SessionStateData telemetry = new SessionStateData();
-        telemetry.setState(SessionState.Start);
-        return telemetry;
-    }
-
-    /**
-     * Adds common properties to the given telemetry data.
-     *
-     * @param telemetry The telemetry data
-     *
-     * @return a ITelemetry object, which contains all common properties.
-     */
-    private ITelemetry addCommonProperties(ITelemetry telemetry){
-        telemetry.setVer(TelemetryClient.CONTRACT_VERSION);
-        if (commonProperties != null) {
-            Map<String, String> map = telemetry.getProperties();
-            if (map != null) {
-                map.putAll(commonProperties);
-            }
-            telemetry.setProperties(map);
-        }
-        return telemetry;
-    }
-
     private class CreateTelemetryDataTask extends AsyncTask<Void, Void, Void> {
 
         private String name;
@@ -479,17 +340,17 @@ public class TelemetryClient {
         private double metric;
         private Throwable exception;
 
-        public CreateTelemetryDataTask(TelemetryType type){
+        private CreateTelemetryDataTask(TelemetryType type){
             this.type = type;
         }
 
-        public CreateTelemetryDataTask(TelemetryType type, String metricName, double metric){
+        private CreateTelemetryDataTask(TelemetryType type, String metricName, double metric){
             this.type = type;
             this.name = metricName;
             this.metric = metric;
         }
 
-        public CreateTelemetryDataTask(TelemetryType type,
+        private CreateTelemetryDataTask(TelemetryType type,
                                        String name,
                                        Map<String,String> properties,
                                        Map<String, Double> measurements){
@@ -499,7 +360,7 @@ public class TelemetryClient {
             this.measurements = measurements;
         }
 
-        public CreateTelemetryDataTask(TelemetryType type,
+        private CreateTelemetryDataTask(TelemetryType type,
                                        Throwable exception,
                                        Map<String,String> properties){
             this.type = type;
@@ -509,35 +370,32 @@ public class TelemetryClient {
 
         @Override
         protected Void doInBackground(Void... params) {
-            ITelemetry telemetryData = null;
+            Envelope envelope = null;
             switch (this.type){
                 case EVENT:
-                    telemetryData = createEvent(this.name, this.properties, this.measurements);
+                    envelope = EnvelopeFactory.INSTANCE.createEventEnvelope(this.name, this.properties, this.measurements);
                     break;
                 case PAGE_VIEW:
-                    telemetryData = createPageView(this.name, this.properties, this.measurements);
+                    envelope = EnvelopeFactory.INSTANCE.createPageViewEnvelope(this.name, this.properties, this.measurements);
                     break;
                 case TRACE:
-                    telemetryData = createTrace(this.name, this.properties);
+                    envelope = EnvelopeFactory.INSTANCE.createTraceEnvelope(this.name, this.properties);
                     break;
                 case METRIC:
-                    telemetryData = createMetric(this.name, this.metric);
+                    envelope = EnvelopeFactory.INSTANCE.createMetricEnvelope(this.name, this.metric);
                     break;
                 case NEW_SESSION:
-                    telemetryData = createNewSession();
+                    envelope = EnvelopeFactory.INSTANCE.createNewSessionEnvelope();
                     break;
                 case HANDLED_EXCEPTION:
                 case UNHANDLED_EXCEPTION:
-                    telemetryData = createException(this.exception, this.properties);
+                    envelope = EnvelopeFactory.INSTANCE.createExceptionEnvelope(this.exception, this.properties);
                     break;
                 default:
                     break;
             }
 
-            if(telemetryData != null){
-                telemetryData = addCommonProperties(telemetryData);
-                Envelope envelope = EnvelopeFactory.INSTANCE.createEnvelope(telemetryData);
-
+            if(envelope != null){
                 if(type == TelemetryType.UNHANDLED_EXCEPTION){
                     channel.processUnhandledException(envelope);
                 }else{
