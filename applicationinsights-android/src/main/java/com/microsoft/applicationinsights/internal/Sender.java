@@ -7,6 +7,7 @@ import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,6 +29,8 @@ public class Sender {
      * The configuration for this sender
      */
     protected final TelemetryQueueConfig config;
+
+    private File fileToSend;
 
     /**
      * Prevent external instantiation
@@ -60,10 +63,13 @@ public class Sender {
             // Send the persisted data
             Persistence persistence = Persistence.getInstance();
             if (persistence != null) {
-                String persistedData = persistence.getNextItemFromDisk();
-                if (!persistedData.isEmpty()) {
-                    InternalLogging.info(TAG, "adding persisted data", persistedData);
-                    sendRequestWithPayload(persistedData);
+                fileToSend = persistence.nextAvailableFile();
+                if(fileToSend != null) {
+                    String persistedData = persistence.load(fileToSend);
+                    if (!persistedData.isEmpty()) {
+                        InternalLogging.info(TAG, "adding persisted data", persistedData);
+                        sendRequestWithPayload(persistedData);
+                    }
                 }
             }
 
@@ -75,8 +81,6 @@ public class Sender {
         }
     }
 
-    //TODO: keep track of the data we sent (like on iOS)
-    //TODO: handle failed sending and persist depending on priority
     private void sendRequestWithPayload(String payload) throws IOException {
         Writer writer = null;
         URL url = new URL(this.config.getEndpointUrl());
@@ -106,7 +110,8 @@ public class Sender {
             InternalLogging.error(TAG, e.toString());
             Persistence persistence = Persistence.getInstance();
             if (persistence != null) {
-                persistence.persist(payload, false); //TODO we should differentiate between crashes and telemetry here
+                persistence.makeAvailable(fileToSend);
+                //TODO delete the file?
             }
         } finally {
             if (writer != null) {
@@ -163,6 +168,11 @@ public class Sender {
         if (this.config.isDeveloperMode()) {
             this.readResponse(connection, builder);
         }
+        Persistence persistence = Persistence.getInstance();
+        if(persistence != null) {
+            persistence.deleteFile(fileToSend);
+        }
+        fileToSend = null;
     }
 
     /**
@@ -193,7 +203,8 @@ public class Sender {
         InternalLogging.info(TAG, "Server error, persisting data", payload);
         Persistence persistence = Persistence.getInstance();
         if (persistence != null) {
-            persistence.persist(payload, false); //TODO refactor to correct priority
+            persistence.makeAvailable(this.fileToSend);
+            fileToSend = null;
         }
     }
 
