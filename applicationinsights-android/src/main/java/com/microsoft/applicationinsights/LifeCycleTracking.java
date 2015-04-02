@@ -78,10 +78,8 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         int count = this.activityCount.getAndIncrement();
         if (count == 0) {
-            SessionStateData sessionData = new SessionStateData();
-            sessionData.setState(SessionState.Start);
             TelemetryClient tc = this.getTelemetryClient(activity);
-            tc.track(sessionData);
+            tc.trackNewSession();
         }
     }
 
@@ -108,9 +106,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
         boolean shouldRenew = now - then >= tc.getConfig().getSessionIntervalMs();
         if (shouldRenew) {
             tc.getContext().renewSessionId();
-            SessionStateData sessionData = new SessionStateData();
-            sessionData.setState(SessionState.Start);
-            tc.track(sessionData);
+            tc.trackNewSession();
         }
 
         // track the page view

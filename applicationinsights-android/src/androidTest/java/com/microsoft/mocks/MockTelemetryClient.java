@@ -23,7 +23,7 @@ public class MockTelemetryClient extends TelemetryClient {
     }
 
     protected MockTelemetryClient(TelemetryClientConfig config, Context context) {
-        super(config, new TelemetryContext(context), new MockChannel(config, context));
+        super(config, new TelemetryContext(context, config.getInstrumentationKey()), new MockChannel());
         ((MockChannel)this.channel).setQueue(new MockQueue(1));
     }
 

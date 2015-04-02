@@ -203,7 +203,6 @@ public class TelemetryContext {
             // create a new hash map and add all context to it
             cachedTags = new LinkedHashMap<>();
             TelemetryContext.application.addToHashMap(cachedTags);
-            TelemetryContext.user.addToHashMap(cachedTags);
             TelemetryContext.internal.addToHashMap(cachedTags);
             this.operation.addToHashMap(cachedTags);
         }
@@ -215,7 +214,8 @@ public class TelemetryContext {
         TelemetryContext.cachedTags.putAll(contextTags);
         TelemetryContext.device.addToHashMap(contextTags);
         TelemetryContext.session.addToHashMap(contextTags);
-        return cachedTags;
+        TelemetryContext.user.addToHashMap(contextTags);
+        return contextTags;
     }
 
     /**
