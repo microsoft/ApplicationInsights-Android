@@ -54,7 +54,7 @@ public class ItemListActivity extends FragmentActivity
         // update endpoint to make traffic visible in the proxy
         TelemetryClient client = TelemetryClient.getInstance(this);
         TelemetryQueueConfig config = client.getConfig().getStaticConfig();
-        config.setEndpointUrl(config.getEndpointUrl().replace("https", "http"));
+        config.setEndpointUrl(config.getEndpointUrl().replace("https", "http")); //TODO change this!?
 
         // Track basic telemetry
         client.trackTrace("example trace");
