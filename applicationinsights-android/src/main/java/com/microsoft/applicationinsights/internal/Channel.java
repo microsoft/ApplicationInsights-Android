@@ -80,6 +80,7 @@ public class Channel {
 
     public void processUnhandledException(Envelope envelope) {
         this.queue.isCrashing = true;
+        this.queue.flush();
 
         IJsonSerializable[] data = new IJsonSerializable[1];
         data[0] = envelope;
@@ -92,8 +93,6 @@ public class Channel {
             InternalLogging.info(TAG, "error persisting crash", envelope.toString());
         }
 
-        this.queue.isCrashing = true;
-        this.queue.flush();
     }
 
 }

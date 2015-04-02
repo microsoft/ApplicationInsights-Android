@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.UUID;
 
 public class Persistence {
 
@@ -26,15 +28,13 @@ public class Persistence {
      */
     private static final Object LOCK = new Object();
 
-    /**
-     * The file path for persisted crash data
-     */
-    private static final String HIGH_PRIO_FILE_NAME = "highPrioAppInsightsData.json";
+    private static final String HIGH_PRIO_DIRECTORY = "/highpriority/";
 
-    /**
-     * The file path for persisted telemetry data
-     */
-    private static final String REGULAR_PRIO_FILE_NAME = "regularPrioAppInsightsData.json";
+    private static final String REGULAR_PRIO_DIRECTORY = "/regularpriority/";
+
+    private static final Integer MAX_FILE_COUNT = 50;
+
+    private ArrayList<File> servedFiles;
 
     /**
      * The tag for logging
@@ -55,7 +55,9 @@ public class Persistence {
      * Restrict access to the default constructor
      */
     protected Persistence(Context context) {
-        this.weakContext = new WeakReference<Context>(context);
+        this.weakContext = new WeakReference<>(context);
+        createDirectoriesIfNecessary();
+        this.servedFiles = new ArrayList<>(51);
     }
 
     /**
@@ -70,6 +72,7 @@ public class Persistence {
                 if (!Persistence.isPersistenceLoaded) {
                     Persistence.isPersistenceLoaded = true;
                     Persistence.instance = new Persistence(context);
+
                 }
             }
         }
@@ -89,11 +92,11 @@ public class Persistence {
     /**
      * Serializes the input and calls:
      *
-     * @see Persistence#persist(String)
+     * @see Persistence#persist(String, Boolean)
      */
     public boolean persist(IJsonSerializable[] data, Boolean highPriority) {
         StringBuilder buffer = new StringBuilder();
-        Boolean isSuccess = false;
+        Boolean isSuccess;
         try {
             buffer.append('[');
             for (int i = 0; i < data.length; i++) {
@@ -123,16 +126,24 @@ public class Persistence {
      * @return true if the operation was successful, false otherwise
      */
     public boolean persist(String data, Boolean highPriority) {
+        if (!this.isFreeSpaceAvailable()) {
+            InternalLogging.warn(TAG, "No free space on disk to persist data.");
+            return false;
+        }
+
+        String uuid = UUID.randomUUID().toString();
         Boolean isSuccess = false;
         Context context = this.getContext();
         if (context != null) {
             FileOutputStream outputStream;
             try {
-                if(highPriority) {
-                    outputStream = context.openFileOutput(HIGH_PRIO_FILE_NAME, Context.MODE_PRIVATE);
-                }
-                else {
-                    outputStream = context.openFileOutput(REGULAR_PRIO_FILE_NAME, Context.MODE_PRIVATE);
+                File filesDir = getContext().getFilesDir();
+                if (highPriority) {
+                    filesDir = new File(filesDir + HIGH_PRIO_DIRECTORY + uuid);
+                    outputStream = new FileOutputStream(filesDir, true);
+                } else {
+                    filesDir = new File(filesDir + REGULAR_PRIO_DIRECTORY + uuid);
+                    outputStream = new FileOutputStream(filesDir, true);
                 }
                 outputStream.write(data.getBytes());
                 outputStream.close();
@@ -151,26 +162,15 @@ public class Persistence {
      *
      * @return the next item from disk or empty string if anything goes wrong
      */
-    public String getNextItemFromDisk() {
+    public String load(File file) {
         StringBuilder buffer = new StringBuilder();
-        Context context = this.getContext();
-        String fileName = HIGH_PRIO_FILE_NAME;
-
-        if (context != null) {
+        if (file != null) {
             try {
-                //TODO: Use multiple files rather than a single one; otherwise payload might be too big
-                File highPrioFile = context.getFileStreamPath(HIGH_PRIO_FILE_NAME);
-
-                //if we don't have a highPrio-File available, use the regular prio one
-                if(!highPrioFile.exists()) {
-                    fileName = REGULAR_PRIO_FILE_NAME;
-                }
-
-                FileInputStream inputStream = context.openFileInput(fileName);
+                FileInputStream inputStream = new FileInputStream(file);
                 InputStreamReader streamReader = new InputStreamReader(inputStream);
-
                 BufferedReader reader = new BufferedReader(streamReader);
                 String str;
+
                 while ((str = reader.readLine()) != null) {
                     buffer.append(str);
                 }
@@ -179,22 +179,101 @@ public class Persistence {
             } catch (Exception e) {
                 InternalLogging.error(TAG, "Error reading telemetry data from file");
             }
-
-            // TODO: Do not delete the file before it has been successfully sent
-            // always delete the file
-            context.deleteFile(fileName);
         }
 
         return buffer.toString();
     }
 
+    public File nextAvailableFile() {
+        File file = this.nextHighPrioFile();
+        if (file != null) {
+            return file;
+        } else {
+            return this.nextRegularPrioFile();
+        }
+    }
+
+
+    private File nextHighPrioFile() {
+        String path = getContext().getFilesDir() + HIGH_PRIO_DIRECTORY;
+        File directory = new File(path);
+       return this.nextAvailableFileInDirectory(directory);
+    }
+
+    private File nextRegularPrioFile() {
+        String path = getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY;
+        File directory = new File(path);
+        return this.nextAvailableFileInDirectory(directory);
+    }
+
+    private File nextAvailableFileInDirectory(File directory) {
+        File[] files = directory.listFiles();
+        File file;
+        if ((files != null) && (files.length > 0)) {
+            for(int i = 0; i < files.length - 1; i++) {
+                file = files[i];
+               if(!this.servedFiles.contains(file)) {
+                   return file;//we haven't served the file, return it
+               }
+            }
+
+            return null; //no available File
+        }
+        else {
+            return null; //no files in directory or no directory
+        }
+
+    }
+
+    public void deleteFile(File file) {
+        if (file != null) {
+            // always delete the file
+            boolean deletedFile = file.delete();
+            this.servedFiles.remove(file); //TODO don't remove in case we haven't deleted the file?
+            if (!deletedFile) {
+                InternalLogging.error(TAG, "Error deleting telemetry file " + file.toString());
+            }
+        }
+    }
+
+    public void makeAvailable(File file) {
+        if(file != null) {
+            this.servedFiles.remove(file);
+        }
+    }
+
+    private Boolean isFreeSpaceAvailable() {
+        String regularPrioPath = getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY;
+        File dir = new File(regularPrioPath);
+        if (dir.listFiles().length < MAX_FILE_COUNT) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void createDirectoriesIfNecessary() {
+        String filesDirPath = getContext().getFilesDir().getPath();
+        //create high prio directory
+        File dir = new File(filesDirPath + HIGH_PRIO_DIRECTORY);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        //create high prio directory
+        dir = new File(filesDirPath + REGULAR_PRIO_DIRECTORY);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+    }
+
     /**
      * Retrieves the weak context reference
+     *
      * @return the context object for this instance
      */
     private Context getContext() {
         Context context = null;
-        if(weakContext != null) {
+        if (weakContext != null) {
             context = weakContext.get();
         }
 
