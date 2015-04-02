@@ -143,17 +143,13 @@ public class Persistence {
             FileOutputStream outputStream;
             try {
                 File filesDir = getContext().getFilesDir();
-                //String path = filesDir.getPath();
-                //TODO writing doesn't work as we now have path seperators
                 if(highPriority) {
                     filesDir = new File(filesDir + HIGH_PRIO_DIRECTORY + HIGH_PRIO_FILE_NAME);
                     outputStream = new FileOutputStream(filesDir, true);
-                    //outputStream = context.openFileOutput(path + HIGH_PRIO_DIRECTORY + HIGH_PRIO_FILE_NAME, Context.MODE_PRIVATE);
                 }
                 else {
                     filesDir = new File(filesDir + REGULAR_PRIO_DIRECTORY + REGULAR_PRIO_FILE_NAME);
                     outputStream = new FileOutputStream(filesDir, true);
-                    //outputStream = context.openFileOutput(path + REGULAR_PRIO_DIRECTORY + REGULAR_PRIO_FILE_NAME, Context.MODE_PRIVATE);
                 }
                 outputStream.write(data.getBytes());
                 outputStream.close();
