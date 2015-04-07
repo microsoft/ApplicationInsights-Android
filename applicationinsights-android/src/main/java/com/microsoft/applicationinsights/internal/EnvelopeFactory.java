@@ -273,7 +273,7 @@ public enum EnvelopeFactory {
             localException = new Exception();
         }
 
-        // TODO: set handletAt
+        // TODO: set handledAt
         // read stack frames
         List<CrashDataThreadFrame> stackFrames = new ArrayList<>();
         StackTraceElement[] stack = localException.getStackTrace();
