@@ -110,8 +110,7 @@ public class Sender {
             InternalLogging.error(TAG, e.toString());
             Persistence persistence = Persistence.getInstance();
             if (persistence != null) {
-                persistence.makeAvailable(fileToSend);
-                //TODO delete the file?
+                persistence.makeAvailable(fileToSend); //send again later
             }
         } finally {
             if (writer != null) {

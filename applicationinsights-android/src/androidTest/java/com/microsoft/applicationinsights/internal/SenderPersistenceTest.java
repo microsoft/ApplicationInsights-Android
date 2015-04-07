@@ -4,6 +4,7 @@ import android.test.AndroidTestCase;
 
 import junit.framework.Assert;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -38,7 +39,8 @@ public class SenderPersistenceTest extends AndroidTestCase {
         String expected = "THIS IS A TEST";
         sender.onResponse(conn, 501, expected);
 
-        String data = persist.getNextItemFromDisk();
+        File file = persist.nextAvailableFile();
+        String data = persist.load(file);
         Assert.assertEquals("Data was retrieved from persistence file", expected, data);
     }
 }

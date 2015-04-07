@@ -22,6 +22,6 @@ public class PersistenceTest extends AndroidTestCase {
         String data = "SAVE THIS DATA";
         persistence.persist(data, false);
 
-        Assert.assertEquals("Data retrieved from file is equal to data saved", data, persistence.getNextItemFromDisk());
+        Assert.assertEquals("Data retrieved from file is equal to data saved", data, persistence.nextAvailableFile());
     }
 }

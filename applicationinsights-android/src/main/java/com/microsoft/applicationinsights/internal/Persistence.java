@@ -90,11 +90,14 @@ public class Persistence {
     }
 
     /**
-     * Serializes the input and calls:
+     * Serializes a IJsonSerializable[] and calls:
+     *
+     * @param data the data to serialize and save to disk
+     * @param highPriority the priority to save the data with
      *
      * @see Persistence#persist(String, Boolean)
      */
-    public boolean persist(IJsonSerializable[] data, Boolean highPriority) {
+    protected boolean persist(IJsonSerializable[] data, Boolean highPriority) {
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess;
         try {
@@ -120,12 +123,14 @@ public class Persistence {
     }
 
     /**
-     * Saves a collection of IJsonSerializable objects to disk
+     * Saves a string to disk.
      *
-     * @param data the serializable collection to save
+     * @param data the string to save
+     * @param highPriority the priority we want to use for persisting the data
+     *
      * @return true if the operation was successful, false otherwise
      */
-    public boolean persist(String data, Boolean highPriority) {
+    protected boolean persist(String data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to persist data.");
             return false;
@@ -158,7 +163,9 @@ public class Persistence {
     }
 
     /**
-     * Retrieves and deletes the next item from disk. Will return a crash if available.
+     * Retrieves the data from a given path.
+     *
+     * @param file reference to a file on disk
      *
      * @return the next item from disk or empty string if anything goes wrong
      */
@@ -184,6 +191,11 @@ public class Persistence {
         return buffer.toString();
     }
 
+    /**
+     * Get a reference to the next available file. High priority is served before regular priority.
+     *
+     * @return the next available file.
+     */
     public File nextAvailableFile() {
         File file = this.nextHighPrioFile();
         if (file != null) {
@@ -200,17 +212,23 @@ public class Persistence {
        return this.nextAvailableFileInDirectory(directory);
     }
 
+
     private File nextRegularPrioFile() {
         String path = getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY;
         File directory = new File(path);
         return this.nextAvailableFileInDirectory(directory);
     }
 
+    /**
+     * @param directory reference to the directory
+     *
+     * @return reference to the next available file, null if no file is available
+     */
     private File nextAvailableFileInDirectory(File directory) {
         File[] files = directory.listFiles();
         File file;
         if ((files != null) && (files.length > 0)) {
-            for(int i = 0; i < files.length - 1; i++) {
+            for(int i = 0; i < files.length - 1; i++) { //TODO make this more efficient if necessary
                 file = files[i];
                if(!this.servedFiles.contains(file)) {
                    return file;//we haven't served the file, return it
@@ -225,23 +243,44 @@ public class Persistence {
 
     }
 
-    public void deleteFile(File file) {
+    /**
+     * delete a file from disk and remove it from the list of served files if deletion was successful
+     *
+     * @param file reference to the file we want to delete
+     *
+     */
+    protected void deleteFile(File file) {
         if (file != null) {
             // always delete the file
             boolean deletedFile = file.delete();
-            this.servedFiles.remove(file); //TODO don't remove in case we haven't deleted the file?
             if (!deletedFile) {
                 InternalLogging.error(TAG, "Error deleting telemetry file " + file.toString());
             }
+            else {
+                this.servedFiles.remove(file);
+            }
+        }
+        else {
+            InternalLogging.warn(TAG, "Couldn't delete file, the reference to the file was null");
         }
     }
 
-    public void makeAvailable(File file) {
+    /**
+     * Make a file available to be served again
+     *
+     * @param file reference to the file that should be made available so it can be sent again later
+     */
+    protected void makeAvailable(File file) {
         if(file != null) {
             this.servedFiles.remove(file);
         }
     }
 
+    /**
+     * Check if we haven't reached MAX_FILE_COUNT yet
+     *
+     * @param highPriority indicates which directory to check for available files
+     */
     private Boolean isFreeSpaceAvailable(Boolean highPriority) {
         String path = highPriority ? (getContext().getFilesDir() + HIGH_PRIO_DIRECTORY) :
               (getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY);
@@ -249,6 +288,9 @@ public class Persistence {
         return (dir.listFiles().length < MAX_FILE_COUNT);
     }
 
+    /**
+     * create local folders for both priorities if they are not present, yet.
+     */
     private void createDirectoriesIfNecessary() {
         String filesDirPath = getContext().getFilesDir().getPath();
         //create high prio directory
