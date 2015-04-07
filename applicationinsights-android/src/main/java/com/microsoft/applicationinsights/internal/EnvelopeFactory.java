@@ -1,8 +1,10 @@
 package com.microsoft.applicationinsights.internal;
 
 
-import com.microsoft.applicationinsights.ExceptionUtil;
 import com.microsoft.applicationinsights.contracts.CrashData;
+import com.microsoft.applicationinsights.contracts.CrashDataHeaders;
+import com.microsoft.applicationinsights.contracts.CrashDataThread;
+import com.microsoft.applicationinsights.contracts.CrashDataThreadFrame;
 import com.microsoft.applicationinsights.contracts.Data;
 import com.microsoft.applicationinsights.contracts.DataPoint;
 import com.microsoft.applicationinsights.contracts.DataPointType;
@@ -13,15 +15,14 @@ import com.microsoft.applicationinsights.contracts.MetricData;
 import com.microsoft.applicationinsights.contracts.PageViewData;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
-import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public enum EnvelopeFactory {
     INSTANCE;
@@ -179,7 +180,7 @@ public enum EnvelopeFactory {
      * @return an Envelope object, which contains a handled or unhandled exception
      */
     public Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
-        CrashData telemetry = ExceptionUtil.getCrashData(exception, properties, this.context.getPackageName());
+        CrashData telemetry = this.getCrashData(exception, properties);
 
         Envelope envelope = createEnvelope(telemetry);
         return envelope;
@@ -257,5 +258,51 @@ public enum EnvelopeFactory {
      */
     public void setCommonProperties(Map<String, String> commonProperties) {
         this.commonProperties = commonProperties;
+    }
+
+
+    /**
+     * Parse an exception and it's stack trace and create the CrashData object
+     * @param exception the throwable object we want to create a crashdata from
+     * @param properties properties used foor the CrashData
+     * @return a CrashData object that contains the stacktrace and context info
+     */
+    private CrashData getCrashData(Throwable exception, Map<String, String> properties) {
+        Throwable localException = exception;
+        if (localException == null) {
+            localException = new Exception();
+        }
+
+        // TODO: set handletAt
+        // read stack frames
+        List<CrashDataThreadFrame> stackFrames = new ArrayList<>();
+        StackTraceElement[] stack = localException.getStackTrace();
+        for (int i = stack.length - 1; i >= 0; i--) {
+            StackTraceElement rawFrame = stack[i];
+            CrashDataThreadFrame frame = new CrashDataThreadFrame();
+            frame.setSymbol(rawFrame.toString());
+            stackFrames.add(frame);
+            frame.setAddress("");
+        }
+
+        CrashDataThread crashDataThread = new CrashDataThread();
+        crashDataThread.setFrames(stackFrames);
+        List<CrashDataThread> threads = new ArrayList<>(1);
+        threads.add(crashDataThread);
+
+        CrashDataHeaders crashDataHeaders = new CrashDataHeaders();
+        crashDataHeaders.setId(UUID.randomUUID().toString());
+
+        String message = localException.getMessage();
+        crashDataHeaders.setExceptionReason(ensureNotNull(message));
+        crashDataHeaders.setExceptionType(localException.getClass().getName());
+        crashDataHeaders.setApplicationPath(this.context.getPackageName());
+
+        CrashData crashData = new CrashData();
+        crashData.setThreads(threads);
+        crashData.setHeaders(crashDataHeaders);
+        crashData.setProperties(properties);
+
+        return crashData;
     }
 }
