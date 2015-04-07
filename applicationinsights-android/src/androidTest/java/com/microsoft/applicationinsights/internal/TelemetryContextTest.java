@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.TelemetryClientConfig;
+import com.microsoft.applicationinsights.SessionConfig;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockTelemetryContext;
 
@@ -25,14 +25,14 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     private final String userIdKey = "ai.user.id";
     private final String userAcqKey = "ai.user.accountAcquisitionDate";
 
-    private TelemetryClientConfig config;
+    private SessionConfig config;
 
     public void setUp() throws Exception {
         super.setUp();
 
         Intent intent = new Intent(getInstrumentation().getTargetContext(), com.microsoft.mocks.MockActivity.class);
         this.setActivity(this.startActivity(intent, null, null));
-        this.config = new TelemetryClientConfig(this.getActivity());
+        this.config = new SessionConfig(this.getActivity());
 
         SharedPreferences.Editor editor = this.getActivity().getApplicationContext()
                 .getSharedPreferences(TelemetryContext.SHARED_PREFERENCES_KEY, 0).edit();

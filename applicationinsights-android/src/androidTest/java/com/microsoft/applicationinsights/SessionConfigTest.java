@@ -5,9 +5,9 @@ import android.test.ActivityUnitTestCase;
 
 import com.microsoft.mocks.MockActivity;
 
-public class TelemetryClientConfigTest extends ActivityUnitTestCase<MockActivity> {
+public class SessionConfigTest extends ActivityUnitTestCase<MockActivity> {
 
-    public TelemetryClientConfigTest() {
+    public SessionConfigTest() {
         super(MockActivity.class);
     }
 

@@ -5,23 +5,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
-import com.microsoft.applicationinsights.contracts.SessionState;
-import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.internal.Channel;
 import com.microsoft.applicationinsights.internal.EnvelopeFactory;
 import com.microsoft.applicationinsights.internal.TelemetryContext;
-import com.microsoft.applicationinsights.contracts.CrashData;
-import com.microsoft.applicationinsights.contracts.DataPoint;
-import com.microsoft.applicationinsights.contracts.DataPointType;
-import com.microsoft.applicationinsights.contracts.EventData;
-import com.microsoft.applicationinsights.contracts.MessageData;
-import com.microsoft.applicationinsights.contracts.MetricData;
-import com.microsoft.applicationinsights.contracts.PageViewData;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,7 +32,7 @@ public class TelemetryClient {
     /**
      * The configuration for this telemetry client.
      */
-    protected final TelemetryClientConfig config;
+    protected final SessionConfig config;
 
     /**
      * The telemetry telemetryContext object.
@@ -70,7 +58,7 @@ public class TelemetryClient {
      * @param context the application context for this client
      */
     protected TelemetryClient(Context context) {
-        this(new TelemetryClientConfig(context), context);
+        this(new SessionConfig(context), context);
     }
 
     /**
@@ -81,7 +69,7 @@ public class TelemetryClient {
      *
      * @param config the configuration for this client
      */
-    private TelemetryClient(TelemetryClientConfig config, Context context) {
+    private TelemetryClient(SessionConfig config, Context context) {
         this(config, new TelemetryContext(context, config.getInstrumentationKey()), new Channel());
     }
 
@@ -97,7 +85,7 @@ public class TelemetryClient {
      */
     protected   TelemetryClient(
             // TODO: TelemetryClientConfig should be member of LifecycleTracking
-            TelemetryClientConfig config,
+            SessionConfig config,
             TelemetryContext context,
             Channel channel) {
         this.config = config;
@@ -135,7 +123,7 @@ public class TelemetryClient {
     /**
      * The telemetry channel for this client.
      */
-    public TelemetryClientConfig getConfig() {
+    public SessionConfig getConfig() {
         return config;
     }
 

@@ -7,8 +7,7 @@ import com.microsoft.applicationinsights.internal.TelemetryChannelConfig;
 /**
  * Configuration object when instantiating TelemetryClient
  */
-// TODO: Rename class to something like SessionConfig
-public class TelemetryClientConfig extends TelemetryChannelConfig {
+public class SessionConfig extends TelemetryChannelConfig {
 
     /**
      * The interval at which sessions are renewed
@@ -25,9 +24,9 @@ public class TelemetryClientConfig extends TelemetryChannelConfig {
      *
      * @param context The android app context
      */
-    public TelemetryClientConfig(Context context) {
+    public SessionConfig(Context context) {
         super(context);
-        this.sessionIntervalMs = TelemetryClientConfig.SESSION_INTERVAL;
+        this.sessionIntervalMs = SessionConfig.SESSION_INTERVAL;
     }
 
     /**

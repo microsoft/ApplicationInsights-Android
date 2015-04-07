@@ -3,7 +3,7 @@ package com.microsoft.mocks;
 import android.content.Context;
 
 import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.TelemetryClientConfig;
+import com.microsoft.applicationinsights.SessionConfig;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.internal.EnvelopeFactory;
 import com.microsoft.applicationinsights.internal.TelemetryContext;
@@ -15,12 +15,12 @@ public class MockTelemetryClient extends TelemetryClient {
     public boolean mockTrackMethod;
 
     public MockTelemetryClient (Context context) {
-        this(new TelemetryClientConfig(context), context);
+        this(new SessionConfig(context), context);
         this.messages = new ArrayList<Envelope>(10);
         this.mockTrackMethod = true;
     }
 
-    protected MockTelemetryClient(TelemetryClientConfig config, Context context) {
+    protected MockTelemetryClient(SessionConfig config, Context context) {
         super(config, new TelemetryContext(context, config.getInstrumentationKey()), new MockChannel());
         ((MockChannel)this.channel).setQueue(new MockQueue(1));
     }
