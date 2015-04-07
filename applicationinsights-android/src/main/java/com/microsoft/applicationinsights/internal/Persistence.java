@@ -126,7 +126,7 @@ public class Persistence {
      * @return true if the operation was successful, false otherwise
      */
     public boolean persist(String data, Boolean highPriority) {
-        if (!this.isFreeSpaceAvailable()) {
+        if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to persist data.");
             return false;
         }
@@ -242,14 +242,11 @@ public class Persistence {
         }
     }
 
-    private Boolean isFreeSpaceAvailable() {
-        String regularPrioPath = getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY;
-        File dir = new File(regularPrioPath);
-        if (dir.listFiles().length < MAX_FILE_COUNT) {
-            return true;
-        } else {
-            return false;
-        }
+    private Boolean isFreeSpaceAvailable(Boolean highPriority) {
+        String path = highPriority ? (getContext().getFilesDir() + HIGH_PRIO_DIRECTORY) :
+              (getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY);
+        File dir = new File(path);
+        return (dir.listFiles().length < MAX_FILE_COUNT);
     }
 
     private void createDirectoriesIfNecessary() {
