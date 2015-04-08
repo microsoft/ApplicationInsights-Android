@@ -60,7 +60,7 @@ public class ItemListActivity extends FragmentActivity
         client.trackTrace("example trace");
         client.trackEvent("example event");
         client.trackMetric("example metric", 1);
-        client.flush();
+        client.sendPendingData();
 
         // Track uncaught exceptions
         client.enableCrashTracking(this);

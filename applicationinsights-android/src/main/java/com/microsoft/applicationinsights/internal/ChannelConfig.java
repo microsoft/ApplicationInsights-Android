@@ -7,8 +7,7 @@ import android.util.Log;
 
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
-public class TelemetryChannelConfig {
-
+public class ChannelConfig {
 
     private static final String TAG = "TelemetryChannelConfig";
 
@@ -32,8 +31,8 @@ public class TelemetryChannelConfig {
      *
      * @param context The android activity context
      */
-    public TelemetryChannelConfig(Context context) {
-        this.instrumentationKey = TelemetryChannelConfig.readInstrumentationKey(context);
+    public ChannelConfig(Context context) {
+        this.instrumentationKey = ChannelConfig.readInstrumentationKey(context);
     }
 
     /**
@@ -64,14 +63,14 @@ public class TelemetryChannelConfig {
      * @return the instrumentation key for the application or empty string if not available
      */
     private static String getInstrumentationKey(Context context) {
-        synchronized (TelemetryChannelConfig.LOCK) {
-            if (TelemetryChannelConfig.iKeyFromManifest == null) {
-                String iKey = TelemetryChannelConfig.readInstrumentationKey(context);
-                TelemetryChannelConfig.iKeyFromManifest = iKey;
+        synchronized (ChannelConfig.LOCK) {
+            if (ChannelConfig.iKeyFromManifest == null) {
+                String iKey = ChannelConfig.readInstrumentationKey(context);
+                ChannelConfig.iKeyFromManifest = iKey;
             }
         }
 
-        return TelemetryChannelConfig.iKeyFromManifest;
+        return ChannelConfig.iKeyFromManifest;
     }
 
     /**

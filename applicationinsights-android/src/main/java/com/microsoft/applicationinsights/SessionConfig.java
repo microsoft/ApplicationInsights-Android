@@ -2,12 +2,12 @@ package com.microsoft.applicationinsights;
 
 import android.content.Context;
 
-import com.microsoft.applicationinsights.internal.TelemetryChannelConfig;
+import com.microsoft.applicationinsights.internal.ChannelConfig;
 
 /**
  * Configuration object when instantiating TelemetryClient
  */
-public class SessionConfig extends TelemetryChannelConfig {
+public class SessionConfig extends ChannelConfig {
 
     /**
      * The interval at which sessions are renewed
