@@ -18,7 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * This class records telemetry for application insights.
  */
-public class Channel {
+public enum Channel {
+    INSTANCE;
 
     private static final String TAG = "Channel";
 
@@ -40,9 +41,8 @@ public class Channel {
     /**
      * Instantiates a new INSTANCE of Sender
      */
-    public Channel() {
+    private Channel() {
         this.queue = TelemetryQueue.INSTANCE;
-
         Random random = new Random();
         this.channelId = Math.abs(random.nextLong());
         this.seqCounter = new AtomicInteger(0);
