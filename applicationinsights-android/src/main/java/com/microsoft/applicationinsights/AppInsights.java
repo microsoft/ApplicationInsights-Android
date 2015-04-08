@@ -92,6 +92,9 @@ public enum AppInsights {
         TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
         EnvelopeFactory.INSTANCE.configure(telemetryContext);
 
+        if(!this.telemetryDisabled){
+            LifeCycleTracking.initialize(config, telemetryContext);
+        }
         if(!this.exceptionTrackingDisabled){
             ExceptionTracking.registerExceptionHandler(this.context);
         }
