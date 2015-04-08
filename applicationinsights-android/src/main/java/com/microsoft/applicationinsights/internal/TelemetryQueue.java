@@ -104,7 +104,7 @@ public class TelemetryQueue {
 
             if (success) {
                 if ((this.list.size() >= this.config.getMaxBatchCount()) || isCrashing) {
-                    // flush if the queue is full
+                    // sendPendingData if the queue is full
                     this.flush();
                 } else if (this.list.size() == 1) {
                     // schedule a FlushTask if this is the first item in the queue
@@ -124,7 +124,7 @@ public class TelemetryQueue {
      */
     public void flush() {
 
-        // asynchronously flush the queue with a non-daemon thread
+        // asynchronously sendPendingData the queue with a non-daemon thread
         // if this was called from the timer task it would inherit the daemon status
         // since this thread does I/O it must not be a daemon thread
         Thread flushThread = new Thread(new SendTask(this, this.sender));
@@ -138,7 +138,7 @@ public class TelemetryQueue {
     }
 
     /**
-     * A task to initiate queue flush on another thread
+     * A task to initiate queue sendPendingData on another thread
      */
     private class FlushTask extends TimerTask {
         private TelemetryQueue queue;

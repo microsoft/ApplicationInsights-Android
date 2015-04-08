@@ -110,7 +110,7 @@ public class TelemetryQueueTest extends TestCase {
     public void testBatchingTimer() {
         this.queue.getConfig().setMaxBatchCount(3);
 
-        // enqueue one item and wait for the queue to flush via the timer
+        // enqueue one item and wait for the queue to sendPendingData via the timer
         this.queue.enqueue(this.item);
         try {
             this.queue.sendSignal.await(batchMargin + this.queue.getConfig().getMaxBatchIntervalMs() + 1, TimeUnit.MILLISECONDS);
@@ -126,7 +126,7 @@ public class TelemetryQueueTest extends TestCase {
     public void testBatchingFlush() {
         this.queue.getConfig().setMaxBatchCount(3);
 
-        // enqueue one item and flush it to bypass the timer
+        // enqueue one item and sendPendingData it to bypass the timer
         this.queue.enqueue(this.item);
         try {
 
@@ -138,7 +138,7 @@ public class TelemetryQueueTest extends TestCase {
 
             this.queue.flush();
             this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
-            Assert.assertEquals("single item was sent after calling sender.flush",
+            Assert.assertEquals("single item was sent after calling sender.sendPendingData",
                     0, this.queue.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
                     this.queue.getQueue().size(), 0);

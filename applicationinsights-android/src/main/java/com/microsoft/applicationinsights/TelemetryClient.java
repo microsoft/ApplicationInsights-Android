@@ -280,12 +280,12 @@ public class TelemetryClient {
     }
 
     /**
-     * Triggers an asynchronous flush of queued telemetry.
+     * Triggers persisting and if applicable sending of queued data
      * note: this will be called
      * {@link com.microsoft.applicationinsights.internal.TelemetryQueueConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
-    public void flush() { //TODO call flush() on the channel and not on the queue!
+    public void sendPendingData() { //TODO call sendPendingData() on the channel and not on the queue!
         this.channel.getQueue().flush();
     }
 

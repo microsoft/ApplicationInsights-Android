@@ -3,7 +3,6 @@ package com.microsoft.applicationinsights;
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.contracts.EventData;
 import com.microsoft.mocks.MockActivity;
 
 import junit.framework.Assert;
@@ -114,6 +113,6 @@ public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
 
     public void testFlush() throws Exception {
         TelemetryClient client = TelemetryClient.getInstance(this.mockActivity);
-        client.flush(); // todo: mock sender and verify that flush is called
+        client.sendPendingData(); // todo: mock sender and verify that sendPendingData is called
     }
 }

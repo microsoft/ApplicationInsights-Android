@@ -109,7 +109,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             Thread.sleep(10);
         }
 
-        this.client.flush();
+        this.client.sendPendingData();
         Thread.sleep(10);
         this.validate();
     }
