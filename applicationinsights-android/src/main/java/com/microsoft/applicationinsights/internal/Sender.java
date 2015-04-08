@@ -1,6 +1,8 @@
 package com.microsoft.applicationinsights.internal;
 
 import android.annotation.TargetApi;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Build;
 
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
@@ -14,9 +16,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.TimerTask;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -25,103 +31,87 @@ import java.util.zip.GZIPOutputStream;
 public class Sender {
 
     private static final String TAG = "Sender";
+
+    /**
+     * Volatile boolean for double checked synchronize block
+     */
+    private static volatile boolean isSenderLoaded = false;
+
+
+    /**
+     * Synchronization LOCK for setting static config
+     */
+    private static final Object LOCK = new Object();
+
     /**
      * The configuration for this sender
      */
-    protected final TelemetryQueueConfig config;
+    protected final TelemetryConfig config;
 
-    private File fileToSend;
+    private static Sender instance;
+
+
+    private HashMap<String, TimerTask> currentTasks = new HashMap<>(10);
 
     /**
-     * Prevent external instantiation
+     * Restrict access to the default constructor
      */
-    public Sender(TelemetryQueueConfig config) {
+    protected Sender(TelemetryConfig config) {
         this.config = config;
     }
 
     /**
-     * Sends data to the configured URL
+     * Initialize the INSTANCE of persistence
      *
-     * @param data a collection of serializable data
+     * @param config the config for the INSTANCE
      */
-    protected void send(IJsonSerializable[] data) {
-        StringBuilder buffer = new StringBuilder();
-
-        try {
-            buffer.append('[');
-            for (int i = 0; i < data.length; i++) {
-                if (i > 0) {
-                    buffer.append(',');
+    public static void initialize(TelemetryConfig config) {
+        // note: isSenderLoaded must be volatile for the double-checked LOCK to work
+        if (!Sender.isSenderLoaded) {
+            synchronized (Sender.LOCK) {
+                if (!Sender.isSenderLoaded) {
+                    Sender.isSenderLoaded = true;
+                    Sender.instance = new Sender(config);
                 }
-                StringWriter stringWriter = new StringWriter();
-                data[i].serialize(stringWriter);
-                buffer.append(stringWriter.toString());
             }
+        }
+    }
 
-            buffer.append(']');
+    /**
+     * @return the INSTANCE of the sender or null if not yet initialized
+     */
+    public static Sender getInstance() {
+        if (Sender.instance == null) {
+            InternalLogging.error(TAG, "getInstance was called before initialization");
+        }
 
+        return Sender.instance;
+    }
+
+
+    protected void send() {
+        if(getInstance().currentTasks.size() < 10) {
             // Send the persisted data
             Persistence persistence = Persistence.getInstance();
             if (persistence != null) {
-                fileToSend = persistence.nextAvailableFile();
+                File fileToSend = persistence.nextAvailableFile();
                 if(fileToSend != null) {
                     String persistedData = persistence.load(fileToSend);
                     if (!persistedData.isEmpty()) {
-                        InternalLogging.info(TAG, "adding persisted data", persistedData);
-                        sendRequestWithPayload(persistedData);
+                        InternalLogging.info(TAG, "sending persisted data", persistedData);
+                        SendingTask sendingTask = new SendingTask(persistedData, this, fileToSend);
+                        this.currentTasks.put(fileToSend.toString(), sendingTask);
+                        sendingTask.run();
+                        Thread sendingThread = new Thread(sendingTask);
+                        sendingThread.setDaemon(false);
                     }
                 }
             }
-
-            // Send the new data
-            String serializedData = buffer.toString();
-            sendRequestWithPayload(serializedData);
-        } catch (IOException e) {
-            InternalLogging.error(TAG, e.toString());
         }
-    }
-
-    private void sendRequestWithPayload(String payload) throws IOException {
-        Writer writer = null;
-        URL url = new URL(this.config.getEndpointUrl());
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setReadTimeout(this.config.getSenderReadTimeout());
-        connection.setConnectTimeout(this.config.getSenderConnectTimeout());
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setUseCaches(false);
-
-        try {
-            InternalLogging.info(TAG, "writing payload", payload);
-            writer = this.getWriter(connection);
-            writer.write(payload);
-            writer.flush();
-
-            // Starts the query
-            connection.connect();
-
-            // read the response code while we're ready to catch the IO exception
-            int responseCode = connection.getResponseCode();
-
-            // process the response
-            this.onResponse(connection, responseCode, payload);
-        } catch (IOException e) {
-            InternalLogging.error(TAG, e.toString());
-            Persistence persistence = Persistence.getInstance();
-            if (persistence != null) {
-                persistence.makeAvailable(fileToSend); //send again later
-            }
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // no-op
-                }
-            }
+        else {
+            InternalLogging.info(TAG, "We have already 10 pending reguests", "");
         }
-    }
+}
 
     /**
      * Handler for the http response from the sender
@@ -131,7 +121,9 @@ public class Sender {
      * @param payload      the payload which generated this response
      * @return null if the request was successful, the server response otherwise
      */
-    protected String onResponse(HttpURLConnection connection, int responseCode, String payload) {
+    protected String onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
+        currentTasks.remove(fileToSend.toString());
+
         StringBuilder builder = new StringBuilder();
 
         InternalLogging.info(TAG, "response code", Integer.toString(responseCode));
@@ -140,12 +132,12 @@ public class Sender {
 
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
-            this.onExpected(connection, builder);
+            this.onExpected(connection, builder, fileToSend);
         }
 
-        // If there was a server issue, persist the data
+        // If there was a server issue, flush the data
         if (isRecoverableError) {
-            this.onRecoverable(payload);
+            this.onRecoverable(payload, fileToSend);
         }
 
         // If it isn't the usual success code (200), log the response from the server.
@@ -153,17 +145,20 @@ public class Sender {
             this.onUnexpected(connection, responseCode, builder);
         }
 
+        //TODO don't trigger sending endlessly
+        //this.send();
+
         return builder.toString();
     }
 
     /**
      * Process the expected response. If {code:TelemetryChannelConfig.isDeveloperMode}, read the
      * response and log it.
-     *
-     * @param connection a connection containing a response
+     *  @param connection a connection containing a response
      * @param builder    a string builder for storing the response
+     * @param fileToSend
      */
-    protected void onExpected(HttpURLConnection connection, StringBuilder builder) {
+    protected void onExpected(HttpURLConnection connection, StringBuilder builder, File fileToSend) {
         if (this.config.isDeveloperMode()) {
             this.readResponse(connection, builder);
         }
@@ -171,12 +166,10 @@ public class Sender {
         if(persistence != null) {
             persistence.deleteFile(fileToSend);
         }
-        fileToSend = null;
     }
 
     /**
-     *
-     * @param connection   a connection containing a response
+     *  @param connection   a connection containing a response
      * @param responseCode the response code from the connection
      * @param builder      a string builder for storing the response
      */
@@ -197,13 +190,13 @@ public class Sender {
      * the failure instead of the client.
      *
      * @param payload the payload which generated this response
+     * @param fileToSend
      */
-    protected void onRecoverable(String payload) {
+    protected void onRecoverable(String payload, File fileToSend) {
         InternalLogging.info(TAG, "Server error, persisting data", payload);
         Persistence persistence = Persistence.getInstance();
         if (persistence != null) {
-            persistence.makeAvailable(this.fileToSend);
-            fileToSend = null;
+            persistence.makeAvailable(fileToSend);
         }
     }
 
@@ -265,5 +258,75 @@ public class Sender {
             return new OutputStreamWriter(connection.getOutputStream());
         }
     }
+
+
+    private class SendingTask extends TimerTask {
+
+        private Sender sender;
+        private String payload;
+        private File fileToSend;
+
+        public SendingTask(String payload, Sender sender, File fileToSend) {
+            this.payload = payload;
+            this.sender = sender;
+            this.fileToSend = fileToSend;
+        }
+
+        @Override
+        public void run() {
+            if (this.payload != null) {
+                try {
+                    InternalLogging.info(TAG, "sending persisted data", payload);
+                    this.sendRequestWithPayload(payload);
+                } catch (IOException e) {
+                    InternalLogging.error(TAG, e.toString());
+                }
+            }
+        }
+
+        protected void sendRequestWithPayload(String payload) throws IOException {
+            Writer writer = null;
+            URL url = new URL(this.sender.config.getEndpointUrl());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setReadTimeout(this.sender.config.getSenderReadTimeout());
+            connection.setConnectTimeout(this.sender.config.getSenderConnectTimeout());
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setUseCaches(false);
+
+            try {
+                InternalLogging.info(TAG, "writing payload", payload);
+                writer = this.sender.getWriter(connection);
+                writer.write(payload);
+                writer.flush();
+
+                // Starts the query
+                connection.connect();
+
+                // read the response code while we're ready to catch the IO exception
+                int responseCode = connection.getResponseCode();
+
+                // process the response
+                this.sender.onResponse(connection, responseCode, payload, fileToSend);
+            } catch (IOException e) {
+                InternalLogging.error(TAG, e.toString());
+                Persistence persistence = Persistence.getInstance();
+                if (persistence != null) {
+                    persistence.makeAvailable(fileToSend); //send again later
+                }
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.close();
+                    } catch (IOException e) {
+                        // no-op
+                    }
+                }
+            }
+        }
+
+    }
 }
+
 

@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.internal.TelemetryQueueConfig;
+import com.microsoft.applicationinsights.internal.TelemetryConfig;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockQueue;
 import com.microsoft.mocks.MockTelemetryClient;
@@ -34,7 +34,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
 
         this.client = new MockTelemetryClient(this.getActivity());
         this.client.mockTrackMethod = false;
-        TelemetryQueueConfig config = this.client.getChannel().getQueue().getConfig();
+        TelemetryConfig config = this.client.getChannel().getQueue().getConfig();
         config.setMaxBatchIntervalMs(20);
 
         // use http for tests

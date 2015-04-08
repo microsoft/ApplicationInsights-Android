@@ -112,6 +112,14 @@ public class Persistence {
             buffer.append(']');
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData, highPriority);
+
+            //TODO trigger sending in a different way?
+            if(isSuccess) {
+                Sender sender = Sender.getInstance();
+                if(sender != null) {
+                    sender.send();
+                }
+            }
         } catch (IOException e) {
             InternalLogging.error(TAG, e.toString());
             return false;
@@ -130,6 +138,7 @@ public class Persistence {
     protected boolean persist(String data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
+            Sender.getInstance().send();
             return false;
         }
 
@@ -210,6 +219,7 @@ public class Persistence {
             return this.nextAvailableFileInDirectory(directory);
         }
 
+        InternalLogging.error(TAG, "The context for persistence is null");//TODO talk to chris about this
         return null;
     }
 
@@ -222,6 +232,7 @@ public class Persistence {
             return this.nextAvailableFileInDirectory(directory);
         }
 
+        InternalLogging.error(TAG, "The context for persistence is null");//TODO talk to chris about this
         return null;
     }
 
@@ -245,7 +256,6 @@ public class Persistence {
         }
 
         return null; //no files in directory or no directory
-
     }
 
     /**
@@ -263,7 +273,7 @@ public class Persistence {
                 this.servedFiles.remove(file);
             }
         } else {
-            InternalLogging.warn(TAG, "Couldn't delete file, the reference to the file was null");
+            InternalLogging.error(TAG, "Couldn't delete file, the reference to the file was null");
         }
     }
 

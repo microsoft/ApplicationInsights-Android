@@ -1,10 +1,10 @@
 package com.microsoft.mocks;
 
-import com.microsoft.applicationinsights.internal.TelemetryQueue;
+import com.microsoft.applicationinsights.internal.ChannelQueue;
 
 import java.util.concurrent.CountDownLatch;
 
-public class MockQueue extends TelemetryQueue {
+public class MockQueue extends ChannelQueue {
 
     public int responseCode;
     public CountDownLatch sendSignal;

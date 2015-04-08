@@ -1,17 +1,9 @@
 package com.microsoft.applicationinsights.internal;
 
-import android.content.Context;
-
-import com.microsoft.applicationinsights.contracts.CrashData;
-import com.microsoft.applicationinsights.contracts.Data;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
-import java.util.Date;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,13 +27,15 @@ public class Channel {
     /**
      * Test hook to the sender
      */
-    private TelemetryQueue queue;
+    private ChannelQueue queue;
+
+    private Sender sender;
 
     /**
      * Instantiates a new INSTANCE of Sender
      */
     public Channel() {
-        this.queue = TelemetryQueue.INSTANCE;
+        this.queue = ChannelQueue.INSTANCE;
 
         Random random = new Random();
         this.channelId = Math.abs(random.nextLong());
@@ -51,7 +45,7 @@ public class Channel {
     /**
      * @return the sender for this channel.
      */
-    public TelemetryQueue getQueue() {
+    public ChannelQueue getQueue() {
         return this.queue;
     }
 
@@ -60,7 +54,7 @@ public class Channel {
      *
      * @param queue the queue to use for this channel
      */
-    protected void setQueue(TelemetryQueue queue) {
+    protected void setQueue(ChannelQueue queue) {
         this.queue = queue;
     }
 

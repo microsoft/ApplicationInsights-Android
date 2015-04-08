@@ -2,7 +2,7 @@ package com.microsoft.applicationinsights.internal.logging;
 
 import android.util.Log;
 
-import com.microsoft.applicationinsights.internal.TelemetryQueue;
+import com.microsoft.applicationinsights.internal.ChannelQueue;
 
 public class InternalLogging {
     private static final String PREFIX = InternalLogging.class.getPackage().getName();
@@ -20,7 +20,7 @@ public class InternalLogging {
      * @param payload the payload for the message
      */
     public static void info(String tag, String message, String payload) {
-        if (TelemetryQueue.INSTANCE.getConfig().isDeveloperMode()) {
+        if (ChannelQueue.INSTANCE.getConfig().isDeveloperMode()) {
             Log.i(PREFIX + tag, message + ":" + payload);
         }
     }
@@ -32,7 +32,7 @@ public class InternalLogging {
      * @param message the log message
      */
     public static void warn(String tag, String message) {
-        if (TelemetryQueue.INSTANCE.getConfig().isDeveloperMode()) {
+        if (ChannelQueue.INSTANCE.getConfig().isDeveloperMode()) {
             Log.w(PREFIX + tag, message);
         }
     }
@@ -44,7 +44,7 @@ public class InternalLogging {
      * @param message the log message
      */
     public static void error(String tag, String message) {
-        if (TelemetryQueue.INSTANCE.getConfig().isDeveloperMode()) {
+        if (ChannelQueue.INSTANCE.getConfig().isDeveloperMode()) {
             Log.e(PREFIX + tag, message);
             throw new UserActionableSDKException(PREFIX + tag + "\n" + message);
         } else {

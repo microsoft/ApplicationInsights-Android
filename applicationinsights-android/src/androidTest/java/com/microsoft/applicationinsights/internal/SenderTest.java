@@ -8,7 +8,7 @@ public class SenderTest extends TestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        TelemetryQueueConfig config = new TelemetryQueueConfig();
+        TelemetryConfig config = new TelemetryConfig();
         this.sender = new Sender(config);
     }
 

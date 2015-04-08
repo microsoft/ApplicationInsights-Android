@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.internal.TelemetryQueueConfig;
+import com.microsoft.applicationinsights.internal.TelemetryConfig;
 
 /**
  * An activity representing a list of Items. This activity
@@ -53,7 +53,7 @@ public class ItemListActivity extends FragmentActivity
 
         // update endpoint to make traffic visible in the proxy
         TelemetryClient client = TelemetryClient.getInstance(this);
-        TelemetryQueueConfig config = client.getConfig().getStaticConfig();
+        TelemetryConfig config = client.getConfig().getStaticConfig();
         config.setEndpointUrl(config.getEndpointUrl().replace("https", "http")); //TODO change this!?
 
         // Track basic telemetry
@@ -88,6 +88,10 @@ public class ItemListActivity extends FragmentActivity
                     .commit();
 
         } else {
+            /*for(int i = 0; i < 200; i++) {
+                TelemetryClient.getInstance(this).trackEvent("Test1234");
+            }*/
+
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             Intent detailIntent = new Intent(this, ItemDetailActivity.class);

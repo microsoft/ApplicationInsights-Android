@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.internal.Channel;
 import com.microsoft.applicationinsights.internal.EnvelopeFactory;
+import com.microsoft.applicationinsights.internal.Sender;
+import com.microsoft.applicationinsights.internal.TelemetryConfig;
 import com.microsoft.applicationinsights.internal.TelemetryContext;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
@@ -282,7 +284,7 @@ public class TelemetryClient {
     /**
      * Triggers persisting and if applicable sending of queued data
      * note: this will be called
-     * {@link com.microsoft.applicationinsights.internal.TelemetryQueueConfig#maxBatchIntervalMs} after
+     * {@link TelemetryConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public void sendPendingData() { //TODO call sendPendingData() on the channel and not on the queue!

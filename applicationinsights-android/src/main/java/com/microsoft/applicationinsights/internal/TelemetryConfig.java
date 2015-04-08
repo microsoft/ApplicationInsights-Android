@@ -1,6 +1,6 @@
 package com.microsoft.applicationinsights.internal;
 
-public class TelemetryQueueConfig {
+public class TelemetryConfig {
 
     public static final int DEFAULT_MAX_BATCH_COUNT = 100;
     public static final int DEFAULT_MAX_BATCH_INTERVAL_MS = 3 * 1000;
@@ -33,12 +33,12 @@ public class TelemetryQueueConfig {
     /**
      * The master off switch.  Do not enqueue any data if set to TRUE
      */
-    private boolean telemetryDisabled;
+    private boolean telemetryDisabled; //TODO why does this disable ALL telemetry (including Crashes!)?
 
     /**
      * The flag to enable developer mode logging
      */
-    private boolean developerMode;
+    private boolean developerMode; //TODO make logging more elegant?
 
     /**
      * The timeout for reading the response from the data collector endpoint
@@ -54,16 +54,16 @@ public class TelemetryQueueConfig {
     /**
      * Constructs a new INSTANCE of the sender config
      */
-    public TelemetryQueueConfig() {
+    public TelemetryConfig() {
         // TODO: Create several configs for queue and sender
         this.lock = new Object();
-        this.maxBatchCount = TelemetryQueueConfig.DEFAULT_MAX_BATCH_COUNT;
-        this.maxBatchIntervalMs = TelemetryQueueConfig.DEFAULT_MAX_BATCH_INTERVAL_MS;
-        this.endpointUrl = TelemetryQueueConfig.DEFAULT_ENDPOINT_URL;
-        this.telemetryDisabled = TelemetryQueueConfig.DEFAULT_DISABLE_TELEMETRY;
-        this.developerMode = TelemetryQueueConfig.DEFAULT_DEVELOPER_MODE;
-        this.senderReadTimeoutMs = TelemetryQueueConfig.DEFAULT_SENDER_READ_TIMEOUT;
-        this.senderConnectTimeoutMs = TelemetryQueueConfig.DEFAULTSENDER_CONNECT_TIMEOUT;
+        this.maxBatchCount = TelemetryConfig.DEFAULT_MAX_BATCH_COUNT;
+        this.maxBatchIntervalMs = TelemetryConfig.DEFAULT_MAX_BATCH_INTERVAL_MS;
+        this.endpointUrl = TelemetryConfig.DEFAULT_ENDPOINT_URL;
+        this.telemetryDisabled = TelemetryConfig.DEFAULT_DISABLE_TELEMETRY;
+        this.developerMode = TelemetryConfig.DEFAULT_DEVELOPER_MODE;
+        this.senderReadTimeoutMs = TelemetryConfig.DEFAULT_SENDER_READ_TIMEOUT;
+        this.senderConnectTimeoutMs = TelemetryConfig.DEFAULTSENDER_CONNECT_TIMEOUT;
     }
 
     /**

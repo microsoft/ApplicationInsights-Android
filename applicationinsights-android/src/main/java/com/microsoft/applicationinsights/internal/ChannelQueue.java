@@ -1,5 +1,7 @@
 package com.microsoft.applicationinsights.internal;
 
+import android.os.AsyncTask;
+
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
@@ -11,7 +13,7 @@ import java.util.TimerTask;
 /**
  * This singleton class sends data to the endpoint
  */
-public class TelemetryQueue {
+public class ChannelQueue {
 
     /**
      * Logging tag for this class
@@ -26,12 +28,12 @@ public class TelemetryQueue {
     /**
      * The singleton INSTANCE
      */
-    public static final TelemetryQueue INSTANCE = new TelemetryQueue();
+    public static final ChannelQueue INSTANCE = new ChannelQueue();
 
     /**
      * The configuration for this queue
      */
-    protected final TelemetryQueueConfig config;
+    protected final TelemetryConfig config;
 
     /**
      * The timer for this queue
@@ -44,29 +46,29 @@ public class TelemetryQueue {
     protected List<IJsonSerializable> list;
 
     /**
-     * The sender for this queue
-     */
-    protected Sender sender;
-
-    /**
      * If true the app is crashing and data should be persisted instead of sent
      */
     protected volatile boolean isCrashing;
 
+    protected Sender sender; //TODO Remove reference to sender from queue?
+
     /**
      * All tasks which have been scheduled and not cancelled
      */
-    private TimerTask sendTask;
+    private TimerTask scheduledPersistenceTask;
 
     /**
      * Prevent external instantiation
      */
-    protected TelemetryQueue() {
+    protected ChannelQueue() {
         this.list = new LinkedList<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", true);
-        this.config = new TelemetryQueueConfig();
-        this.sender = new Sender(this.config);
+        this.config = new TelemetryConfig();
         this.isCrashing = false;
+
+
+        Sender.initialize(getConfig());
+        this.sender = Sender.getInstance();
     }
 
     /**
@@ -81,7 +83,7 @@ public class TelemetryQueue {
     /**
      * @return The configuration for this sender
      */
-    public TelemetryQueueConfig getConfig() {
+    public TelemetryConfig getConfig() {
         return config;
     }
 
@@ -98,18 +100,18 @@ public class TelemetryQueue {
         }
 
         boolean success;
-        synchronized (TelemetryQueue.LOCK) {
+        synchronized (ChannelQueue.LOCK) {
             // attempt to add the item to the queue
             success = this.list.add(item);
 
             if (success) {
                 if ((this.list.size() >= this.config.getMaxBatchCount()) || isCrashing) {
-                    // sendPendingData if the queue is full
+                    // persisting if the queue is full
                     this.flush();
                 } else if (this.list.size() == 1) {
                     // schedule a FlushTask if this is the first item in the queue
-                    this.sendTask = new FlushTask(this);
-                    this.timer.schedule(this.sendTask, this.config.getMaxBatchIntervalMs());
+                    this.scheduledPersistenceTask = new TriggerPersistTask(this);
+                    this.timer.schedule(this.scheduledPersistenceTask, this.config.getMaxBatchIntervalMs());
                 }
             } else {
                 InternalLogging.warn(TAG, "Unable to add item to queue");
@@ -120,35 +122,38 @@ public class TelemetryQueue {
     }
 
     /**
-     * Empties the queue and sends all items to the endpoint
+     * Empties the queue and sends all items to persistence
      */
     public void flush() {
+        PersistenceTask persistTask = new PersistenceTask(this);
+        persistTask.execute();
 
         // asynchronously sendPendingData the queue with a non-daemon thread
         // if this was called from the timer task it would inherit the daemon status
         // since this thread does I/O it must not be a daemon thread
-        Thread flushThread = new Thread(new SendTask(this, this.sender));
-        flushThread.setDaemon(false);
-        flushThread.start();
+        //Thread flushThread = new Thread(new TimedPersistenceTask(this));
+        //flushThread.setDaemon(false);
+        //flushThread.start();
 
-        // cancel the scheduled enqueue task if it exists
-        if (this.sendTask != null) {
-            this.sendTask.cancel();
+
+        // cancel the scheduled persistence task if it exists
+        if (this.scheduledPersistenceTask != null) {
+            this.scheduledPersistenceTask.cancel();
         }
     }
 
     /**
      * A task to initiate queue sendPendingData on another thread
      */
-    private class FlushTask extends TimerTask {
-        private TelemetryQueue queue;
+    private class TriggerPersistTask extends TimerTask {
+        private ChannelQueue queue;
 
         /**
          * The sender INSTANCE is provided to the constructor as a test hook
          *
-         * @param queue the sender INSTANCE which will be flushed
+         * @param queue the sender INSTANCE which willbe flushed
          */
-        public FlushTask(TelemetryQueue queue) {
+        public TriggerPersistTask(ChannelQueue queue) {
             this.queue = queue;
         }
 
@@ -159,27 +164,28 @@ public class TelemetryQueue {
     }
 
     /**
-     * A task to initiate network I/O on another thread
+     * A task to initiate flushing the queue and persisting it's data
      */
-    private class SendTask extends TimerTask {
-        private TelemetryQueue queue;
-        private Sender sender;
+    //private class PersistTask extends TimerTask {
+
+    private class PersistenceTask extends AsyncTask<Void, Void, Void> {
+
+        private ChannelQueue queue;
 
         /**
-         * The sender INSTANCE is provided to the constructor as a test hook
          *
          * @param queue  the queue for this task
-         * @param sender the sender for this task
          */
-        public SendTask(TelemetryQueue queue, Sender sender) {
+        public PersistenceTask(ChannelQueue queue) {
             this.queue = queue;
-            this.sender = sender;
         }
 
         @Override
-        public void run() {
+         //     public void run() {
+        protected Void doInBackground(Void... params) {
+
             IJsonSerializable[] data = null;
-            synchronized (TelemetryQueue.LOCK) {
+            synchronized (ChannelQueue.LOCK) {
                 // enqueue if more than one item is in the queue
                 if (!this.queue.list.isEmpty()) {
                     data = new IJsonSerializable[this.queue.list.size()];
@@ -189,19 +195,23 @@ public class TelemetryQueue {
             }
 
             if (data != null) {
-                if (this.queue.isCrashing) {
-                    // persist the queue if the app is crashing
-                    Persistence persistence = Persistence.getInstance();
-                    if (persistence != null) {
-                        persistence.persist(data, false);
-                    }
-                } else {
-                    // otherwise enqueue data
-                    // TODO: Persist items before sending them (otherwise they'll get lost in case of app crash)
-                    this.sender.send(data);
+                // flush the queue
+                Persistence persistence = Persistence.getInstance();
+                if (persistence != null) {
+                    persistence.persist(data, false);
                 }
             }
+
+            return null;
         }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            return ;
+        } //TODO do we want do something here?!
+
     }
+
+
 }
 

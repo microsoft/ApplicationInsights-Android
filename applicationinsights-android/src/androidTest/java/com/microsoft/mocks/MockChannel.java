@@ -1,7 +1,7 @@
 package com.microsoft.mocks;
 
 import com.microsoft.applicationinsights.internal.Channel;
-import com.microsoft.applicationinsights.internal.TelemetryQueue;
+import com.microsoft.applicationinsights.internal.ChannelQueue;
 
 public class MockChannel extends Channel {
     public MockChannel() {
@@ -9,7 +9,7 @@ public class MockChannel extends Channel {
     }
 
     @Override
-    public void setQueue(TelemetryQueue queue) {
+    public void setQueue(ChannelQueue queue) {
         super.setQueue(queue);
     }
 

@@ -12,7 +12,7 @@ import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class TelemetryQueueTest extends TestCase {
+public class ChannelQueueTest extends TestCase {
 
     private TestQueue queue;
     private IJsonSerializable item;
@@ -161,7 +161,7 @@ public class TelemetryQueueTest extends TestCase {
         Assert.assertEquals("item is queued when telemetry is enabled", 1, queueSize);
     }
 
-    private class TestQueue extends TelemetryQueue {
+    private class TestQueue extends ChannelQueue {
 
         public CountDownLatch sendSignal;
         public CountDownLatch responseSignal;
@@ -169,11 +169,11 @@ public class TelemetryQueueTest extends TestCase {
 
         public TestQueue() {
             super();
-            TelemetryQueueConfig config = new TelemetryQueueConfig();
+            TelemetryConfig config = new TelemetryConfig();
 
             this.sendSignal = new CountDownLatch(1);
             this.responseSignal = new CountDownLatch(1);
-            this.sender = new TestSender(sendSignal, config);
+            //this.sender = new TestSender(sendSignal, config);
         }
 
         public LinkedList<IJsonSerializable> getQueue() {
@@ -185,18 +185,18 @@ public class TelemetryQueueTest extends TestCase {
         }
     }
 
-    private class TestSender extends Sender {
-        public CountDownLatch sendSignal;
-
-        public TestSender(CountDownLatch sendSignal, TelemetryQueueConfig config) {
-            super(config);
-            this.sendSignal = sendSignal;
-        }
-
-        @Override
-        protected void send(IJsonSerializable[] data) {
-            this.sendSignal.countDown();
-            super.send(data);
-        }
-    }
+//    private class TestSender extends Sender {
+//        public CountDownLatch sendSignal;
+//
+//        public TestSender(CountDownLatch sendSignal, TelemetryConfig config) {
+//            super(config);
+//            this.sendSignal = sendSignal;
+//        }
+//
+//        @Override
+//        protected void send(IJsonSerializable[] data) {
+//            this.sendSignal.countDown();
+//            super.send(data);
+//        }
+//    }
 }
