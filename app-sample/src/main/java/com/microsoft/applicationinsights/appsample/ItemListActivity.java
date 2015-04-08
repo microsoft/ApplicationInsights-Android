@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import com.microsoft.applicationinsights.AppInsights;
+import com.microsoft.applicationinsights.SessionConfig;
 import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.internal.ChannelConfig;
 import com.microsoft.applicationinsights.internal.TelemetryQueueConfig;
 
 /**
@@ -51,22 +54,22 @@ public class ItemListActivity extends FragmentActivity
                     .setActivateOnItemClick(true);
         }
 
+        AppInsights.setup(this);
+        AppInsights.start();
+
         // update endpoint to make traffic visible in the proxy
-        TelemetryClient client = TelemetryClient.getInstance(this);
-        TelemetryQueueConfig config = client.getConfig().getStaticConfig();
+        TelemetryClient client = TelemetryClient.INSTANCE;
+        TelemetryQueueConfig config = ChannelConfig.getStaticConfig();
         config.setEndpointUrl(config.getEndpointUrl().replace("https", "http")); //TODO change this!?
 
         // Track basic telemetry
         client.trackTrace("example trace");
         client.trackEvent("example event");
         client.trackMetric("example metric", 1);
-        client.sendPendingData();
-
-        // Track uncaught exceptions
-        client.enableCrashTracking(this);
+        AppInsights.sendPendingData();
 
         // track activity lifecycle (note this only needs to be done once per application)
-        client.enableActivityTracking(this.getApplication());
+        AppInsights.enableActivityTracking(this.getApplication());
     }
 
     /**

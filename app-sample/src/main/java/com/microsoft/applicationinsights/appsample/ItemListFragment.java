@@ -120,7 +120,7 @@ public class ItemListFragment extends ListFragment {
 
         //crash the app
         if (position == 2) {
-            TelemetryClient client = TelemetryClient.getInstance(getActivity());
+            TelemetryClient client = TelemetryClient.INSTANCE;
             client.trackTrace("example trace");
             client.trackEvent("example event");
             client.trackMetric("example metric", 1);
