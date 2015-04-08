@@ -6,8 +6,9 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.microsoft.applicationinsights.contracts.SessionState;
-import com.microsoft.applicationinsights.contracts.SessionStateData;
+import com.microsoft.applicationinsights.internal.TelemetryContext;
+import com.microsoft.applicationinsights.internal.CreateDataTask;
+import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,16 +26,80 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     protected final AtomicInteger activityCount;
 
     /**
+     * The configuration for tracking sessions
+     */
+    protected SessionConfig config;
+
+    /**
      * The timestamp of the last activity
      */
     protected final AtomicLong lastBackground;
 
     /**
-     * Create a new INSTANCE of the lifecycle event tracking
+     * The telemetryContext which is needed to renew a session
      */
-    protected LifeCycleTracking() {
+    protected TelemetryContext telemetryContext;
+
+    /**
+     * Volatile boolean for double checked synchronize block
+     */
+    private static volatile boolean isLoaded = false;
+
+    /**
+     * Synchronization LOCK for setting static context
+     */
+    private static final Object LOCK = new Object();
+
+    /**
+     * The singleton INSTANCE of this class
+     */
+    private static LifeCycleTracking instance;
+
+    /**
+     * The tag for logging
+     */
+    private static final String TAG = "LifeCycleTracking";
+
+    /**
+     * Create a new INSTANCE of the lifecycle event tracking
+     *
+     * @param config the session configuration for session tracking
+     * @param telemetryContext the context, which is needed to renew sessions
+     */
+    protected LifeCycleTracking(SessionConfig config, TelemetryContext telemetryContext) {
         this.activityCount = new AtomicInteger(0);
         this.lastBackground = new AtomicLong(this.getTime());
+        this.config = config;
+        this.telemetryContext = telemetryContext;
+    }
+
+    /**
+     * Initialize the INSTANCE of lifecycle event tracking
+     *
+     * @param config the session configuration for session tracking
+     * @param telemetryContext the context, which is needed to renew sessions
+     */
+    public static void initialize(SessionConfig config, TelemetryContext telemetryContext) {
+        // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
+        if (!LifeCycleTracking.isLoaded) {
+            synchronized (LifeCycleTracking.LOCK) {
+                if (!LifeCycleTracking.isLoaded) {
+                    LifeCycleTracking.isLoaded = true;
+                    LifeCycleTracking.instance = new LifeCycleTracking(config, telemetryContext);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return the INSTANCE of lifecycle event tracking or null if not yet initialized
+     */
+    private static LifeCycleTracking getInstance() {
+        if (LifeCycleTracking.instance == null) {
+            InternalLogging.error(TAG, "getInstance was called before initialization");
+        }
+
+        return LifeCycleTracking.instance;
     }
 
     /**
@@ -50,26 +115,6 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     }
 
     /**
-     * Gets the singleton INSTANCE of LifeCycleTracking
-     *
-     * @return the singleton INSTANCE of LifeCycleTracking
-     */
-    protected static LifeCycleTracking getInstance() {
-        return LazyInitialization.INSTANCE;
-    }
-
-    /**
-     * Private class to facilitate lazy singleton initialization
-     */
-    private static class LazyInitialization {
-        private static final LifeCycleTracking INSTANCE = new LifeCycleTracking();
-
-        private LazyInitialization() {
-            // hide default constructor
-        }
-    }
-
-    /**
      * This is called each time an activity is created.
      *
      * @param activity
@@ -78,8 +123,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         int count = this.activityCount.getAndIncrement();
         if (count == 0) {
-            TelemetryClient tc = this.getTelemetryClient(activity);
-            tc.trackNewSession();
+            new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
         }
     }
 
@@ -98,19 +142,18 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
      * @param activity the activity which left the foreground
      */
     public void onActivityResumed(Activity activity) {
-        TelemetryClient tc = this.getTelemetryClient(activity);
 
         // check if the session should be renewed
         long now = this.getTime();
         long then = this.lastBackground.getAndSet(this.getTime());
-        boolean shouldRenew = now - then >= tc.getConfig().getSessionIntervalMs();
+        boolean shouldRenew = now - then >= this.config.getSessionIntervalMs();
         if (shouldRenew) {
-            tc.getContext().renewSessionId();
-            tc.trackNewSession();
+            this.telemetryContext.renewSessionId();
+            new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
         }
 
         // track the page view
-        tc.trackPageView(activity.getClass().getName());
+        new CreateDataTask(CreateDataTask.DataType.PAGE_VIEW, activity.getClass().getName(), null, null).execute();
     }
 
     /**
@@ -141,15 +184,5 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
      */
     protected long getTime() {
         return new Date().getTime();
-    }
-
-    /**
-     * Test hook for injecting a mock telemetry client
-     *
-     * @param activity the activity to get a telemetry client for
-     * @return a telemetry client associated with the given activity
-     */
-    protected TelemetryClient getTelemetryClient(Activity activity) {
-        return TelemetryClient.getInstance(activity);
     }
 }
