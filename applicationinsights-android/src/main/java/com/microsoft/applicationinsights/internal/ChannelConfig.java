@@ -52,7 +52,7 @@ public class ChannelConfig {
     /**
      * Gets the sender config INSTANCE for this channel.
      */
-    public TelemetryQueueConfig getStaticConfig() {
+    public static TelemetryQueueConfig getStaticConfig() {
         return TelemetryQueue.INSTANCE.getConfig();
     }
 
