@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights;
 
 import android.content.Context;
 
+import com.microsoft.applicationinsights.internal.CreateDataTask;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -12,7 +13,6 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
     private static final Object LOCK = new Object();
     private static String TAG = "ExceptionHandler";
 
-    protected TelemetryClient telemetryClient;
     protected UncaughtExceptionHandler preexistingExceptionHandler;
 
     private boolean ignoreDefaultHandler;
@@ -29,7 +29,6 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
                                 boolean ignoreDefaultHandler) {
         this.preexistingExceptionHandler = preexistingExceptionHandler;
         if (context != null) {
-            this.telemetryClient = TelemetryClient.getInstance(context);
             this.ignoreDefaultHandler = ignoreDefaultHandler;
         } else {
             InternalLogging.error(TAG, "Failed to initialize ExceptionHandler with null Context");
@@ -91,7 +90,7 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
         }
 
         // track the crash
-        this.telemetryClient.trackUnhandledException(exception, properties);
+        new CreateDataTask(CreateDataTask.DataType.UNHANDLED_EXCEPTION, exception, properties).execute();
 
         // invoke the existing handler if requested and if it exists
         if (!this.ignoreDefaultHandler && this.preexistingExceptionHandler != null) {
