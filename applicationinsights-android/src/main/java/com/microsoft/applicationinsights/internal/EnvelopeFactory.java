@@ -45,8 +45,8 @@ public enum EnvelopeFactory {
      *
      * @param context the telemetry context, which is used to create envelops with proper context information.
      */
-    public void configureWithTelemetryContext(TelemetryContext context){
-        this.configureWithTelemetryContext(context, null);
+    public void configure(TelemetryContext context){
+        this.configure(context, null);
     }
 
     /**
@@ -55,7 +55,7 @@ public enum EnvelopeFactory {
      *
      * @param context the telemetry context, which is used to create envelops with proper context information.
      */
-    public void configureWithTelemetryContext(TelemetryContext context, Map<String,String>commonProperties){
+    public void configure(TelemetryContext context, Map<String,String>commonProperties){
         this.context = context;
         this.commonProperties = commonProperties;
     }
