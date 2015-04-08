@@ -72,7 +72,6 @@ public class Persistence {
                 if (!Persistence.isPersistenceLoaded) {
                     Persistence.isPersistenceLoaded = true;
                     Persistence.instance = new Persistence(context);
-
                 }
             }
         }
@@ -92,9 +91,8 @@ public class Persistence {
     /**
      * Serializes a IJsonSerializable[] and calls:
      *
-     * @param data the data to serialize and save to disk
+     * @param data         the data to serialize and save to disk
      * @param highPriority the priority to save the data with
-     *
      * @see Persistence#persist(String, Boolean)
      */
     protected boolean persist(IJsonSerializable[] data, Boolean highPriority) {
@@ -125,14 +123,13 @@ public class Persistence {
     /**
      * Saves a string to disk.
      *
-     * @param data the string to save
+     * @param data         the string to save
      * @param highPriority the priority we want to use for persisting the data
-     *
      * @return true if the operation was successful, false otherwise
      */
     protected boolean persist(String data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
-            InternalLogging.warn(TAG, "No free space on disk to persist data.");
+            InternalLogging.warn(TAG, "No free space on disk to flush data.");
             return false;
         }
 
@@ -166,7 +163,6 @@ public class Persistence {
      * Retrieves the data from a given path.
      *
      * @param file reference to a file on disk
-     *
      * @return the next item from disk or empty string if anything goes wrong
      */
     public String load(File file) {
@@ -207,39 +203,48 @@ public class Persistence {
 
 
     private File nextHighPrioFile() {
-        String path = getContext().getFilesDir() + HIGH_PRIO_DIRECTORY;
-        File directory = new File(path);
-       return this.nextAvailableFileInDirectory(directory);
+        Context context = getContext();
+        if (context != null) {
+            String path = context.getFilesDir() + HIGH_PRIO_DIRECTORY;
+            File directory = new File(path);
+            return this.nextAvailableFileInDirectory(directory);
+        }
+
+        return null;
     }
 
 
     private File nextRegularPrioFile() {
-        String path = getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY;
-        File directory = new File(path);
-        return this.nextAvailableFileInDirectory(directory);
+        Context context = getContext();
+        if (context != null) {
+            String path = context.getFilesDir() + REGULAR_PRIO_DIRECTORY;
+            File directory = new File(path);
+            return this.nextAvailableFileInDirectory(directory);
+        }
+
+        return null;
     }
 
     /**
      * @param directory reference to the directory
-     *
      * @return reference to the next available file, null if no file is available
      */
     private File nextAvailableFileInDirectory(File directory) {
-        File[] files = directory.listFiles();
-        File file;
-        if ((files != null) && (files.length > 0)) {
-            for(int i = 0; i < files.length - 1; i++) { //TODO make this more efficient if necessary
-                file = files[i];
-               if(!this.servedFiles.contains(file)) {
-                   return file;//we haven't served the file, return it
-               }
-            }
+        if (directory != null) {
+            File[] files = directory.listFiles();
+            File file;
+            if ((files != null) && (files.length > 0)) {
+                for (int i = 0; i < files.length - 1; i++) { //TODO make this more efficient if necessary
+                    file = files[i];
+                    if (!this.servedFiles.contains(file)) {
+                        return file;//we haven't served the file, return it
+                    }
+                }
 
-            return null; //no available File
+            }
         }
-        else {
-            return null; //no files in directory or no directory
-        }
+
+        return null; //no files in directory or no directory
 
     }
 
@@ -247,7 +252,6 @@ public class Persistence {
      * delete a file from disk and remove it from the list of served files if deletion was successful
      *
      * @param file reference to the file we want to delete
-     *
      */
     protected void deleteFile(File file) {
         if (file != null) {
@@ -255,12 +259,10 @@ public class Persistence {
             boolean deletedFile = file.delete();
             if (!deletedFile) {
                 InternalLogging.error(TAG, "Error deleting telemetry file " + file.toString());
-            }
-            else {
+            } else {
                 this.servedFiles.remove(file);
             }
-        }
-        else {
+        } else {
             InternalLogging.warn(TAG, "Couldn't delete file, the reference to the file was null");
         }
     }
@@ -271,7 +273,7 @@ public class Persistence {
      * @param file reference to the file that should be made available so it can be sent again later
      */
     protected void makeAvailable(File file) {
-        if(file != null) {
+        if (file != null) {
             this.servedFiles.remove(file);
         }
     }
@@ -282,10 +284,15 @@ public class Persistence {
      * @param highPriority indicates which directory to check for available files
      */
     private Boolean isFreeSpaceAvailable(Boolean highPriority) {
-        String path = highPriority ? (getContext().getFilesDir() + HIGH_PRIO_DIRECTORY) :
-              (getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY);
-        File dir = new File(path);
-        return (dir.listFiles().length < MAX_FILE_COUNT);
+        Context context = getContext();
+        if (context != null) {
+            String path = highPriority ? (context.getFilesDir() + HIGH_PRIO_DIRECTORY) :
+                  (getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY);
+            File dir = new File(path);
+            return (dir.listFiles().length < MAX_FILE_COUNT);
+        }
+
+        return false;
     }
 
     /**
