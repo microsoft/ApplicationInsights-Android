@@ -58,8 +58,8 @@ public class ItemListActivity extends FragmentActivity
         AppInsights.start();
 
         // update endpoint to make traffic visible in the proxy
-        TelemetryClient client = TelemetryClient.INSTANCE;
-        TelemetryConfig config = client.getConfig().getStaticConfig();
+        TelemetryClient client = TelemetryClient.getInstance();
+        TelemetryConfig config = ChannelConfig.getStaticConfig();
         config.setEndpointUrl(config.getEndpointUrl().replace("https", "http")); //TODO change this!?
 
         // Track basic telemetry

@@ -23,7 +23,7 @@ public class EnvelopeFactoryTest extends ActivityUnitTestCase<MockActivity> {
         Intent intent = new Intent(getInstrumentation().getTargetContext(), com.microsoft.mocks.MockActivity.class);
         this.setActivity(this.startActivity(intent, null, null));
         TelemetryContext mockContext = new MockTelemetryContext(this.getActivity(), "testIKey");
-        EnvelopeFactory.INSTANCE.configureWithTelemetryContext(mockContext);
+        EnvelopeFactory.INSTANCE.configure(mockContext);
     }
 
     public void testCreatedEnvelopeIsInitialized() {

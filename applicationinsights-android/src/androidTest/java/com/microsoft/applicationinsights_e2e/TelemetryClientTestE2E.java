@@ -4,8 +4,12 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
+import com.microsoft.applicationinsights.AppInsights;
+import com.microsoft.applicationinsights.internal.Channel;
+import com.microsoft.applicationinsights.internal.ChannelConfig;
 import com.microsoft.applicationinsights.internal.TelemetryConfig;
 import com.microsoft.mocks.MockActivity;
+import com.microsoft.mocks.MockChannel;
 import com.microsoft.mocks.MockQueue;
 import com.microsoft.mocks.MockTelemetryClient;
 
@@ -32,9 +36,8 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
         Intent intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
         this.setActivity(this.startActivity(intent, null, null));
 
-        this.client = new MockTelemetryClient(this.getActivity());
-        this.client.mockTrackMethod = false;
-        TelemetryConfig config = this.client.getChannel().getQueue().getConfig();
+        MockTelemetryClient.getInstance().mockTrackMethod = false;
+        TelemetryConfig config = Channel.getInstance().getQueue().getConfig();
         config.setMaxBatchIntervalMs(20);
 
         // use http for tests
@@ -99,7 +102,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             exception = e;
         }
 
-        this.client.getConfig().getStaticConfig().setMaxBatchCount(10);
+        ChannelConfig.getStaticConfig().setMaxBatchCount(10);
         for (int i = 0; i < 10; i++) {
             this.client.trackEvent("android event");
             this.client.trackTrace("android trace");
@@ -109,14 +112,14 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             Thread.sleep(10);
         }
 
-        this.client.sendPendingData();
+        AppInsights.INSTANCE.sendPendingData();
         Thread.sleep(10);
         this.validate();
     }
 
     public void validate() throws Exception {
         try {
-            MockQueue queue = this.client.getChannel().getQueue();
+            MockQueue queue = MockChannel.getInstance().getQueue();
             CountDownLatch rspSignal = queue.sender.responseSignal;
             CountDownLatch sendSignal = queue.sender.sendSignal;
             rspSignal.await(30, TimeUnit.SECONDS);

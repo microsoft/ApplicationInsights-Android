@@ -107,7 +107,7 @@ public enum AppInsights {
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
-        Channel.INSTANCE.getQueue().flush();
+        Channel.getInstance().synchronize();
     }
 
     /**
@@ -118,7 +118,7 @@ public enum AppInsights {
      */
     public static void enableActivityTracking(Application application){
         if(!INSTANCE.telemetryDisabled){
-            TelemetryClient.INSTANCE.enableActivityTracking(application);
+            TelemetryClient.getInstance().enableActivityTracking(application);
         }
     }
 

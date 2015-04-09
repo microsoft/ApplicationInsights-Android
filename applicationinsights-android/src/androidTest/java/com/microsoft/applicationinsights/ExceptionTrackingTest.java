@@ -63,8 +63,8 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
         // setup
         Context context = this.getActivity();
         MockExceptionTracking tracker = new MockExceptionTracking(context, null, false);
-        MockTelemetryClient client = new MockTelemetryClient(context);
-        tracker.setTelemetryClient(client);
+        MockTelemetryClient client = MockTelemetryClient.getInstance();
+//        tracker.setTelemetryClient(client);
         CrashData testData = new CrashData();
         String testMessage = "test exception message";
 

@@ -84,7 +84,7 @@ public class CreateDataTask extends AsyncTask<Void, Void, Void> {
         }
 
         if(envelope != null){
-            Channel channel = Channel.INSTANCE;
+            Channel channel = Channel.getInstance();
             if(type == DataType.UNHANDLED_EXCEPTION){
                 channel.processUnhandledException(envelope);
             }else{

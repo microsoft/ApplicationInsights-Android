@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.microsoft.applicationinsights.AppInsights;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.appsample.dummy.DummyContent;
 
@@ -121,16 +122,16 @@ public class ItemListFragment extends ListFragment {
         switch (position) {
             case 0:
                 for(int i = 0; i < 50; i++) {
-                    TelemetryClient.INSTANCE.trackEvent("something wicked this way comes");
+                    TelemetryClient.getInstance().trackEvent("something wicked this way comes");
                 }
                 break;
             case 1:
                 for(int i = 0; i < 200; i++) {
-                    TelemetryClient.INSTANCE.trackEvent("something wicked this way comes");
+                    TelemetryClient.getInstance().trackEvent("something wicked this way comes");
                 }
                 break;
             case 2:
-            TelemetryClient client = TelemetryClient.INSTANCE;
+            TelemetryClient client = TelemetryClient.getInstance();
             client.trackTrace("example trace");
             client.trackEvent("example event");
             client.trackMetric("example metric", 1);
@@ -138,7 +139,7 @@ public class ItemListFragment extends ListFragment {
                 crashMe1();
                 break;
             case 3:
-                TelemetryClient.getInstance(getActivity()).sendPendingData();
+                AppInsights.INSTANCE.sendPendingData();
                 break;
 
             default:

@@ -3,16 +3,61 @@ package com.microsoft.applicationinsights;
 import android.app.Application;
 
 import com.microsoft.applicationinsights.internal.CreateDataTask;
+import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.Map;
 
 /**
  * The public API for recording application insights telemetry.
  */
-public enum TelemetryClient {
-    INSTANCE;
-
+public class TelemetryClient {
     public static final String TAG = "TelemetryClient";
+
+    private static TelemetryClient instance;
+
+    /**
+     * Volatile boolean for double checked synchronize block
+     */
+    private static volatile boolean isTelemetryClientLoaded = false;
+
+    /**
+     * Synchronization LOCK for setting static context
+     */
+    private static final Object LOCK = new Object();
+
+    /**
+     * Restrict access to the default constructor
+     */
+    protected TelemetryClient() {
+    }
+
+    /**
+     * Initialize the INSTANCE of the telemetryclient
+     */
+    protected static void initialize() {
+        // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
+        if (!TelemetryClient.isTelemetryClientLoaded) {
+            synchronized (TelemetryClient.LOCK) {
+                if (!TelemetryClient.isTelemetryClientLoaded) {
+                    TelemetryClient.isTelemetryClientLoaded = true;
+                    TelemetryClient.instance = new TelemetryClient();
+                }
+            }
+        }
+    }
+
+    /**
+     * @return the INSTANCE of persistence or null if not yet initialized
+     */
+    public static TelemetryClient getInstance() {
+        initialize();
+        if (TelemetryClient.instance == null) {
+            InternalLogging.error(TAG, "getInstance was called before initialization");
+        }
+
+        return TelemetryClient.instance;
+    }
+
 
     /**
      * {@code properties} defaults to {@code null}.
@@ -42,9 +87,9 @@ public enum TelemetryClient {
      * @param measurements Custom measurements associated with the event.
      */
     public void trackEvent(
-            String eventName,
-            Map<String, String> properties,
-            Map<String, Double> measurements) {
+          String eventName,
+          Map<String, String> properties,
+          Map<String, Double> measurements) {
         new CreateDataTask(CreateDataTask.DataType.EVENT, eventName, properties, measurements).execute();
     }
 
@@ -93,9 +138,9 @@ public enum TelemetryClient {
     /**
      * Sends information about an handledException to Application Insights.
      *
-     * @param handledException  The handledException to track.
-     * @param properties Custom properties associated with the event. Note: values set here will
-     *                   supersede values set in {@link com.microsoft.applicationinsights.AppInsights#setCommonProperties}.
+     * @param handledException The handledException to track.
+     * @param properties       Custom properties associated with the event. Note: values set here will
+     *                         supersede values set in {@link com.microsoft.applicationinsights.AppInsights#setCommonProperties}.
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
         new CreateDataTask(CreateDataTask.DataType.HANDLED_EXCEPTION, handledException, properties).execute();
@@ -129,9 +174,9 @@ public enum TelemetryClient {
      * @param measurements Custom measurements associated with the event.
      */
     public void trackPageView(
-            String pageName,
-            Map<String, String> properties,
-            Map<String, Double> measurements) {
+          String pageName,
+          Map<String, String> properties,
+          Map<String, Double> measurements) {
         new CreateDataTask(CreateDataTask.DataType.PAGE_VIEW, pageName, properties, null).execute();
     }
 
@@ -140,32 +185,6 @@ public enum TelemetryClient {
      */
     public void trackNewSession() {
         new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
-    }
-
-    /**
-     * Triggers persisting and if applicable sending of queued data
-     * note: this will be called
-     * {@link TelemetryConfig#maxBatchIntervalMs} after
-     * tracking any telemetry so it is not necessary to call this in most cases.
-     */
-    public void sendPendingData() {
-        this.channel.synchronize(); //will persist all queued up data and trigger sending it.
-    }
-
-    /**
-     * Registers a custom exceptionHandler to catch unhandled exceptions. Unhandled exceptions will be
-     * persisted and sent when starting the app again.
-     *
-     * @param context the application context used to register the exceptionHandler to catch unhandled
-     *                exceptions
-     */
-    public void enableCrashTracking(Context context) {
-        if (context != null) {
-            // TODO: In case of multiple client instance, this should be done somewhere else + only once
-            ExceptionTracking.registerExceptionHandler(context);
-        } else {
-            InternalLogging.warn(TAG, "Unable to register ExceptionHandler, context is null");
-        }
     }
 
     /**

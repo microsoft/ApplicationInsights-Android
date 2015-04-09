@@ -3,34 +3,30 @@ package com.microsoft.mocks;
 import android.app.Activity;
 import android.content.Context;
 
+import com.microsoft.applicationinsights.AppInsights;
 import com.microsoft.applicationinsights.LifeCycleTracking;
+import com.microsoft.applicationinsights.SessionConfig;
 import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.internal.TelemetryContext;
 
 public class MockLifeCycleTracking extends LifeCycleTracking {
 
-    private static final Object lock = new Object();
-    private static MockLifeCycleTracking instance;
+    //TODO check this implementation
 
     public final MockTelemetryClient tc;
     public long currentTime;
 
-    public static MockLifeCycleTracking getInstance(Context context) {
-        synchronized (MockLifeCycleTracking.lock) {
-            if(MockLifeCycleTracking.instance == null) {
-                MockLifeCycleTracking.instance = new MockLifeCycleTracking(context);
-            }
-        }
-
-        return MockLifeCycleTracking.instance;
+    public static MockLifeCycleTracking getInstance() {
+        return (MockLifeCycleTracking)LifeCycleTracking.getInstance();
     }
 
-    protected MockLifeCycleTracking(Context context) {
-        super();
+    protected MockLifeCycleTracking(SessionConfig config, TelemetryContext telemetryContext) {
+        super(config, telemetryContext);
         currentTime = 0;
-        this.tc = new MockTelemetryClient(context);
+        this.tc = new MockTelemetryClient();
     }
 
-    @Override
+    //@Override
     protected TelemetryClient getTelemetryClient(Activity activity) {
         return this.tc;
     }

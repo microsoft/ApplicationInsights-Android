@@ -40,7 +40,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         super.setUp();
 
         Context context = this.getInstrumentation().getContext();
-        this.mockLifeCycleTracking = MockLifeCycleTracking.getInstance(context);
+        this.mockLifeCycleTracking = MockLifeCycleTracking.getInstance();
         this.mockLifeCycleTracking.reset();
         this.telemetryClient = this.mockLifeCycleTracking.tc;
 
@@ -170,7 +170,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
 
-        this.mockLifeCycleTracking.currentTime += this.telemetryClient.getConfig().getSessionIntervalMs();
+        this.mockLifeCycleTracking.currentTime += AppInsights.INSTANCE.config.getSessionIntervalMs();
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
 

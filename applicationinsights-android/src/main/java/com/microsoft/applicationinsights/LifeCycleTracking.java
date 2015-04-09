@@ -94,7 +94,7 @@ public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks
     /**
      * @return the INSTANCE of lifecycle event tracking or null if not yet initialized
      */
-    private static LifeCycleTracking getInstance() {
+    protected static LifeCycleTracking getInstance() {
         if (LifeCycleTracking.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }

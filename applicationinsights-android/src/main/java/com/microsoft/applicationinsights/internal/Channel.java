@@ -10,36 +10,72 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * This class records telemetry for application insights.
  */
-public enum Channel {
-    INSTANCE;
-
+public class Channel {
     private static final String TAG = "Channel";
+
+    /**
+     * Volatile boolean for double checked synchronize block
+     */
+    private static volatile boolean isChannelLoaded = false;
+
+    /**
+     * Synchronization LOCK for setting static context
+     */
+    private static final Object LOCK = new Object();
 
     /**
      * The id for this channel
      */
-    private final long channelId;
+    private static long channelId; //TODO where and why is this used for
 
     /**
      * The sequence counter for this channel
      */
-    private final AtomicInteger seqCounter;
+    private static AtomicInteger seqCounter; //TODO where is this used?!
 
     /**
      * Test hook to the sender
      */
-    private ChannelQueue queue;
+    private static ChannelQueue queue;
 
-    private Sender sender;
+    /**
+     * The singleton INSTANCE of this class
+     */
+    private static Channel instance;
+
 
     /**
      * Instantiates a new INSTANCE of Sender
      */
-    public Channel() {
-        this.queue = ChannelQueue.INSTANCE;
+    protected Channel() {
+    }
+
+    private static void initialize() {
+        // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
+        if (!Channel.isChannelLoaded) {
+            synchronized (Channel.LOCK) {
+                if (!Channel.isChannelLoaded) {
+                    Channel.isChannelLoaded = true;
+                    Channel.instance = new Channel();
+                }
+            }
+        }
+        queue = ChannelQueue.INSTANCE;
         Random random = new Random();
-        this.channelId = Math.abs(random.nextLong());
-        this.seqCounter = new AtomicInteger(0);
+        channelId = Math.abs(random.nextLong());
+        seqCounter = new AtomicInteger(0);
+    }
+
+    /**
+     * @return the INSTANCE of persistence or null if not yet initialized
+     */
+    public static Channel getInstance() {
+        initialize();
+        if (Channel.instance == null) {
+            InternalLogging.error(TAG, "getInstance was called before initialization");
+        }
+
+        return Channel.instance;
     }
 
     public void synchronize() {

@@ -6,7 +6,8 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.SessionConfig;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.internal.EnvelopeFactory;
-import com.microsoft.applicationinsights.internal.TelemetryContext;
+import com.microsoft.applicationinsights.internal.logging.InternalLogging;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -14,16 +15,53 @@ public class MockTelemetryClient extends TelemetryClient {
     public ArrayList<Envelope> messages;
     public boolean mockTrackMethod;
 
-    public MockTelemetryClient (Context context) {
-        this(new SessionConfig(context), context);
-        this.messages = new ArrayList<Envelope>(10);
-        this.mockTrackMethod = true;
+//    private static MockTelemetryClient instance;
+//
+//    /**
+//     * Volatile boolean for double checked synchronize block
+//     */
+//    private static volatile boolean isTelemetryClientLoaded = false;
+//
+//    /**
+//     * Synchronization LOCK for setting static context
+//     */
+//    private static final Object LOCK = new Object();
+//
+//    /**
+//     * Restrict access to the default constructor
+//     */
+//    protected MockTelemetryClient() {
+//    }
+//
+//    /**
+//     * Initialize the INSTANCE of the telemetryclient
+//     */
+//    protected static void initialize() {
+//        // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
+//        if (!MockTelemetryClient.isTelemetryClientLoaded) {
+//            synchronized (MockTelemetryClient.LOCK) {
+//                if (!MockTelemetryClient.isTelemetryClientLoaded) {
+//                    MockTelemetryClient.isTelemetryClientLoaded = true;
+//                    MockTelemetryClient.instance = new MockTelemetryClient();
+//                }
+//            }
+//        }
+//    }
+
+    /**
+     * @return the INSTANCE of persistence or null if not yet initialized
+     */
+    public static MockTelemetryClient getInstance() {
+//        initialize();
+//        if (MockTelemetryClient.instance == null) {
+//            InternalLogging.error(TAG, "getInstance was called before initialization");
+//        }
+//
+//        return MockTelemetryClient.instance;
+
+        return (MockTelemetryClient)TelemetryClient.getInstance();
     }
 
-    protected MockTelemetryClient(SessionConfig config, Context context) {
-        super(config, new TelemetryContext(context, config.getInstrumentationKey()), new MockChannel());
-        ((MockChannel)this.channel).setQueue(new MockQueue(1));
-    }
 
     @Override
     public void trackEvent(
@@ -65,15 +103,6 @@ public class MockTelemetryClient extends TelemetryClient {
     }
 
     @Override
-    public void trackUnhandledException(Throwable unhandledException, Map<String, String> properties) {
-        if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.INSTANCE.createExceptionEnvelope(unhandledException, properties));
-        }else{
-            super.trackUnhandledException(unhandledException, properties);
-        }
-    }
-
-    @Override
     public void trackPageView(
             String pageName,
             Map<String, String> properties,
@@ -102,9 +131,5 @@ public class MockTelemetryClient extends TelemetryClient {
     public void clearMessages()
     {
         messages.clear();
-    }
-
-    public MockChannel getChannel() {
-        return (MockChannel)this.channel;
     }
 }

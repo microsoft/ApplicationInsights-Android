@@ -17,4 +17,8 @@ public class MockChannel extends Channel {
     public MockQueue getQueue() {
         return (MockQueue)super.getQueue();
     }
+
+    public static MockChannel getInstance() {
+        return (MockChannel)Channel.getInstance();
+    }
 }

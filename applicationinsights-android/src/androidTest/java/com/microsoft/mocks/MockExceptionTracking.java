@@ -15,10 +15,6 @@ public class MockExceptionTracking extends ExceptionTracking {
         this.processKillCount = 0;
     }
 
-    public void setTelemetryClient(MockTelemetryClient mockTelemetryClient) {
-        super.telemetryClient = mockTelemetryClient;
-    }
-
     public void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
         super.preexistingExceptionHandler = handler;
     }
