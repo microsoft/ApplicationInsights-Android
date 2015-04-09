@@ -134,12 +134,22 @@ public class Sender {
         StringBuilder builder = new StringBuilder();
 
         InternalLogging.info(TAG, "response code", Integer.toString(responseCode));
-        boolean isExpected = responseCode == 200;
-        boolean isRecoverableError = responseCode > 500 && responseCode != 529;
+        boolean isExpected = ((responseCode > 199) && (responseCode < 203));
+        boolean isRecoverableError = (responseCode > 500 && responseCode != 529) || (responseCode == 404);
+
+        boolean deleteFile = isExpected || (responseCode == 529) || !isRecoverableError;
+        //TODO handle other status codes depending on specification (needs discussion)
 
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
             this.onExpected(connection, builder, fileToSend);
+        }
+
+        if(deleteFile) {
+            Persistence persistence = Persistence.getInstance();
+            if(persistence != null) {
+                persistence.deleteFile(fileToSend);
+            }
         }
 
         // If there was a server issue, flush the data
@@ -168,10 +178,6 @@ public class Sender {
     protected void onExpected(HttpURLConnection connection, StringBuilder builder, File fileToSend) {
         if (this.config.isDeveloperMode()) {
             this.readResponse(connection, builder);
-        }
-        Persistence persistence = Persistence.getInstance();
-        if(persistence != null) {
-            persistence.deleteFile(fileToSend);
         }
     }
 
