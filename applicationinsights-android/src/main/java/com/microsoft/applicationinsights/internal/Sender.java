@@ -99,7 +99,7 @@ public class Sender {
                     if (!persistedData.isEmpty()) {
                         InternalLogging.info(TAG, "sending persisted data", persistedData);
                         SendingTask sendingTask = new SendingTask(persistedData, fileToSend);
-                        this.currentTasks.put(fileToSend.toString(), sendingTask);
+                        this.addToRunning(fileToSend.toString(), sendingTask);
                         sendingTask.run();
 
                         //TODO add comment for this
@@ -113,6 +113,18 @@ public class Sender {
             InternalLogging.info(TAG, "We have already 10 pending reguests", "");
         }
 }
+
+    private void addToRunning(String key, SendingTask task) {
+        synchronized (Sender.LOCK) {
+            this.currentTasks.put(key, task);
+        }
+    }
+
+    private void remoteFromRunning(String key) {
+        synchronized (Sender.LOCK) {
+            this.currentTasks.remove(key);
+        }
+    }
 
     private int runningRequestCount() {
         synchronized (Sender.LOCK) {
@@ -129,7 +141,7 @@ public class Sender {
      * @return null if the request was successful, the server response otherwise
      */
     protected String onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
-        currentTasks.remove(fileToSend.toString());
+        this.remoteFromRunning(fileToSend.toString());
 
         StringBuilder builder = new StringBuilder();
 
