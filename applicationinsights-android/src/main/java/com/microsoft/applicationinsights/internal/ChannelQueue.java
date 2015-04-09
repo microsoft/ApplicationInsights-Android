@@ -67,8 +67,8 @@ public class ChannelQueue {
         this.isCrashing = false;
 
 
-        Sender.initialize(getConfig());
-        this.sender = Sender.getInstance();
+        Sender.initialize(getConfig()); //TODO do this in the umbrella header
+        this.sender = Sender.getInstance();// don't hold reference to this?
     }
 
     /**
@@ -110,7 +110,7 @@ public class ChannelQueue {
                     this.flush();
                 } else if (this.list.size() == 1) {
                     // schedule a FlushTask if this is the first item in the queue
-                    this.scheduledPersistenceTask = new TriggerPersistTask(this);
+                    this.scheduledPersistenceTask = new TriggerPersistTask();
                     this.timer.schedule(this.scheduledPersistenceTask, this.config.getMaxBatchIntervalMs());
                 }
             } else {
@@ -125,20 +125,21 @@ public class ChannelQueue {
      * Empties the queue and sends all items to persistence
      */
     public void flush() {
-        PersistenceTask persistTask = new PersistenceTask(this);
-        persistTask.execute();
-
-        // asynchronously sendPendingData the queue with a non-daemon thread
-        // if this was called from the timer task it would inherit the daemon status
-        // since this thread does I/O it must not be a daemon thread
-        //Thread flushThread = new Thread(new TimedPersistenceTask(this));
-        //flushThread.setDaemon(false);
-        //flushThread.start();
-
-
         // cancel the scheduled persistence task if it exists
         if (this.scheduledPersistenceTask != null) {
             this.scheduledPersistenceTask.cancel();
+        }
+
+        IJsonSerializable[] data = null;
+        synchronized (ChannelQueue.LOCK) {
+            if (!list.isEmpty()) {
+                data = new IJsonSerializable[list.size()];
+                list.toArray(data);
+                list.clear();
+
+                PersistenceTask persistTask = new PersistenceTask(data);
+                persistTask.execute();
+            }
         }
     }
 
@@ -146,70 +147,38 @@ public class ChannelQueue {
      * A task to initiate queue sendPendingData on another thread
      */
     private class TriggerPersistTask extends TimerTask {
-        private ChannelQueue queue;
-
         /**
          * The sender INSTANCE is provided to the constructor as a test hook
          *
-         * @param queue the sender INSTANCE which willbe flushed
          */
-        public TriggerPersistTask(ChannelQueue queue) {
-            this.queue = queue;
-        }
+        public TriggerPersistTask() {}
 
         @Override
         public void run() {
-            this.queue.flush();
+            flush();
         }
     }
 
     /**
      * A task to initiate flushing the queue and persisting it's data
      */
-    //private class PersistTask extends TimerTask {
-
     private class PersistenceTask extends AsyncTask<Void, Void, Void> {
-
-        private ChannelQueue queue;
-
-        /**
-         *
-         * @param queue  the queue for this task
-         */
-        public PersistenceTask(ChannelQueue queue) {
-            this.queue = queue;
+        private IJsonSerializable[] data;
+        public PersistenceTask(IJsonSerializable[] data) {
+            this.data = data;
         }
 
         @Override
-         //     public void run() {
         protected Void doInBackground(Void... params) {
-
-            IJsonSerializable[] data = null;
-            synchronized (ChannelQueue.LOCK) {
-                // enqueue if more than one item is in the queue
-                if (!this.queue.list.isEmpty()) {
-                    data = new IJsonSerializable[this.queue.list.size()];
-                    this.queue.list.toArray(data);
-                    this.queue.list.clear();
-                }
-            }
-
-            if (data != null) {
-                // flush the queue
+                if (this.data != null) {
                 Persistence persistence = Persistence.getInstance();
                 if (persistence != null) {
-                    persistence.persist(data, false);
+                    persistence.persist(this.data, false);
                 }
             }
 
             return null;
         }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            return ;
-        } //TODO do we want do something here?!
-
     }
 
 
