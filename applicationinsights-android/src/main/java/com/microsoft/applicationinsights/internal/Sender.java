@@ -1,11 +1,8 @@
 package com.microsoft.applicationinsights.internal;
 
 import android.annotation.TargetApi;
-import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Build;
 
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.io.BufferedReader;
@@ -14,12 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimerTask;
@@ -120,7 +114,7 @@ public class Sender {
         }
     }
 
-    private void remoteFromRunning(String key) {
+    private void removeFromRunning(String key) {
         synchronized (Sender.LOCK) {
             this.currentTasks.remove(key);
         }
@@ -141,7 +135,7 @@ public class Sender {
      * @return null if the request was successful, the server response otherwise
      */
     protected String onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
-        this.remoteFromRunning(fileToSend.toString());
+        this.removeFromRunning(fileToSend.toString());
 
         StringBuilder builder = new StringBuilder();
 
