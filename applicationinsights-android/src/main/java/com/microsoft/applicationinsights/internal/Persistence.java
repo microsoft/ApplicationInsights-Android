@@ -95,7 +95,13 @@ public class Persistence {
      * @param highPriority the priority to save the data with
      * @see Persistence#persist(String, Boolean)
      */
-    protected boolean persist(IJsonSerializable[] data, Boolean highPriority) { //TODO Synchronize delete & persist?
+    protected boolean persist(IJsonSerializable[] data, Boolean highPriority) {
+        if (!this.isFreeSpaceAvailable(highPriority)) {
+            InternalLogging.warn(TAG, "No free space on disk to flush data.");
+            Sender.getInstance().send();
+            return false;
+        }
+
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess;
         try {
@@ -134,13 +140,7 @@ public class Persistence {
      * @param highPriority the priority we want to use for persisting the data
      * @return true if the operation was successful, false otherwise
      */
-    protected boolean persist(String data, Boolean highPriority) {
-        if (!this.isFreeSpaceAvailable(highPriority)) {
-            InternalLogging.warn(TAG, "No free space on disk to flush data.");
-            Sender.getInstance().send();
-            return false;
-        }
-
+    private boolean persist(String data, Boolean highPriority) {
         String uuid = UUID.randomUUID().toString();
         Boolean isSuccess = false;
         Context context = this.getContext();
@@ -240,21 +240,23 @@ public class Persistence {
      * @return reference to the next available file, null if no file is available
      */
     private File nextAvailableFileInDirectory(File directory) {
-        if (directory != null) {
-            File[] files = directory.listFiles();
-            File file;
-            if ((files != null) && (files.length > 0)) {
-                for (int i = 0; i < files.length - 1; i++) { //TODO make this more efficient if necessary
-                    file = files[i];
-                    if (!this.servedFiles.contains(file)) {
-                        return file;//we haven't served the file, return it
+        synchronized (Persistence.LOCK) {
+            if (directory != null) {
+                File[] files = directory.listFiles();
+                File file;
+                if ((files != null) && (files.length > 0)) {
+                    for (int i = 0; i < files.length - 1; i++) {
+                        file = files[i];
+                        if (!this.servedFiles.contains(file)) {
+                            return file;//we haven't served the file, return it
+                        }
                     }
+
                 }
-
             }
-        }
 
-        return null; //no files in directory or no directory
+            return null; //no files in directory or no directory
+        }
     }
 
     /**
@@ -264,12 +266,14 @@ public class Persistence {
      */
     protected void deleteFile(File file) {
         if (file != null) {
-            // always delete the file
-            boolean deletedFile = file.delete();
-            if (!deletedFile) {
-                InternalLogging.error(TAG, "Error deleting telemetry file " + file.toString());
-            } else {
-                this.servedFiles.remove(file);
+            synchronized (Persistence.LOCK) {
+                // always delete the file
+                boolean deletedFile = file.delete();
+                if (!deletedFile) {
+                    InternalLogging.error(TAG, "Error deleting telemetry file " + file.toString());
+                } else {
+                    this.servedFiles.remove(file);
+                }
             }
         } else {
             InternalLogging.error(TAG, "Couldn't delete file, the reference to the file was null");
@@ -282,8 +286,10 @@ public class Persistence {
      * @param file reference to the file that should be made available so it can be sent again later
      */
     protected void makeAvailable(File file) {
-        if (file != null) {
-            this.servedFiles.remove(file);
+        synchronized (Persistence.LOCK) {
+            if (file != null) {
+                this.servedFiles.remove(file);
+            }
         }
     }
 
@@ -293,15 +299,17 @@ public class Persistence {
      * @param highPriority indicates which directory to check for available files
      */
     private Boolean isFreeSpaceAvailable(Boolean highPriority) {
-        Context context = getContext();
-        if (context != null) {
-            String path = highPriority ? (context.getFilesDir() + HIGH_PRIO_DIRECTORY) :
-                  (getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY);
-            File dir = new File(path);
-            return (dir.listFiles().length < MAX_FILE_COUNT);
-        }
+        synchronized (Persistence.LOCK) {
+            Context context = getContext();
+            if (context != null) {
+                String path = highPriority ? (context.getFilesDir() + HIGH_PRIO_DIRECTORY) :
+                      (getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY);
+                File dir = new File(path);
+                return (dir.listFiles().length < MAX_FILE_COUNT);
+            }
 
-        return false;
+            return false;
+        }
     }
 
     /**
