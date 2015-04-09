@@ -42,6 +42,10 @@ public class Channel {
         this.seqCounter = new AtomicInteger(0);
     }
 
+    public void synchronize() {
+        getQueue().flush();
+    }
+
     /**
      * @return the sender for this channel.
      */

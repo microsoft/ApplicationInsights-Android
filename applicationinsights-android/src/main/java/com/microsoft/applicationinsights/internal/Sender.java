@@ -88,7 +88,7 @@ public class Sender {
     }
 
 
-    protected void send() {
+    public void send() {
         if(runningRequestCount() < 10) {
             // Send the persisted data
             Persistence persistence = Persistence.getInstance();

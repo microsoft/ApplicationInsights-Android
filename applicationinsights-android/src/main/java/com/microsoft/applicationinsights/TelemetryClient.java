@@ -287,8 +287,8 @@ public class TelemetryClient {
      * {@link TelemetryConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
-    public void sendPendingData() { //TODO call sendPendingData() on the channel and not on the queue!
-        this.channel.getQueue().flush();
+    public void sendPendingData() {
+        this.channel.synchronize(); //will persist all queued up data and trigger sending it.
     }
 
     /**
