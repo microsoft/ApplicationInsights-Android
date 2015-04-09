@@ -87,7 +87,7 @@ public enum AppInsights {
         if(this.instrumentationKey != null){
             iKey = this.instrumentationKey;
         }else{
-            config.getInstrumentationKey();
+            iKey = config.getInstrumentationKey();
         }
         TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
         EnvelopeFactory.INSTANCE.configure(telemetryContext);
