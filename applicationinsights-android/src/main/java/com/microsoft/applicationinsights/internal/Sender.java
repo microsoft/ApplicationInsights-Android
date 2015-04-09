@@ -50,7 +50,6 @@ public class Sender {
 
     private static Sender instance;
 
-
     private HashMap<String, TimerTask> currentTasks = new HashMap<>(10);
 
     /**
@@ -89,7 +88,7 @@ public class Sender {
     }
 
 
-    protected void send() {
+    protected void send() { //TODO synchronize count of tasks in method
         if(getInstance().currentTasks.size() < 10) {
             // Send the persisted data
             Persistence persistence = Persistence.getInstance();
@@ -99,9 +98,11 @@ public class Sender {
                     String persistedData = persistence.load(fileToSend);
                     if (!persistedData.isEmpty()) {
                         InternalLogging.info(TAG, "sending persisted data", persistedData);
-                        SendingTask sendingTask = new SendingTask(persistedData, this, fileToSend);
+                        SendingTask sendingTask = new SendingTask(persistedData, fileToSend);
                         this.currentTasks.put(fileToSend.toString(), sendingTask);
                         sendingTask.run();
+
+                        //TODO add comment for this
                         Thread sendingThread = new Thread(sendingTask);
                         sendingThread.setDaemon(false);
                     }
@@ -145,8 +146,8 @@ public class Sender {
             this.onUnexpected(connection, responseCode, builder);
         }
 
-        //TODO don't trigger sending endlessly
-        //this.send();
+        //TODO don't trigger sending endlessly?
+        this.send();
 
         return builder.toString();
     }
@@ -261,14 +262,11 @@ public class Sender {
 
 
     private class SendingTask extends TimerTask {
-
-        private Sender sender;
         private String payload;
         private File fileToSend;
 
-        public SendingTask(String payload, Sender sender, File fileToSend) {
+        public SendingTask(String payload, File fileToSend) {
             this.payload = payload;
-            this.sender = sender;
             this.fileToSend = fileToSend;
         }
 
@@ -286,10 +284,10 @@ public class Sender {
 
         protected void sendRequestWithPayload(String payload) throws IOException {
             Writer writer = null;
-            URL url = new URL(this.sender.config.getEndpointUrl());
+            URL url = new URL(config.getEndpointUrl());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setReadTimeout(this.sender.config.getSenderReadTimeout());
-            connection.setConnectTimeout(this.sender.config.getSenderConnectTimeout());
+            connection.setReadTimeout(config.getSenderReadTimeout());
+            connection.setConnectTimeout(config.getSenderConnectTimeout());
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setDoInput(true);
@@ -297,7 +295,7 @@ public class Sender {
 
             try {
                 InternalLogging.info(TAG, "writing payload", payload);
-                writer = this.sender.getWriter(connection);
+                writer = getWriter(connection);
                 writer.write(payload);
                 writer.flush();
 
@@ -308,7 +306,7 @@ public class Sender {
                 int responseCode = connection.getResponseCode();
 
                 // process the response
-                this.sender.onResponse(connection, responseCode, payload, fileToSend);
+                onResponse(connection, responseCode, payload, fileToSend);
             } catch (IOException e) {
                 InternalLogging.error(TAG, e.toString());
                 Persistence persistence = Persistence.getInstance();
