@@ -141,10 +141,9 @@ public class Sender {
 
         InternalLogging.info(TAG, "response code", Integer.toString(responseCode));
         boolean isExpected = ((responseCode > 199) && (responseCode < 203));
-        boolean isRecoverableError = (responseCode > 500 && responseCode != 529) || (responseCode == 404);
-
-        boolean deleteFile = isExpected || (responseCode == 529) || !isRecoverableError;
-        //TODO handle other status codes depending on specification (needs discussion)
+        boolean isRecoverableError = (responseCode == 429) || (responseCode == 408) ||
+              (responseCode == 500) || (responseCode == 503) || (responseCode == 511);
+        boolean deleteFile = isExpected || !isRecoverableError;
 
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
