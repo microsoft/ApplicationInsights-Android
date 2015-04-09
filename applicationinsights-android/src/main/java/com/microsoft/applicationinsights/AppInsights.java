@@ -103,7 +103,7 @@ public enum AppInsights {
     /**
      * Triggers persisting and if applicable sending of queued data
      * note: this will be called
-     * {@link com.microsoft.applicationinsights.internal.TelemetryQueueConfig#maxBatchIntervalMs} after
+     * {@link com.microsoft.applicationinsights.internal.TelemetryConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
