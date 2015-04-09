@@ -248,6 +248,7 @@ public class Persistence {
                     for (int i = 0; i < files.length - 1; i++) {
                         file = files[i];
                         if (!this.servedFiles.contains(file)) {
+                            this.servedFiles.add(file);
                             return file;//we haven't served the file, return it
                         }
                     }
@@ -272,7 +273,7 @@ public class Persistence {
                 if (!deletedFile) {
                     InternalLogging.error(TAG, "Error deleting telemetry file " + file.toString());
                 } else {
-                    this.servedFiles.remove(file);
+                    servedFiles.remove(file);
                 }
             }
         } else {
@@ -288,7 +289,7 @@ public class Persistence {
     protected void makeAvailable(File file) {
         synchronized (Persistence.LOCK) {
             if (file != null) {
-                this.servedFiles.remove(file);
+                servedFiles.remove(file);
             }
         }
     }
