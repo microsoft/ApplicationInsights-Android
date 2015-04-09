@@ -88,10 +88,6 @@ public class ItemListActivity extends FragmentActivity
                     .commit();
 
         } else {
-            /*for(int i = 0; i < 200; i++) {
-                TelemetryClient.getInstance(this).trackEvent("Test1234");
-            }*/
-
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             Intent detailIntent = new Intent(this, ItemDetailActivity.class);
