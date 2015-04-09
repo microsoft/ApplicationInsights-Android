@@ -143,6 +143,32 @@ public enum TelemetryClient {
     }
 
     /**
+     * Triggers persisting and if applicable sending of queued data
+     * note: this will be called
+     * {@link TelemetryConfig#maxBatchIntervalMs} after
+     * tracking any telemetry so it is not necessary to call this in most cases.
+     */
+    public void sendPendingData() {
+        this.channel.synchronize(); //will persist all queued up data and trigger sending it.
+    }
+
+    /**
+     * Registers a custom exceptionHandler to catch unhandled exceptions. Unhandled exceptions will be
+     * persisted and sent when starting the app again.
+     *
+     * @param context the application context used to register the exceptionHandler to catch unhandled
+     *                exceptions
+     */
+    public void enableCrashTracking(Context context) {
+        if (context != null) {
+            // TODO: In case of multiple client instance, this should be done somewhere else + only once
+            ExceptionTracking.registerExceptionHandler(context);
+        } else {
+            InternalLogging.warn(TAG, "Unable to register ExceptionHandler, context is null");
+        }
+    }
+
+    /**
      * Registers an activity life cycle callback handler to track page views and sessions.
      *
      * @param application the application used to register the life cycle callbacks

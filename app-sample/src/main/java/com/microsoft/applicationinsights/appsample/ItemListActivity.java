@@ -8,7 +8,7 @@ import com.microsoft.applicationinsights.AppInsights;
 import com.microsoft.applicationinsights.SessionConfig;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.internal.ChannelConfig;
-import com.microsoft.applicationinsights.internal.TelemetryQueueConfig;
+import com.microsoft.applicationinsights.internal.TelemetryConfig;
 
 /**
  * An activity representing a list of Items. This activity
@@ -59,7 +59,7 @@ public class ItemListActivity extends FragmentActivity
 
         // update endpoint to make traffic visible in the proxy
         TelemetryClient client = TelemetryClient.INSTANCE;
-        TelemetryQueueConfig config = ChannelConfig.getStaticConfig();
+        TelemetryConfig config = client.getConfig().getStaticConfig();
         config.setEndpointUrl(config.getEndpointUrl().replace("https", "http")); //TODO change this!?
 
         // Track basic telemetry

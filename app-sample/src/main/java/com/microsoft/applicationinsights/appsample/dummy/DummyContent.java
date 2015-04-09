@@ -23,10 +23,10 @@ public class DummyContent {
     public static Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
 
     static {
-        // Add 3 sample items.
-        addItem(new DummyItem("1", "Item 1"));
-        addItem(new DummyItem("2", "Item 2"));
+        addItem(new DummyItem("1", "Send 50 events"));
+        addItem(new DummyItem("2", "Send 200 events"));
         addItem(new DummyItem("3", "Crash the App!"));
+        addItem(new DummyItem("4", "Trigger Synchronize"));
     }
 
     private static void addItem(DummyItem item) {

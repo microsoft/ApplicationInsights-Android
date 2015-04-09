@@ -5,9 +5,8 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
-import com.microsoft.applicationinsights.internal.TelemetryQueue;
+import com.microsoft.applicationinsights.internal.ChannelQueue;
 import com.microsoft.applicationinsights.contracts.CrashData;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockExceptionTracking;
 import com.microsoft.mocks.MockTelemetryClient;
@@ -31,8 +30,8 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
     public void tearDown() throws Exception {
         super.tearDown();
         Thread.setDefaultUncaughtExceptionHandler(originalHandler);
-        TelemetryQueue.INSTANCE.setIsCrashing(false);
-        TelemetryQueue.INSTANCE.getConfig().setDeveloperMode(false);
+        ChannelQueue.INSTANCE.setIsCrashing(false);
+        ChannelQueue.INSTANCE.getConfig().setDeveloperMode(false);
     }
 
     public void testRegisterExceptionHandler() throws Exception {
@@ -43,12 +42,12 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
         Assert.assertEquals("handler is of correct type", ExceptionTracking.class, handler.getClass());
 
         // double register without debug mode
-        TelemetryQueue.INSTANCE.getConfig().setDeveloperMode(false);
+        ChannelQueue.INSTANCE.getConfig().setDeveloperMode(false);
         ExceptionTracking.registerExceptionHandler(this.getActivity());
         Assert.assertTrue("no exception for multiple registration without debug mode", true);
 
         // double register with debug mode and verify runtime exception
-        TelemetryQueue.INSTANCE.getConfig().setDeveloperMode(true);
+        ChannelQueue.INSTANCE.getConfig().setDeveloperMode(true);
         RuntimeException exception = null;
         try {
             ExceptionTracking.registerExceptionHandler(this.getActivity());

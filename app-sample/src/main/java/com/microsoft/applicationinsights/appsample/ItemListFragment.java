@@ -118,14 +118,35 @@ public class ItemListFragment extends ListFragment {
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
-        //crash the app
-        if (position == 2) {
+        switch (position) {
+            case 0:
+                for(int i = 0; i < 50; i++) {
+                    TelemetryClient.INSTANCE.trackEvent("something wicked this way comes");
+                }
+                break;
+            case 1:
+                for(int i = 0; i < 200; i++) {
+                    TelemetryClient.INSTANCE.trackEvent("something wicked this way comes");
+                }
+                break;
+            case 2:
             TelemetryClient client = TelemetryClient.INSTANCE;
             client.trackTrace("example trace");
             client.trackEvent("example event");
             client.trackMetric("example metric", 1);
 
-            crashMe1();
+                crashMe1();
+                break;
+            case 3:
+                TelemetryClient.getInstance(getActivity()).sendPendingData();
+                break;
+
+            default:
+                break;
+        }
+
+        if(position == 1) {
+
         }
 
         // Notify the active callbacks interface (the activity, if the
