@@ -88,8 +88,8 @@ public class Sender {
     }
 
 
-    protected void send() { //TODO synchronize count of tasks in method
-        if(getInstance().currentTasks.size() < 10) {
+    protected void send() {
+        if(runningRequestCount() < 10) {
             // Send the persisted data
             Persistence persistence = Persistence.getInstance();
             if (persistence != null) {
@@ -113,6 +113,12 @@ public class Sender {
             InternalLogging.info(TAG, "We have already 10 pending reguests", "");
         }
 }
+
+    private int runningRequestCount() {
+        synchronized (Sender.LOCK) {
+            return getInstance().currentTasks.size();
+        }
+    }
 
     /**
      * Handler for the http response from the sender
