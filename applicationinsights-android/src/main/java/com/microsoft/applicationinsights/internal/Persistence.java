@@ -95,7 +95,7 @@ public class Persistence {
      * @param highPriority the priority to save the data with
      * @see Persistence#persist(String, Boolean)
      */
-    protected boolean persist(IJsonSerializable[] data, Boolean highPriority) {
+    protected boolean persist(IJsonSerializable[] data, Boolean highPriority) { //TODO Synchronize delete & persist?
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess;
         try {
@@ -219,7 +219,7 @@ public class Persistence {
             return this.nextAvailableFileInDirectory(directory);
         }
 
-        InternalLogging.error(TAG, "The context for persistence is null");//TODO talk to chris about this
+        InternalLogging.error(TAG, "The context for persistence is null");
         return null;
     }
 
@@ -232,7 +232,7 @@ public class Persistence {
             return this.nextAvailableFileInDirectory(directory);
         }
 
-        InternalLogging.error(TAG, "The context for persistence is null");//TODO talk to chris about this
+        InternalLogging.error(TAG, "The context for persistence is null");
         return null;
     }
 
