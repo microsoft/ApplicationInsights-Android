@@ -113,7 +113,6 @@ public class Persistence {
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData, highPriority);
 
-            //TODO trigger sending in a different way?
             if(isSuccess) {
                 Sender sender = Sender.getInstance();
                 if(sender != null) {
