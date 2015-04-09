@@ -140,7 +140,7 @@ public class Persistence {
      * @param highPriority the priority we want to use for persisting the data
      * @return true if the operation was successful, false otherwise
      */
-    private boolean persist(String data, Boolean highPriority) {
+    protected boolean persist(String data, Boolean highPriority) {
         String uuid = UUID.randomUUID().toString();
         Boolean isSuccess = false;
         Context context = this.getContext();
