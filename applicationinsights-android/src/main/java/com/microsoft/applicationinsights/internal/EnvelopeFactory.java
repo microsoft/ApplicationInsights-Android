@@ -277,7 +277,7 @@ public enum EnvelopeFactory {
         // read stack frames
         List<CrashDataThreadFrame> stackFrames = new ArrayList<>();
         StackTraceElement[] stack = localException.getStackTrace();
-        for (int i = stack.length - 1; i >= 0; i--) {
+        for (int i = 0; i < stack.length - 1; i++) {
             StackTraceElement rawFrame = stack[i];
             CrashDataThreadFrame frame = new CrashDataThreadFrame();
             frame.setSymbol(rawFrame.toString());
