@@ -13,6 +13,10 @@ import com.microsoft.applicationinsights.AppInsights;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.appsample.dummy.DummyContent;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Objects;
+
 /**
  * A list fragment representing a list of Items. This fragment
  * also supports tablet devices by allowing list items to be given an
@@ -118,27 +122,28 @@ public class ItemListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
+        TelemetryClient client = TelemetryClient.getInstance();
 
         switch (position) {
             case 0:
-                for(int i = 0; i < 50; i++) {
-                    TelemetryClient.getInstance().trackEvent("something wicked this way comes");
-                }
+                client.trackEvent("something wicked this way comes");
                 break;
             case 1:
-                for(int i = 0; i < 200; i++) {
-                    TelemetryClient.getInstance().trackEvent("something wicked this way comes");
-                }
+                client.trackTrace("something wicked this way comes");
                 break;
             case 2:
-            TelemetryClient client = TelemetryClient.getInstance();
-            client.trackTrace("example trace");
-            client.trackEvent("example event");
-            client.trackMetric("example metric", 1);
 
-                crashMe1();
+                ArrayList<Object> myList = new ArrayList<Object>();
+                try{
+                    Object test = myList.get(2);
+                }catch(Exception e){
+                    client.trackHandledException(e);
+                }
                 break;
             case 3:
+                crashMe1();
+                break;
+            case 4:
                 AppInsights.INSTANCE.sendPendingData();
                 break;
 

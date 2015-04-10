@@ -62,12 +62,6 @@ public class ItemListActivity extends FragmentActivity
         TelemetryConfig config = ChannelConfig.getStaticConfig();
         config.setEndpointUrl(config.getEndpointUrl().replace("https", "http")); //TODO change this!?
 
-        // Track basic telemetry
-        client.trackTrace("example trace");
-        client.trackEvent("example event");
-        client.trackMetric("example metric", 1);
-        AppInsights.sendPendingData();
-
         // track activity lifecycle (note this only needs to be done once per application)
         AppInsights.enableActivityTracking(this.getApplication());
     }
