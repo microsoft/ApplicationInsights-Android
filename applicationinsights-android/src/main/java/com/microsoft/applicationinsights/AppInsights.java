@@ -67,6 +67,9 @@ public enum AppInsights {
      * @param instrumentationKey the instrumentation key associated with the app
      */
     public void setupInstance(Context context, String instrumentationKey){
+        if(isRunning) {
+            return;
+        }
         this.context = context;
         this.instrumentationKey = instrumentationKey;
         this.config = new SessionConfig(this.context);
@@ -77,10 +80,9 @@ public enum AppInsights {
      * Note: This should be called after {@link com.microsoft.applicationinsights.AppInsights#setup(android.content.Context)}
      */
     public static void start(){
-        if(!isRunning) {
-            INSTANCE.startInstance();
-            isRunning = true;
-        }
+
+        INSTANCE.startInstance();
+
     }
 
     /**
@@ -88,20 +90,25 @@ public enum AppInsights {
      * Note: This should be called after {@link com.microsoft.applicationinsights.AppInsights#setup(android.content.Context)}
      */
     public void startInstance(){
-        String iKey = null;
-        if(this.instrumentationKey != null){
-            iKey = this.instrumentationKey;
-        }else{
-            iKey = config.getInstrumentationKey();
-        }
-        TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
-        EnvelopeFactory.INSTANCE.configure(telemetryContext);
+        if(!isRunning) {
+            isRunning = true;
+            String iKey = null;
 
-        if(!this.telemetryDisabled){
-            LifeCycleTracking.initialize(config, telemetryContext);
-        }
-        if(!this.exceptionTrackingDisabled){
-            ExceptionTracking.registerExceptionHandler(this.context);
+            if(this.instrumentationKey != null){
+                iKey = this.instrumentationKey;
+            }else{
+                iKey = config.getInstrumentationKey();
+            }
+
+            TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
+            EnvelopeFactory.INSTANCE.configure(telemetryContext);
+
+            if(!this.telemetryDisabled){
+                LifeCycleTracking.initialize(config, telemetryContext);
+            }
+            if(!this.exceptionTrackingDisabled){
+                ExceptionTracking.registerExceptionHandler(this.context);
+            }
         }
     }
 

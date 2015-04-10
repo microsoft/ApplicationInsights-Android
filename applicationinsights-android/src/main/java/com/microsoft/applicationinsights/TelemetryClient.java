@@ -15,6 +15,9 @@ public class TelemetryClient {
 
     private static TelemetryClient instance;
 
+    private boolean activityTrackingEnabled;
+
+
     /**
      * Volatile boolean for double checked synchronize block
      */
@@ -193,6 +196,9 @@ public class TelemetryClient {
      * @param application the application used to register the life cycle callbacks
      */
     protected void enableActivityTracking(Application application) {
-        LifeCycleTracking.registerActivityLifecycleCallbacks(application);
+        if(!activityTrackingEnabled){
+            activityTrackingEnabled = true;
+            LifeCycleTracking.registerActivityLifecycleCallbacks(application);
+        }
     }
 }
