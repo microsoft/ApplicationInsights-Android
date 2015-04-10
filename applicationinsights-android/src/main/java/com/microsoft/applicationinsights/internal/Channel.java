@@ -24,16 +24,6 @@ public class Channel {
     private static final Object LOCK = new Object();
 
     /**
-     * The id for this channel
-     */
-    private static long channelId; //TODO where and why is this used for
-
-    /**
-     * The sequence counter for this channel
-     */
-    private static AtomicInteger seqCounter; //TODO where is this used?!
-
-    /**
      * Test hook to the sender
      */
     private static ChannelQueue queue;
@@ -61,9 +51,6 @@ public class Channel {
             }
         }
         queue = ChannelQueue.INSTANCE;
-        Random random = new Random();
-        channelId = Math.abs(random.nextLong());
-        seqCounter = new AtomicInteger(0);
     }
 
     /**
