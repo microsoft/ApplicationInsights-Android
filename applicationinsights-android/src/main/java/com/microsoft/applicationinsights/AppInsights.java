@@ -109,6 +109,7 @@ public enum AppInsights {
             if(!this.exceptionTrackingDisabled){
                 ExceptionTracking.registerExceptionHandler(this.context);
             }
+            sendPendingData();
         }
     }
 
