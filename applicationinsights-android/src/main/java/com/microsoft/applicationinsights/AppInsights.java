@@ -28,6 +28,8 @@ public enum AppInsights {
      */
     private Map<String, String> commonProperties;
 
+    private static boolean isRunning;
+
     /**
      * Create AppInsights instance
      */
@@ -75,7 +77,10 @@ public enum AppInsights {
      * Note: This should be called after {@link com.microsoft.applicationinsights.AppInsights#setup(android.content.Context)}
      */
     public static void start(){
-        INSTANCE.startInstance();
+        if(!isRunning) {
+            INSTANCE.startInstance();
+            isRunning = true;
+        }
     }
 
     /**

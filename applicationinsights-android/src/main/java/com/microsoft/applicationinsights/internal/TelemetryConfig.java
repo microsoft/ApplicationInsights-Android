@@ -33,7 +33,7 @@ public class TelemetryConfig {
     /**
      * The master off switch.  Do not enqueue any data if set to TRUE
      */
-    private boolean telemetryDisabled; //TODO why does this disable ALL telemetry (including Crashes!)?
+    private boolean telemetryDisabled;
 
     /**
      * The flag to enable developer mode logging
