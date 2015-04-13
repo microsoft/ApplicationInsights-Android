@@ -33,7 +33,7 @@ public class TelemetryContext {
     protected static final String SHARED_PREFERENCES_KEY = "APP_INSIGHTS_CONTEXT";
     protected static final String USER_ID_KEY = "USER_ID";
     protected static final String USER_ACQ_KEY = "USER_ACQ";
-    protected static final String SDK_VERSION = "1.0-a.2";
+    protected static final String SDK_VERSION = "1.0-beta.1";
     private static final String TAG = "TelemetryContext";
 
     /**
@@ -215,6 +215,8 @@ public class TelemetryContext {
         TelemetryContext.device.addToHashMap(contextTags);
         TelemetryContext.session.addToHashMap(contextTags);
         TelemetryContext.user.addToHashMap(contextTags);
+        TelemetryContext.internal.addToHashMap(contextTags);
+        
         return contextTags;
     }
 
