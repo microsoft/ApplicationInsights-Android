@@ -148,7 +148,6 @@ public class Sender {
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
             this.onExpected(connection, builder, fileToSend);
-            //TODO don't trigger sending endlessly?
             this.send();
         }
 
