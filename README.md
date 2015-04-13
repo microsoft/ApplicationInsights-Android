@@ -1,6 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/AppInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/AppInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-Beta.1)
+# Application Insights for Android (1.0-Alpha.5)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
