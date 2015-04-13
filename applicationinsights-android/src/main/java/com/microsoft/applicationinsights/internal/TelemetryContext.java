@@ -248,6 +248,7 @@ public class TelemetryContext {
      * Sets the application telemetryContext tags
      */
     protected static void setAppContext(Context appContext) {
+        String version = "unknown";
         TelemetryContext.appIdForEnvelope = "";
 
         try {
@@ -260,11 +261,12 @@ public class TelemetryContext {
             }
 
             String appBuild = Integer.toString(info.versionCode);
-            String ver = String.format("%s (%S)", TelemetryContext.appIdForEnvelope, appBuild);
-            Application context = TelemetryContext.application;
-            context.setVer(ver);
+            version = String.format("%s (%S)", TelemetryContext.appIdForEnvelope, appBuild);
         } catch (PackageManager.NameNotFoundException e) {
             InternalLogging.warn("TelemetryContext", "Could not collect application context");
+        } finally {
+            Application context = TelemetryContext.application;
+            context.setVer(version);
         }
     }
 
