@@ -101,7 +101,7 @@ public enum AppInsights {
             }
 
             TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
-            EnvelopeFactory.INSTANCE.configure(telemetryContext);
+            EnvelopeFactory.INSTANCE.configure(telemetryContext, this.commonProperties);
 
             if(!this.telemetryDisabled){
                 LifeCycleTracking.initialize(config, telemetryContext);
@@ -168,8 +168,9 @@ public enum AppInsights {
      * @param commonProperties a dictionary of properties to enqueue with all telemetry.
      */
     public static void setCommonProperties(Map<String, String> commonProperties) {
-        INSTANCE.commonProperties = commonProperties;
-        EnvelopeFactory.INSTANCE.setCommonProperties(commonProperties);
+        if(!isRunning) {
+            INSTANCE.commonProperties = commonProperties;
+        }
     }
 
     public static SessionConfig getConfig() {
