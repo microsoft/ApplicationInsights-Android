@@ -216,7 +216,7 @@ public class TelemetryContext {
         TelemetryContext.session.addToHashMap(contextTags);
         TelemetryContext.user.addToHashMap(contextTags);
         TelemetryContext.internal.addToHashMap(contextTags);
-        
+
         return contextTags;
     }
 
@@ -351,6 +351,6 @@ public class TelemetryContext {
         Internal context = TelemetryContext.internal;
 
         // todo: pull version from gradle.properties
-        context.setSdkVersion("Android:" + TelemetryContext.SDK_VERSION);
+        context.setSdkVersion("android:" + TelemetryContext.SDK_VERSION);
     }
 }
