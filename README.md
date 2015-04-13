@@ -94,41 +94,22 @@ public class MyActivity extends Activity {
 
 > Note: this only works in Android SDK version 15 and up (Ice Cream Sandwich+)
 
-**Extend Application and register for life cycle callbacks**
+**Register for life cycle callbacks**
 
-MyApplication.java
+In order to register for lifecycle events, you only have to do the following call
+
 ```java
-import com.microsoft.applicationinsights.ApplicationLifeCycleEventTracking;
-```
-```java
-public class MyApplication extends Application {
-
-    @Override
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public void onCreate() {
-        super.onCreate();
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
-        }
-    }
-}
-```
-AndroidManifest.xml
-```xml
-<manifest>
-    <application android:name="MyApplication"></application>
-</manifest>
+	// track activity lifecycle / session states
+    AppInsights.enableActivityTracking(this.getApplication());
 ```
 
+Please note, that this will only work after `AppInsights.start()`has been called. Furthermore, the telemetry feature must not be disabled. 
 
 ## Documentation ##
 
 http://microsoft.github.io/AppInsights-Android/
 
-
-
 ## Contributing ##
-
 
 **Development environment**
 
