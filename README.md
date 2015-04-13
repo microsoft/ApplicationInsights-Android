@@ -1,8 +1,20 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/AppInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/AppInsights-Android/_latestVersion)
 
-# Application Insights for Android
+# Application Insights for Android (1.0-Beta.1)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
+
+**Release Notes**
+* The sdk can now differentiate between handled and unhandeled exceptions (aka crashes).
+* Updated example app
+* Changed internal package structure
+* Updated and cleaner internal architecture of the sdk
+* Improved performance because of new architecture.
+
+
+**Breaking Changes**
+
+* Setup and start of the Application Insights SDK are now done using the new umbrella class `AppInsights` instead of `TelemetryClient`.  
 
 ## Setup ##
 	
@@ -20,7 +32,7 @@ dependencies {
 
 Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
-AndroidManifest.xml
+Plase add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` into your app's `AndroidManifest.xml` as well as the property for your instrumentation key as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key or the variable leave it and use gradle.properties to set it. 
 
 ```xml
 <manifest>
@@ -43,7 +55,7 @@ AndroidManifest.xml
 ai_instrumentation_key=<KEY_PLACEHOLDER>
 ```
 
-Top-level build file
+Top-level gradle build file
 
 ```java
 android {
@@ -66,9 +78,22 @@ AppInsights.start();
 
 ## Usage ##
 
+Add the following import to your apps root activity
+
 ```java
 import com.microsoft.applicationinsights.TelemetryClient;
 ```
+
+And add 
+```java
+AppInsights.setup(this);
+AppInsights.start();
+```
+
+in the activity's `onCreate`-callback.
+
+A typicall onCreate-method looks like this.
+
 ```java
 public class MyActivity extends Activity {
 
@@ -107,7 +132,7 @@ Please note, that this will only work after `AppInsights.start()`has been called
 
 ## Documentation ##
 
-http://microsoft.github.io/AppInsights-Android/
+[http://microsoft.github.io/AppInsights-Android/]()
 
 ## Contributing ##
 
