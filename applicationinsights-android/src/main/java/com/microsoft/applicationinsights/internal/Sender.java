@@ -305,6 +305,7 @@ public class Sender {
             connection.setReadTimeout(config.getSenderReadTimeout());
             connection.setConnectTimeout(config.getSenderConnectTimeout());
             connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setUseCaches(false);
