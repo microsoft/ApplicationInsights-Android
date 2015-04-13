@@ -55,6 +55,14 @@ android {
 
 
 
+**Optional: set instrumentation key in code**
+
+It is also possible to set the instrumentation key of your app in code. This will override the one you might have set in your gradle or manifest file. Setting the instrumentation key programmatically can be done while setting up AppInsights:
+
+```java
+AppInsights.setup(this, "<YOUR-IKEY-GOES-HERE>");
+AppInsights.start();
+```
 
 ## Usage ##
 
