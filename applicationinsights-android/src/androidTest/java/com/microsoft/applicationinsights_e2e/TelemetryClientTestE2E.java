@@ -4,8 +4,12 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.channel.TelemetryQueueConfig;
+import com.microsoft.applicationinsights.AppInsights;
+import com.microsoft.applicationinsights.internal.Channel;
+import com.microsoft.applicationinsights.internal.ChannelConfig;
+import com.microsoft.applicationinsights.internal.TelemetryConfig;
 import com.microsoft.mocks.MockActivity;
+import com.microsoft.mocks.MockChannel;
 import com.microsoft.mocks.MockQueue;
 import com.microsoft.mocks.MockTelemetryClient;
 
@@ -32,9 +36,8 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
         Intent intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
         this.setActivity(this.startActivity(intent, null, null));
 
-        this.client = new MockTelemetryClient(this.getActivity());
-        this.client.mockTrackMethod = false;
-        TelemetryQueueConfig config = this.client.getChannel().getQueue().getConfig();
+        MockTelemetryClient.getInstance().mockTrackMethod = false;
+        TelemetryConfig config = Channel.getInstance().getQueue().getConfig();
         config.setMaxBatchIntervalMs(20);
 
         // use http for tests
@@ -71,13 +74,13 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testTrackException() throws Exception {
-        this.client.trackException(null);
-        this.client.trackException(new Exception());
+        this.client.trackHandledException(null);
+        this.client.trackHandledException(new Exception());
         try {
             throw new InvalidObjectException("this is expected");
         } catch (InvalidObjectException exception) {
-            this.client.trackException(exception);
-            this.client.trackException(exception, properties);
+            this.client.trackHandledException(exception);
+            this.client.trackHandledException(exception, properties);
         }
 
         this.validate();
@@ -99,24 +102,24 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             exception = e;
         }
 
-        this.client.getConfig().getStaticConfig().setMaxBatchCount(10);
+        ChannelConfig.getStaticConfig().setMaxBatchCount(10);
         for (int i = 0; i < 10; i++) {
             this.client.trackEvent("android event");
             this.client.trackTrace("android trace");
             this.client.trackMetric("android metric", 0.0);
-            this.client.trackException(exception);
+            this.client.trackHandledException(exception);
             this.client.trackPageView("android page");
             Thread.sleep(10);
         }
 
-        this.client.flush();
+        AppInsights.INSTANCE.sendPendingData();
         Thread.sleep(10);
         this.validate();
     }
 
     public void validate() throws Exception {
         try {
-            MockQueue queue = this.client.getChannel().getQueue();
+            MockQueue queue = MockChannel.getInstance().getQueue();
             CountDownLatch rspSignal = queue.sender.responseSignal;
             CountDownLatch sendSignal = queue.sender.sendSignal;
             rspSignal.await(30, TimeUnit.SECONDS);
@@ -124,7 +127,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             Log.i("RESPONSE", queue.sender.getLastResponse());
 
             if (rspSignal.getCount() < sendSignal.getCount()) {
-                Log.w("BACKEND_ERROR", "response count is lower than send count");
+                Log.w("BACKEND_ERROR", "response count is lower than enqueue count");
             } else if (queue.sender.responseCode == 206) {
                 Log.w("BACKEND_ERROR", "response is 206, some telemetry was rejected");
             }

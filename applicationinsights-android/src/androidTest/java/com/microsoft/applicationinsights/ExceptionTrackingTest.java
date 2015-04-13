@@ -1,10 +1,12 @@
 package com.microsoft.applicationinsights;
 
+import android.content.Context;
+import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.channel.TelemetryQueue;
-import com.microsoft.applicationinsights.channel.contracts.CrashData;
-import com.microsoft.applicationinsights.channel.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.contracts.Envelope;
+import com.microsoft.applicationinsights.internal.ChannelQueue;
+import com.microsoft.applicationinsights.contracts.CrashData;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockExceptionTracking;
 import com.microsoft.mocks.MockTelemetryClient;
@@ -21,13 +23,15 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
     public void setUp() throws Exception {
         super.setUp();
         originalHandler = Thread.getDefaultUncaughtExceptionHandler();
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), com.microsoft.mocks.MockActivity.class);
+        this.setActivity(this.startActivity(intent, null, null));
     }
 
     public void tearDown() throws Exception {
         super.tearDown();
         Thread.setDefaultUncaughtExceptionHandler(originalHandler);
-        TelemetryQueue.INSTANCE.setIsCrashing(false);
-        TelemetryQueue.INSTANCE.getConfig().setDeveloperMode(false);
+        ChannelQueue.INSTANCE.setIsCrashing(false);
+        ChannelQueue.INSTANCE.getConfig().setDeveloperMode(false);
     }
 
     public void testRegisterExceptionHandler() throws Exception {
@@ -38,12 +42,12 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
         Assert.assertEquals("handler is of correct type", ExceptionTracking.class, handler.getClass());
 
         // double register without debug mode
-        TelemetryQueue.INSTANCE.getConfig().setDeveloperMode(false);
+        ChannelQueue.INSTANCE.getConfig().setDeveloperMode(false);
         ExceptionTracking.registerExceptionHandler(this.getActivity());
         Assert.assertTrue("no exception for multiple registration without debug mode", true);
 
         // double register with debug mode and verify runtime exception
-        TelemetryQueue.INSTANCE.getConfig().setDeveloperMode(true);
+        ChannelQueue.INSTANCE.getConfig().setDeveloperMode(true);
         RuntimeException exception = null;
         try {
             ExceptionTracking.registerExceptionHandler(this.getActivity());
@@ -57,18 +61,20 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
     public void testUncaughtException() throws Exception {
 
         // setup
-        MockExceptionTracking tracker = new MockExceptionTracking(this.getActivity(), null, false);
-        MockTelemetryClient client = new MockTelemetryClient(this.getActivity());
-        tracker.setTelemetryClient(client);
+        Context context = this.getActivity();
+        MockExceptionTracking tracker = new MockExceptionTracking(context, null, false);
+        MockTelemetryClient client = MockTelemetryClient.getInstance();
+//        tracker.setTelemetryClient(client);
+        CrashData testData = new CrashData();
         String testMessage = "test exception message";
 
         // test
         tracker.uncaughtException(Thread.currentThread(), new Exception(testMessage));
 
         // validation
-        ITelemetry message = client.getMessages().get(0);
+        Envelope message = client.getMessages().get(0);
         Assert.assertNotNull("crash was caught", message);
-        Assert.assertEquals("crash is of the correct type", CrashData.class, message.getClass());
+        Assert.assertEquals("crash is of the correct type", testData.getEnvelopeName(), message.getName());
         Assert.assertEquals("kill process was called", 1, tracker.processKillCount);
     }
 }

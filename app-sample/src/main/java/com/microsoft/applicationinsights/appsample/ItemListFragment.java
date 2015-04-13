@@ -9,8 +9,13 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.microsoft.applicationinsights.AppInsights;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.appsample.dummy.DummyContent;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A list fragment representing a list of Items. This fragment
@@ -117,15 +122,37 @@ public class ItemListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
+        TelemetryClient client = TelemetryClient.getInstance();
 
-        //crash the app
-        if (position == 2) {
-            TelemetryClient client = TelemetryClient.getInstance(getActivity());
-            client.trackTrace("example trace");
-            client.trackEvent("example event");
-            client.trackMetric("example metric", 1);
+        switch (position) {
+            case 0:
+                client.trackEvent("something wicked this way comes");
+                break;
+            case 1:
+                client.trackTrace("something wicked this way comes");
+                break;
+            case 2:
 
-            crashMe1();
+                ArrayList<Object> myList = new ArrayList<Object>();
+                try{
+                    Object test = myList.get(2);
+                }catch(Exception e){
+                    client.trackHandledException(e);
+                }
+                break;
+            case 3:
+                crashMe1();
+                break;
+            case 4:
+                AppInsights.INSTANCE.sendPendingData();
+                break;
+
+            default:
+                break;
+        }
+
+        if(position == 1) {
+
         }
 
         // Notify the active callbacks interface (the activity, if the

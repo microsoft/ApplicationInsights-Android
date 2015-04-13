@@ -1,23 +1,24 @@
 package com.microsoft.mocks;
 
-import android.content.Context;
+import com.microsoft.applicationinsights.internal.Channel;
+import com.microsoft.applicationinsights.internal.ChannelQueue;
 
-import com.microsoft.applicationinsights.TelemetryClientConfig;
-import com.microsoft.applicationinsights.channel.TelemetryChannel;
-import com.microsoft.applicationinsights.channel.TelemetryQueue;
-
-public class MockChannel extends TelemetryChannel {
-    public MockChannel(TelemetryClientConfig config, Context context) {
-        super(config, context);
+public class MockChannel extends Channel {
+    public MockChannel() {
+        super();
     }
 
     @Override
-    public void setQueue(TelemetryQueue queue) {
+    public void setQueue(ChannelQueue queue) {
         super.setQueue(queue);
     }
 
     @Override
     public MockQueue getQueue() {
         return (MockQueue)super.getQueue();
+    }
+
+    public static MockChannel getInstance() {
+        return (MockChannel)Channel.getInstance();
     }
 }
