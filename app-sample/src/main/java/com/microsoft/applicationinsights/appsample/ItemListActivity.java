@@ -57,11 +57,6 @@ public class ItemListActivity extends FragmentActivity
         AppInsights.setup(this);
         AppInsights.start();
 
-        // update endpoint to make traffic visible in the proxy
-        TelemetryClient client = TelemetryClient.getInstance();
-        TelemetryConfig config = ChannelConfig.getStaticConfig();
-        config.setEndpointUrl(config.getEndpointUrl().replace("https", "http")); //TODO change this!?
-
         // track activity lifecycle (note this only needs to be done once per application)
         AppInsights.enableActivityTracking(this.getApplication());
     }
