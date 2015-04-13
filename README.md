@@ -4,15 +4,12 @@
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
-
-
-
 ## Setup ##
-
-
+	
 **Add a compile dependency for the SDK**
 
 Per-module
+
 ```java
 dependencies {
     compile 'com.microsoft.azure:applicationinsights-android:+'
@@ -21,9 +18,10 @@ dependencies {
 
 **Configure the instrumentation key and add permissions**
 
->Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
+Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
 AndroidManifest.xml
+
 ```xml
 <manifest>
     <uses-permission android:name="android.permission.INTERNET" />
@@ -36,13 +34,17 @@ AndroidManifest.xml
     </application>
 </manifest>
 ```
+
 **Optional: load instrumentation key from gradle**
 
 ~/.gradle/gradle.properties
+
 ```java
 ai_instrumentation_key=<KEY_PLACEHOLDER>
 ```
+
 Top-level build file
+
 ```java
 android {
     buildTypes {
@@ -52,8 +54,6 @@ android {
     }
 }
 ```
-
-
 
 **Optional: set instrumentation key in code**
 
