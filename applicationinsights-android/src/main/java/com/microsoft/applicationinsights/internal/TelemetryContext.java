@@ -213,6 +213,7 @@ public class TelemetryContext {
         Map<String, String> contextTags = new LinkedHashMap<>();
         TelemetryContext.cachedTags.putAll(contextTags);
         TelemetryContext.device.addToHashMap(contextTags);
+        TelemetryContext.application.addToHashMap(contextTags);
         TelemetryContext.session.addToHashMap(contextTags);
         TelemetryContext.user.addToHashMap(contextTags);
         TelemetryContext.internal.addToHashMap(contextTags);
