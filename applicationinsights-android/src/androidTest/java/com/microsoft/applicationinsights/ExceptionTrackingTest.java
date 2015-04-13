@@ -57,24 +57,4 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
 
         Assert.assertNotNull("developer Exception was thrown", exception);
     }
-
-    public void testUncaughtException() throws Exception {
-
-        // setup
-        Context context = this.getActivity();
-        MockExceptionTracking tracker = new MockExceptionTracking(context, null, false);
-        MockTelemetryClient client = MockTelemetryClient.getInstance();
-//        tracker.setTelemetryClient(client);
-        CrashData testData = new CrashData();
-        String testMessage = "test exception message";
-
-        // test
-        tracker.uncaughtException(Thread.currentThread(), new Exception(testMessage));
-
-        // validation
-        Envelope message = client.getMessages().get(0);
-        Assert.assertNotNull("crash was caught", message);
-        Assert.assertEquals("crash is of the correct type", testData.getEnvelopeName(), message.getName());
-        Assert.assertEquals("kill process was called", 1, tracker.processKillCount);
-    }
 }

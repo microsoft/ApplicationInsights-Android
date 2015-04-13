@@ -8,6 +8,9 @@ public class PersistenceTest extends AndroidTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
+
+        //TODO add clear all here
+
         Persistence.initialize(this.getContext());
     }
 

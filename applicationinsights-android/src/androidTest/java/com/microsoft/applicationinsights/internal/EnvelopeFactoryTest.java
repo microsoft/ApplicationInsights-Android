@@ -70,4 +70,6 @@ public class EnvelopeFactoryTest extends ActivityUnitTestCase<MockActivity> {
         Assert.assertNotNull("Os is not null.", envelope.getOs());
         Assert.assertNotNull("Tags is not null.", envelope.getTags());
     }
+
+    //TODO write more tests
 }

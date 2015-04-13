@@ -171,4 +171,12 @@ public enum AppInsights {
         INSTANCE.commonProperties = commonProperties;
         EnvelopeFactory.INSTANCE.setCommonProperties(commonProperties);
     }
+
+    public static SessionConfig getConfig() {
+        return INSTANCE.config;
+    }
+
+    public void setConfig(SessionConfig config) {
+        INSTANCE.config = config;
+    }
 }

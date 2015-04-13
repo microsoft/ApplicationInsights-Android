@@ -36,6 +36,9 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         super(MockActivity.class);
     }
 
+    //TODO fix Mock object if easily possible
+
+
     public void setUp() throws Exception {
         super.setUp();
 

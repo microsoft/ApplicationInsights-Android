@@ -63,6 +63,8 @@ public class MockTelemetryClient extends TelemetryClient {
     }
 
 
+    //TODO fix unit tests
+
     @Override
     public void trackEvent(
             String eventName,

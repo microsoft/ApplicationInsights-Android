@@ -18,9 +18,9 @@ public class SessionConfigTest extends ActivityUnitTestCase<MockActivity> {
         this.setActivity(this.startActivity(intent, null, null));
     }
 
-    //TODO move to AppInsights-Tests
-//    public void testRegister() throws Exception {
-//        TelemetryClient client = TelemetryClient.getInstance();
-//        assertNotNull("iKey is initialized", client.config.getInstrumentationKey());
-//    }
+    public void testRegister() throws Exception {
+        AppInsights.setup(getActivity());
+        AppInsights.start();
+        assertNotNull("iKey is initialized", AppInsights.getConfig().getInstrumentationKey());
+    }
 }

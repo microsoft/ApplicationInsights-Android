@@ -34,7 +34,7 @@ public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
 
     //TODO test at applicable location
 //    public void testGetContext() throws Exception {
-//        TelemetryClient client = TelemetryClient.getInstance(this.mockActivity);
+//        TelemetryClient client = TelemetryClient.getInstance();
 //        Assert.assertNotNull("context is initialized", client.getContext());
 //    }
 
@@ -58,61 +58,61 @@ public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
 //        Assert.assertEquals("Property 1 matches", "v1", properties2.get("p1"));
 //    }
 
-    public void testTrackEvent() throws Exception {
-        TelemetryClient client = TelemetryClient.getInstance();
-        LinkedHashMap<String, String> properties = new LinkedHashMap<>();
-        LinkedHashMap<String, Double> measurements = new LinkedHashMap<>();
-
-        client.trackEvent(null);
-        client.trackEvent("event1");
-        client.trackEvent("event2", properties);
-        client.trackEvent("event3", properties, measurements);
-    }
-
-    public void testTrackTrace() throws Exception {
-        TelemetryClient client = TelemetryClient.getInstance();
-        LinkedHashMap<String, String> properties = new LinkedHashMap<>();
-
-        client.trackTrace(null);
-        client.trackTrace("trace1");
-        client.trackTrace("trace2", properties);
-    }
-
-    public void testTrackMetric() throws Exception {
-        TelemetryClient client = TelemetryClient.getInstance();
-
-        client.trackMetric(null, 0);
-        client.trackMetric("metric1", 1.1);
-        client.trackMetric("metric2", 3);
-        client.trackMetric("metric3", 3.3);
-        client.trackMetric("metric3", 4);
-    }
-
-    public void testTrackException() throws Exception {
-        TelemetryClient client = TelemetryClient.getInstance();
-        LinkedHashMap<String, String> properties = new LinkedHashMap<>();
-        LinkedHashMap<String, Double> measurements = new LinkedHashMap<>();
-
-        client.trackHandledException(null);
-        client.trackHandledException(new Exception());
-        try {
-            throw new InvalidObjectException("this is expected");
-        } catch (InvalidObjectException exception) {
-            client.trackHandledException(exception);
-            client.trackHandledException(exception, properties);
-        }
-    }
-
-    public void testTrackPageView() throws Exception {
-        TelemetryClient client = TelemetryClient.getInstance();
-        LinkedHashMap<String, String> properties = new LinkedHashMap<>();
-        LinkedHashMap<String, Double> measurements = new LinkedHashMap<>();
-
-        client.trackPageView("android page");
-        client.trackPageView("android page");
-        client.trackPageView("android page", properties);
-        client.trackPageView("android page", properties, measurements);
-    }
+//    public void testTrackEvent() throws Exception {
+//        TelemetryClient client = TelemetryClient.getInstance();
+//        LinkedHashMap<String, String> properties = new LinkedHashMap<>();
+//        LinkedHashMap<String, Double> measurements = new LinkedHashMap<>();
+//
+//        client.trackEvent(null);
+//        client.trackEvent("event1");
+//        client.trackEvent("event2", properties);
+//        client.trackEvent("event3", properties, measurements);
+//    }
+//
+//    public void testTrackTrace() throws Exception {
+//        TelemetryClient client = TelemetryClient.getInstance();
+//        LinkedHashMap<String, String> properties = new LinkedHashMap<>();
+//
+//        client.trackTrace(null);
+//        client.trackTrace("trace1");
+//        client.trackTrace("trace2", properties);
+//    }
+//
+//    public void testTrackMetric() throws Exception {
+//        TelemetryClient client = TelemetryClient.getInstance();
+//
+//        client.trackMetric(null, 0);
+//        client.trackMetric("metric1", 1.1);
+//        client.trackMetric("metric2", 3);
+//        client.trackMetric("metric3", 3.3);
+//        client.trackMetric("metric3", 4);
+//    }
+//
+//    public void testTrackException() throws Exception {
+//        TelemetryClient client = TelemetryClient.getInstance();
+//        LinkedHashMap<String, String> properties = new LinkedHashMap<>();
+//        LinkedHashMap<String, Double> measurements = new LinkedHashMap<>();
+//
+//        client.trackHandledException(null);
+//        client.trackHandledException(new Exception());
+//        try {
+//            throw new InvalidObjectException("this is expected");
+//        } catch (InvalidObjectException exception) {
+//            client.trackHandledException(exception);
+//            client.trackHandledException(exception, properties);
+//        }
+//    }
+//
+//    public void testTrackPageView() throws Exception {
+//        TelemetryClient client = TelemetryClient.getInstance();
+//        LinkedHashMap<String, String> properties = new LinkedHashMap<>();
+//        LinkedHashMap<String, Double> measurements = new LinkedHashMap<>();
+//
+//        client.trackPageView("android page");
+//        client.trackPageView("android page");
+//        client.trackPageView("android page", properties);
+//        client.trackPageView("android page", properties, measurements);
+//    }
 
     //TODO test at applicable location
 //    public void testFlush() throws Exception {

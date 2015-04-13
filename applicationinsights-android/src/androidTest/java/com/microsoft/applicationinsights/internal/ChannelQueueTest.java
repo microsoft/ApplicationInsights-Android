@@ -47,17 +47,6 @@ public class ChannelQueueTest extends TestCase {
 
     }
 
-    public void testGetSenderTask() throws Exception {
-
-    }
-
-    public void testSend() throws Exception {
-
-    }
-
-    public void testOnResponse() throws Exception {
-    }
-
     public void testBatchingLimit() {
         this.queue.getConfig().setMaxBatchCount(3);
         this.queue.enqueue(this.item);
@@ -184,19 +173,4 @@ public class ChannelQueueTest extends TestCase {
             return this.timer;
         }
     }
-
-//    private class TestSender extends Sender {
-//        public CountDownLatch sendSignal;
-//
-//        public TestSender(CountDownLatch sendSignal, TelemetryConfig config) {
-//            super(config);
-//            this.sendSignal = sendSignal;
-//        }
-//
-//        @Override
-//        protected void send(IJsonSerializable[] data) {
-//            this.sendSignal.countDown();
-//            super.send(data);
-//        }
-//    }
 }
