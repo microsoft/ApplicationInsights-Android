@@ -74,13 +74,18 @@ public class MyActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //... other initialization code ...//
+        
 
-        TelemetryClient client = TelemetryClient.getInstance(this);
-        client.trackTrace("example trace");
-        client.trackEvent("example event");
-        client.trackException(new Exception("example error"));
-        client.trackMetric("example metric", 1);
+        AppInsights.setup(this);
+        //... other initialization code ...//
+        AppInsights.start();
+        
+        // track telemetry data
+        HashMap<String, String> properties = new HashMap<String, String>();
+        properties.put("property1", "my custom property");
+        client.trackEvent("custom event", properties);
+        
+        client.trackMetric("custom metric", 3);
     }
 }
 ```
