@@ -148,6 +148,8 @@ public class Sender {
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
             this.onExpected(connection, builder, fileToSend);
+            //TODO don't trigger sending endlessly?
+            this.send();
         }
 
         if(deleteFile) {
@@ -166,9 +168,6 @@ public class Sender {
         if (!isExpected) {
             this.onUnexpected(connection, responseCode, builder);
         }
-
-        //TODO don't trigger sending endlessly?
-        this.send();
 
         return builder.toString();
     }
