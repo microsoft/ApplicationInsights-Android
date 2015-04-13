@@ -106,11 +106,12 @@ public class MyActivity extends Activity {
         AppInsights.start();
         
         // track telemetry data
+        TelemetryClient client = TelemetryClient.getInstance();
         HashMap<String, String> properties = new HashMap<String, String>();
         properties.put("property1", "my custom property");
-        client.trackEvent("custom event", properties);
-        
-        client.trackMetric("custom metric", 3);
+        client.trackEvent("sample event", properties);
+        client.trackTrace("sample trace");
+        client.trackMetric("sample metric", 3);
     }
 }
 ```
