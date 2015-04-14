@@ -186,4 +186,13 @@ public enum ApplicationInsights {
     public void setConfig(SessionConfig config) {
         INSTANCE.config = config;
     }
+
+    /**
+     * Returns the application context that Application Insights uses.
+     *
+     * @return context the Context that's used by the Application Insights SDK
+     */
+    public Context getContext() {
+        return context;
+    }
 }

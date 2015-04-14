@@ -1,6 +1,7 @@
 package com.microsoft.applicationinsights.internal;
 
 
+import com.microsoft.applicationinsights.ApplicationInsights;
 import com.microsoft.applicationinsights.contracts.CrashData;
 import com.microsoft.applicationinsights.contracts.CrashDataHeaders;
 import com.microsoft.applicationinsights.contracts.CrashDataThread;
@@ -65,6 +66,7 @@ public enum EnvelopeFactory {
      */
     public Envelope createEnvelope() {
         Envelope envelope = new Envelope();
+        this.context.setScreenResolution(ApplicationInsights.INSTANCE.getContext());
         envelope.setAppId(this.context.getPackageName());
         envelope.setAppVer(this.context.getApplication().getVer());
         envelope.setTime(Util.dateToISO8601(new Date()));

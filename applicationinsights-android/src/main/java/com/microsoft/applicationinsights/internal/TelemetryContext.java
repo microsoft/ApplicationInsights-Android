@@ -344,6 +344,7 @@ public class TelemetryContext {
         }
 
         // detect emulator
+        //TODO use util method
         if (Build.FINGERPRINT.startsWith("generic")) {
             device.setModel("[Emulator]" + device.getModel());
         }
