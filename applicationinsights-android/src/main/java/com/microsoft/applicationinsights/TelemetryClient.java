@@ -67,7 +67,6 @@ public class TelemetryClient {
      * @return the INSTANCE of persistence or null if not yet initialized
      */
     public static TelemetryClient getInstance() {
-        initialize(true);
         if (TelemetryClient.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }
