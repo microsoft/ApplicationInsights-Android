@@ -59,16 +59,14 @@ public class Sender {
 
     /**
      * Initialize the INSTANCE of persistence.
-     *
-     * @param config the config for the INSTANCE
      */
-    public static void initialize(TelemetryConfig config) {
+    public static void initialize() {
         // note: isSenderLoaded must be volatile for the double-checked LOCK to work
         if (!Sender.isSenderLoaded) {
             synchronized (Sender.LOCK) {
                 if (!Sender.isSenderLoaded) {
                     Sender.isSenderLoaded = true;
-                    Sender.instance = new Sender(config);
+                    Sender.instance = new Sender(new TelemetryConfig());
                 }
             }
         }
@@ -78,6 +76,7 @@ public class Sender {
      * @return the INSTANCE of the sender or null if not yet initialized
      */
     public static Sender getInstance() {
+        initialize();
         if (Sender.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }
@@ -343,7 +342,6 @@ public class Sender {
                 }
             }
         }
-
     }
 }
 
