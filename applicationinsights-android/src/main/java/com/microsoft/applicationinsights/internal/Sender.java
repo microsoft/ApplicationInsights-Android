@@ -1,6 +1,7 @@
 package com.microsoft.applicationinsights.internal;
 
 import android.annotation.TargetApi;
+import android.os.AsyncTask;
 import android.os.Build;
 
 import com.microsoft.applicationinsights.ApplicationInsights;
@@ -84,6 +85,17 @@ public class Sender {
         return Sender.instance;
     }
 
+
+    public void sendDataOnAppStart() {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                send();
+                return null;
+            }
+        }.execute();
+    }
 
     public void send() {
         if(runningRequestCount() < 10) {
