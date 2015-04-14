@@ -21,7 +21,7 @@ public class Base implements
     private String baseType;
     
     /**
-     * Initializes a new instance of the <see cref="Base"/> class.
+     * Initializes a new instance of the Base class.
      */
     public Base()
     {

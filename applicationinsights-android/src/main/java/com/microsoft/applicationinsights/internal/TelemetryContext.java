@@ -223,7 +223,7 @@ public class TelemetryContext {
 
     /**
      * Renews the session context
-     * <p/>
+     * <p>
      * The session ID is on demand. Additionally, the isFirst flag is set if no data was
      * found in settings and the isNew flag is set each time a new UUID is
      * generated.

@@ -13,16 +13,14 @@ import com.microsoft.applicationinsights.AppInsights;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.appsample.dummy.DummyContent;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * A list fragment representing a list of Items. This fragment
  * also supports tablet devices by allowing list items to be given an
  * 'activated' state upon selection. This helps indicate which item is
  * currently being viewed in a {@link ItemDetailFragment}.
- * <p/>
+ * <p>
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */

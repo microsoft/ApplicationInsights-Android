@@ -81,7 +81,7 @@ public class CrashDataHeaders implements
     private String exceptionReason;
     
     /**
-     * Initializes a new instance of the <see cref="CrashDataHeaders"/> class.
+     * Initializes a new instance of the CrashDataHeaders class.
      */
     public CrashDataHeaders()
     {

@@ -35,7 +35,7 @@ public class MetricData extends Domain implements
     private Map<String, String> properties;
     
     /**
-     * Initializes a new instance of the <see cref="MetricData"/> class.
+     * Initializes a new instance of the MetricData class.
      */
     public MetricData()
     {

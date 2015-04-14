@@ -51,7 +51,7 @@ public class DataPoint implements
     private Double stdDev;
     
     /**
-     * Initializes a new instance of the <see cref="DataPoint"/> class.
+     * Initializes a new instance of the DataPoint class.
      */
     public DataPoint()
     {

@@ -3,8 +3,6 @@ package com.microsoft.applicationinsights.internal;
 import android.os.AsyncTask;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
-import com.microsoft.applicationinsights.internal.Channel;
-import com.microsoft.applicationinsights.internal.EnvelopeFactory;
 
 import java.util.Map;
 

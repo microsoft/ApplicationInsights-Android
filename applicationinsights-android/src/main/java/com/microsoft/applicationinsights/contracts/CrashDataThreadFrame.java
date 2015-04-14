@@ -33,7 +33,7 @@ public class CrashDataThreadFrame implements
     private Map<String, String> registers;
     
     /**
-     * Initializes a new instance of the <see cref="CrashDataThreadFrame"/> class.
+     * Initializes a new instance of the CrashDataThreadFrame class.
      */
     public CrashDataThreadFrame()
     {

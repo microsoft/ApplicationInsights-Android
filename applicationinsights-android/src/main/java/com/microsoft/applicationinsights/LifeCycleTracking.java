@@ -6,8 +6,8 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.microsoft.applicationinsights.internal.TelemetryContext;
 import com.microsoft.applicationinsights.internal.CreateDataTask;
+import com.microsoft.applicationinsights.internal.TelemetryContext;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.Date;

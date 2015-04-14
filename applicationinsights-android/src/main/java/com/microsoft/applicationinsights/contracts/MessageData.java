@@ -38,7 +38,7 @@ public class MessageData extends Domain implements
     private Map<String, String> properties;
     
     /**
-     * Initializes a new instance of the <see cref="MessageData"/> class.
+     * Initializes a new instance of the MessageData class.
      */
     public MessageData()
     {

@@ -53,7 +53,7 @@ public class ExceptionDetails implements
     private List<StackFrame> parsedStack;
     
     /**
-     * Initializes a new instance of the <see cref="ExceptionDetails"/> class.
+     * Initializes a new instance of the ExceptionDetails class.
      */
     public ExceptionDetails()
     {

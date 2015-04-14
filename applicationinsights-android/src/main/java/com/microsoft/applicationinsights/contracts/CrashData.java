@@ -2,6 +2,7 @@
  * Generated from CrashData.bond (https://github.com/Microsoft/bond)
 */
 package com.microsoft.applicationinsights.contracts;
+
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
 
@@ -38,7 +39,7 @@ public class CrashData extends Domain implements
     private List<CrashDataBinary> binaries;
     
     /**
-     * Initializes a new instance of the <see cref="CrashData"/> class.
+     * Initializes a new instance of the CrashData class.
      */
     public CrashData()
     {

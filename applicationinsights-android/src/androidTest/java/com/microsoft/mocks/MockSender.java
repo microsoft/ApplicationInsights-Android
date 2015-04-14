@@ -2,11 +2,9 @@ package com.microsoft.mocks;
 
 import com.microsoft.applicationinsights.internal.Sender;
 import com.microsoft.applicationinsights.internal.TelemetryConfig;
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.net.HttpURLConnection;
 import java.util.concurrent.CountDownLatch;
 
 public class MockSender extends Sender {

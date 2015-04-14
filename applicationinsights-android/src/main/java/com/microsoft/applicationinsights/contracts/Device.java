@@ -2,6 +2,7 @@
  * Generated from ContextTagKeys.bond (https://github.com/Microsoft/bond)
 */
 package com.microsoft.applicationinsights.contracts;
+
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
 
@@ -86,7 +87,7 @@ public class Device implements
     private String machineName;
     
     /**
-     * Initializes a new instance of the <see cref="Device"/> class.
+     * Initializes a new instance of the Device class.
      */
     public Device()
     {

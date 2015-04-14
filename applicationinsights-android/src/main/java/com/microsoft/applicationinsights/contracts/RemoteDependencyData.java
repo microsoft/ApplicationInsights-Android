@@ -93,7 +93,7 @@ public class RemoteDependencyData extends Domain implements
     private Map<String, String> properties;
     
     /**
-     * Initializes a new instance of the <see cref="RemoteDependencyData"/> class.
+     * Initializes a new instance of the RemoteDependencyData class.
      */
     public RemoteDependencyData()
     {

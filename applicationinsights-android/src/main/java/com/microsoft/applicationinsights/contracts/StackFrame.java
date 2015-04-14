@@ -41,7 +41,7 @@ public class StackFrame implements
     private int line;
     
     /**
-     * Initializes a new instance of the <see cref="StackFrame"/> class.
+     * Initializes a new instance of the StackFrame class.
      */
     public StackFrame()
     {

@@ -26,7 +26,7 @@ public class PageViewData extends EventData implements
     private String duration;
     
     /**
-     * Initializes a new instance of the <see cref="PageViewData"/> class.
+     * Initializes a new instance of the PageViewData class.
      */
     public PageViewData()
     {

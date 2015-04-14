@@ -4,9 +4,6 @@ import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * This class records telemetry for application insights.
  */

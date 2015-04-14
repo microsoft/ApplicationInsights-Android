@@ -41,7 +41,7 @@ public class PageViewPerfData extends PageViewData implements
     private String domProcessing;
     
     /**
-     * Initializes a new instance of the <see cref="PageViewPerfData"/> class.
+     * Initializes a new instance of the PageViewPerfData class.
      */
     public PageViewPerfData()
     {

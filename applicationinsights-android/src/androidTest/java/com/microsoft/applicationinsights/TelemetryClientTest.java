@@ -7,10 +7,6 @@ import com.microsoft.mocks.MockActivity;
 
 import junit.framework.Assert;
 
-import java.io.InvalidObjectException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
 
     MockActivity mockActivity;

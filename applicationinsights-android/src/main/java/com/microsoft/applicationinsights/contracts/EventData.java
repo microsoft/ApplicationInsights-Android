@@ -38,7 +38,7 @@ public class EventData extends Domain implements
     private Map<String, Double> measurements;
     
     /**
-     * Initializes a new instance of the <see cref="EventData"/> class.
+     * Initializes a new instance of the EventData class.
      */
     public EventData()
     {

@@ -2,6 +2,7 @@
  * Generated from Telemetry.bond (https://github.com/Microsoft/bond)
 */
 package com.microsoft.applicationinsights.contracts;
+
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
 
@@ -20,7 +21,7 @@ public class Data<TDomain extends ITelemetryData> extends Base implements
     private TDomain baseData;
     
     /**
-     * Initializes a new instance of the <see cref="Data{TDomain}"/> class.
+     * Initializes a new instance of the Data{TDomain} class.
      */
     public Data()
     {

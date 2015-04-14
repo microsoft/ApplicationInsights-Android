@@ -32,7 +32,7 @@ public class Session implements
     private String isNew;
     
     /**
-     * Initializes a new instance of the <see cref="Session"/> class.
+     * Initializes a new instance of the Session class.
      */
     public Session()
     {
