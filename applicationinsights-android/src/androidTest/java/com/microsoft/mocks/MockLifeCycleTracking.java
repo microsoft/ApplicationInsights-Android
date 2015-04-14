@@ -1,9 +1,7 @@
 package com.microsoft.mocks;
 
 import android.app.Activity;
-import android.content.Context;
 
-import com.microsoft.applicationinsights.AppInsights;
 import com.microsoft.applicationinsights.LifeCycleTracking;
 import com.microsoft.applicationinsights.SessionConfig;
 import com.microsoft.applicationinsights.TelemetryClient;

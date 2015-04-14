@@ -1,12 +1,8 @@
 package com.microsoft.mocks;
 
-import android.content.Context;
-
 import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.SessionConfig;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.internal.EnvelopeFactory;
-import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.ArrayList;
 import java.util.Map;

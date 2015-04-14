@@ -5,10 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.AppInsights;
-import com.microsoft.applicationinsights.SessionConfig;
-import com.microsoft.applicationinsights.TelemetryClient;
-import com.microsoft.applicationinsights.internal.ChannelConfig;
-import com.microsoft.applicationinsights.internal.TelemetryConfig;
 
 /**
  * An activity representing a list of Items. This activity

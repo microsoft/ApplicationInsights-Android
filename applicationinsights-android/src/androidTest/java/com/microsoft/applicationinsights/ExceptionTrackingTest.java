@@ -1,15 +1,10 @@
 package com.microsoft.applicationinsights;
 
-import android.content.Context;
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.internal.ChannelQueue;
-import com.microsoft.applicationinsights.contracts.CrashData;
 import com.microsoft.mocks.MockActivity;
-import com.microsoft.mocks.MockExceptionTracking;
-import com.microsoft.mocks.MockTelemetryClient;
 
 import junit.framework.Assert;
 

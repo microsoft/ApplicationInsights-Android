@@ -13,9 +13,7 @@ import com.microsoft.applicationinsights.AppInsights;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.appsample.dummy.DummyContent;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * A list fragment representing a list of Items. This fragment
