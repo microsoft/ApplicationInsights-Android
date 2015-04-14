@@ -37,7 +37,7 @@ public enum EnvelopeFactory {
     /**
      * Map of properties, which should be set for each envelope
      */
-    private Map<String,String> commonProperties;
+    private Map<String, String> commonProperties;
 
     /**
      * Configures the shared instance with a telemetry context, which is needed to create envelops.
@@ -45,7 +45,7 @@ public enum EnvelopeFactory {
      *
      * @param context the telemetry context, which is used to create envelops with proper context information.
      */
-    public void configure(TelemetryContext context){
+    public void configure(TelemetryContext context) {
         this.configure(context, null);
     }
 
@@ -55,7 +55,7 @@ public enum EnvelopeFactory {
      *
      * @param context the telemetry context, which is used to create envelops with proper context information.
      */
-    public void configure(TelemetryContext context, Map<String,String>commonProperties){
+    public void configure(TelemetryContext context, Map<String, String> commonProperties) {
         this.context = context;
         this.commonProperties = commonProperties;
     }
@@ -65,19 +65,19 @@ public enum EnvelopeFactory {
      */
     public Envelope createEnvelope() {
         Envelope envelope = new Envelope();
-            envelope.setAppId(this.context.getPackageName());
-            envelope.setAppVer(this.context.getApplication().getVer());
-            envelope.setTime(Util.dateToISO8601(new Date()));
-            envelope.setIKey(this.context.getInstrumentationKey());
-            envelope.setUserId(this.context.getUser().getId());
-            envelope.setDeviceId(this.context.getDevice().getId());
-            envelope.setOsVer(this.context.getDevice().getOsVersion());
-            envelope.setOs(this.context.getDevice().getOs());
+        envelope.setAppId(this.context.getPackageName());
+        envelope.setAppVer(this.context.getApplication().getVer());
+        envelope.setTime(Util.dateToISO8601(new Date()));
+        envelope.setIKey(this.context.getInstrumentationKey());
+        envelope.setUserId(this.context.getUser().getId());
+        envelope.setDeviceId(this.context.getDevice().getId());
+        envelope.setOsVer(this.context.getDevice().getOsVersion());
+        envelope.setOs(this.context.getDevice().getOs());
 
-            Map<String, String> tags = this.context.getContextTags();
-            if (tags != null) {
-                envelope.setTags(tags);
-            }
+        Map<String, String> tags = this.context.getContextTags();
+        if (tags != null) {
+            envelope.setTags(tags);
+        }
 
         return envelope;
     }
@@ -85,7 +85,7 @@ public enum EnvelopeFactory {
     /**
      * Create an envelope with the given object as its base data
      */
-    public Envelope createEnvelope(ITelemetry telemetryData){
+    public Envelope createEnvelope(ITelemetry telemetryData) {
         addCommonProperties(telemetryData);
 
         Data<ITelemetryData> data = new Data<>();
@@ -110,12 +110,11 @@ public enum EnvelopeFactory {
      * @param eventName    The name of the event
      * @param properties   Custom properties associated with the event
      * @param measurements Custom measurements associated with the event
-     *
      * @return an Envelope object, which contains an event
      */
     public Envelope createEventEnvelope(String eventName,
-                                  Map<String, String> properties,
-                                  Map<String, Double> measurements) {
+                                        Map<String, String> properties,
+                                        Map<String, Double> measurements) {
         EventData telemetry = new EventData();
         telemetry.setName(ensureNotNull(eventName));
         telemetry.setProperties(properties);
@@ -131,7 +130,6 @@ public enum EnvelopeFactory {
      *
      * @param message    The message associated with this trace
      * @param properties Custom properties associated with the event
-     *
      * @return an Envelope object, which contains a trace
      */
     public Envelope createTraceEnvelope(String message, Map<String, String> properties) {
@@ -149,7 +147,6 @@ public enum EnvelopeFactory {
      *
      * @param name  The name of the metric
      * @param value The value of the metric
-     *
      * @return an Envelope object, which contains a metric
      */
     public Envelope createMetricEnvelope(String name, double value) {
@@ -176,7 +173,6 @@ public enum EnvelopeFactory {
      *
      * @param exception  The exception to track
      * @param properties Custom properties associated with the event
-     *
      * @return an Envelope object, which contains a handled or unhandled exception
      */
     public Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
@@ -193,13 +189,12 @@ public enum EnvelopeFactory {
      * @param pageName     The name of the page
      * @param properties   Custom properties associated with the event
      * @param measurements Custom measurements associated with the event
-     *
      * @return an Envelope object, which contains a page view
      */
     public Envelope createPageViewEnvelope(
-            String pageName,
-            Map<String, String> properties,
-            Map<String, Double> measurements) {
+          String pageName,
+          Map<String, String> properties,
+          Map<String, Double> measurements) {
         PageViewData telemetry = new PageViewData();
         telemetry.setName(ensureNotNull(pageName));
         telemetry.setUrl(null);
@@ -229,7 +224,7 @@ public enum EnvelopeFactory {
      *
      * @param telemetry The telemetry data
      */
-    private void addCommonProperties(ITelemetry telemetry){
+    private void addCommonProperties(ITelemetry telemetry) {
         telemetry.setVer(CONTRACT_VERSION);
         if (this.commonProperties != null) {
             Map<String, String> map = telemetry.getProperties();
@@ -263,7 +258,8 @@ public enum EnvelopeFactory {
 
     /**
      * Parse an exception and it's stack trace and create the CrashData object
-     * @param exception the throwable object we want to create a crashdata from
+     *
+     * @param exception  the throwable object we want to create a crashdata from
      * @param properties properties used foor the CrashData
      * @return a CrashData object that contains the stacktrace and context info
      */

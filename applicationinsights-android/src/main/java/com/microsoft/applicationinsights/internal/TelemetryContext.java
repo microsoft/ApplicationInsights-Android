@@ -10,6 +10,8 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import com.microsoft.applicationinsights.contracts.Application;
 import com.microsoft.applicationinsights.contracts.Device;
@@ -118,7 +120,7 @@ public class TelemetryContext {
 
                     // get an INSTANCE of the shared preferences manager for persistent context fields
                     TelemetryContext.settings = appContext.getSharedPreferences(
-                            TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+                          TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
 
                     // initialize static context
                     TelemetryContext.device = new Device();
@@ -138,6 +140,7 @@ public class TelemetryContext {
                     // initialize persistence
                     Persistence.initialize(appContext);
                 }
+
             }
         }
     }
@@ -198,8 +201,7 @@ public class TelemetryContext {
      * @return a map of the context tags assembled in the required data contract format.
      */
     private Map<String, String> getCachedTags() {
-
-        if(cachedTags == null) {
+        if (cachedTags == null) {
             // create a new hash map and add all context to it
             cachedTags = new LinkedHashMap<>();
             TelemetryContext.application.addToHashMap(cachedTags);
@@ -223,7 +225,7 @@ public class TelemetryContext {
 
     /**
      * Renews the session context
-     * <p>
+     * <p/>
      * The session ID is on demand. Additionally, the isFirst flag is set if no data was
      * found in settings and the isNew flag is set each time a new UUID is
      * generated.
@@ -254,7 +256,7 @@ public class TelemetryContext {
         try {
             final PackageManager manager = appContext.getPackageManager();
             final PackageInfo info = manager
-                    .getPackageInfo(appContext.getPackageName(), 0);
+                  .getPackageInfo(appContext.getPackageName(), 0);
 
             if (info.packageName != null) {
                 TelemetryContext.appIdForEnvelope = info.packageName;
@@ -297,45 +299,45 @@ public class TelemetryContext {
      * Sets the device telemetryContext tags
      */
     protected static void setDeviceContext(Context appContext) {
-        Device context = TelemetryContext.device;
+        Device device = TelemetryContext.device;
 
-        context.setOsVersion(Build.VERSION.RELEASE);
-        context.setOs("Android");
-        context.setModel(Build.MODEL);
-        context.setOemName(Build.MANUFACTURER);
-        context.setLocale(Locale.getDefault().toString());
-
+        device.setOsVersion(Build.VERSION.RELEASE);
+        device.setOs("Android");
+        device.setModel(Build.MODEL);
+        device.setOemName(Build.MANUFACTURER);
+        device.setLocale(Locale.getDefault().toString());
+        setScreenResolution(appContext);
         // get device ID
         ContentResolver resolver = appContext.getContentResolver();
         String deviceIdentifier = Settings.Secure.getString(resolver, Settings.Secure.ANDROID_ID);
         if (deviceIdentifier != null) {
-            context.setId(Util.tryHashStringSha256(deviceIdentifier));
+            device.setId(Util.tryHashStringSha256(deviceIdentifier));
         }
 
         // check device type
         final TelephonyManager telephonyManager = (TelephonyManager)
-                appContext.getSystemService(Context.TELEPHONY_SERVICE);
+              appContext.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE) {
-            context.setType("Phone");
+            device.setType("Phone");
         } else {
-            context.setType("Tablet");
+            device.setType("Tablet");
         }
 
         // check network type
         final ConnectivityManager connectivityManager = (ConnectivityManager)
-                appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+              appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null) {
             int networkType = activeNetwork.getType();
             switch (networkType) {
                 case ConnectivityManager.TYPE_WIFI:
-                    context.setNetwork("WiFi");
+                    device.setNetwork("WiFi");
                     break;
                 case ConnectivityManager.TYPE_MOBILE:
-                    context.setNetwork("Mobile");
+                    device.setNetwork("Mobile");
                     break;
                 default:
-                    context.setNetwork("Unknown");
+                    device.setNetwork("Unknown");
                     InternalLogging.warn(TAG, "Unknown network type:" + networkType);
                     break;
             }
@@ -343,8 +345,20 @@ public class TelemetryContext {
 
         // detect emulator
         if (Build.FINGERPRINT.startsWith("generic")) {
-            context.setModel("[Emulator]" + context.getModel());
+            device.setModel("[Emulator]" + device.getModel());
         }
+    }
+
+    protected static void setScreenResolution(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(
+              Context.WINDOW_SERVICE);
+        DisplayMetrics metrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(metrics);
+        int heightPixels = metrics.heightPixels;
+        int widhtPixels = metrics.widthPixels;
+        String resolutionString = String.format("%dx%d", heightPixels, widhtPixels);
+
+        TelemetryContext.device.setScreenResolution(resolutionString);
     }
 
     /**
