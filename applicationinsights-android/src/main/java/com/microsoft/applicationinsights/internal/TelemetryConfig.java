@@ -5,8 +5,6 @@ public class TelemetryConfig {
     public static final int DEFAULT_MAX_BATCH_COUNT = 100;
     public static final int DEFAULT_MAX_BATCH_INTERVAL_MS = 3 * 1000;
     public static final String DEFAULT_ENDPOINT_URL = "https://dc.services.visualstudio.com/v2/track";
-    public static final boolean DEFAULT_DISABLE_TELEMETRY = false;
-    public static final boolean DEFAULT_DEVELOPER_MODE = false;
     public static final int DEFAULT_SENDER_READ_TIMEOUT = 10 * 1000;
     public static final int DEFAULTSENDER_CONNECT_TIMEOUT = 15 * 1000;
 
@@ -60,8 +58,6 @@ public class TelemetryConfig {
         this.maxBatchCount = TelemetryConfig.DEFAULT_MAX_BATCH_COUNT;
         this.maxBatchIntervalMs = TelemetryConfig.DEFAULT_MAX_BATCH_INTERVAL_MS;
         this.endpointUrl = TelemetryConfig.DEFAULT_ENDPOINT_URL;
-        this.telemetryDisabled = TelemetryConfig.DEFAULT_DISABLE_TELEMETRY;
-        this.developerMode = TelemetryConfig.DEFAULT_DEVELOPER_MODE;
         this.senderReadTimeoutMs = TelemetryConfig.DEFAULT_SENDER_READ_TIMEOUT;
         this.senderConnectTimeoutMs = TelemetryConfig.DEFAULTSENDER_CONNECT_TIMEOUT;
     }
@@ -80,20 +76,6 @@ public class TelemetryConfig {
         synchronized (this.lock) {
             this.maxBatchCount = maxBatchCount;
         }
-    }
-
-    /**
-     * Get the flag to enable developer mode logging
-     */
-    public boolean isDeveloperMode() {
-        return this.developerMode;
-    }
-
-    /**
-     * Set the flag to enable developer mode logging
-     */
-    public void setDeveloperMode(boolean enableDeveloperMode) {
-        this.developerMode = enableDeveloperMode;
     }
 
     /**
@@ -125,22 +107,6 @@ public class TelemetryConfig {
     public void setEndpointUrl(String endpointUrl) {
         synchronized (this.lock) {
             this.endpointUrl = endpointUrl;
-        }
-    }
-
-    /**
-     * Gets the value of the master off switch. No data is queued when TRUE
-     */
-    public boolean isTelemetryDisabled() {
-        return telemetryDisabled;
-    }
-
-    /**
-     * Sets the master off switch.  Do not enqueue any data if set to TRUE
-     */
-    public void setTelemetryDisabled(boolean disableTelemetry) {
-        synchronized (this.lock) {
-            this.telemetryDisabled = disableTelemetry;
         }
     }
 

@@ -6,12 +6,17 @@ import android.content.Context;
 import com.microsoft.applicationinsights.internal.Channel;
 import com.microsoft.applicationinsights.internal.EnvelopeFactory;
 import com.microsoft.applicationinsights.internal.TelemetryContext;
+import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.Map;
 
 public enum ApplicationInsights {
     INSTANCE;
 
+    /**
+     * A flag which determines, if developer mode (logging) should be enabled.
+     */
+    private static boolean DEVELOPER_MODE;
     private boolean telemetryDisabled;
     private boolean exceptionTrackingDisabled;
     private String instrumentationKey;
@@ -185,5 +190,13 @@ public enum ApplicationInsights {
      */
     public void setConfig(SessionConfig config) {
         INSTANCE.config = config;
+    }
+
+    public static void setDeveloperMode(boolean developerMode) {
+        DEVELOPER_MODE = developerMode;
+    }
+
+    public static boolean isDeveloperMode() {
+        return DEVELOPER_MODE;
     }
 }

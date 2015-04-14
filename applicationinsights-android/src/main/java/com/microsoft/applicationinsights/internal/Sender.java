@@ -3,6 +3,7 @@ package com.microsoft.applicationinsights.internal;
 import android.annotation.TargetApi;
 import android.os.Build;
 
+import com.microsoft.applicationinsights.ApplicationInsights;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.io.BufferedReader;
@@ -179,7 +180,7 @@ public class Sender {
      * @param fileToSend
      */
     protected void onExpected(HttpURLConnection connection, StringBuilder builder, File fileToSend) {
-        if (this.config.isDeveloperMode()) {
+        if (ApplicationInsights.isDeveloperMode()) {
             this.readResponse(connection, builder);
         }
     }

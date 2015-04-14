@@ -95,7 +95,7 @@ public class ChannelQueue {
      */
     public boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
-        if (item == null || this.config.isTelemetryDisabled()) {
+        if (item == null) {
             return false;
         }
 
