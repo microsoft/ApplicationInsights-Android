@@ -13,11 +13,11 @@ import com.microsoft.applicationinsights.AppInsights;
  * lead to a {@link ItemDetailActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
- * <p/>
+ * <p>
  * The activity makes heavy use of fragments. The list of items is a
  * {@link ItemListFragment} and the item details
  * (if present) is a {@link ItemDetailFragment}.
- * <p/>
+ * <p>
  * This activity also implements the required
  * {@link ItemListFragment.Callbacks} interface
  * to listen for item selections.
