@@ -37,9 +37,9 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
 
     /**
      * Registers the application insights exception handler to track uncaught exceptions
+     * {@code ignoreDefaulthandler} defaults to {@literal false}
      *
      * @param context the context associated with uncaught exceptions
-     * @see ExceptionTracking#registerExceptionHandler(Context, boolean)
      */
     public static void registerExceptionHandler(Context context) {
         ExceptionTracking.registerExceptionHandler(context, false);

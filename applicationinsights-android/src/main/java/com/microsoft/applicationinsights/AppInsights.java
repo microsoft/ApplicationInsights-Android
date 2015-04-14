@@ -76,7 +76,7 @@ public enum AppInsights {
 
     /**
      * Start AppInsights
-     * Note: This should be called after {@link com.microsoft.applicationinsights.AppInsights#setup(android.content.Context)}
+     * Note: This should be called after {@link #setup}
      */
     public static void start(){
 
@@ -86,7 +86,7 @@ public enum AppInsights {
 
     /**
      * Start AppInsights
-     * Note: This should be called after {@link com.microsoft.applicationinsights.AppInsights#setup(android.content.Context)}
+     * Note: This should be called after {@link #setup}
      */
     public void startInstance(){
         if(!isRunning) {
@@ -172,10 +172,17 @@ public enum AppInsights {
         }
     }
 
+    /**
+     * Gets the session configuration for the instance
+     * @return the instance session configuration
+     */
     public static SessionConfig getConfig() {
         return INSTANCE.config;
     }
 
+    /**
+     * Sets the session configuration for the instance
+     */
     public void setConfig(SessionConfig config) {
         INSTANCE.config = config;
     }
