@@ -51,7 +51,7 @@ public class CrashDataBinary implements
     private String path;
     
     /**
-     * Initializes a new instance of the <see cref="CrashDataBinary"/> class.
+     * Initializes a new instance of the CrashDataBinary class.
      */
     public CrashDataBinary()
     {

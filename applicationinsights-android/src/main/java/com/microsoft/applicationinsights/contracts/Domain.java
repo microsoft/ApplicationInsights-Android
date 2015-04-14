@@ -15,7 +15,7 @@ public class Domain implements
     IJsonSerializable
 {
     /**
-     * Initializes a new instance of the <see cref="Domain"/> class.
+     * Initializes a new instance of the Domain class.
      */
     public Domain()
     {

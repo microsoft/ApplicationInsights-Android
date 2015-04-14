@@ -27,7 +27,7 @@ public class Internal implements
     private String agentVersion;
     
     /**
-     * Initializes a new instance of the <see cref="Internal"/> class.
+     * Initializes a new instance of the Internal class.
      */
     public Internal()
     {

@@ -27,7 +27,7 @@ public class SessionStateData extends Domain implements
     private int state = SessionState.Start;
     
     /**
-     * Initializes a new instance of the <see cref="SessionStateData"/> class.
+     * Initializes a new instance of the SessionStateData class.
      */
     public SessionStateData()
     {

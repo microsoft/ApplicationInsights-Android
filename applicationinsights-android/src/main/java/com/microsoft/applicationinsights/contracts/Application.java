@@ -27,7 +27,7 @@ public class Application implements
     private String build;
     
     /**
-     * Initializes a new instance of the <see cref="Application"/> class.
+     * Initializes a new instance of the Application class.
      */
     public Application()
     {

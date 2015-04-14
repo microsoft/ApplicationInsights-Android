@@ -73,7 +73,7 @@ public class RequestData extends Domain implements
     private Map<String, Double> measurements;
     
     /**
-     * Initializes a new instance of the <see cref="RequestData"/> class.
+     * Initializes a new instance of the RequestData class.
      */
     public RequestData()
     {

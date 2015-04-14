@@ -22,7 +22,7 @@ public class Location implements
     private String ip;
     
     /**
-     * Initializes a new instance of the <see cref="Location"/> class.
+     * Initializes a new instance of the Location class.
      */
     public Location()
     {

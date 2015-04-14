@@ -42,12 +42,7 @@ public class Operation implements
     private String syntheticSource;
     
     /**
-     * Backing field for property IsSynthetic.
-     */
-    private String isSynthetic;
-    
-    /**
-     * Initializes a new instance of the <see cref="Operation"/> class.
+     * Initializes a new instance of the Operation class.
      */
     public Operation()
     {
@@ -124,20 +119,6 @@ public class Operation implements
         this.syntheticSource = value;
     }
     
-    /**
-     * Gets the IsSynthetic property.
-     */
-    public String getIsSynthetic() {
-        return this.isSynthetic;
-    }
-    
-    /**
-     * Sets the IsSynthetic property.
-     */
-    public void setIsSynthetic(String value) {
-        this.isSynthetic = value;
-    }
-    
 
     /**
      * Adds all members of this class to a hashmap
@@ -159,9 +140,6 @@ public class Operation implements
         }
         if (!(this.syntheticSource == null)) {
             map.put("ai.operation.syntheticSource", this.syntheticSource);
-        }
-        if (!(this.isSynthetic == null)) {
-            map.put("ai.operation.isSynthetic", this.isSynthetic);
         }
     }
     
@@ -222,13 +200,6 @@ public class Operation implements
         {
             writer.write(prefix + "\"ai.operation.syntheticSource\":");
             writer.write(JsonHelper.convert(this.syntheticSource));
-            prefix = ",";
-        }
-        
-        if (!(this.isSynthetic == null))
-        {
-            writer.write(prefix + "\"ai.operation.isSynthetic\":");
-            writer.write(JsonHelper.convert(this.isSynthetic));
             prefix = ",";
         }
         

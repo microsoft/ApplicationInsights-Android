@@ -42,7 +42,7 @@ public class User implements
     private String storeRegion;
     
     /**
-     * Initializes a new instance of the <see cref="User"/> class.
+     * Initializes a new instance of the User class.
      */
     public User()
     {

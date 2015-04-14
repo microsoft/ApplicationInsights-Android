@@ -60,7 +60,7 @@ public class ExceptionData extends Domain implements
     private Map<String, Double> measurements;
     
     /**
-     * Initializes a new instance of the <see cref="ExceptionData"/> class.
+     * Initializes a new instance of the ExceptionData class.
      */
     public ExceptionData()
     {

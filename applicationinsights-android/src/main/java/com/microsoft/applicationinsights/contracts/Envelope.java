@@ -93,7 +93,7 @@ public class Envelope implements
     private Base data;
     
     /**
-     * Initializes a new instance of the <see cref="Envelope"/> class.
+     * Initializes a new instance of the Envelope class.
      */
     public Envelope()
     {

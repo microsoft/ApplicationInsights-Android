@@ -28,7 +28,7 @@ public class CrashDataThread implements
     private List<CrashDataThreadFrame> frames;
     
     /**
-     * Initializes a new instance of the <see cref="CrashDataThread"/> class.
+     * Initializes a new instance of the CrashDataThread class.
      */
     public CrashDataThread()
     {
