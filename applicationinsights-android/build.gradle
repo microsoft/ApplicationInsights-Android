@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 21
@@ -16,6 +17,87 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+// these are used by the install task to set groupId and version in the POM
+group = projectGroup
+version = projectVersion
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name projectName
+                description projectDesc
+                url projectRepo
+
+                licenses {
+                    license {
+                        name 'MIT'
+                        url 'http://opensource.org/licenses/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'appinsights-android'
+                        email 'appinsights-android@microsoft.com'
+                    }
+                }
+
+                scm {
+                    connection projectRepo + '.git'
+                    developerConnection projectRepo + '.git'
+                    url projectRepo
+                }
+            }
+        }
+    }
+}
+
+if (!this.hasProperty('bintray_user') ||
+    !this.hasProperty('bintray_key') ||
+    !this.hasProperty('bintray_gpg_passphrase') ||
+    !this.hasProperty('sonatype_user') ||
+    !this.hasProperty('sonatype_key')) {
+
+    println 'to enable bintray set bintray_user, bintray_key, bintray_gpg_passphrase, sonatype_user, and sonatype_key'
+} else {
+    bintray {
+        user = bintray_user
+        key = bintray_key
+
+        dryRun = false // Whether to run this as dry-run, without deploying
+        publish = true // If version should be auto published after an upload
+
+        configurations = ['archives']
+
+        pkg {
+            repo = 'maven'
+            name = projectName
+            desc = projectDesc
+            websiteUrl = projectRepo
+            issueTrackerUrl = projectRepo + '/issues'
+            vcsUrl = projectRepo + '.git'
+            licenses = ['MIT']
+            labels = ['Application Insights', 'AppInsights', 'Monitoring', 'Microsoft', 'Android']
+            publicDownloadNumbers = true
+
+            version {
+                name = projectVersion
+                vcsTag = projectVersion
+                gpg {
+                    sign = true
+                    passphrase = bintray_gpg_passphrase
+                }
+                mavenCentralSync {
+                    sync = false // todo: check if this is fixed; this part can't be automated yet due to bintray preventing automation of the publish step
+                    user = sonatype_user
+                    password = sonatype_key
+                }
+            }
         }
     }
 }
@@ -45,34 +127,4 @@ task sourcesJar(type: Jar) {
 artifacts {
     archives docsJar
     archives sourcesJar
-}
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            packaging 'aar'
-            name project.name
-            url projectRepo
-
-            licenses {
-                license {
-                    name 'MIT'
-                    url 'http://opensource.org/licenses/MIT'
-                }
-            }
-
-            developers {
-                developer {
-                    id 'appinsights-android'
-                    email 'appinsights-android@microsoft.com'
-                }
-            }
-
-            scm {
-                connection projectRepo + '.git'
-                developerConnection projectRepo + '.git'
-                url projectRepo
-            }
-        }
-    }
 }

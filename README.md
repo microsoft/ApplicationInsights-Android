@@ -1,16 +1,27 @@
-# Application Insights for Android
+[ ![Download](https://api.bintray.com/packages/appinsights-android/maven/AppInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/AppInsights-Android/_latestVersion)
+
+# Application Insights for Android (1.0-Alpha.5)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
+**Release Notes**
+* The sdk can now differentiate between handled and unhandeled exceptions (aka crashes).
+* Updated example app
+* Changed internal package structure
+* Updated and cleaner internal architecture of the sdk
+* Improved performance because of new architecture.
 
 
+**Breaking Changes**
+
+* Setup and start of the Application Insights SDK are now done using the new umbrella class `AppInsights` instead of `TelemetryClient`.  
 
 ## Setup ##
-
-
+	
 **Add a compile dependency for the SDK**
 
 Per-module
+
 ```java
 dependencies {
     compile 'com.microsoft.azure:applicationinsights-android:+'
@@ -19,9 +30,10 @@ dependencies {
 
 **Configure the instrumentation key and add permissions**
 
->Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
+Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/AppInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
-AndroidManifest.xml
+Plase add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` into your app's `AndroidManifest.xml` as well as the property for your instrumentation key as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key or the variable leave it and use gradle.properties to set it. 
+
 ```xml
 <manifest>
     <uses-permission android:name="android.permission.INTERNET" />
@@ -34,13 +46,17 @@ AndroidManifest.xml
     </application>
 </manifest>
 ```
+
 **Optional: load instrumentation key from gradle**
 
 ~/.gradle/gradle.properties
+
 ```java
 ai_instrumentation_key=<KEY_PLACEHOLDER>
 ```
-Top-level build file
+
+Top-level gradle build file
+
 ```java
 android {
     buildTypes {
@@ -51,26 +67,51 @@ android {
 }
 ```
 
+**Optional: set instrumentation key in code**
 
+It is also possible to set the instrumentation key of your app in code. This will override the one you might have set in your gradle or manifest file. Setting the instrumentation key programmatically can be done while setting up AppInsights:
 
+```java
+AppInsights.setup(this, "<YOUR-IKEY-GOES-HERE>");
+AppInsights.start();
+```
 
 ## Usage ##
+
+Add the following import to your apps root activity
 
 ```java
 import com.microsoft.applicationinsights.TelemetryClient;
 ```
+
+And add 
+```java
+AppInsights.setup(this);
+AppInsights.start();
+```
+
+in the activity's `onCreate`-callback.
+
+A typicall onCreate-method looks like this.
+
 ```java
 public class MyActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //... other initialization code ...//
+        
 
-        TelemetryClient client = TelemetryClient.getInstance(this);
-        client.trackTrace("example trace");
-        client.trackEvent("example event");
-        client.trackException(new Exception("example error"));
-        client.trackMetric("example metric", 1);
+        AppInsights.setup(this);
+        //... other initialization code ...//
+        AppInsights.start();
+        
+        // track telemetry data
+        TelemetryClient client = TelemetryClient.getInstance();
+        HashMap<String, String> properties = new HashMap<String, String>();
+        properties.put("property1", "my custom property");
+        client.trackEvent("sample event", properties);
+        client.trackTrace("sample trace");
+        client.trackMetric("sample metric", 3);
     }
 }
 ```
@@ -79,41 +120,22 @@ public class MyActivity extends Activity {
 
 > Note: this only works in Android SDK version 15 and up (Ice Cream Sandwich+)
 
-**Extend Application and register for life cycle callbacks**
+**Register for life cycle callbacks**
 
-MyApplication.java
+In order to register for lifecycle events, you only have to do the following call
+
 ```java
-import com.microsoft.applicationinsights.ApplicationLifeCycleEventTracking;
-```
-```java
-public class MyApplication extends Application {
-
-    @Override
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public void onCreate() {
-        super.onCreate();
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
-        }
-    }
-}
-```
-AndroidManifest.xml
-```xml
-<manifest>
-    <application android:name="MyApplication"></application>
-</manifest>
+	// track activity lifecycle / session states
+    AppInsights.enableActivityTracking(this.getApplication());
 ```
 
+Please note, that this will only work after `AppInsights.start()`has been called. Furthermore, the telemetry feature must not be disabled. 
 
 ## Documentation ##
 
-http://microsoft.github.io/AppInsights-Android/
-
-
+[http://microsoft.github.io/AppInsights-Android/]()
 
 ## Contributing ##
-
 
 **Development environment**
 

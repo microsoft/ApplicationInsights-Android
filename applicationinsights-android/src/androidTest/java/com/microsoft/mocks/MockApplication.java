@@ -1,9 +1,7 @@
 package com.microsoft.mocks;
 
 import android.app.Application;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 
 public class MockApplication extends Application {
@@ -22,13 +20,13 @@ public class MockApplication extends Application {
     public void onCreate() {
         super.onCreate();
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            registerActivityLifecycleCallbacks(MockLifeCycleTracking.getInstance(this.context));
+            registerActivityLifecycleCallbacks(MockLifeCycleTracking.getInstance());
         }
     }
 
     public void unregister() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            unregisterActivityLifecycleCallbacks(MockLifeCycleTracking.getInstance(this.context));
+            unregisterActivityLifecycleCallbacks(MockLifeCycleTracking.getInstance());
         }
     }
 }

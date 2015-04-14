@@ -4,8 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-import com.microsoft.applicationinsights.TelemetryClient;
-
+import com.microsoft.applicationinsights.AppInsights;
 
 /**
  * An activity representing a list of Items. This activity
@@ -14,11 +13,11 @@ import com.microsoft.applicationinsights.TelemetryClient;
  * lead to a {@link ItemDetailActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
- * <p/>
+ * <p>
  * The activity makes heavy use of fragments. The list of items is a
  * {@link ItemListFragment} and the item details
  * (if present) is a {@link ItemDetailFragment}.
- * <p/>
+ * <p>
  * This activity also implements the required
  * {@link ItemListFragment.Callbacks} interface
  * to listen for item selections.
@@ -51,12 +50,11 @@ public class ItemListActivity extends FragmentActivity
                     .setActivateOnItemClick(true);
         }
 
-        TelemetryClient client = TelemetryClient.getInstance(this);
-        client.trackTrace("example trace");
-        client.trackEvent("example event");
-        client.trackException(new Exception("example error"));
-        client.trackMetric("example metric", 1);
-        client.flush();
+        AppInsights.setup(this);
+        AppInsights.start();
+
+        // track activity lifecycle (note this only needs to be done once per application)
+        AppInsights.enableActivityTracking(this.getApplication());
     }
 
     /**

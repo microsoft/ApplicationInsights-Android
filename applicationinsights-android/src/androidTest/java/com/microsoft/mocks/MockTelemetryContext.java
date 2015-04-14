@@ -1,16 +1,17 @@
 package com.microsoft.mocks;
 
-import com.microsoft.applicationinsights.TelemetryClientConfig;
-import com.microsoft.applicationinsights.channel.TelemetryContext;
+import android.content.Context;
+
+import com.microsoft.applicationinsights.internal.TelemetryContext;
 
 public class MockTelemetryContext extends TelemetryContext {
 
-    public MockTelemetryContext(TelemetryClientConfig config) {
-        super(config);
-        TelemetryContext.setDeviceContext();
+    public MockTelemetryContext(Context context, String instrumentationKey) {
+        super(context, instrumentationKey);
+        TelemetryContext.setDeviceContext(context);
         TelemetryContext.setSessionContext();
         TelemetryContext.setUserContext();
-        TelemetryContext.setAppContext();
+        TelemetryContext.setAppContext(context);
         TelemetryContext.setInternalContext();
     }
 }
