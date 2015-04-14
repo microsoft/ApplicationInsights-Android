@@ -17,6 +17,11 @@ public enum ApplicationInsights {
      * A flag which determines, if developer mode (logging) should be enabled.
      */
     private static boolean DEVELOPER_MODE;
+    /**
+     * A flag, which determines if auto collection of sessions and page views should be disabled.
+     * Default is false.
+     */
+    private boolean autoCollectionDisabled;
     private boolean telemetryDisabled;
     private boolean exceptionTrackingDisabled;
     private String instrumentationKey;
@@ -33,13 +38,15 @@ public enum ApplicationInsights {
     private Map<String, String> commonProperties;
 
     private static boolean isRunning;
+    private static boolean isSetup;
 
     /**
-     * Create AppInsights instance
+     * Create ApplicationInsights instance
      */
     private ApplicationInsights(){
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
+        this.autoCollectionDisabled = false;
     }
 
     /**
@@ -49,7 +56,18 @@ public enum ApplicationInsights {
      * @param context the context associated with Application Insights
      */
     public static void setup(Context context){
-        ApplicationInsights.INSTANCE.setupInstance(context, null);
+        ApplicationInsights.INSTANCE.setupInstance(context, null, null);
+    }
+
+    /**
+     * Configure Application Insights
+     * Note: This should be called before start
+     *
+     * @param context the context associated with Application Insights
+     * @param application the application needed for auto collecting telemetry data
+     */
+    public static void setup(Context context, Application application){
+        ApplicationInsights.INSTANCE.setupInstance(context, null, null);
     }
 
     /**
@@ -60,7 +78,19 @@ public enum ApplicationInsights {
      * @param instrumentationKey the instrumentation key associated with the app
      */
     public static void setup(Context context, String instrumentationKey){
-        ApplicationInsights.INSTANCE.setupInstance(context, instrumentationKey);
+        ApplicationInsights.INSTANCE.setupInstance(context, null, instrumentationKey);
+    }
+
+    /**
+     * Configure Application Insights
+     * Note: This should be called before start
+     *
+     * @param context the context associated with Application Insights
+     * @param application the application needed for auto collecting telemetry data
+     * @param instrumentationKey the instrumentation key associated with the app
+     */
+    public static void setup(Context context, Application application,  String instrumentationKey){
+        ApplicationInsights.INSTANCE.setupInstance(context, application, instrumentationKey);
     }
 
     /**
@@ -70,34 +100,40 @@ public enum ApplicationInsights {
      * @param context the context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
      */
-    public void setupInstance(Context context, String instrumentationKey){
-        if(isRunning) {
-            return;
+    public void setupInstance(Context context, Application application, String instrumentationKey){
+        if(!isSetup) {
+            if(context != null){
+                this.context = context;
+                this.config = new SessionConfig(this.context);
+                this.instrumentationKey = instrumentationKey;
+                this.application = application;
+                this.isSetup = true;
+            }else{
+            }
         }
-        this.context = context;
-        this.instrumentationKey = instrumentationKey;
-        this.config = new SessionConfig(this.context);
+
     }
 
     /**
-     * Start Application Insights
-     * Note: This should be called after {@link #setup}
+     * Start ApplicationInsights
+     * Note: This should be called after {@link #isSetup}
      */
     public static void start(){
-
         INSTANCE.startInstance();
-
     }
 
     /**
-     * Start Application Insights
-     * Note: This should be called after {@link #setup}
+     * Start ApplicationInsights
+     * Note: This should be called after {@link #isSetup}
      */
     public void startInstance(){
-        if(!isRunning) {
-            isRunning = true;
-            String iKey = null;
+        if(!isSetup){
+            return;
+        }
+        if (!isRunning) {
 
+            // Get telemetry context
+            String iKey = null;
             if(this.instrumentationKey != null){
                 iKey = this.instrumentationKey;
             }else{
@@ -107,12 +143,22 @@ public enum ApplicationInsights {
             TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
             EnvelopeFactory.INSTANCE.configure(telemetryContext, this.commonProperties);
 
-            if(!this.telemetryDisabled){
+            // Start autocollection feature
+            TelemetryClient.initialize(!telemetryDisabled);
+            if(!this.telemetryDisabled && !this.autoCollectionDisabled){
                 LifeCycleTracking.initialize(config, telemetryContext);
+                if(this.application != null){
+                    TelemetryClient.getInstance().enableActivityTracking(this.application);
+                }else{
+                }
             }
+
+            // Start crash reporting
             if(!this.exceptionTrackingDisabled){
                 ExceptionTracking.registerExceptionHandler(this.context);
             }
+
+            isRunning = true;
             sendPendingData();
         }
     }
@@ -124,16 +170,22 @@ public enum ApplicationInsights {
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
+        if(!isRunning){
+            return;
+        }
         Channel.getInstance().synchronize();
     }
 
     /**
      * Enable auto page view tracking as well as auto session tracking. This will only work, if
-     * {@link ApplicationInsights#telemetryDisabled} is set to false.
-     *
+     * {@link com.microsoft.applicationinsights.ApplicationInsights#telemetryDisabled} is set to false.
+     * @deprecated This method is deprecated: Use setAutoCollectionDisabled instead.
      * @param application the application used to register the life cycle callbacks
      */
     public static void enableActivityTracking(Application application){
+        if(!isRunning){
+            return;
+        }
         if(!INSTANCE.telemetryDisabled){
             TelemetryClient.getInstance().enableActivityTracking(application);
         }
@@ -144,7 +196,13 @@ public enum ApplicationInsights {
      *
      * @param disabled if set to true, crash reporting will be disabled
      */
-    public static void setExceptionTracking(boolean disabled){
+    public static void setExceptionTrackingDisabled(boolean disabled){
+        if(!isSetup){
+            return;
+        }
+        if(isRunning){
+            return;
+        }
         INSTANCE.exceptionTrackingDisabled = disabled;
     }
 
@@ -154,7 +212,28 @@ public enum ApplicationInsights {
      * @param disabled if set to true, the telemetry feature will be disabled
      */
     public static void setTelemetryDisabled(boolean disabled){
+        if(!isSetup){
+            return;
+        }
+        if(isRunning){
+            return;
+        }
         INSTANCE.telemetryDisabled = disabled;
+    }
+
+    /**
+     * Enable / disable auto collection of telemetry data.
+     *
+     * @param disabled if set to true, the auto collection feature will be disabled
+     */
+    public static void setAutoCollectionDisabled(boolean disabled){
+        if(!isSetup){
+            return;
+        }
+        if(isRunning){
+            return;
+        }
+        INSTANCE.autoCollectionDisabled = disabled;
     }
 
     /**
@@ -172,9 +251,13 @@ public enum ApplicationInsights {
      * @param commonProperties a dictionary of properties to enqueue with all telemetry.
      */
     public static void setCommonProperties(Map<String, String> commonProperties) {
-        if(!isRunning) {
-            INSTANCE.commonProperties = commonProperties;
+        if(!isSetup){
+            return;
         }
+        if(isRunning){
+            return;
+        }
+        INSTANCE.commonProperties = commonProperties;
     }
 
     /**
@@ -189,6 +272,12 @@ public enum ApplicationInsights {
      * Sets the session configuration for the instance
      */
     public void setConfig(SessionConfig config) {
+        if(!isSetup){
+            return;
+        }
+        if(isRunning){
+            return;
+        }
         INSTANCE.config = config;
     }
 
