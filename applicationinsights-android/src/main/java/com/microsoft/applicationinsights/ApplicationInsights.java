@@ -6,6 +6,7 @@ import android.content.Context;
 import com.microsoft.applicationinsights.internal.Channel;
 import com.microsoft.applicationinsights.internal.EnvelopeFactory;
 import com.microsoft.applicationinsights.internal.TelemetryContext;
+import com.microsoft.applicationinsights.internal.Util;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.Map;
@@ -74,6 +75,7 @@ public enum ApplicationInsights {
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
         this.autoCollectionDisabled = false;
+        setDeveloperMode(Util.isEmulator() || Util.isDebuggerAttached());
     }
 
     /**
