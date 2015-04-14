@@ -114,6 +114,9 @@ public class Sender {
                         //TODO add comment for this
                         Thread sendingThread = new Thread(sendingTask);
                         sendingThread.setDaemon(false);
+                    }else{
+                        persistence.deleteFile(fileToSend);
+                        send();
                     }
                 }
             }
