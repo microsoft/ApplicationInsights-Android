@@ -30,6 +30,10 @@ public enum EnvelopeFactory {
     public static final int CONTRACT_VERSION = 2;
 
     /**
+     * The tag for logging
+     */
+    private static final String TAG = "EnvelopeManager";
+
     /**
      * Flag which determines, if the EnvelopeManager has been configured, yet
      */

@@ -14,18 +14,45 @@ public enum ApplicationInsights {
     INSTANCE;
 
     /**
+     * The tag for logging.
+     */
+    private static final String TAG = "ApplicationInsights";
+
+    /**
      * A flag which determines, if developer mode (logging) should be enabled.
      */
     private static boolean DEVELOPER_MODE;
+
     /**
      * A flag, which determines if auto collection of sessions and page views should be disabled.
      * Default is false.
      */
     private boolean autoCollectionDisabled;
+
+    /**
+     * A flag, which determines if sending telemetry data should be disabled. Default is false.
+     */
     private boolean telemetryDisabled;
+
+    /**
+     * A flag, which determines if crash reporting should be disabled. Default is false.
+     */
     private boolean exceptionTrackingDisabled;
+
+    /**
+     * The instrumentation key associated with the app.
+     */
     private String instrumentationKey;
+
+    /**
+     * The context associated with Application Insights.
+     */
     private Context context;
+
+    /**
+     * The application needed for auto collecting telemetry data
+     */
+    private Application application;
 
     /**
      * The configuration for this telemetry client.

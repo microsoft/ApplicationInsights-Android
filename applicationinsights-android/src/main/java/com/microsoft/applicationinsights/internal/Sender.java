@@ -21,28 +21,31 @@ import java.util.TimerTask;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * This singleton class sends data to the endpoint
+ * This singleton class sends data to the endpoint.
  */
 public class Sender {
 
     private static final String TAG = "Sender";
 
     /**
-     * Volatile boolean for double checked synchronize block
+     * Volatile boolean for double checked synchronize block.
      */
     private static volatile boolean isSenderLoaded = false;
 
 
     /**
-     * Synchronization LOCK for setting static config
+     * Synchronization LOCK for setting static config.
      */
     private static final Object LOCK = new Object();
 
     /**
-     * The configuration for this sender
+     * The configuration for this sender.
      */
     protected final TelemetryConfig config;
 
+    /**
+     * The shared Sender instance.
+     */
     private static Sender instance;
 
     private HashMap<String, TimerTask> currentTasks = new HashMap<>(10);
@@ -55,7 +58,7 @@ public class Sender {
     }
 
     /**
-     * Initialize the INSTANCE of persistence
+     * Initialize the INSTANCE of persistence.
      *
      * @param config the config for the INSTANCE
      */

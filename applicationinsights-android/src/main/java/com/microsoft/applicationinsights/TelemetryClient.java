@@ -13,8 +13,14 @@ import java.util.Map;
 public class TelemetryClient {
     public static final String TAG = "TelemetryClient";
 
+    /**
+     * The shared TelemetryClient instance.
+     */
     private static TelemetryClient instance;
 
+    /**
+     * A flag, which determines if page views should be tracked automatically.
+     */
     private boolean activityTrackingEnabled;
 
     /**
