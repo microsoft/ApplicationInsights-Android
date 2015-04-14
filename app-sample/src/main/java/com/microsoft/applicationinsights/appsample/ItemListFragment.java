@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.microsoft.applicationinsights.AppInsights;
+import com.microsoft.applicationinsights.ApplicationInsights;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.appsample.dummy.DummyContent;
 
@@ -142,7 +142,7 @@ public class ItemListFragment extends ListFragment {
                 crashMe1();
                 break;
             case 4:
-                AppInsights.INSTANCE.sendPendingData();
+                ApplicationInsights.INSTANCE.sendPendingData();
                 break;
 
             default:

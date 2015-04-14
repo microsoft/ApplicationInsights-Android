@@ -19,8 +19,8 @@ public class SessionConfigTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testRegister() throws Exception {
-        AppInsights.setup(getActivity());
-        AppInsights.start();
-        assertNotNull("iKey is initialized", AppInsights.getConfig().getInstrumentationKey());
+        ApplicationInsights.setup(getActivity());
+        ApplicationInsights.start();
+        assertNotNull("iKey is initialized", ApplicationInsights.getConfig().getInstrumentationKey());
     }
 }

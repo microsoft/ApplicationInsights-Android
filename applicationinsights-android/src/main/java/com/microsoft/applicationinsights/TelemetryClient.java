@@ -86,7 +86,7 @@ public class TelemetryClient {
      *
      * @param eventName    The name of the event
      * @param properties   Custom properties associated with the event. Note: values set here will
-     *                     supersede values set in {@link com.microsoft.applicationinsights.AppInsights#setCommonProperties}.
+     *                     supersede values set in {@link ApplicationInsights#setCommonProperties}.
      * @param measurements Custom measurements associated with the event.
      */
     public void trackEvent(
@@ -110,7 +110,7 @@ public class TelemetryClient {
      *
      * @param message    The message associated with this trace.
      * @param properties Custom properties associated with the event. Note: values set here will
-     *                   supersede values set in {@link com.microsoft.applicationinsights.AppInsights#setCommonProperties}.
+     *                   supersede values set in {@link ApplicationInsights#setCommonProperties}.
      */
     public void trackTrace(String message, Map<String, String> properties) {
         new CreateDataTask(CreateDataTask.DataType.TRACE, message, properties, null).execute();
@@ -143,7 +143,7 @@ public class TelemetryClient {
      *
      * @param handledException The handledException to track.
      * @param properties       Custom properties associated with the event. Note: values set here will
-     *                         supersede values set in {@link com.microsoft.applicationinsights.AppInsights#setCommonProperties}.
+     *                         supersede values set in {@link ApplicationInsights#setCommonProperties}.
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
         new CreateDataTask(CreateDataTask.DataType.HANDLED_EXCEPTION, handledException, properties).execute();
@@ -173,7 +173,7 @@ public class TelemetryClient {
      *
      * @param pageName     The name of the page.
      * @param properties   Custom properties associated with the event. Note: values set here will
-     *                     supersede values set in {@link com.microsoft.applicationinsights.AppInsights#setCommonProperties}.
+     *                     supersede values set in {@link ApplicationInsights#setCommonProperties}.
      * @param measurements Custom measurements associated with the event.
      */
     public void trackPageView(

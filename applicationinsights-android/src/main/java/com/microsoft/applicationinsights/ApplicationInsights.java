@@ -9,7 +9,7 @@ import com.microsoft.applicationinsights.internal.TelemetryContext;
 
 import java.util.Map;
 
-public enum AppInsights {
+public enum ApplicationInsights {
     INSTANCE;
 
     private boolean telemetryDisabled;
@@ -32,37 +32,37 @@ public enum AppInsights {
     /**
      * Create AppInsights instance
      */
-    private AppInsights(){
+    private ApplicationInsights(){
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
     }
 
     /**
-     * Configure AppInsights
+     * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context the context associated with AppInsights
+     * @param context the context associated with Application Insights
      */
     public static void setup(Context context){
-        AppInsights.INSTANCE.setupInstance(context, null);
+        ApplicationInsights.INSTANCE.setupInstance(context, null);
     }
 
     /**
-     * Configure AppInsights
+     * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context the context associated with AppInsights
+     * @param context the context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
      */
     public static void setup(Context context, String instrumentationKey){
-        AppInsights.INSTANCE.setupInstance(context, instrumentationKey);
+        ApplicationInsights.INSTANCE.setupInstance(context, instrumentationKey);
     }
 
     /**
-     * Configure AppInsights
+     * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context the context associated with AppInsights
+     * @param context the context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
      */
     public void setupInstance(Context context, String instrumentationKey){
@@ -75,7 +75,7 @@ public enum AppInsights {
     }
 
     /**
-     * Start AppInsights
+     * Start Application Insights
      * Note: This should be called after {@link #setup}
      */
     public static void start(){
@@ -85,7 +85,7 @@ public enum AppInsights {
     }
 
     /**
-     * Start AppInsights
+     * Start Application Insights
      * Note: This should be called after {@link #setup}
      */
     public void startInstance(){
@@ -124,7 +124,7 @@ public enum AppInsights {
 
     /**
      * Enable auto page view tracking as well as auto session tracking. This will only work, if
-     * {@link com.microsoft.applicationinsights.AppInsights#telemetryDisabled} is set to false.
+     * {@link ApplicationInsights#telemetryDisabled} is set to false.
      *
      * @param application the application used to register the life cycle callbacks
      */

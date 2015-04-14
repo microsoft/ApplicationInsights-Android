@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.AppInsights;
+import com.microsoft.applicationinsights.ApplicationInsights;
 import com.microsoft.applicationinsights.internal.Channel;
 import com.microsoft.applicationinsights.internal.ChannelConfig;
 import com.microsoft.applicationinsights.internal.TelemetryConfig;
@@ -112,7 +112,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             Thread.sleep(10);
         }
 
-        AppInsights.INSTANCE.sendPendingData();
+        ApplicationInsights.INSTANCE.sendPendingData();
         Thread.sleep(10);
         this.validate();
     }

@@ -171,7 +171,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
 
-        this.mockLifeCycleTracking.currentTime += AppInsights.INSTANCE.config.getSessionIntervalMs();
+        this.mockLifeCycleTracking.currentTime += ApplicationInsights.INSTANCE.config.getSessionIntervalMs();
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
 
