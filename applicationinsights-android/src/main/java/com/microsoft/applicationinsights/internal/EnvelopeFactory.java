@@ -28,7 +28,7 @@ import java.util.UUID;
 public enum EnvelopeFactory {
     INSTANCE;
 
-    public static final int CONTRACT_VERSION = 2;
+    protected static final int CONTRACT_VERSION = 2;
 
     /**
      * The tag for logging
@@ -75,7 +75,7 @@ public enum EnvelopeFactory {
     /**
      * Create an envelope template
      */
-    public Envelope createEnvelope() {
+    protected Envelope createEnvelope() {
         Envelope envelope = new Envelope();
         envelope.setAppId(this.context.getPackageName());
         envelope.setAppVer(this.context.getApplication().getVer());
@@ -96,7 +96,7 @@ public enum EnvelopeFactory {
     /**
      * Create an envelope with the given object as its base data
      */
-    public Envelope createEnvelope(ITelemetry telemetryData){
+    protected Envelope createEnvelope(ITelemetry telemetryData){
         addCommonProperties(telemetryData);
 
         Data<ITelemetryData> data = new Data<>();
@@ -124,7 +124,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains an event
      */
-    public Envelope createEventEnvelope(String eventName,
+    protected Envelope createEventEnvelope(String eventName,
                                   Map<String, String> properties,
                                   Map<String, Double> measurements) {
         Envelope envelope = null;
@@ -148,7 +148,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a trace
      */
-    public Envelope createTraceEnvelope(String message, Map<String, String> properties) {
+    protected Envelope createTraceEnvelope(String message, Map<String, String> properties) {
         Envelope envelope = null;
         if(isConfigured()){
             MessageData telemetry = new MessageData();
@@ -169,7 +169,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a metric
      */
-    public Envelope createMetricEnvelope(String name, double value) {
+    protected Envelope createMetricEnvelope(String name, double value) {
         Envelope envelope = null;
         if(isConfigured()){
             MetricData telemetry = new MetricData();
@@ -199,7 +199,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a handled or unhandled exception
      */
-    public Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
+    protected Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
         Envelope envelope = null;
         if(isConfigured()){
             CrashData telemetry = this.getCrashData(exception, properties);
@@ -219,7 +219,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a page view
      */
-    public Envelope createPageViewEnvelope(
+    protected Envelope createPageViewEnvelope(
             String pageName,
             Map<String, String> properties,
             Map<String, Double> measurements) {
@@ -242,7 +242,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a session
      */
-    public Envelope createNewSessionEnvelope() {
+    protected Envelope createNewSessionEnvelope() {
         Envelope envelope = null;
         if(isConfigured()){
             SessionStateData telemetry = new SessionStateData();
@@ -258,7 +258,7 @@ public enum EnvelopeFactory {
      *
      * @param telemetry The telemetry data
      */
-    private void addCommonProperties(ITelemetry telemetry){
+    protected void addCommonProperties(ITelemetry telemetry){
         telemetry.setVer(CONTRACT_VERSION);
         if (this.commonProperties != null) {
             Map<String, String> map = telemetry.getProperties();
@@ -285,7 +285,7 @@ public enum EnvelopeFactory {
      *
      * @param commonProperties a map with properties, which should be set for each envelope
      */
-    public void setCommonProperties(Map<String, String> commonProperties) {
+    protected void setCommonProperties(Map<String, String> commonProperties) {
         this.commonProperties = commonProperties;
     }
 
