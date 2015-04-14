@@ -13,13 +13,14 @@ android {
     }
 
     buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
         all {
             // note: set this in ~/.gradle/gradle.properties to adding the key to version control
             manifestPlaceholders = [AI_INSTRUMENTATION_KEY: ai_instrumentation_key]
+        }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }

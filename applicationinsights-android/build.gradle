@@ -14,6 +14,9 @@ android {
     }
 
     buildTypes {
+        all {
+            manifestPlaceholders = [AI_SDK_VERSION: projectVersion]
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

@@ -12,6 +12,6 @@ public class MockTelemetryContext extends TelemetryContext {
         TelemetryContext.setSessionContext();
         TelemetryContext.setUserContext();
         TelemetryContext.setAppContext(context);
-        TelemetryContext.setInternalContext();
+        TelemetryContext.setInternalContext(context);
     }
 }
