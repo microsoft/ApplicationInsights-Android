@@ -30,6 +30,12 @@ public enum EnvelopeFactory {
     public static final int CONTRACT_VERSION = 2;
 
     /**
+    /**
+     * Flag which determines, if the EnvelopeManager has been configured, yet
+     */
+    private boolean configured;
+
+    /**
      * The context for this recorder
      */
     private TelemetryContext context;
@@ -58,6 +64,7 @@ public enum EnvelopeFactory {
     public void configure(TelemetryContext context, Map<String,String>commonProperties){
         this.context = context;
         this.commonProperties = commonProperties;
+        this.configured = true;
     }
 
     /**
@@ -65,20 +72,19 @@ public enum EnvelopeFactory {
      */
     public Envelope createEnvelope() {
         Envelope envelope = new Envelope();
-            envelope.setAppId(this.context.getPackageName());
-            envelope.setAppVer(this.context.getApplication().getVer());
-            envelope.setTime(Util.dateToISO8601(new Date()));
-            envelope.setIKey(this.context.getInstrumentationKey());
-            envelope.setUserId(this.context.getUser().getId());
-            envelope.setDeviceId(this.context.getDevice().getId());
-            envelope.setOsVer(this.context.getDevice().getOsVersion());
-            envelope.setOs(this.context.getDevice().getOs());
+        envelope.setAppId(this.context.getPackageName());
+        envelope.setAppVer(this.context.getApplication().getVer());
+        envelope.setTime(Util.dateToISO8601(new Date()));
+        envelope.setIKey(this.context.getInstrumentationKey());
+        envelope.setUserId(this.context.getUser().getId());
+        envelope.setDeviceId(this.context.getDevice().getId());
+        envelope.setOsVer(this.context.getDevice().getOsVersion());
+        envelope.setOs(this.context.getDevice().getOs());
 
-            Map<String, String> tags = this.context.getContextTags();
-            if (tags != null) {
-                envelope.setTags(tags);
-            }
-
+        Map<String, String> tags = this.context.getContextTags();
+        if (tags != null) {
+            envelope.setTags(tags);
+        }
         return envelope;
     }
 
@@ -116,12 +122,15 @@ public enum EnvelopeFactory {
     public Envelope createEventEnvelope(String eventName,
                                   Map<String, String> properties,
                                   Map<String, Double> measurements) {
-        EventData telemetry = new EventData();
-        telemetry.setName(ensureNotNull(eventName));
-        telemetry.setProperties(properties);
-        telemetry.setMeasurements(measurements);
+        Envelope envelope = null;
+        if(isConfigured()){
+            EventData telemetry = new EventData();
+            telemetry.setName(ensureNotNull(eventName));
+            telemetry.setProperties(properties);
+            telemetry.setMeasurements(measurements);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -135,11 +144,14 @@ public enum EnvelopeFactory {
      * @return an Envelope object, which contains a trace
      */
     public Envelope createTraceEnvelope(String message, Map<String, String> properties) {
-        MessageData telemetry = new MessageData();
-        telemetry.setMessage(this.ensureNotNull(message));
-        telemetry.setProperties(properties);
+        Envelope envelope = null;
+        if(isConfigured()){
+            MessageData telemetry = new MessageData();
+            telemetry.setMessage(this.ensureNotNull(message));
+            telemetry.setProperties(properties);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -153,19 +165,22 @@ public enum EnvelopeFactory {
      * @return an Envelope object, which contains a metric
      */
     public Envelope createMetricEnvelope(String name, double value) {
-        MetricData telemetry = new MetricData();
-        DataPoint data = new DataPoint();
-        data.setCount(1);
-        data.setKind(DataPointType.Measurement);
-        data.setMax(value);
-        data.setMax(value);
-        data.setName(ensureNotNull(name));
-        data.setValue(value);
-        List<DataPoint> metricsList = new ArrayList<DataPoint>();
-        metricsList.add(data);
-        telemetry.setMetrics(metricsList);
+        Envelope envelope = null;
+        if(isConfigured()){
+            MetricData telemetry = new MetricData();
+            DataPoint data = new DataPoint();
+            data.setCount(1);
+            data.setKind(DataPointType.Measurement);
+            data.setMax(value);
+            data.setMax(value);
+            data.setName(ensureNotNull(name));
+            data.setValue(value);
+            List<DataPoint> metricsList = new ArrayList<DataPoint>();
+            metricsList.add(data);
+            telemetry.setMetrics(metricsList);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -180,9 +195,12 @@ public enum EnvelopeFactory {
      * @return an Envelope object, which contains a handled or unhandled exception
      */
     public Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
-        CrashData telemetry = this.getCrashData(exception, properties);
+        Envelope envelope = null;
+        if(isConfigured()){
+            CrashData telemetry = this.getCrashData(exception, properties);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -200,13 +218,16 @@ public enum EnvelopeFactory {
             String pageName,
             Map<String, String> properties,
             Map<String, Double> measurements) {
-        PageViewData telemetry = new PageViewData();
-        telemetry.setName(ensureNotNull(pageName));
-        telemetry.setUrl(null);
-        telemetry.setProperties(properties);
-        telemetry.setMeasurements(measurements);
+        Envelope envelope = null;
+        if(isConfigured()){
+            PageViewData telemetry = new PageViewData();
+            telemetry.setName(ensureNotNull(pageName));
+            telemetry.setUrl(null);
+            telemetry.setProperties(properties);
+            telemetry.setMeasurements(measurements);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -217,10 +238,13 @@ public enum EnvelopeFactory {
      * @return an Envelope object, which contains a session
      */
     public Envelope createNewSessionEnvelope() {
-        SessionStateData telemetry = new SessionStateData();
-        telemetry.setState(SessionState.Start);
+        Envelope envelope = null;
+        if(isConfigured()){
+            SessionStateData telemetry = new SessionStateData();
+            telemetry.setState(SessionState.Start);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -304,5 +328,8 @@ public enum EnvelopeFactory {
         crashData.setProperties(properties);
 
         return crashData;
+    }
+    protected boolean isConfigured(){
+        return configured;
     }
 }
