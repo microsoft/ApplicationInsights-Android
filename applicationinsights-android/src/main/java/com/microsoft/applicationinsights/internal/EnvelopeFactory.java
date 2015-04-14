@@ -17,6 +17,7 @@ import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -333,7 +334,11 @@ public enum EnvelopeFactory {
 
         return crashData;
     }
+
     protected boolean isConfigured(){
+        if(!configured){
+            InternalLogging.warn(TAG, "Could not create telemetry data. You have to setup & start ApplicationInsights first.");
+        }
         return configured;
     }
 }

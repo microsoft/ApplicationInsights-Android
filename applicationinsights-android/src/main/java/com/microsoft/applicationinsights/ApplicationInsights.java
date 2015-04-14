@@ -135,7 +135,10 @@ public enum ApplicationInsights {
                 this.instrumentationKey = instrumentationKey;
                 this.application = application;
                 this.isSetup = true;
+                InternalLogging.info(TAG, "ApplicationInsights has been setup correctly.", null);
             }else{
+                InternalLogging.warn(TAG, "ApplicationInsights could not be setup correctly " +
+                        "because the given context was null");
             }
         }
 
@@ -155,6 +158,8 @@ public enum ApplicationInsights {
      */
     public void startInstance(){
         if(!isSetup){
+            InternalLogging.warn(TAG, "Could not start ApplicationInsight since it has not been " +
+                    "setup correctly.");
             return;
         }
         if (!isRunning) {
@@ -177,6 +182,8 @@ public enum ApplicationInsights {
                 if(this.application != null){
                     TelemetryClient.getInstance().enableActivityTracking(this.application);
                 }else{
+                    InternalLogging.warn(TAG, "Auto collection of page views could not be " +
+                            "started, since the given application was null");
                 }
             }
 
@@ -187,6 +194,7 @@ public enum ApplicationInsights {
 
             isRunning = true;
             sendPendingData();
+            InternalLogging.info(TAG, "ApplicationInsights has been started.", null);
         }
     }
 
@@ -198,6 +206,8 @@ public enum ApplicationInsights {
      */
     public static void sendPendingData() {
         if(!isRunning){
+            InternalLogging.warn(TAG, "Could not set send pending data, because " +
+                    "ApplicationInsights has not been started, yet.");
             return;
         }
         Channel.getInstance().synchronize();
@@ -211,6 +221,8 @@ public enum ApplicationInsights {
      */
     public static void enableActivityTracking(Application application){
         if(!isRunning){
+            InternalLogging.warn(TAG, "Could not set exception tracking, because " +
+                    "ApplicationInsights has not been started, yet.");
             return;
         }
         if(!INSTANCE.telemetryDisabled){
@@ -225,9 +237,13 @@ public enum ApplicationInsights {
      */
     public static void setExceptionTrackingDisabled(boolean disabled){
         if(!isSetup){
+            InternalLogging.warn(TAG, "Could not enable/disable exception tracking, because " +
+                    "ApplicationInsights has not been setup correctly.");
             return;
         }
         if(isRunning){
+            InternalLogging.warn(TAG, "Could not enable/disable exception tracking, because " +
+                    "ApplicationInsights has already been started.");
             return;
         }
         INSTANCE.exceptionTrackingDisabled = disabled;
@@ -240,9 +256,13 @@ public enum ApplicationInsights {
      */
     public static void setTelemetryDisabled(boolean disabled){
         if(!isSetup){
+            InternalLogging.warn(TAG, "Could not enable/disable telemetry, because " +
+                    "ApplicationInsights has not been setup correctly.");
             return;
         }
         if(isRunning){
+            InternalLogging.warn(TAG, "Could not enable/disable telemetry, because " +
+                    "ApplicationInsights has already been started.");
             return;
         }
         INSTANCE.telemetryDisabled = disabled;
@@ -255,9 +275,13 @@ public enum ApplicationInsights {
      */
     public static void setAutoCollectionDisabled(boolean disabled){
         if(!isSetup){
+            InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
+                    "ApplicationInsights has not been setup correctly.");
             return;
         }
         if(isRunning){
+            InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
+                    "ApplicationInsights has already been started.");
             return;
         }
         INSTANCE.autoCollectionDisabled = disabled;
@@ -279,9 +303,13 @@ public enum ApplicationInsights {
      */
     public static void setCommonProperties(Map<String, String> commonProperties) {
         if(!isSetup){
+            InternalLogging.warn(TAG, "Could not set common properties, because " +
+                    "ApplicationInsights has not been setup correctly.");
             return;
         }
         if(isRunning){
+            InternalLogging.warn(TAG, "Could not set common properties, because " +
+                    "ApplicationInsights has already been started.");
             return;
         }
         INSTANCE.commonProperties = commonProperties;
@@ -300,9 +328,13 @@ public enum ApplicationInsights {
      */
     public void setConfig(SessionConfig config) {
         if(!isSetup){
+            InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
+                    "ApplicationInsights has not been setup correctly.");
             return;
         }
         if(isRunning){
+            InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
+                    "ApplicationInsights has already been started.");
             return;
         }
         INSTANCE.config = config;

@@ -234,6 +234,10 @@ public class TelemetryClient {
      * @return YES if telemetry data can be tracked
      */
     protected boolean isTelemetryEnabled() {
+        if(!this.telemetryEnabled){
+            InternalLogging.warn(TAG, "Could not track telemetry item, because telemetry " +
+                    "feature is disabled.");
+        }
         return this.telemetryEnabled;
     }
 }
