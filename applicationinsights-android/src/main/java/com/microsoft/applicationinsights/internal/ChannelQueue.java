@@ -65,9 +65,6 @@ public class ChannelQueue {
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = new TelemetryConfig();
         this.isCrashing = false;
-
-
-        Sender.initialize(getConfig()); //TODO do this in the umbrella header
         this.sender = Sender.getInstance();// don't hold reference to this?
     }
 
@@ -95,7 +92,7 @@ public class ChannelQueue {
      */
     public boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
-        if (item == null || this.config.isTelemetryDisabled()) {
+        if (item == null) {
             return false;
         }
 

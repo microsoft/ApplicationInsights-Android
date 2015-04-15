@@ -1,8 +1,10 @@
 package com.microsoft.applicationinsights.internal;
 
 import android.annotation.TargetApi;
+import android.os.AsyncTask;
 import android.os.Build;
 
+import com.microsoft.applicationinsights.ApplicationInsights;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.io.BufferedReader;
@@ -20,28 +22,31 @@ import java.util.TimerTask;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * This singleton class sends data to the endpoint
+ * This singleton class sends data to the endpoint.
  */
 public class Sender {
 
     private static final String TAG = "Sender";
 
     /**
-     * Volatile boolean for double checked synchronize block
+     * Volatile boolean for double checked synchronize block.
      */
     private static volatile boolean isSenderLoaded = false;
 
 
     /**
-     * Synchronization LOCK for setting static config
+     * Synchronization LOCK for setting static config.
      */
     private static final Object LOCK = new Object();
 
     /**
-     * The configuration for this sender
+     * The configuration for this sender.
      */
     protected final TelemetryConfig config;
 
+    /**
+     * The shared Sender instance.
+     */
     private static Sender instance;
 
     private HashMap<String, TimerTask> currentTasks = new HashMap<>(10);
@@ -54,26 +59,25 @@ public class Sender {
     }
 
     /**
-     * Initialize the INSTANCE of persistence
-     *
-     * @param config the config for the INSTANCE
+     * Initialize the INSTANCE of sender.
      */
-    public static void initialize(TelemetryConfig config) {
+    protected static void initialize() {
         // note: isSenderLoaded must be volatile for the double-checked LOCK to work
         if (!Sender.isSenderLoaded) {
             synchronized (Sender.LOCK) {
                 if (!Sender.isSenderLoaded) {
                     Sender.isSenderLoaded = true;
-                    Sender.instance = new Sender(config);
+                    Sender.instance = new Sender(new TelemetryConfig());
                 }
             }
         }
     }
 
     /**
-     * @return the INSTANCE of the sender or null if not yet initialized
+     * @return the INSTANCE of the sender calls initialize before that.
      */
     public static Sender getInstance() {
+        initialize();
         if (Sender.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }
@@ -81,6 +85,16 @@ public class Sender {
         return Sender.instance;
     }
 
+
+    public void sendDataOnAppStart() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                send();
+                return null;
+            }
+        }.execute();
+    }
 
     public void send() {
         if(runningRequestCount() < 10) {
@@ -99,6 +113,9 @@ public class Sender {
                         //TODO add comment for this
                         Thread sendingThread = new Thread(sendingTask);
                         sendingThread.setDaemon(false);
+                    }else{
+                        persistence.deleteFile(fileToSend);
+                        send();
                     }
                 }
             }
@@ -179,7 +196,7 @@ public class Sender {
      * @param fileToSend
      */
     protected void onExpected(HttpURLConnection connection, StringBuilder builder, File fileToSend) {
-        if (this.config.isDeveloperMode()) {
+        if (ApplicationInsights.isDeveloperMode()) {
             this.readResponse(connection, builder);
         }
     }
@@ -339,7 +356,6 @@ public class Sender {
                 }
             }
         }
-
     }
 }
 

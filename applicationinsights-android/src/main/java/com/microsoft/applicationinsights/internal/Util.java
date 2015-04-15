@@ -1,5 +1,8 @@
 package com.microsoft.applicationinsights.internal;
 
+import android.os.Build;
+import android.os.Debug;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -95,5 +98,13 @@ public class Util {
             // All android devices should support SHA256, but if unavailable return ""
             return "";
         }
+    }
+
+    public static boolean isEmulator() {
+        return Build.BRAND.equalsIgnoreCase("generic");
+    }
+
+    public static boolean isDebuggerAttached() {
+        return Debug.isDebuggerConnected();
     }
 }
