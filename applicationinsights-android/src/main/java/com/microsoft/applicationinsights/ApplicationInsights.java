@@ -15,6 +15,7 @@ public enum ApplicationInsights {
     private boolean telemetryDisabled;
     private boolean exceptionTrackingDisabled;
     private String instrumentationKey;
+    private String userId;
     private Context context;
     private TelemetryContext telemetryContext;
 
@@ -100,7 +101,7 @@ public enum ApplicationInsights {
                 iKey = config.getInstrumentationKey();
             }
 
-            TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
+            this.telemetryContext = new TelemetryContext(this.context, iKey, userId);
             EnvelopeFactory.INSTANCE.configure(telemetryContext, this.commonProperties);
 
             if(!this.telemetryDisabled){
@@ -181,6 +182,20 @@ public enum ApplicationInsights {
     public static void renewSession(String sessionId){
         if(!INSTANCE.telemetryDisabled && INSTANCE.telemetryContext != null){
             INSTANCE.telemetryContext.renewSessionId(sessionId);
+        }
+    }
+
+    /**
+     * Set the user Id associated with the telemetry data. If userId == null, ApplicationInsights
+     * will generate a random ID.
+     *
+     * @param userId a user ID associated with the telemetry data
+     */
+    public static void setUserId(String userId){
+        if(isRunning){
+            TelemetryContext.setUserContext(userId);
+        }else{
+            INSTANCE.userId = userId;
         }
     }
 

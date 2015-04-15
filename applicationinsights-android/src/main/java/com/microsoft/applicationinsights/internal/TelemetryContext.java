@@ -107,8 +107,9 @@ public class TelemetryContext {
      *
      * @param appContext the context for this telemetryContext
      */
-    public TelemetryContext(Context appContext, String instrumentationKey) {
+    public TelemetryContext(Context appContext, String instrumentationKey, String userId) {
 
+        // TODO: Why does everything in here have to be static? Constructor is used to create new instance rather than setting static fields
         this.operation = new Operation();
 
         // note: isContextLoaded must be volatile for the double-checked LOCK to work
@@ -132,7 +133,7 @@ public class TelemetryContext {
                     TelemetryContext.cachedTags = getCachedTags();
                     TelemetryContext.setDeviceContext(appContext);
                     TelemetryContext.setSessionContext();
-                    TelemetryContext.setUserContext();
+                    TelemetryContext.setUserContext(userId);
                     TelemetryContext.setAppContext(appContext);
                     TelemetryContext.setInternalContext(appContext);
 
@@ -283,24 +284,35 @@ public class TelemetryContext {
     /**
      * Sets the user context
      */
-    protected static void setUserContext() {
-        String userId = TelemetryContext.settings.getString(TelemetryContext.USER_ID_KEY, null);
-        String userAcq = TelemetryContext.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
+    public static void setUserContext(String userId) {
+        String userAcq = null;
 
-        if (userId == null || userAcq == null) {
-            userId = UUID.randomUUID().toString();
-            userAcq = Util.dateToISO8601(new Date());
-
-            SharedPreferences.Editor editor = TelemetryContext.settings.edit();
-            editor.putString(TelemetryContext.USER_ID_KEY, userId);
-            editor.putString(TelemetryContext.USER_ACQ_KEY, userAcq);
-            editor.apply();
+        // No custom user Id is given, so get this info from settings
+        if(userId == null){
+            userId = TelemetryContext.settings.getString(TelemetryContext.USER_ID_KEY, null);
+            userAcq = TelemetryContext.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
         }
 
+        // Generate new user Id if needed
+        if (userId == null) {
+            userId = UUID.randomUUID().toString();
+        }
+
+        // Generate new acquisition date if needed
+        if(userAcq == null) {
+            userAcq = Util.dateToISO8601(new Date());
+        }
+
+        // Update settings
+        SharedPreferences.Editor editor = TelemetryContext.settings.edit();
+        editor.putString(TelemetryContext.USER_ID_KEY, userId);
+        editor.putString(TelemetryContext.USER_ACQ_KEY, userAcq);
+        editor.apply();
+
+        // Update user context
         User context = TelemetryContext.user;
         context.setId(userId);
         context.setAccountAcquisitionDate(userAcq);
-
     }
 
     /**
