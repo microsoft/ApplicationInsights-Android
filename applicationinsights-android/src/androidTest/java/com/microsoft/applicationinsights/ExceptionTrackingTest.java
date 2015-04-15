@@ -26,7 +26,7 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
         super.tearDown();
         Thread.setDefaultUncaughtExceptionHandler(originalHandler);
         ChannelQueue.INSTANCE.setIsCrashing(false);
-        ChannelQueue.INSTANCE.getConfig().setDeveloperMode(false);
+        ApplicationInsights.setDeveloperMode(false);
     }
 
     public void testRegisterExceptionHandler() throws Exception {
@@ -37,12 +37,12 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
         Assert.assertEquals("handler is of correct type", ExceptionTracking.class, handler.getClass());
 
         // double register without debug mode
-        ChannelQueue.INSTANCE.getConfig().setDeveloperMode(false);
+        ApplicationInsights.setDeveloperMode(false);
         ExceptionTracking.registerExceptionHandler(this.getActivity());
         Assert.assertTrue("no exception for multiple registration without debug mode", true);
 
         // double register with debug mode and verify runtime exception
-        ChannelQueue.INSTANCE.getConfig().setDeveloperMode(true);
+        ApplicationInsights.setDeveloperMode(true);
         RuntimeException exception = null;
         try {
             ExceptionTracking.registerExceptionHandler(this.getActivity());

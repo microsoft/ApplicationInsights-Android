@@ -18,6 +18,7 @@ import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,7 +29,17 @@ import java.util.UUID;
 public enum EnvelopeFactory {
     INSTANCE;
 
-    public static final int CONTRACT_VERSION = 2;
+    protected static final int CONTRACT_VERSION = 2;
+
+    /**
+     * The tag for logging
+     */
+    private static final String TAG = "EnvelopeManager";
+
+    /**
+     * Flag which determines, if the EnvelopeManager has been configured, yet
+     */
+    private boolean configured;
 
     /**
      * The context for this recorder
@@ -59,12 +70,13 @@ public enum EnvelopeFactory {
     public void configure(TelemetryContext context, Map<String, String> commonProperties) {
         this.context = context;
         this.commonProperties = commonProperties;
+        this.configured = true;
     }
 
     /**
      * Create an envelope template
      */
-    public Envelope createEnvelope() {
+    protected Envelope createEnvelope() {
         Envelope envelope = new Envelope();
         this.context.setScreenResolution(ApplicationInsights.INSTANCE.getContext());
         envelope.setAppId(this.context.getPackageName());
@@ -80,7 +92,6 @@ public enum EnvelopeFactory {
         if (tags != null) {
             envelope.setTags(tags);
         }
-
         return envelope;
     }
 
@@ -90,7 +101,7 @@ public enum EnvelopeFactory {
     public Envelope createEnvelope(ITelemetry telemetryData) {
         addCommonProperties(telemetryData);
 
-        Data<ITelemetryData> data = new Data<>();
+        Data<ITelemetryData> data = new Data<ITelemetryData>();
         data.setBaseData(telemetryData);
         data.setBaseType(telemetryData.getBaseType());
 
@@ -117,12 +128,15 @@ public enum EnvelopeFactory {
     public Envelope createEventEnvelope(String eventName,
                                         Map<String, String> properties,
                                         Map<String, Double> measurements) {
-        EventData telemetry = new EventData();
-        telemetry.setName(ensureNotNull(eventName));
-        telemetry.setProperties(properties);
-        telemetry.setMeasurements(measurements);
+        Envelope envelope = null;
+        if(isConfigured()){
+            EventData telemetry = new EventData();
+            telemetry.setName(ensureNotNull(eventName));
+            telemetry.setProperties(properties);
+            telemetry.setMeasurements(measurements);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -135,11 +149,14 @@ public enum EnvelopeFactory {
      * @return an Envelope object, which contains a trace
      */
     public Envelope createTraceEnvelope(String message, Map<String, String> properties) {
-        MessageData telemetry = new MessageData();
-        telemetry.setMessage(this.ensureNotNull(message));
-        telemetry.setProperties(properties);
+        Envelope envelope = null;
+        if(isConfigured()){
+            MessageData telemetry = new MessageData();
+            telemetry.setMessage(this.ensureNotNull(message));
+            telemetry.setProperties(properties);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -152,19 +169,22 @@ public enum EnvelopeFactory {
      * @return an Envelope object, which contains a metric
      */
     public Envelope createMetricEnvelope(String name, double value) {
-        MetricData telemetry = new MetricData();
-        DataPoint data = new DataPoint();
-        data.setCount(1);
-        data.setKind(DataPointType.Measurement);
-        data.setMax(value);
-        data.setMax(value);
-        data.setName(ensureNotNull(name));
-        data.setValue(value);
-        List<DataPoint> metricsList = new ArrayList<DataPoint>();
-        metricsList.add(data);
-        telemetry.setMetrics(metricsList);
+        Envelope envelope = null;
+        if(isConfigured()){
+            MetricData telemetry = new MetricData();
+            DataPoint data = new DataPoint();
+            data.setCount(1);
+            data.setKind(DataPointType.Measurement);
+            data.setMax(value);
+            data.setMax(value);
+            data.setName(ensureNotNull(name));
+            data.setValue(value);
+            List<DataPoint> metricsList = new ArrayList<DataPoint>();
+            metricsList.add(data);
+            telemetry.setMetrics(metricsList);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -178,9 +198,12 @@ public enum EnvelopeFactory {
      * @return an Envelope object, which contains a handled or unhandled exception
      */
     public Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
-        CrashData telemetry = this.getCrashData(exception, properties);
+        Envelope envelope = null;
+        if(isConfigured()){
+            CrashData telemetry = this.getCrashData(exception, properties);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -197,13 +220,16 @@ public enum EnvelopeFactory {
           String pageName,
           Map<String, String> properties,
           Map<String, Double> measurements) {
-        PageViewData telemetry = new PageViewData();
-        telemetry.setName(ensureNotNull(pageName));
-        telemetry.setUrl(null);
-        telemetry.setProperties(properties);
-        telemetry.setMeasurements(measurements);
+        Envelope envelope = null;
+        if(isConfigured()){
+            PageViewData telemetry = new PageViewData();
+            telemetry.setName(ensureNotNull(pageName));
+            telemetry.setUrl(null);
+            telemetry.setProperties(properties);
+            telemetry.setMeasurements(measurements);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -214,10 +240,13 @@ public enum EnvelopeFactory {
      * @return an Envelope object, which contains a session
      */
     public Envelope createNewSessionEnvelope() {
-        SessionStateData telemetry = new SessionStateData();
-        telemetry.setState(SessionState.Start);
+        Envelope envelope = null;
+        if(isConfigured()){
+            SessionStateData telemetry = new SessionStateData();
+            telemetry.setState(SessionState.Start);
 
-        Envelope envelope = createEnvelope(telemetry);
+            envelope = createEnvelope(telemetry);
+        }
         return envelope;
     }
 
@@ -226,7 +255,7 @@ public enum EnvelopeFactory {
      *
      * @param telemetry The telemetry data
      */
-    private void addCommonProperties(ITelemetry telemetry) {
+    protected void addCommonProperties(ITelemetry telemetry){
         telemetry.setVer(CONTRACT_VERSION);
         if (this.commonProperties != null) {
             Map<String, String> map = telemetry.getProperties();
@@ -253,7 +282,7 @@ public enum EnvelopeFactory {
      *
      * @param commonProperties a map with properties, which should be set for each envelope
      */
-    public void setCommonProperties(Map<String, String> commonProperties) {
+    protected void setCommonProperties(Map<String, String> commonProperties) {
         this.commonProperties = commonProperties;
     }
 
@@ -273,7 +302,7 @@ public enum EnvelopeFactory {
 
         // TODO: set handledAt - Is of relevance in future releases, not at the moment
         // read stack frames
-        List<CrashDataThreadFrame> stackFrames = new ArrayList<>();
+        List<CrashDataThreadFrame> stackFrames = new ArrayList<CrashDataThreadFrame>();
         StackTraceElement[] stack = localException.getStackTrace();
         for (int i = 0; i < stack.length - 1; i++) {
             StackTraceElement rawFrame = stack[i];
@@ -285,7 +314,7 @@ public enum EnvelopeFactory {
 
         CrashDataThread crashDataThread = new CrashDataThread();
         crashDataThread.setFrames(stackFrames);
-        List<CrashDataThread> threads = new ArrayList<>(1);
+        List<CrashDataThread> threads = new ArrayList<CrashDataThread>(1);
         threads.add(crashDataThread);
 
         CrashDataHeaders crashDataHeaders = new CrashDataHeaders();
@@ -302,5 +331,12 @@ public enum EnvelopeFactory {
         crashData.setProperties(properties);
 
         return crashData;
+    }
+
+    protected boolean isConfigured(){
+        if(!configured){
+            InternalLogging.warn(TAG, "Could not create telemetry data. You have to setup & start ApplicationInsights first.");
+        }
+        return configured;
     }
 }

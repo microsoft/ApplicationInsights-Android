@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights.internal;
 
+import com.microsoft.applicationinsights.ApplicationInsights;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 
@@ -137,13 +138,13 @@ public class ChannelQueueTest extends TestCase {
     }
 
     public void testDisableTelemetry() {
-        this.queue.getConfig().setTelemetryDisabled(true);
+        ApplicationInsights.setTelemetryDisabled(true);
 
         this.queue.enqueue(this.item);
         long queueSize = this.queue.getQueue().size();
         Assert.assertEquals("item is not queued when telemetry is disabled", 0, queueSize);
 
-        this.queue.getConfig().setTelemetryDisabled(false);
+        ApplicationInsights.setTelemetryDisabled(false);
 
         this.queue.enqueue(this.item);
         queueSize = this.queue.getQueue().size();

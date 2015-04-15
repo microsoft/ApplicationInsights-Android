@@ -55,9 +55,9 @@ public class Persistence {
      * Restrict access to the default constructor
      */
     protected Persistence(Context context) {
-        this.weakContext = new WeakReference<>(context);
+        this.weakContext = new WeakReference<Context>(context);
         createDirectoriesIfNecessary();
-        this.servedFiles = new ArrayList<>(51);
+        this.servedFiles = new ArrayList<File>(51);
     }
 
     /**
