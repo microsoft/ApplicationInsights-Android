@@ -48,7 +48,7 @@ public enum EnvelopeFactory {
     /**
      * Map of properties, which should be set for each envelope
      */
-    private Map<String,String> commonProperties;
+    private Map<String, String> commonProperties;
 
     /**
      * Configures the shared instance with a telemetry context, which is needed to create envelops.
@@ -56,7 +56,7 @@ public enum EnvelopeFactory {
      *
      * @param context the telemetry context, which is used to create envelops with proper context information.
      */
-    public void configure(TelemetryContext context){
+    public void configure(TelemetryContext context) {
         this.configure(context, null);
     }
 
@@ -64,9 +64,10 @@ public enum EnvelopeFactory {
      * Configures the shared instance with a telemetry context, which is needed to create envelops.
      * Warning: Method should be called before creating envelops.
      *
-     * @param context the telemetry context, which is used to create envelops with proper context information.
+     * @param context          the telemetry context, which is used to create envelops with proper context information.
+     * @param commonProperties Map of properties
      */
-    public void configure(TelemetryContext context, Map<String,String>commonProperties){
+    public void configure(TelemetryContext context, Map<String, String> commonProperties) {
         this.context = context;
         this.commonProperties = commonProperties;
         this.configured = true;
@@ -74,6 +75,8 @@ public enum EnvelopeFactory {
 
     /**
      * Create an envelope template
+     *
+     * @return the envelope used for telemetry
      */
     protected Envelope createEnvelope() {
         Envelope envelope = new Envelope();
@@ -95,8 +98,11 @@ public enum EnvelopeFactory {
 
     /**
      * Create an envelope with the given object as its base data
+     *
+     * @param telemetryData The telemetry we want to wrap inside an Enevelope and send to the server
+     * @return the envelope that includes the telemetry data
      */
-    protected Envelope createEnvelope(ITelemetry telemetryData){
+    protected Envelope createEnvelope(ITelemetry telemetryData) {
         addCommonProperties(telemetryData);
 
         Data<ITelemetryData> data = new Data<ITelemetryData>();
@@ -121,14 +127,13 @@ public enum EnvelopeFactory {
      * @param eventName    The name of the event
      * @param properties   Custom properties associated with the event
      * @param measurements Custom measurements associated with the event
-     *
      * @return an Envelope object, which contains an event
      */
     public Envelope createEventEnvelope(String eventName,
                                         Map<String, String> properties,
                                         Map<String, Double> measurements) {
         Envelope envelope = null;
-        if(isConfigured()){
+        if (isConfigured()) {
             EventData telemetry = new EventData();
             telemetry.setName(ensureNotNull(eventName));
             telemetry.setProperties(properties);
@@ -145,12 +150,11 @@ public enum EnvelopeFactory {
      *
      * @param message    The message associated with this trace
      * @param properties Custom properties associated with the event
-     *
      * @return an Envelope object, which contains a trace
      */
     public Envelope createTraceEnvelope(String message, Map<String, String> properties) {
         Envelope envelope = null;
-        if(isConfigured()){
+        if (isConfigured()) {
             MessageData telemetry = new MessageData();
             telemetry.setMessage(this.ensureNotNull(message));
             telemetry.setProperties(properties);
@@ -166,12 +170,11 @@ public enum EnvelopeFactory {
      *
      * @param name  The name of the metric
      * @param value The value of the metric
-     *
      * @return an Envelope object, which contains a metric
      */
     public Envelope createMetricEnvelope(String name, double value) {
         Envelope envelope = null;
-        if(isConfigured()){
+        if (isConfigured()) {
             MetricData telemetry = new MetricData();
             DataPoint data = new DataPoint();
             data.setCount(1);
@@ -196,12 +199,11 @@ public enum EnvelopeFactory {
      *
      * @param exception  The exception to track
      * @param properties Custom properties associated with the event
-     *
      * @return an Envelope object, which contains a handled or unhandled exception
      */
     public Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
         Envelope envelope = null;
-        if(isConfigured()){
+        if (isConfigured()) {
             CrashData telemetry = this.getCrashData(exception, properties);
 
             envelope = createEnvelope(telemetry);
@@ -216,7 +218,6 @@ public enum EnvelopeFactory {
      * @param pageName     The name of the page
      * @param properties   Custom properties associated with the event
      * @param measurements Custom measurements associated with the event
-     *
      * @return an Envelope object, which contains a page view
      */
     public Envelope createPageViewEnvelope(
@@ -224,7 +225,7 @@ public enum EnvelopeFactory {
           Map<String, String> properties,
           Map<String, Double> measurements) {
         Envelope envelope = null;
-        if(isConfigured()){
+        if (isConfigured()) {
             PageViewData telemetry = new PageViewData();
             telemetry.setName(ensureNotNull(pageName));
             telemetry.setUrl(null);
@@ -244,7 +245,7 @@ public enum EnvelopeFactory {
      */
     public Envelope createNewSessionEnvelope() {
         Envelope envelope = null;
-        if(isConfigured()){
+        if (isConfigured()) {
             SessionStateData telemetry = new SessionStateData();
             telemetry.setState(SessionState.Start);
 
@@ -258,7 +259,7 @@ public enum EnvelopeFactory {
      *
      * @param telemetry The telemetry data
      */
-    protected void addCommonProperties(ITelemetry telemetry){
+    protected void addCommonProperties(ITelemetry telemetry) {
         telemetry.setVer(CONTRACT_VERSION);
         if (this.commonProperties != null) {
             Map<String, String> map = telemetry.getProperties();
@@ -292,7 +293,8 @@ public enum EnvelopeFactory {
 
     /**
      * Parse an exception and it's stack trace and create the CrashData object
-     * @param exception the throwable object we want to create a crashdata from
+     *
+     * @param exception  the throwable object we want to create a crashdata from
      * @param properties properties used foor the CrashData
      * @return a CrashData object that contains the stacktrace and context info
      */
@@ -335,8 +337,8 @@ public enum EnvelopeFactory {
         return crashData;
     }
 
-    protected boolean isConfigured(){
-        if(!configured){
+    protected boolean isConfigured() {
+        if (!configured) {
             InternalLogging.warn(TAG, "Could not create telemetry data. You have to setup & start ApplicationInsights first.");
         }
         return configured;

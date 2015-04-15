@@ -53,6 +53,7 @@ public class Sender {
 
     /**
      * Restrict access to the default constructor
+     * @param config the telemetryconfig object used to configure the telemetry module
      */
     protected Sender(TelemetryConfig config) {
         this.config = config;
@@ -149,6 +150,7 @@ public class Sender {
      * @param connection   a connection containing a response
      * @param responseCode the response code from the connection
      * @param payload      the payload which generated this response
+     * @param fileToSend reference to the file we want to send
      * @return null if the request was successful, the server response otherwise
      */
     protected String onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
@@ -193,7 +195,7 @@ public class Sender {
      * response and log it.
      *  @param connection a connection containing a response
      * @param builder    a string builder for storing the response
-     * @param fileToSend
+     * @param fileToSend reference to the file we sent
      */
     protected void onExpected(HttpURLConnection connection, StringBuilder builder, File fileToSend) {
         if (ApplicationInsights.isDeveloperMode()) {
@@ -223,7 +225,7 @@ public class Sender {
      * the failure instead of the client.
      *
      * @param payload the payload which generated this response
-     * @param fileToSend
+     * @param fileToSend reference to the file we sent
      */
     protected void onRecoverable(String payload, File fileToSend) {
         InternalLogging.info(TAG, "Server error, persisting data", payload);
@@ -276,7 +278,7 @@ public class Sender {
      *
      * @param connection the connection to which the stream will be flushed
      * @return a writer for the given connection stream
-     * @throws java.io.IOException
+     * @throws java.io.IOException Exception thrown by GZIP (used in SDK 19+)
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
     protected Writer getWriter(HttpURLConnection connection) throws IOException {

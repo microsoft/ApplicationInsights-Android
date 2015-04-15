@@ -68,6 +68,7 @@ public class TelemetryConfig {
 
     /**
      * Gets the maximum size of a batch in bytes
+     * @return the max batch count until we send a bundle of data to the server
      */
     public int getMaxBatchCount() {
         return this.maxBatchCount;
@@ -75,6 +76,7 @@ public class TelemetryConfig {
 
     /**
      * Sets the maximum size of a batch in bytes
+     * @param maxBatchCount the batchsize of data that will be queued until we send/persist it
      */
     public void setMaxBatchCount(int maxBatchCount) {
         synchronized (this.lock) {
@@ -84,6 +86,7 @@ public class TelemetryConfig {
 
     /**
      * Gets the maximum interval allowed between calls to batchInvoke
+     * @return the interval until we send/persist queued up data
      */
     public int getMaxBatchIntervalMs() {
         return this.maxBatchIntervalMs;
@@ -91,6 +94,7 @@ public class TelemetryConfig {
 
     /**
      * Sets the maximum interval allowed between calls to batchInvoke
+     * @param maxBatchIntervalMs the amount of MS until we want to send out a batch of data
      */
     public void setMaxBatchIntervalMs(int maxBatchIntervalMs) {
         synchronized (this.lock) {
@@ -100,6 +104,8 @@ public class TelemetryConfig {
 
     /**
      * Gets the url to which payloads will be sent
+     *
+     * @return the server's endpoint URL
      */
     public String getEndpointUrl() {
         return this.endpointUrl;
@@ -107,6 +113,8 @@ public class TelemetryConfig {
 
     /**
      * Sets the url to which payloads will be sent
+     *
+     * @param endpointUrl url of the server that receives our data
      */
     public void setEndpointUrl(String endpointUrl) {
         synchronized (this.lock) {
@@ -116,6 +124,8 @@ public class TelemetryConfig {
 
     /**
      * Gets the timeout for reading the response from the data collector endpoint
+     *
+     * @return configured timeout in ms for reading
      */
     public int getSenderReadTimeout() {
         return this.senderReadTimeoutMs;
@@ -123,6 +133,8 @@ public class TelemetryConfig {
 
     /**
      * Gets the timeout for connecting to the data collector endpoint
+     *
+     * @return configured timeout in ms for sending
      */
     public int getSenderConnectTimeout() {
         return this.senderConnectTimeoutMs;

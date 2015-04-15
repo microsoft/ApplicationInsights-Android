@@ -145,6 +145,7 @@ public class TelemetryContext {
 
     /**
      * Get user the instrumentationKey.
+     * @return the instrumentation key
      */
     public String getInstrumentationKey() {
         return instrumentationKey;
@@ -153,6 +154,7 @@ public class TelemetryContext {
 
     /**
      * Get user telemetryContext.
+     * @return the user object
      */
     public User getUser() {
         return user;
@@ -160,6 +162,7 @@ public class TelemetryContext {
 
     /**
      * Get device telemetryContext.
+     * @return the device object
      */
     public Device getDevice() {
         return device;
@@ -167,6 +170,7 @@ public class TelemetryContext {
 
     /**
      * Operation telemetryContext.
+     * @return the operation
      */
     public Operation getOperation() {
         return operation;
@@ -174,6 +178,7 @@ public class TelemetryContext {
 
     /**
      * Session telemetryContext.
+     * @return the session
      */
     public Session getSession() {
         return session;
@@ -181,6 +186,7 @@ public class TelemetryContext {
 
     /**
      * Application telemetryContext.
+     * @return the application
      */
     public Application getApplication() {
         return application;
@@ -247,6 +253,7 @@ public class TelemetryContext {
 
     /**
      * Sets the application telemetryContext tags
+     * @param appContext the android context
      */
     protected static void setAppContext(Context appContext) {
         String version = "unknown";
@@ -296,6 +303,7 @@ public class TelemetryContext {
 
     /**
      * Sets the device telemetryContext tags
+     * @param appContext the android Context
      */
     protected static void setDeviceContext(Context appContext) {
         Device context = TelemetryContext.device;

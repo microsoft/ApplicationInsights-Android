@@ -37,6 +37,7 @@ public class ChannelConfig {
 
     /**
      * Gets the instrumentation key for this telemetry channel
+     * @return the instrumentation key
      */
     public String getInstrumentationKey() {
         return instrumentationKey;
@@ -44,6 +45,8 @@ public class ChannelConfig {
 
     /**
      * Sets the instrumentation key for this telemetry channel
+     *
+     * @param instrumentationKey
      */
     public void setInstrumentationKey(String instrumentationKey) {
         this.instrumentationKey = instrumentationKey;
@@ -51,6 +54,8 @@ public class ChannelConfig {
 
     /**
      * Gets the sender config INSTANCE for this channel.
+     *
+     * @return The TelemetryConfig for Application Insights
      */
     public static TelemetryConfig getStaticConfig() {
         return ChannelQueue.INSTANCE.getConfig();
