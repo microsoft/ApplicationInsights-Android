@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.microsoft.applicationinsights.internal.Channel;
 import com.microsoft.applicationinsights.internal.EnvelopeFactory;
+import com.microsoft.applicationinsights.internal.Sender;
 import com.microsoft.applicationinsights.internal.TelemetryContext;
 import com.microsoft.applicationinsights.internal.Util;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
@@ -195,7 +196,7 @@ public enum ApplicationInsights {
             }
 
             isRunning = true;
-            sendPendingData();
+            Sender.getInstance().sendDataOnAppStart();
             InternalLogging.info(TAG, "ApplicationInsights has been started.", null);
         }
     }

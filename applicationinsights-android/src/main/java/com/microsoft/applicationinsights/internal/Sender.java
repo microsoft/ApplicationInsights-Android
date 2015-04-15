@@ -1,6 +1,7 @@
 package com.microsoft.applicationinsights.internal;
 
 import android.annotation.TargetApi;
+import android.os.AsyncTask;
 import android.os.Build;
 
 import com.microsoft.applicationinsights.ApplicationInsights;
@@ -58,26 +59,25 @@ public class Sender {
     }
 
     /**
-     * Initialize the INSTANCE of persistence.
-     *
-     * @param config the config for the INSTANCE
+     * Initialize the INSTANCE of sender.
      */
-    public static void initialize(TelemetryConfig config) {
+    protected static void initialize() {
         // note: isSenderLoaded must be volatile for the double-checked LOCK to work
         if (!Sender.isSenderLoaded) {
             synchronized (Sender.LOCK) {
                 if (!Sender.isSenderLoaded) {
                     Sender.isSenderLoaded = true;
-                    Sender.instance = new Sender(config);
+                    Sender.instance = new Sender(new TelemetryConfig());
                 }
             }
         }
     }
 
     /**
-     * @return the INSTANCE of the sender or null if not yet initialized
+     * @return the INSTANCE of the sender calls initialize before that.
      */
     public static Sender getInstance() {
+        initialize();
         if (Sender.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }
@@ -85,6 +85,16 @@ public class Sender {
         return Sender.instance;
     }
 
+
+    public void sendDataOnAppStart() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                send();
+                return null;
+            }
+        }.execute();
+    }
 
     public void send() {
         if(runningRequestCount() < 10) {
@@ -103,6 +113,9 @@ public class Sender {
                         //TODO add comment for this
                         Thread sendingThread = new Thread(sendingTask);
                         sendingThread.setDaemon(false);
+                    }else{
+                        persistence.deleteFile(fileToSend);
+                        send();
                     }
                 }
             }
@@ -343,7 +356,6 @@ public class Sender {
                 }
             }
         }
-
     }
 }
 
