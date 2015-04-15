@@ -59,9 +59,9 @@ public class Sender {
     }
 
     /**
-     * Initialize the INSTANCE of persistence.
+     * Initialize the INSTANCE of sender.
      */
-    public static void initialize() {
+    protected static void initialize() {
         // note: isSenderLoaded must be volatile for the double-checked LOCK to work
         if (!Sender.isSenderLoaded) {
             synchronized (Sender.LOCK) {
@@ -74,7 +74,7 @@ public class Sender {
     }
 
     /**
-     * @return the INSTANCE of the sender or null if not yet initialized
+     * @return the INSTANCE of the sender calls initialize before that.
      */
     public static Sender getInstance() {
         initialize();
@@ -88,7 +88,6 @@ public class Sender {
 
     public void sendDataOnAppStart() {
         new AsyncTask<Void, Void, Void>() {
-
             @Override
             protected Void doInBackground(Void... params) {
                 send();
