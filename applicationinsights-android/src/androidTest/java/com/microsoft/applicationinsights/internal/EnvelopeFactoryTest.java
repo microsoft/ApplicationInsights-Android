@@ -38,7 +38,7 @@ public class EnvelopeFactoryTest extends ActivityUnitTestCase<MockActivity> {
         testTelemetryData.setName("myEvent");
 
         // Create expectation
-        Data<ITelemetryData> testData = new Data<>();
+        Data<ITelemetryData> testData = new Data<ITelemetryData>();
         testData.setBaseData(testTelemetryData);
         testData.setBaseType(testTelemetryData.getBaseType());
 

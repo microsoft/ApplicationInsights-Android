@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.AppInsights;
+import com.microsoft.applicationinsights.ApplicationInsights;
 import com.microsoft.applicationinsights.internal.Channel;
 import com.microsoft.applicationinsights.internal.ChannelConfig;
 import com.microsoft.applicationinsights.internal.TelemetryConfig;
@@ -43,9 +43,9 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
         // use http for tests
         config.setEndpointUrl(config.getEndpointUrl().replace("https", "http"));
 
-        this.properties = new LinkedHashMap<>();
+        this.properties = new LinkedHashMap<String, String>();
         this.properties.put("core property", "core value");
-        this.measurements = new LinkedHashMap<>();
+        this.measurements = new LinkedHashMap<String, Double>();
         this.measurements.put("core measurement", 5.5);
     }
 
@@ -112,7 +112,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             Thread.sleep(10);
         }
 
-        AppInsights.INSTANCE.sendPendingData();
+        ApplicationInsights.INSTANCE.sendPendingData();
         Thread.sleep(10);
         this.validate();
     }

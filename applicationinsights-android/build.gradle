@@ -6,6 +6,10 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+    }
+
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 21
@@ -14,6 +18,9 @@ android {
     }
 
     buildTypes {
+        all {
+            manifestPlaceholders = [AI_SDK_VERSION: projectVersion]
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

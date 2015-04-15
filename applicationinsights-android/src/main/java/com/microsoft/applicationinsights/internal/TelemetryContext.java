@@ -8,8 +8,10 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.microsoft.applicationinsights.contracts.Application;
 import com.microsoft.applicationinsights.contracts.Device;
@@ -33,7 +35,6 @@ public class TelemetryContext {
     protected static final String SHARED_PREFERENCES_KEY = "APP_INSIGHTS_CONTEXT";
     protected static final String USER_ID_KEY = "USER_ID";
     protected static final String USER_ACQ_KEY = "USER_ACQ";
-    protected static final String SDK_VERSION = "1.0-beta.1";
     private static final String TAG = "TelemetryContext";
 
     /**
@@ -133,7 +134,7 @@ public class TelemetryContext {
                     TelemetryContext.setSessionContext();
                     TelemetryContext.setUserContext();
                     TelemetryContext.setAppContext(appContext);
-                    TelemetryContext.setInternalContext();
+                    TelemetryContext.setInternalContext(appContext);
 
                     // initialize persistence
                     Persistence.initialize(appContext);
@@ -201,7 +202,7 @@ public class TelemetryContext {
 
         if(cachedTags == null) {
             // create a new hash map and add all context to it
-            cachedTags = new LinkedHashMap<>();
+            cachedTags = new LinkedHashMap<String, String>();
             TelemetryContext.application.addToHashMap(cachedTags);
             TelemetryContext.internal.addToHashMap(cachedTags);
             this.operation.addToHashMap(cachedTags);
@@ -210,7 +211,7 @@ public class TelemetryContext {
     }
 
     public Map<String, String> getContextTags() {
-        Map<String, String> contextTags = new LinkedHashMap<>();
+        Map<String, String> contextTags = new LinkedHashMap<String, String>();
         TelemetryContext.cachedTags.putAll(contextTags);
         TelemetryContext.device.addToHashMap(contextTags);
         TelemetryContext.application.addToHashMap(contextTags);
@@ -350,10 +351,26 @@ public class TelemetryContext {
     /**
      * Sets the internal package context
      */
-    protected static void setInternalContext() {
+    protected static void setInternalContext(Context appContext) {
         Internal context = TelemetryContext.internal;
 
-        // todo: pull version from gradle.properties
-        context.setSdkVersion("android:" + TelemetryContext.SDK_VERSION);
+        String sdkVersionString = "";
+        String packageName = appContext.getPackageName();
+        if (appContext != null) {
+            try {
+                Bundle bundle = appContext.getPackageManager()
+                      .getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA)
+                      .metaData;
+                if (bundle != null) {
+                    sdkVersionString = bundle.getString("com.microsoft.applicationinsights.internal.sdkVersion");
+                } else {
+                   InternalLogging.warn(TAG, "Could not load sdk version from gradle.properties or manifest");
+                }
+            } catch (PackageManager.NameNotFoundException exception) {
+                InternalLogging.warn(TAG, "Error loading SDK version from manifest");
+                Log.v(TAG, exception.toString());
+            }
+        }
+        context.setSdkVersion("android:" + sdkVersionString);
     }
 }

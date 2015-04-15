@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-import com.microsoft.applicationinsights.AppInsights;
+import com.microsoft.applicationinsights.ApplicationInsights;
 
 /**
  * An activity representing a list of Items. This activity
@@ -50,11 +50,11 @@ public class ItemListActivity extends FragmentActivity
                     .setActivateOnItemClick(true);
         }
 
-        AppInsights.setup(this);
-        AppInsights.start();
+        ApplicationInsights.setup(this);
+        ApplicationInsights.start();
 
         // track activity lifecycle (note this only needs to be done once per application)
-        AppInsights.enableActivityTracking(this.getApplication());
+        ApplicationInsights.enableActivityTracking(this.getApplication());
     }
 
     /**
