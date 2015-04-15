@@ -124,9 +124,9 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains an event
      */
-    protected Envelope createEventEnvelope(String eventName,
-                                  Map<String, String> properties,
-                                  Map<String, Double> measurements) {
+    public Envelope createEventEnvelope(String eventName,
+                                        Map<String, String> properties,
+                                        Map<String, Double> measurements) {
         Envelope envelope = null;
         if(isConfigured()){
             EventData telemetry = new EventData();
@@ -148,7 +148,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a trace
      */
-    protected Envelope createTraceEnvelope(String message, Map<String, String> properties) {
+    public Envelope createTraceEnvelope(String message, Map<String, String> properties) {
         Envelope envelope = null;
         if(isConfigured()){
             MessageData telemetry = new MessageData();
@@ -169,7 +169,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a metric
      */
-    protected Envelope createMetricEnvelope(String name, double value) {
+    public Envelope createMetricEnvelope(String name, double value) {
         Envelope envelope = null;
         if(isConfigured()){
             MetricData telemetry = new MetricData();
@@ -199,7 +199,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a handled or unhandled exception
      */
-    protected Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
+    public Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
         Envelope envelope = null;
         if(isConfigured()){
             CrashData telemetry = this.getCrashData(exception, properties);
@@ -219,10 +219,10 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a page view
      */
-    protected Envelope createPageViewEnvelope(
-            String pageName,
-            Map<String, String> properties,
-            Map<String, Double> measurements) {
+    public Envelope createPageViewEnvelope(
+          String pageName,
+          Map<String, String> properties,
+          Map<String, Double> measurements) {
         Envelope envelope = null;
         if(isConfigured()){
             PageViewData telemetry = new PageViewData();
@@ -242,7 +242,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a session
      */
-    protected Envelope createNewSessionEnvelope() {
+    public Envelope createNewSessionEnvelope() {
         Envelope envelope = null;
         if(isConfigured()){
             SessionStateData telemetry = new SessionStateData();
