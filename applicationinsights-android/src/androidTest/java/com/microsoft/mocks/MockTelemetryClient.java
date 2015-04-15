@@ -11,6 +11,15 @@ public class MockTelemetryClient extends TelemetryClient {
     public ArrayList<Envelope> messages;
     public boolean mockTrackMethod;
 
+    /**
+     * Restrict access to the default constructor
+     *
+     * @param telemetryEnabled YES if tracking telemetry data manually should be enabled
+     */
+    protected MockTelemetryClient(boolean telemetryEnabled) {
+        super(telemetryEnabled);
+    }
+
 //    private static MockTelemetryClient instance;
 //
 //    /**

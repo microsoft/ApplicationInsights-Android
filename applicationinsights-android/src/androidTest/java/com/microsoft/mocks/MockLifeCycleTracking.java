@@ -21,7 +21,7 @@ public class MockLifeCycleTracking extends LifeCycleTracking {
     protected MockLifeCycleTracking(SessionConfig config, TelemetryContext telemetryContext) {
         super(config, telemetryContext);
         currentTime = 0;
-        this.tc = new MockTelemetryClient();
+        this.tc = new MockTelemetryClient(true);
     }
 
     //@Override
