@@ -83,7 +83,7 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
     public void uncaughtException(Thread thread, Throwable exception) {
         Map<String, String> properties = null;
         if (thread != null) {
-            properties = new LinkedHashMap<>();
+            properties = new LinkedHashMap<String, String>();
             properties.put("threadName", thread.getName());
             properties.put("threadId", Long.toString(thread.getId()));
             properties.put("threadPriority", Integer.toString(thread.getPriority()));
