@@ -43,9 +43,9 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
         // use http for tests
         config.setEndpointUrl(config.getEndpointUrl().replace("https", "http"));
 
-        this.properties = new LinkedHashMap<>();
+        this.properties = new LinkedHashMap<String, String>();
         this.properties.put("core property", "core value");
-        this.measurements = new LinkedHashMap<>();
+        this.measurements = new LinkedHashMap<String, Double>();
         this.measurements.put("core measurement", 5.5);
     }
 
