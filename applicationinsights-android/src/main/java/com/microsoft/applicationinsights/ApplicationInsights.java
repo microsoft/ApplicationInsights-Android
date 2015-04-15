@@ -16,6 +16,7 @@ public enum ApplicationInsights {
     private boolean exceptionTrackingDisabled;
     private String instrumentationKey;
     private Context context;
+    private TelemetryContext telemetryContext;
 
     /**
      * The configuration for this telemetry client.
@@ -169,6 +170,17 @@ public enum ApplicationInsights {
     public static void setCommonProperties(Map<String, String> commonProperties) {
         if(!isRunning) {
             INSTANCE.commonProperties = commonProperties;
+        }
+    }
+
+    /**
+     * Force Application Insights to create a new session with a custom sessionID.
+     *
+     * @param sessionId a custom session ID used of the session to create
+     */
+    public static void renewSession(String sessionId){
+        if(!INSTANCE.telemetryDisabled && INSTANCE.telemetryContext != null){
+            INSTANCE.telemetryContext.renewSessionId(sessionId);
         }
     }
 

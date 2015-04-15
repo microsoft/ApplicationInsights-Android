@@ -231,7 +231,16 @@ public class TelemetryContext {
      */
     public static void renewSessionId() {
         String newId = UUID.randomUUID().toString();
-        TelemetryContext.session.setId(newId);
+       renewSessionId(newId);
+    }
+
+    /**
+     * Renews the session context with a custom session ID.
+     *
+     * @param sessionId a custom session ID
+     */
+    public static void renewSessionId(String sessionId) {
+        TelemetryContext.session.setId(sessionId);
     }
 
     /**
