@@ -4,6 +4,11 @@
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
+The minimum SDK to use the Application Insights SDK in your app is 9.
+
+Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream Sandwich+).
+
+
 **Release Notes**
 
 * Renamed umbrella class for setting up and starting the SDK to ```ApplicationInsights```
@@ -120,18 +125,16 @@ public class MyActivity extends Activity {
 
 ## Automatic collection of life-cycle events ##
 
-> Note: this only works in Android SDK version 15 and up (Ice Cream Sandwich+)
-
-**Register for life cycle callbacks**
-
-In order to register for lifecycle events, you only have to do the following call
+This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default.
+If you want to **Disable** automatic collection of life-cycle events call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
 
 ```java
-	// track activity lifecycle / session states
-    ApplicationInsights.enableActivityTracking(this.getApplication());
-```
+	ApplicationInsights.setup(this); //setup
 
-Please note, that this will only work after `ApplicationInsights.start()`has been called. Furthermore, the telemetry feature must not be disabled. 
+	ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
+	
+	ApplicationInsights.start(); //start
+```
 
 ## Documentation ##
 
