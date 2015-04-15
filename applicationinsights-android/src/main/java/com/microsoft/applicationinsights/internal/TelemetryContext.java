@@ -202,7 +202,7 @@ public class TelemetryContext {
 
         if(cachedTags == null) {
             // create a new hash map and add all context to it
-            cachedTags = new LinkedHashMap<>();
+            cachedTags = new LinkedHashMap<String, String>();
             TelemetryContext.application.addToHashMap(cachedTags);
             TelemetryContext.internal.addToHashMap(cachedTags);
             this.operation.addToHashMap(cachedTags);
@@ -211,7 +211,7 @@ public class TelemetryContext {
     }
 
     public Map<String, String> getContextTags() {
-        Map<String, String> contextTags = new LinkedHashMap<>();
+        Map<String, String> contextTags = new LinkedHashMap<String, String>();
         TelemetryContext.cachedTags.putAll(contextTags);
         TelemetryContext.device.addToHashMap(contextTags);
         TelemetryContext.application.addToHashMap(contextTags);

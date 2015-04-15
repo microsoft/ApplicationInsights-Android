@@ -49,7 +49,7 @@ public class Sender {
      */
     private static Sender instance;
 
-    private HashMap<String, TimerTask> currentTasks = new HashMap<>(10);
+    private HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
 
     /**
      * Restrict access to the default constructor

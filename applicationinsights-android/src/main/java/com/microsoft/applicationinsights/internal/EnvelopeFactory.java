@@ -99,7 +99,7 @@ public enum EnvelopeFactory {
     protected Envelope createEnvelope(ITelemetry telemetryData){
         addCommonProperties(telemetryData);
 
-        Data<ITelemetryData> data = new Data<>();
+        Data<ITelemetryData> data = new Data<ITelemetryData>();
         data.setBaseData(telemetryData);
         data.setBaseType(telemetryData.getBaseType());
 
@@ -304,7 +304,7 @@ public enum EnvelopeFactory {
 
         // TODO: set handledAt - Is of relevance in future releases, not at the moment
         // read stack frames
-        List<CrashDataThreadFrame> stackFrames = new ArrayList<>();
+        List<CrashDataThreadFrame> stackFrames = new ArrayList<CrashDataThreadFrame>();
         StackTraceElement[] stack = localException.getStackTrace();
         for (int i = 0; i < stack.length - 1; i++) {
             StackTraceElement rawFrame = stack[i];
@@ -316,7 +316,7 @@ public enum EnvelopeFactory {
 
         CrashDataThread crashDataThread = new CrashDataThread();
         crashDataThread.setFrames(stackFrames);
-        List<CrashDataThread> threads = new ArrayList<>(1);
+        List<CrashDataThread> threads = new ArrayList<CrashDataThread>(1);
         threads.add(crashDataThread);
 
         CrashDataHeaders crashDataHeaders = new CrashDataHeaders();
