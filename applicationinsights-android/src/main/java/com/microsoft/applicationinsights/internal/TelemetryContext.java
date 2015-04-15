@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -12,7 +13,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.WindowManager;
 
 import com.microsoft.applicationinsights.contracts.Application;
@@ -23,6 +24,7 @@ import com.microsoft.applicationinsights.contracts.Session;
 import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -352,13 +354,39 @@ public class TelemetryContext {
     }
 
     protected static void setScreenResolution(Context context) {
+        String resolutionString = "";
+        int width = 0;
+        int height = 0;
+
         WindowManager wm = (WindowManager) context.getSystemService(
               Context.WINDOW_SERVICE);
-        DisplayMetrics metrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(metrics);
-        int heightPixels = metrics.heightPixels;
-        int widhtPixels = metrics.widthPixels;
-        String resolutionString = String.format("%dx%d", heightPixels, widhtPixels);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Point size = new Point();
+            wm.getDefaultDisplay().getRealSize(size);
+            width = size.x;
+            height = size.y;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            try {
+                Method mGetRawW = Display.class.getMethod("getRawWidth");
+                Method mGetRawH = Display.class.getMethod("getRawHeight");
+                Display display = wm.getDefaultDisplay();
+                width = (Integer) mGetRawW.invoke(display);
+                height = (Integer) mGetRawH.invoke(display);
+            } catch (Exception ex) {
+                Point size = new Point();
+                wm.getDefaultDisplay().getSize(size);
+                width = size.x;
+                height = size.y;
+                InternalLogging.error(TAG, ex.toString());
+            }
+
+        } else {
+            Display d = wm.getDefaultDisplay();
+            width = d.getWidth();
+            height = d.getHeight();
+        }
+
+        resolutionString = String.valueOf(height) + "x" + String.valueOf(width);
 
         TelemetryContext.device.setScreenResolution(resolutionString);
     }
@@ -379,7 +407,7 @@ public class TelemetryContext {
                 if (bundle != null) {
                     sdkVersionString = bundle.getString("com.microsoft.applicationinsights.internal.sdkVersion");
                 } else {
-                   InternalLogging.warn(TAG, "Could not load sdk version from gradle.properties or manifest");
+                    InternalLogging.warn(TAG, "Could not load sdk version from gradle.properties or manifest");
                 }
             } catch (PackageManager.NameNotFoundException exception) {
                 InternalLogging.warn(TAG, "Error loading SDK version from manifest");
