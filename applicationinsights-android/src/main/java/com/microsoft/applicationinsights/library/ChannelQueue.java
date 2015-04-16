@@ -51,8 +51,6 @@ class ChannelQueue {
      */
     private TimerTask scheduledPersistenceTask;
 
-    protected Sender sender; //TODO Remove reference to sender from queue?
-
     /**
      * Prevent external instantiation
      */
@@ -66,7 +64,6 @@ class ChannelQueue {
     /**
      * Set the isCrashing flag
      *
-        this.sender = Sender.getInstance();// don't hold reference to this?
      * @param isCrashing if true the app is assumed to be crashing and data will be written to disk
      */
     protected void setIsCrashing(Boolean isCrashing) {
