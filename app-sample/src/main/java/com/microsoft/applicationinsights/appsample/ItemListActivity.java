@@ -5,6 +5,11 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
+import com.microsoft.applicationinsights.library.config.QueueConfig;
+import com.microsoft.applicationinsights.library.config.SenderConfig;
+import com.microsoft.applicationinsights.library.config.SessionConfig;
+
+import java.util.HashMap;
 
 /**
  * An activity representing a list of Items. This activity
@@ -49,12 +54,24 @@ public class ItemListActivity extends FragmentActivity
                     .findFragmentById(R.id.item_list))
                     .setActivateOnItemClick(true);
         }
+        ApplicationInsights.setup(this, getApplication());
 
-        ApplicationInsights.setup(this);
+        SessionConfig sessionConfig = ApplicationInsights.getSessionConfig();
+        sessionConfig.setSessionIntervalMs(30000);
+
+        SenderConfig senderConfig = ApplicationInsights.getSenderConfig();
+        senderConfig.setEndpointUrl("http://dc.services.visualstudio.com/v2/track");
+
+        QueueConfig queueConfig = ApplicationInsights.getQueueConfig();
+        queueConfig.setMaxBatchCount(45);
+
+        ApplicationInsights.setDeveloperMode(false);
+
+        HashMap<String, String> properties = new HashMap<String,String>();
+        properties.put("Hometown", "Karlsruhe");
+        ApplicationInsights.setCommonProperties(properties);
+
         ApplicationInsights.start();
-
-        // track activity lifecycle (note this only needs to be done once per application)
-        ApplicationInsights.enableActivityTracking(this.getApplication());
     }
 
     /**
