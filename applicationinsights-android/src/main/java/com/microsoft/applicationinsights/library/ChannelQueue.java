@@ -61,10 +61,10 @@ class ChannelQueue {
     /**
      * Prevent external instantiation
      */
-    protected ChannelQueue() {
+    protected ChannelQueue(QueueConfig queueConfig) {
         this.list = new LinkedList<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", true);
-        this.config = new QueueConfig();
+        this.config = queueConfig;
         this.isCrashing = false;
         this.sender = Sender.getInstance();// don't hold reference to this?
     }

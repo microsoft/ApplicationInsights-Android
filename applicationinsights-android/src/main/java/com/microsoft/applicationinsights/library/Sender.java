@@ -62,13 +62,13 @@ class Sender {
     /**
      * Initialize the INSTANCE of sender.
      */
-    protected static void initialize() {
+    protected static void initialize(SenderConfig config) {
         // note: isSenderLoaded must be volatile for the double-checked LOCK to work
         if (!Sender.isSenderLoaded) {
             synchronized (Sender.LOCK) {
                 if (!Sender.isSenderLoaded) {
                     Sender.isSenderLoaded = true;
-                    Sender.instance = new Sender(new SenderConfig());
+                    Sender.instance = new Sender(config);
                 }
             }
         }
@@ -78,7 +78,6 @@ class Sender {
      * @return the INSTANCE of the sender calls initialize before that.
      */
     protected static Sender getInstance() {
-        initialize();
         if (Sender.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }

@@ -18,7 +18,7 @@ public class SessionConfig extends Config {
     /**
      * Constructs a new INSTANCE of SessionConfig
      */
-    protected SessionConfig() {
+    public SessionConfig() {
         super();
         this.sessionIntervalMs = SessionConfig.SESSION_INTERVAL;
     }

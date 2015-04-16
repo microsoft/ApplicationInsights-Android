@@ -6,6 +6,9 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.microsoft.applicationinsights.library.config.QueueConfig;
+import com.microsoft.applicationinsights.library.config.SenderConfig;
+import com.microsoft.applicationinsights.library.config.SessionConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Map;
@@ -22,6 +25,12 @@ public enum ApplicationInsights {
      * A flag which determines, if developer mode (logging) should be enabled.
      */
     private static boolean DEVELOPER_MODE;
+
+    private SessionConfig sessionConfig;
+
+    private QueueConfig queueConfig;
+
+    private SenderConfig senderConfig;
 
     /**
      * A flag, which determines if auto collection of sessions and page views should be disabled.
@@ -69,6 +78,9 @@ public enum ApplicationInsights {
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
         this.autoCollectionDisabled = false;
+        this.senderConfig = new SenderConfig();
+        this.queueConfig = new QueueConfig();
+        this.sessionConfig = new SessionConfig();
         setDeveloperMode(Util.isEmulator() || Util.isDebuggerAttached());
     }
 
@@ -169,11 +181,13 @@ public enum ApplicationInsights {
 
             TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
             EnvelopeFactory.INSTANCE.configure(telemetryContext, this.commonProperties);
+            Sender.initialize(this.senderConfig);
+            Channel.initialize(this.queueConfig);
 
             // Start autocollection feature
             TelemetryClient.initialize(!telemetryDisabled);
             if(!this.telemetryDisabled && !this.autoCollectionDisabled){
-                LifeCycleTracking.initialize(telemetryContext);
+                LifeCycleTracking.initialize(telemetryContext, this.sessionConfig);
                 if(this.application != null){
                     TelemetryClient.getInstance().enableActivityTracking(this.application);
                 }else{
@@ -356,5 +370,29 @@ public enum ApplicationInsights {
                 "android:name=\"com.microsoft.applicationinsights.instrumentationKey\"\n" +
                 "android:value=\"${AI_INSTRUMENTATION_KEY}\" />";
         InternalLogging.error("MissingInstrumentationkey", instructions + "\n" + manifestSnippet);
+    }
+
+    public static SessionConfig getSessionConfig() {
+        return INSTANCE.sessionConfig;
+    }
+
+    public static void setSessionConfig(SessionConfig sessionConfig) {
+        INSTANCE.sessionConfig = sessionConfig;
+    }
+
+    public static QueueConfig getQueueConfig() {
+        return INSTANCE.queueConfig;
+    }
+
+    public static void setQueueConfig(QueueConfig queueConfig) {
+        INSTANCE.queueConfig = queueConfig;
+    }
+
+    public static SenderConfig getSenderConfig() {
+        return INSTANCE.senderConfig;
+    }
+
+    public static void setSenderConfig(SenderConfig senderConfig) {
+        INSTANCE.senderConfig = senderConfig;
     }
 }
