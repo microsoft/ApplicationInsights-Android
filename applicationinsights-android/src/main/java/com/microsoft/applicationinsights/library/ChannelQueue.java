@@ -24,12 +24,7 @@ class ChannelQueue {
     /**
      * The synchronization LOCK for queueing items
      */
-    private static final Object LOCK = new Object();
-
-    /**
-     * The singleton INSTANCE
-     */
-    public static final ChannelQueue INSTANCE = new ChannelQueue();
+    private final Object LOCK = new Object();
 
     /**
      * The configuration for this queue
@@ -51,12 +46,12 @@ class ChannelQueue {
      */
     protected volatile boolean isCrashing;
 
-    protected Sender sender; //TODO Remove reference to sender from queue?
-
     /**
      * All tasks which have been scheduled and not cancelled
      */
     private TimerTask scheduledPersistenceTask;
+
+    protected Sender sender; //TODO Remove reference to sender from queue?
 
     /**
      * Prevent external instantiation
@@ -66,23 +61,16 @@ class ChannelQueue {
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = queueConfig;
         this.isCrashing = false;
-        this.sender = Sender.getInstance();// don't hold reference to this?
     }
 
     /**
      * Set the isCrashing flag
      *
+        this.sender = Sender.getInstance();// don't hold reference to this?
      * @param isCrashing if true the app is assumed to be crashing and data will be written to disk
      */
     protected void setIsCrashing(Boolean isCrashing) {
         this.isCrashing = isCrashing;
-    }
-
-    /**
-     * @return The configuration for this sender
-     */
-    protected QueueConfig getConfig() {
-        return config;
     }
 
     /**
@@ -91,6 +79,13 @@ class ChannelQueue {
      * @param item a telemetry item to enqueue
      * @return true if the item was successfully added to the queue
      */
+     * @return The configuration for this sender
+     */
+    protected QueueConfig getConfig() {
+        return config;
+    }
+
+    /**
     protected boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
         if (item == null) {
@@ -98,7 +93,7 @@ class ChannelQueue {
         }
 
         boolean success;
-        synchronized (ChannelQueue.LOCK) {
+        synchronized (this.LOCK) {
             // attempt to add the item to the queue
             success = this.list.add(item);
 
@@ -129,7 +124,7 @@ class ChannelQueue {
         }
 
         IJsonSerializable[] data = null;
-        synchronized (ChannelQueue.LOCK) {
+        synchronized (this.LOCK) {
             if (!list.isEmpty()) {
                 data = new IJsonSerializable[list.size()];
                 list.toArray(data);
