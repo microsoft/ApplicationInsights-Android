@@ -7,7 +7,7 @@ public class QueueConfig extends Config {
     private static final int DEBUG_MAX_BATCH_COUNT = 5;
     private static final int DEBUG_MAX_BATCH_INTERVAL_MS = 3 * 1000;
     private static final int DEFAULT_MAX_BATCH_COUNT = 100;
-    private static final int DEFAULT_MAX_BATCH_INTERVAL_MS = 3 * 1000;
+    private static final int DEFAULT_MAX_BATCH_INTERVAL_MS = 15 * 1000;
 
     /**
      * The maximum size of a batch in bytes
