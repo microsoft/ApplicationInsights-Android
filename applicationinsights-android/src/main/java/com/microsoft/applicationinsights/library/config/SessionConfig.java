@@ -1,6 +1,4 @@
-package com.microsoft.applicationinsights.library;
-
-import android.content.Context;
+package com.microsoft.applicationinsights.library.config;
 
 /**
  * Configuration object when instantiating TelemetryClient

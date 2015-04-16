@@ -1,4 +1,6 @@
-package com.microsoft.applicationinsights.library;
+package com.microsoft.applicationinsights.library.config;
+
+import com.microsoft.applicationinsights.library.ApplicationInsights;
 
 public class QueueConfig extends Config {
 

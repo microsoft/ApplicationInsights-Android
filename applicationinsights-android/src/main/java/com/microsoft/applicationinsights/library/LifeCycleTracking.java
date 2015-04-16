@@ -6,6 +6,7 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.microsoft.applicationinsights.library.config.SessionConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Date;

@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
 
+import com.microsoft.applicationinsights.library.config.SenderConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.io.BufferedReader;

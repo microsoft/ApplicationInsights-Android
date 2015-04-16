@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.library;
+package com.microsoft.applicationinsights.library.config;
 
 public class SenderConfig extends Config{
 

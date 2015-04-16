@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.library;
+package com.microsoft.applicationinsights.library.config;
 
 abstract class Config {
 

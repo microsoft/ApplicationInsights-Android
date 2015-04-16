@@ -3,6 +3,7 @@ package com.microsoft.applicationinsights.library;
 import android.os.AsyncTask;
 
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.library.config.QueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.LinkedList;
