@@ -102,7 +102,7 @@ public enum ApplicationInsights {
      * @param application the application needed for auto collecting telemetry data
      */
     public static void setup(Context context, Application application){
-        ApplicationInsights.INSTANCE.setupInstance(context, null, null);
+        ApplicationInsights.INSTANCE.setupInstance(context, application, null);
     }
 
     /**
