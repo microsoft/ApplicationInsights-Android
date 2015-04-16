@@ -7,7 +7,7 @@ import com.microsoft.applicationinsights.logging.InternalLogging;
 /**
  * This class records telemetry for application insights.
  */
-public class Channel {
+class Channel {
     private static final String TAG = "Channel";
 
     /**

@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * The public API for auto collecting application insights telemetry.
  */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
+class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
 
     /**
      * The activity counter

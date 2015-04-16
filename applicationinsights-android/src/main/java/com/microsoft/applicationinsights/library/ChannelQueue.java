@@ -13,7 +13,7 @@ import java.util.TimerTask;
 /**
  * This singleton class sends data to the endpoint
  */
-public class ChannelQueue {
+class ChannelQueue {
 
     /**
      * Logging tag for this class

@@ -16,7 +16,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class Persistence {
+class Persistence {
 
     /**
      * Volatile boolean for double checked synchronize block

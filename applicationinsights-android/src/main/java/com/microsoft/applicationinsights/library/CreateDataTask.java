@@ -6,7 +6,7 @@ import com.microsoft.applicationinsights.contracts.Envelope;
 
 import java.util.Map;
 
-public class CreateDataTask extends AsyncTask<Void, Void, Void> {
+class CreateDataTask extends AsyncTask<Void, Void, Void> {
 
     protected enum DataType {
         NONE,

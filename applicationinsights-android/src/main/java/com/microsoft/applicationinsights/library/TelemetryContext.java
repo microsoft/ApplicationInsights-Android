@@ -30,7 +30,7 @@ import java.util.UUID;
 /**
  * This class is holding all telemetryContext information.
  */
-public class TelemetryContext {
+class TelemetryContext {
 
     protected static final String SHARED_PREFERENCES_KEY = "APP_INSIGHTS_CONTEXT";
     protected static final String USER_ID_KEY = "USER_ID";

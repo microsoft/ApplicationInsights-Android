@@ -8,7 +8,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ExceptionTracking implements UncaughtExceptionHandler {
+class ExceptionTracking implements UncaughtExceptionHandler {
     private static final Object LOCK = new Object();
     private static String TAG = "ExceptionHandler";
 

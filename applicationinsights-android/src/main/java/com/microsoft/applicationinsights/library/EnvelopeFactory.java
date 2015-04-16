@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public enum EnvelopeFactory {
+enum EnvelopeFactory {
     INSTANCE;
 
     protected static final int CONTRACT_VERSION = 2;

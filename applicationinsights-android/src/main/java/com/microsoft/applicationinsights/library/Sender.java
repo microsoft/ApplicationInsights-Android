@@ -23,7 +23,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * This singleton class sends data to the endpoint.
  */
-public class Sender {
+class Sender {
 
     private static final String TAG = "Sender";
 

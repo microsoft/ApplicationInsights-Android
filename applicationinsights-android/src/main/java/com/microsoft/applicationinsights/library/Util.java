@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class Util {
+class Util {
 
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
     private static final DateFormat DATE_FORMAT =
