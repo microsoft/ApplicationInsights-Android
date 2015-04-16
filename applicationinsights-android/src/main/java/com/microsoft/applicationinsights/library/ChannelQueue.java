@@ -76,13 +76,6 @@ class ChannelQueue {
      * @param item a telemetry item to enqueue
      * @return true if the item was successfully added to the queue
      */
-     * @return The configuration for this sender
-     */
-    protected QueueConfig getConfig() {
-        return config;
-    }
-
-    /**
     protected boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
         if (item == null) {
