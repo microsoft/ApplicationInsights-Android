@@ -41,7 +41,7 @@ class Sender {
     /**
      * The configuration for this sender.
      */
-    protected final TelemetryConfig config;
+    protected final SenderConfig config;
 
     /**
      * The shared Sender instance.
@@ -54,7 +54,7 @@ class Sender {
      * Restrict access to the default constructor
      * @param config the telemetryconfig object used to configure the telemetry module
      */
-    protected Sender(TelemetryConfig config) {
+    protected Sender(SenderConfig config) {
         this.config = config;
     }
 
@@ -67,7 +67,7 @@ class Sender {
             synchronized (Sender.LOCK) {
                 if (!Sender.isSenderLoaded) {
                     Sender.isSenderLoaded = true;
-                    Sender.instance = new Sender(new TelemetryConfig());
+                    Sender.instance = new Sender(new SenderConfig());
                 }
             }
         }

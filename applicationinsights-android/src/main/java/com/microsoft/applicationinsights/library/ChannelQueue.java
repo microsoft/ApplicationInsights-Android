@@ -33,7 +33,7 @@ class ChannelQueue {
     /**
      * The configuration for this queue
      */
-    protected final TelemetryConfig config;
+    protected final QueueConfig config;
 
     /**
      * The timer for this queue
@@ -63,7 +63,7 @@ class ChannelQueue {
     protected ChannelQueue() {
         this.list = new LinkedList<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", true);
-        this.config = new TelemetryConfig();
+        this.config = new QueueConfig();
         this.isCrashing = false;
         this.sender = Sender.getInstance();// don't hold reference to this?
     }
@@ -80,7 +80,7 @@ class ChannelQueue {
     /**
      * @return The configuration for this sender
      */
-    protected TelemetryConfig getConfig() {
+    protected QueueConfig getConfig() {
         return config;
     }
 
