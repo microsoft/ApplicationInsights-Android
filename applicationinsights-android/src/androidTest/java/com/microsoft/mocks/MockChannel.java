@@ -1,7 +1,7 @@
 package com.microsoft.mocks;
 
-import com.microsoft.applicationinsights.internal.Channel;
-import com.microsoft.applicationinsights.internal.ChannelQueue;
+import com.microsoft.applicationinsights.library.Channel;
+import com.microsoft.applicationinsights.library.ChannelQueue;
 
 public class MockChannel extends Channel {
     public MockChannel() {

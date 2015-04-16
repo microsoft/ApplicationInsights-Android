@@ -3,7 +3,9 @@ package com.microsoft.applicationinsights;
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.internal.ChannelQueue;
+import com.microsoft.applicationinsights.library.ApplicationInsights;
+import com.microsoft.applicationinsights.library.ChannelQueue;
+import com.microsoft.applicationinsights.library.ExceptionTracking;
 import com.microsoft.mocks.MockActivity;
 
 import junit.framework.Assert;

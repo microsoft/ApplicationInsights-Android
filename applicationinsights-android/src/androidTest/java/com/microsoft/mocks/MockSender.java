@@ -1,7 +1,7 @@
 package com.microsoft.mocks;
 
-import com.microsoft.applicationinsights.internal.Sender;
-import com.microsoft.applicationinsights.internal.TelemetryConfig;
+import com.microsoft.applicationinsights.library.Sender;
+import com.microsoft.applicationinsights.library.TelemetryConfig;
 
 import java.io.IOException;
 import java.io.Writer;

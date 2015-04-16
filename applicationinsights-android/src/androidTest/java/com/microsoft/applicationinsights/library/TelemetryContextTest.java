@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.internal;
+package com.microsoft.applicationinsights.library;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.SessionConfig;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockTelemetryContext;
 

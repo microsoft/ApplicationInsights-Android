@@ -1,14 +1,9 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.library;
 
 import android.app.Application;
 import android.content.Context;
 
-import com.microsoft.applicationinsights.internal.Channel;
-import com.microsoft.applicationinsights.internal.EnvelopeFactory;
-import com.microsoft.applicationinsights.internal.Sender;
-import com.microsoft.applicationinsights.internal.TelemetryContext;
-import com.microsoft.applicationinsights.internal.Util;
-import com.microsoft.applicationinsights.internal.logging.InternalLogging;
+import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Map;
 
@@ -204,7 +199,7 @@ public enum ApplicationInsights {
     /**
      * Triggers persisting and if applicable sending of queued data
      * note: this will be called
-     * {@link com.microsoft.applicationinsights.internal.TelemetryConfig#maxBatchIntervalMs} after
+     * {@link TelemetryConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
@@ -218,7 +213,7 @@ public enum ApplicationInsights {
 
     /**
      * Enable auto page view tracking as well as auto session tracking. This will only work, if
-     * {@link com.microsoft.applicationinsights.ApplicationInsights#telemetryDisabled} is set to false.
+     * {@link ApplicationInsights#telemetryDisabled} is set to false.
      * @deprecated This method is deprecated: Use setAutoCollectionDisabled instead.
      * @param application the application used to register the life cycle callbacks
      */

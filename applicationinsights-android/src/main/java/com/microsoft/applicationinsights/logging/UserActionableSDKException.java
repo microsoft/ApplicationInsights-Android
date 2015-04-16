@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.internal.logging;
+package com.microsoft.applicationinsights.logging;
 
 /**
  * This exception is only thrown if {@code TelemetryQueueConfig.developerMode} is true. If this is

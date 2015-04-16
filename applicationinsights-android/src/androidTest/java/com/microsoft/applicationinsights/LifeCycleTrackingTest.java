@@ -14,6 +14,7 @@ import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.library.ApplicationInsights;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockApplication;
 import com.microsoft.mocks.MockLifeCycleTracking;

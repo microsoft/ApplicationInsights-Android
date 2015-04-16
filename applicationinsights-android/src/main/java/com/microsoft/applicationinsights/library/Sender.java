@@ -1,11 +1,10 @@
-package com.microsoft.applicationinsights.internal;
+package com.microsoft.applicationinsights.library;
 
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
 
-import com.microsoft.applicationinsights.ApplicationInsights;
-import com.microsoft.applicationinsights.internal.logging.InternalLogging;
+import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.io.BufferedReader;
 import java.io.File;

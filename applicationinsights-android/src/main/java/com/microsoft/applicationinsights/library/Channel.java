@@ -1,8 +1,8 @@
-package com.microsoft.applicationinsights.internal;
+package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.internal.logging.InternalLogging;
+import com.microsoft.applicationinsights.logging.InternalLogging;
 
 /**
  * This class records telemetry for application insights.

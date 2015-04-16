@@ -1,8 +1,6 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.library;
 
 import android.content.Context;
-
-import com.microsoft.applicationinsights.internal.ChannelConfig;
 
 /**
  * Configuration object when instantiating TelemetryClient

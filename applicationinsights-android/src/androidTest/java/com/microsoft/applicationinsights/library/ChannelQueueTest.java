@@ -1,6 +1,5 @@
-package com.microsoft.applicationinsights.internal;
+package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.ApplicationInsights;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 

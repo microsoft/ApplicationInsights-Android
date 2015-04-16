@@ -1,6 +1,6 @@
 package com.microsoft.mocks;
 
-import com.microsoft.applicationinsights.internal.ChannelQueue;
+import com.microsoft.applicationinsights.library.ChannelQueue;
 
 import java.util.concurrent.CountDownLatch;
 

@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.ApplicationInsights;
-import com.microsoft.applicationinsights.internal.Channel;
-import com.microsoft.applicationinsights.internal.ChannelConfig;
-import com.microsoft.applicationinsights.internal.TelemetryConfig;
+import com.microsoft.applicationinsights.library.ApplicationInsights;
+import com.microsoft.applicationinsights.library.Channel;
+import com.microsoft.applicationinsights.library.ChannelConfig;
+import com.microsoft.applicationinsights.library.TelemetryConfig;
 import com.microsoft.mocks.MockActivity;
 import com.microsoft.mocks.MockChannel;
 import com.microsoft.mocks.MockQueue;

@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.library;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -6,9 +6,7 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.microsoft.applicationinsights.internal.CreateDataTask;
-import com.microsoft.applicationinsights.internal.TelemetryContext;
-import com.microsoft.applicationinsights.internal.logging.InternalLogging;
+import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;

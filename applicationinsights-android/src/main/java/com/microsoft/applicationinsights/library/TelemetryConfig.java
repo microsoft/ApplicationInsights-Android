@@ -1,6 +1,4 @@
-package com.microsoft.applicationinsights.internal;
-
-import com.microsoft.applicationinsights.ApplicationInsights;
+package com.microsoft.applicationinsights.library;
 
 public class TelemetryConfig {
 

@@ -1,9 +1,8 @@
-package com.microsoft.applicationinsights.internal.logging;
+package com.microsoft.applicationinsights.logging;
 
 import android.util.Log;
 
-import com.microsoft.applicationinsights.ApplicationInsights;
-import com.microsoft.applicationinsights.internal.ChannelQueue;
+import com.microsoft.applicationinsights.library.ApplicationInsights;
 
 public class InternalLogging {
     private static final String PREFIX = InternalLogging.class.getPackage().getName();

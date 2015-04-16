@@ -3,6 +3,7 @@ package com.microsoft.applicationinsights;
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 
+import com.microsoft.applicationinsights.library.ApplicationInsights;
 import com.microsoft.mocks.MockActivity;
 
 public class SessionConfigTest extends ActivityUnitTestCase<MockActivity> {

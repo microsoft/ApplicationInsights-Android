@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-import com.microsoft.applicationinsights.ApplicationInsights;
+import com.microsoft.applicationinsights.library.ApplicationInsights;
 
 /**
  * An activity representing a list of Items. This activity

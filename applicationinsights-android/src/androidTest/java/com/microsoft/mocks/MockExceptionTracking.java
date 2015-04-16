@@ -2,7 +2,7 @@ package com.microsoft.mocks;
 
 import android.content.Context;
 
-import com.microsoft.applicationinsights.ExceptionTracking;
+import com.microsoft.applicationinsights.library.ExceptionTracking;
 
 public class MockExceptionTracking extends ExceptionTracking {
 

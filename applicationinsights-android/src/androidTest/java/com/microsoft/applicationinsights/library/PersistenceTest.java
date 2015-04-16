@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.internal;
+package com.microsoft.applicationinsights.library;
 
 import android.test.AndroidTestCase;
 

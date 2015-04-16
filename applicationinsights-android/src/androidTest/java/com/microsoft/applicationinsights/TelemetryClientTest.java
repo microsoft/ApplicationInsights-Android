@@ -3,6 +3,7 @@ package com.microsoft.applicationinsights;
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 
+import com.microsoft.applicationinsights.library.TelemetryClient;
 import com.microsoft.mocks.MockActivity;
 
 import junit.framework.Assert;

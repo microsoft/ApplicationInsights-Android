@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.internal;
+package com.microsoft.applicationinsights.library;
 
 
 import com.microsoft.applicationinsights.contracts.CrashData;
@@ -17,7 +17,7 @@ import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
-import com.microsoft.applicationinsights.internal.logging.InternalLogging;
+import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.ArrayList;
 import java.util.Date;

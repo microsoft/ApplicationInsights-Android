@@ -1,9 +1,8 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.library;
 
 import android.app.Application;
 
-import com.microsoft.applicationinsights.internal.CreateDataTask;
-import com.microsoft.applicationinsights.internal.logging.InternalLogging;
+import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Map;
 

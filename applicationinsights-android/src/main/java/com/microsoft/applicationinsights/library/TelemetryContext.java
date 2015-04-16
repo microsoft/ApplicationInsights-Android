@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.internal;
+package com.microsoft.applicationinsights.library;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -19,7 +19,7 @@ import com.microsoft.applicationinsights.contracts.Internal;
 import com.microsoft.applicationinsights.contracts.Operation;
 import com.microsoft.applicationinsights.contracts.Session;
 import com.microsoft.applicationinsights.contracts.User;
-import com.microsoft.applicationinsights.internal.logging.InternalLogging;
+import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
