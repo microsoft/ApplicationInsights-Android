@@ -56,7 +56,7 @@ public enum EnvelopeFactory {
      *
      * @param context the telemetry context, which is used to create envelops with proper context information.
      */
-    public void configure(TelemetryContext context) {
+    protected void configure(TelemetryContext context) {
         this.configure(context, null);
     }
 
@@ -67,7 +67,7 @@ public enum EnvelopeFactory {
      * @param context          the telemetry context, which is used to create envelops with proper context information.
      * @param commonProperties Map of properties
      */
-    public void configure(TelemetryContext context, Map<String, String> commonProperties) {
+    protected void configure(TelemetryContext context, Map<String, String> commonProperties) {
         this.context = context;
         this.commonProperties = commonProperties;
         this.configured = true;
@@ -129,7 +129,7 @@ public enum EnvelopeFactory {
      * @param measurements Custom measurements associated with the event
      * @return an Envelope object, which contains an event
      */
-    public Envelope createEventEnvelope(String eventName,
+    protected Envelope createEventEnvelope(String eventName,
                                         Map<String, String> properties,
                                         Map<String, Double> measurements) {
         Envelope envelope = null;
@@ -152,7 +152,7 @@ public enum EnvelopeFactory {
      * @param properties Custom properties associated with the event
      * @return an Envelope object, which contains a trace
      */
-    public Envelope createTraceEnvelope(String message, Map<String, String> properties) {
+    protected Envelope createTraceEnvelope(String message, Map<String, String> properties) {
         Envelope envelope = null;
         if (isConfigured()) {
             MessageData telemetry = new MessageData();
@@ -172,7 +172,7 @@ public enum EnvelopeFactory {
      * @param value The value of the metric
      * @return an Envelope object, which contains a metric
      */
-    public Envelope createMetricEnvelope(String name, double value) {
+    protected Envelope createMetricEnvelope(String name, double value) {
         Envelope envelope = null;
         if (isConfigured()) {
             MetricData telemetry = new MetricData();
@@ -201,7 +201,7 @@ public enum EnvelopeFactory {
      * @param properties Custom properties associated with the event
      * @return an Envelope object, which contains a handled or unhandled exception
      */
-    public Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
+    protected Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
         Envelope envelope = null;
         if (isConfigured()) {
             CrashData telemetry = this.getCrashData(exception, properties);
@@ -220,7 +220,7 @@ public enum EnvelopeFactory {
      * @param measurements Custom measurements associated with the event
      * @return an Envelope object, which contains a page view
      */
-    public Envelope createPageViewEnvelope(
+    protected Envelope createPageViewEnvelope(
           String pageName,
           Map<String, String> properties,
           Map<String, Double> measurements) {
@@ -243,7 +243,7 @@ public enum EnvelopeFactory {
      *
      * @return an Envelope object, which contains a session
      */
-    public Envelope createNewSessionEnvelope() {
+    protected Envelope createNewSessionEnvelope() {
         Envelope envelope = null;
         if (isConfigured()) {
             SessionStateData telemetry = new SessionStateData();

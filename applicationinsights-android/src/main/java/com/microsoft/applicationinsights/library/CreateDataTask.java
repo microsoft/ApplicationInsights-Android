@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class CreateDataTask extends AsyncTask<Void, Void, Void> {
 
-    public enum DataType {
+    protected enum DataType {
         NONE,
         EVENT,
         TRACE,
@@ -26,17 +26,17 @@ public class CreateDataTask extends AsyncTask<Void, Void, Void> {
     private double metric;
     private Throwable exception;
 
-    public CreateDataTask(DataType type){
+    protected CreateDataTask(DataType type){
         this.type = type;
     }
 
-    public CreateDataTask(DataType type, String metricName, double metric){
+    protected CreateDataTask(DataType type, String metricName, double metric){
         this.type = type;
         this.name = metricName;
         this.metric = metric;
     }
 
-    public CreateDataTask(DataType type,
+    protected CreateDataTask(DataType type,
                                     String name,
                                     Map<String,String> properties,
                                     Map<String, Double> measurements){
@@ -46,7 +46,7 @@ public class CreateDataTask extends AsyncTask<Void, Void, Void> {
         this.measurements = measurements;
     }
 
-    public CreateDataTask(DataType type,
+    protected CreateDataTask(DataType type,
                                     Throwable exception,
                                     Map<String,String> properties){
         this.type = type;

@@ -32,7 +32,7 @@ public class Util {
      * @param date the date object to be formatted
      * @return an ISO 8601 string representation of the date
      */
-    public static String dateToISO8601(Date date) {
+    protected static String dateToISO8601(Date date) {
         Date localDate = date;
         if (localDate == null) {
             localDate = new Date();
@@ -47,7 +47,7 @@ public class Util {
      * @param durationMs the duration in milliseconds
      * @return a string representation of the time span
      */
-    public static String msToTimeSpan(long durationMs) {
+    protected static String msToTimeSpan(long durationMs) {
         long localDurationMs = durationMs;
         if (localDurationMs <= 0) {
             localDurationMs = 0;
@@ -76,7 +76,7 @@ public class Util {
      * @param input the string to hash.
      * @return a SHA-256 hash of the input or the empty string.
      */
-    public static String tryHashStringSha256(String input) {
+    protected static String tryHashStringSha256(String input) {
         String salt = "oRq=MAHHHC~6CCe|JfEqRZ+gc0ESI||g2Jlb^PYjc5UYN2P 27z_+21xxd2n";
         try {
             // Get a Sha256 digest
@@ -100,11 +100,11 @@ public class Util {
         }
     }
 
-    public static boolean isEmulator() {
+    protected static boolean isEmulator() {
         return Build.BRAND.equalsIgnoreCase("generic");
     }
 
-    public static boolean isDebuggerAttached() {
+    protected static boolean isDebuggerAttached() {
         return Debug.isDebuggerConnected();
     }
 }

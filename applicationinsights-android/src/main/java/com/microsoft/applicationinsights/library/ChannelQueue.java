@@ -73,14 +73,14 @@ public class ChannelQueue {
      *
      * @param isCrashing if true the app is assumed to be crashing and data will be written to disk
      */
-    public void setIsCrashing(Boolean isCrashing) {
+    protected void setIsCrashing(Boolean isCrashing) {
         this.isCrashing = isCrashing;
     }
 
     /**
      * @return The configuration for this sender
      */
-    public TelemetryConfig getConfig() {
+    protected TelemetryConfig getConfig() {
         return config;
     }
 
@@ -90,7 +90,7 @@ public class ChannelQueue {
      * @param item a telemetry item to enqueue
      * @return true if the item was successfully added to the queue
      */
-    public boolean enqueue(IJsonSerializable item) {
+    protected boolean enqueue(IJsonSerializable item) {
         // prevent invalid argument exception
         if (item == null) {
             return false;
@@ -121,7 +121,7 @@ public class ChannelQueue {
     /**
      * Empties the queue and sends all items to persistence
      */
-    public void flush() {
+    protected void flush() {
         // cancel the scheduled persistence task if it exists
         if (this.scheduledPersistenceTask != null) {
             this.scheduledPersistenceTask.cancel();
@@ -177,7 +177,5 @@ public class ChannelQueue {
             return null;
         }
     }
-
-
 }
 

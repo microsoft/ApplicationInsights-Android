@@ -37,7 +37,7 @@ public class Channel {
     protected Channel() {
     }
 
-    private static void initialize() {
+    protected static void initialize() {
         // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
         if (!Channel.isChannelLoaded) {
             synchronized (Channel.LOCK) {
@@ -53,7 +53,7 @@ public class Channel {
     /**
      * @return the INSTANCE of persistence or null if not yet initialized
      */
-    public static Channel getInstance() {
+    protected static Channel getInstance() {
         initialize();
         if (Channel.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
@@ -62,14 +62,14 @@ public class Channel {
         return Channel.instance;
     }
 
-    public void synchronize() {
+    protected void synchronize() {
         getQueue().flush();
     }
 
     /**
      * @return the sender for this channel.
      */
-    public ChannelQueue getQueue() {
+    protected ChannelQueue getQueue() {
         return this.queue;
     }
 
@@ -87,7 +87,7 @@ public class Channel {
      *
      * @param envelope the envelope object to record
      */
-    public void enqueue(Envelope envelope) {
+    protected void enqueue(Envelope envelope) {
         this.queue.isCrashing = false;
 
         // enqueue to queue
@@ -96,7 +96,7 @@ public class Channel {
         InternalLogging.info(TAG, "enqueued telemetry", envelope.getName());
     }
 
-    public void processUnhandledException(Envelope envelope) {
+    protected void processUnhandledException(Envelope envelope) {
         this.queue.isCrashing = true;
         this.queue.flush();
 

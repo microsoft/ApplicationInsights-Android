@@ -40,7 +40,7 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
      *
      * @param context the context associated with uncaught exceptions
      */
-    public static void registerExceptionHandler(Context context) {
+    protected static void registerExceptionHandler(Context context) {
         ExceptionTracking.registerExceptionHandler(context, false);
     }
 
@@ -50,7 +50,7 @@ public class ExceptionTracking implements UncaughtExceptionHandler {
      * @param context              the context associated with uncaught exceptions
      * @param ignoreDefaultHandler if true the default exception handler will be ignored
      */
-    public static void registerExceptionHandler(Context context, boolean ignoreDefaultHandler) {
+    protected static void registerExceptionHandler(Context context, boolean ignoreDefaultHandler) {
         synchronized (ExceptionTracking.LOCK) {
             UncaughtExceptionHandler preexistingExceptionHandler =
                   Thread.getDefaultUncaughtExceptionHandler();

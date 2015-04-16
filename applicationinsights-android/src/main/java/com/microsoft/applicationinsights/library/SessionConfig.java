@@ -22,7 +22,7 @@ public class SessionConfig extends ChannelConfig {
      *
      * @param context The android app context
      */
-    public SessionConfig(Context context) {
+    protected SessionConfig(Context context) {
         super(context);
         this.sessionIntervalMs = SessionConfig.SESSION_INTERVAL;
     }

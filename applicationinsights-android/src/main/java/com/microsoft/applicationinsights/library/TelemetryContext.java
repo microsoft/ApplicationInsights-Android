@@ -107,7 +107,7 @@ public class TelemetryContext {
      *
      * @param appContext the context for this telemetryContext
      */
-    public TelemetryContext(Context appContext, String instrumentationKey) {
+    protected TelemetryContext(Context appContext, String instrumentationKey) {
 
         this.operation = new Operation();
 
@@ -147,7 +147,7 @@ public class TelemetryContext {
      * Get user the instrumentationKey.
      * @return the instrumentation key
      */
-    public String getInstrumentationKey() {
+    protected String getInstrumentationKey() {
         return instrumentationKey;
     }
 
@@ -156,7 +156,7 @@ public class TelemetryContext {
      * Get user telemetryContext.
      * @return the user object
      */
-    public User getUser() {
+    protected User getUser() {
         return user;
     }
 
@@ -164,7 +164,7 @@ public class TelemetryContext {
      * Get device telemetryContext.
      * @return the device object
      */
-    public Device getDevice() {
+    protected Device getDevice() {
         return device;
     }
 
@@ -172,7 +172,7 @@ public class TelemetryContext {
      * Operation telemetryContext.
      * @return the operation
      */
-    public Operation getOperation() {
+    protected Operation getOperation() {
         return operation;
     }
 
@@ -180,7 +180,7 @@ public class TelemetryContext {
      * Session telemetryContext.
      * @return the session
      */
-    public Session getSession() {
+    protected Session getSession() {
         return session;
     }
 
@@ -188,7 +188,7 @@ public class TelemetryContext {
      * Application telemetryContext.
      * @return the application
      */
-    public Application getApplication() {
+    protected Application getApplication() {
         return application;
     }
 
@@ -197,7 +197,7 @@ public class TelemetryContext {
      *
      * @see TelemetryContext#appIdForEnvelope
      */
-    public String getPackageName() {
+    protected String getPackageName() {
         return appIdForEnvelope;
     }
 
@@ -216,7 +216,7 @@ public class TelemetryContext {
         return cachedTags;
     }
 
-    public Map<String, String> getContextTags() {
+    protected Map<String, String> getContextTags() {
         Map<String, String> contextTags = new LinkedHashMap<String, String>();
         TelemetryContext.cachedTags.putAll(contextTags);
         TelemetryContext.device.addToHashMap(contextTags);
@@ -235,7 +235,7 @@ public class TelemetryContext {
      * found in settings and the isNew flag is set each time a new UUID is
      * generated.
      */
-    public static void renewSessionId() {
+    protected static void renewSessionId() {
         String newId = UUID.randomUUID().toString();
         TelemetryContext.session.setId(newId);
     }

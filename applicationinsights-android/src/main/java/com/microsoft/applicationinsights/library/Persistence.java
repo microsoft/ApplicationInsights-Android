@@ -66,7 +66,7 @@ public class Persistence {
      *
      * @param context the app context for the INSTANCE
      */
-    public static void initialize(Context context) {
+    protected static void initialize(Context context) {
         // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
         if (!Persistence.isPersistenceLoaded) {
             synchronized (Persistence.LOCK) {
@@ -81,7 +81,7 @@ public class Persistence {
     /**
      * @return the INSTANCE of persistence or null if not yet initialized
      */
-    public static Persistence getInstance() {
+    protected static Persistence getInstance() {
         if (Persistence.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }
@@ -176,7 +176,7 @@ public class Persistence {
      * @param file reference to a file on disk
      * @return the next item from disk or empty string if anything goes wrong
      */
-    public String load(File file) {
+    protected String load(File file) {
         StringBuilder buffer = new StringBuilder();
         if (file != null) {
             try {
@@ -203,7 +203,7 @@ public class Persistence {
      *
      * @return the next available file.
      */
-    public File nextAvailableFile() {
+    protected File nextAvailableFile() {
         File file = this.nextHighPrioFile();
         if (file != null) {
             return file;

@@ -76,7 +76,7 @@ public class Sender {
     /**
      * @return the INSTANCE of the sender calls initialize before that.
      */
-    public static Sender getInstance() {
+    protected static Sender getInstance() {
         initialize();
         if (Sender.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
@@ -86,7 +86,7 @@ public class Sender {
     }
 
 
-    public void sendDataOnAppStart() {
+    protected void sendDataOnAppStart() {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -96,7 +96,7 @@ public class Sender {
         }.execute();
     }
 
-    public void send() {
+    protected void send() {
         if(runningRequestCount() < 10) {
             // Send the persisted data
             Persistence persistence = Persistence.getInstance();
@@ -125,19 +125,19 @@ public class Sender {
         }
 }
 
-    private void addToRunning(String key, SendingTask task) {
+    protected void addToRunning(String key, SendingTask task) {
         synchronized (Sender.LOCK) {
             this.currentTasks.put(key, task);
         }
     }
 
-    private void removeFromRunning(String key) {
+    protected void removeFromRunning(String key) {
         synchronized (Sender.LOCK) {
             this.currentTasks.remove(key);
         }
     }
 
-    private int runningRequestCount() {
+    protected int runningRequestCount() {
         synchronized (Sender.LOCK) {
             return getInstance().currentTasks.size();
         }
