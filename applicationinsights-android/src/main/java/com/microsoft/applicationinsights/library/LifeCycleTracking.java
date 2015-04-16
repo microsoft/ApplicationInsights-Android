@@ -74,16 +74,15 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
     /**
      * Initialize the INSTANCE of lifecycle event tracking
      *
-     * @param config the session configuration for session tracking
      * @param telemetryContext the context, which is needed to renew sessions
      */
-    protected static void initialize(SessionConfig config, TelemetryContext telemetryContext) {
+    protected static void initialize(TelemetryContext telemetryContext) {
         // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
         if (!LifeCycleTracking.isLoaded) {
             synchronized (LifeCycleTracking.LOCK) {
                 if (!LifeCycleTracking.isLoaded) {
                     LifeCycleTracking.isLoaded = true;
-                    LifeCycleTracking.instance = new LifeCycleTracking(config, telemetryContext);
+                    LifeCycleTracking.instance = new LifeCycleTracking(new SessionConfig(), telemetryContext);
                 }
             }
         }

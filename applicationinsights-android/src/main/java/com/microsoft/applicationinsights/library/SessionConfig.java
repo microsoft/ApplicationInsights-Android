@@ -5,7 +5,7 @@ import android.content.Context;
 /**
  * Configuration object when instantiating TelemetryClient
  */
-class SessionConfig extends ChannelConfig {
+public class SessionConfig extends Config {
 
     /**
      * The interval at which sessions are renewed
@@ -18,12 +18,10 @@ class SessionConfig extends ChannelConfig {
     private long sessionIntervalMs;
 
     /**
-     * Constructs a new INSTANCE of TelemetryClientConfig
-     *
-     * @param context The android app context
+     * Constructs a new INSTANCE of SessionConfig
      */
-    protected SessionConfig(Context context) {
-        super(context);
+    protected SessionConfig() {
+        super();
         this.sessionIntervalMs = SessionConfig.SESSION_INTERVAL;
     }
 

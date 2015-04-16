@@ -2,6 +2,9 @@ package com.microsoft.applicationinsights.library;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.util.Log;
 
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
@@ -50,11 +53,6 @@ public enum ApplicationInsights {
      * The application needed for auto collecting telemetry data
      */
     private Application application;
-
-    /**
-     * The configuration for this telemetry client.
-     */
-    protected SessionConfig config;
 
     /**
      * Properties associated with this telemetryContext.
@@ -129,7 +127,6 @@ public enum ApplicationInsights {
         if(!isSetup) {
             if(context != null){
                 this.context = context;
-                this.config = new SessionConfig(this.context);
                 this.instrumentationKey = instrumentationKey;
                 this.application = application;
                 this.isSetup = true;
@@ -167,7 +164,7 @@ public enum ApplicationInsights {
             if(this.instrumentationKey != null){
                 iKey = this.instrumentationKey;
             }else{
-                iKey = config.getInstrumentationKey();
+                iKey = readInstrumentationKey(this.context);
             }
 
             TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
@@ -176,7 +173,7 @@ public enum ApplicationInsights {
             // Start autocollection feature
             TelemetryClient.initialize(!telemetryDisabled);
             if(!this.telemetryDisabled && !this.autoCollectionDisabled){
-                LifeCycleTracking.initialize(config, telemetryContext);
+                LifeCycleTracking.initialize(telemetryContext);
                 if(this.application != null){
                     TelemetryClient.getInstance().enableActivityTracking(this.application);
                 }else{
@@ -199,7 +196,7 @@ public enum ApplicationInsights {
     /**
      * Triggers persisting and if applicable sending of queued data
      * note: this will be called
-     * {@link TelemetryConfig#maxBatchIntervalMs} after
+     * {@link QueueConfig#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
@@ -313,36 +310,51 @@ public enum ApplicationInsights {
         INSTANCE.commonProperties = commonProperties;
     }
 
-    /**
-     * Gets the session configuration for the instance
-     * @return the instance session configuration
-     */
-    public static SessionConfig getConfig() {
-        return INSTANCE.config;
-    }
-
-    /**
-     * Sets the session configuration for the instance
-     */
-    public void setConfig(SessionConfig config) {
-        if(!isSetup){
-            InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
-                    "ApplicationInsights has not been setup correctly.");
-            return;
-        }
-        if(isRunning){
-            InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
-                    "ApplicationInsights has already been started.");
-            return;
-        }
-        INSTANCE.config = config;
-    }
-
     public static void setDeveloperMode(boolean developerMode) {
         DEVELOPER_MODE = developerMode;
     }
 
     public static boolean isDeveloperMode() {
         return DEVELOPER_MODE;
+    }
+
+    /**
+     * Reads the instrumentation key from AndroidManifest.xml if it is available
+     *
+     * @param context the application context to check the manifest from
+     * @return the instrumentation key configured for the application
+     */
+    private String readInstrumentationKey(Context context) {
+        String iKey = "";
+        if (context != null) {
+            try {
+                Bundle bundle = context
+                        .getPackageManager()
+                        .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA)
+                        .metaData;
+                if (bundle != null) {
+                    iKey = bundle.getString("com.microsoft.applicationinsights.instrumentationKey");
+                } else {
+                    logInstrumentationInstructions();
+                }
+            } catch (PackageManager.NameNotFoundException exception) {
+                logInstrumentationInstructions();
+                Log.v(TAG, exception.toString());
+            }
+        }
+
+        return iKey;
+    }
+
+    /**
+     * Writes instructions on how to configure the instrumentation key.
+     */
+    private static void logInstrumentationInstructions() {
+        String instructions = "No instrumentation key found.\n" +
+                "Set the instrumentation key in AndroidManifest.xml";
+        String manifestSnippet = "<meta-data\n" +
+                "android:name=\"com.microsoft.applicationinsights.instrumentationKey\"\n" +
+                "android:value=\"${AI_INSTRUMENTATION_KEY}\" />";
+        InternalLogging.error("MissingInstrumentationkey", instructions + "\n" + manifestSnippet);
     }
 }
