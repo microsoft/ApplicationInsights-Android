@@ -342,12 +342,22 @@ public enum ApplicationInsights {
         }
         INSTANCE.config = config;
     }
+ /**
+     * Returns the application context that Application Insights uses.
+     *
+     * @return context the Context that's used by the Application Insights SDK
+     */
+    public Context getContext() {
+        return this.context;
+    }
 
-    public static void setDeveloperMode(boolean developerMode) {
+public static void setDeveloperMode(boolean developerMode) {
         DEVELOPER_MODE = developerMode;
     }
 
     public static boolean isDeveloperMode() {
         return DEVELOPER_MODE;
     }
+
+
 }

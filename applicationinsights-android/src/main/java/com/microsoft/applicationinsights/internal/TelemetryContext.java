@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -12,6 +13,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 
 import com.microsoft.applicationinsights.contracts.Application;
 import com.microsoft.applicationinsights.contracts.Device;
@@ -21,6 +24,7 @@ import com.microsoft.applicationinsights.contracts.Session;
 import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.applicationinsights.internal.logging.InternalLogging;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -119,7 +123,7 @@ public class TelemetryContext {
 
                     // get an INSTANCE of the shared preferences manager for persistent context fields
                     TelemetryContext.settings = appContext.getSharedPreferences(
-                            TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+                          TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
 
                     // initialize static context
                     TelemetryContext.device = new Device();
@@ -139,6 +143,7 @@ public class TelemetryContext {
                     // initialize persistence
                     Persistence.initialize(appContext);
                 }
+
             }
         }
     }
@@ -205,8 +210,7 @@ public class TelemetryContext {
      * @return a map of the context tags assembled in the required data contract format.
      */
     private Map<String, String> getCachedTags() {
-
-        if(cachedTags == null) {
+        if (cachedTags == null) {
             // create a new hash map and add all context to it
             cachedTags = new LinkedHashMap<String, String>();
             TelemetryContext.application.addToHashMap(cachedTags);
@@ -230,7 +234,7 @@ public class TelemetryContext {
 
     /**
      * Renews the session context
-     * <p>
+     * <p/>
      * The session ID is on demand. Additionally, the isFirst flag is set if no data was
      * found in settings and the isNew flag is set each time a new UUID is
      * generated.
@@ -262,7 +266,7 @@ public class TelemetryContext {
         try {
             final PackageManager manager = appContext.getPackageManager();
             final PackageInfo info = manager
-                    .getPackageInfo(appContext.getPackageName(), 0);
+                  .getPackageInfo(appContext.getPackageName(), 0);
 
             if (info.packageName != null) {
                 TelemetryContext.appIdForEnvelope = info.packageName;
@@ -306,54 +310,93 @@ public class TelemetryContext {
      * @param appContext the android Context
      */
     protected static void setDeviceContext(Context appContext) {
-        Device context = TelemetryContext.device;
+        Device device = TelemetryContext.device;
 
-        context.setOsVersion(Build.VERSION.RELEASE);
-        context.setOs("Android");
-        context.setModel(Build.MODEL);
-        context.setOemName(Build.MANUFACTURER);
-        context.setLocale(Locale.getDefault().toString());
-
+        device.setOsVersion(Build.VERSION.RELEASE);
+        device.setOs("Android");
+        device.setModel(Build.MODEL);
+        device.setOemName(Build.MANUFACTURER);
+        device.setLocale(Locale.getDefault().toString());
+        setScreenResolution(appContext);
         // get device ID
         ContentResolver resolver = appContext.getContentResolver();
         String deviceIdentifier = Settings.Secure.getString(resolver, Settings.Secure.ANDROID_ID);
         if (deviceIdentifier != null) {
-            context.setId(Util.tryHashStringSha256(deviceIdentifier));
+            device.setId(Util.tryHashStringSha256(deviceIdentifier));
         }
 
         // check device type
         final TelephonyManager telephonyManager = (TelephonyManager)
-                appContext.getSystemService(Context.TELEPHONY_SERVICE);
+              appContext.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE) {
-            context.setType("Phone");
+            device.setType("Phone");
         } else {
-            context.setType("Tablet");
+            device.setType("Tablet");
         }
 
         // check network type
         final ConnectivityManager connectivityManager = (ConnectivityManager)
-                appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+              appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null) {
             int networkType = activeNetwork.getType();
             switch (networkType) {
                 case ConnectivityManager.TYPE_WIFI:
-                    context.setNetwork("WiFi");
+                    device.setNetwork("WiFi");
                     break;
                 case ConnectivityManager.TYPE_MOBILE:
-                    context.setNetwork("Mobile");
+                    device.setNetwork("Mobile");
                     break;
                 default:
-                    context.setNetwork("Unknown");
+                    device.setNetwork("Unknown");
                     InternalLogging.warn(TAG, "Unknown network type:" + networkType);
                     break;
             }
         }
 
         // detect emulator
+        //TODO use util method
         if (Build.FINGERPRINT.startsWith("generic")) {
-            context.setModel("[Emulator]" + context.getModel());
+            device.setModel("[Emulator]" + device.getModel());
         }
+    }
+
+    protected static void setScreenResolution(Context context) {
+        String resolutionString = "";
+        int width = 0;
+        int height = 0;
+
+        WindowManager wm = (WindowManager) context.getSystemService(
+              Context.WINDOW_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Point size = new Point();
+            wm.getDefaultDisplay().getRealSize(size);
+            width = size.x;
+            height = size.y;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            try {
+                Method mGetRawW = Display.class.getMethod("getRawWidth");
+                Method mGetRawH = Display.class.getMethod("getRawHeight");
+                Display display = wm.getDefaultDisplay();
+                width = (Integer) mGetRawW.invoke(display);
+                height = (Integer) mGetRawH.invoke(display);
+            } catch (Exception ex) {
+                Point size = new Point();
+                wm.getDefaultDisplay().getSize(size);
+                width = size.x;
+                height = size.y;
+                InternalLogging.error(TAG, ex.toString());
+            }
+
+        } else {
+            Display d = wm.getDefaultDisplay();
+            width = d.getWidth();
+            height = d.getHeight();
+        }
+
+        resolutionString = String.valueOf(height) + "x" + String.valueOf(width);
+
+        TelemetryContext.device.setScreenResolution(resolutionString);
     }
 
     /**
@@ -372,7 +415,7 @@ public class TelemetryContext {
                 if (bundle != null) {
                     sdkVersionString = bundle.getString("com.microsoft.applicationinsights.internal.sdkVersion");
                 } else {
-                   InternalLogging.warn(TAG, "Could not load sdk version from gradle.properties or manifest");
+                    InternalLogging.warn(TAG, "Could not load sdk version from gradle.properties or manifest");
                 }
             } catch (PackageManager.NameNotFoundException exception) {
                 InternalLogging.warn(TAG, "Error loading SDK version from manifest");
