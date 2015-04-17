@@ -206,6 +206,7 @@ class TelemetryContext {
         return contextTags;
     }
 
+    // TODO: Synchronize session renewal
     /**
      * Renews the session context
      * <p/>
@@ -331,6 +332,7 @@ class TelemetryContext {
         }
     }
 
+    // TODO: Synchronize resolution update
     protected void updateScreenResolution(Context context) {
         String resolutionString = "";
         int width = 0;
