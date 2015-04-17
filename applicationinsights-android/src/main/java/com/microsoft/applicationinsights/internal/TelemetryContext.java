@@ -287,27 +287,22 @@ public class TelemetryContext {
     public static void setUserContext(String userId) {
         String userAcq = null;
 
-        // No custom user Id is given, so get this info from settings
         if(userId == null){
+            // No custom user Id is given, so get this info from settings
             userId = TelemetryContext.settings.getString(TelemetryContext.USER_ID_KEY, null);
             userAcq = TelemetryContext.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
-        }
 
-        // Generate new user Id if needed
-        if (userId == null) {
-            userId = UUID.randomUUID().toString();
-        }
-
-        // Generate new acquisition date if needed
-        if(userAcq == null) {
+            if (userId == null || userAcq == null) {
+                // No settings available, generate new user info
+                userId = UUID.randomUUID().toString();
+                userAcq = Util.dateToISO8601(new Date());
+                saveUserInfo(userId, userAcq);
+            }
+        }else{
+            // UserId provided by the User, generate date
             userAcq = Util.dateToISO8601(new Date());
+            saveUserInfo(userId, userAcq);
         }
-
-        // Update settings
-        SharedPreferences.Editor editor = TelemetryContext.settings.edit();
-        editor.putString(TelemetryContext.USER_ID_KEY, userId);
-        editor.putString(TelemetryContext.USER_ACQ_KEY, userAcq);
-        editor.apply();
 
         // Update user context
         User context = TelemetryContext.user;
@@ -315,6 +310,18 @@ public class TelemetryContext {
         context.setAccountAcquisitionDate(userAcq);
     }
 
+    /**
+     * Write user information to shared preferences.
+     *
+     * @param userId the user ID
+     * @param acqDateString the date of the acquisition as string
+     */
+    private static void saveUserInfo(String userId, String acqDateString) {
+        SharedPreferences.Editor editor = TelemetryContext.settings.edit();
+        editor.putString(TelemetryContext.USER_ID_KEY, userId);
+        editor.putString(TelemetryContext.USER_ACQ_KEY, acqDateString);
+        editor.apply();
+    }
     /**
      * Sets the device telemetryContext tags
      */
