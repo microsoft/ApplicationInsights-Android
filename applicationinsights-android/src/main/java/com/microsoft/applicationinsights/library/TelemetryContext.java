@@ -198,10 +198,8 @@ class TelemetryContext {
         Map<String, String> contextTags = new LinkedHashMap<String, String>();
         contextTags.putAll(getCachedTags());
         this.device.addToHashMap(contextTags);
-        this.application.addToHashMap(contextTags);
         this.session.addToHashMap(contextTags);
         this.user.addToHashMap(contextTags);
-        this.internal.addToHashMap(contextTags);
 
         return contextTags;
     }
