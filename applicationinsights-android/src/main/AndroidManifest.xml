@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application>
         <meta-data
-            android:name="com.microsoft.applicationinsights.internal.sdkVersion"
+            android:name="com.microsoft.applicationinsights.library.sdkVersion"
             android:value="${AI_SDK_VERSION}" />
     </application>
 
