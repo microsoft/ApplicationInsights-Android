@@ -135,9 +135,6 @@ class TelemetryContext {
                     TelemetryContext.setUserContext();
                     TelemetryContext.setAppContext(appContext);
                     TelemetryContext.setInternalContext(appContext);
-
-                    // initialize persistence
-                    Persistence.initialize(appContext);
                 }
             }
         }

@@ -171,16 +171,14 @@ public enum ApplicationInsights {
         }
         if (!isRunning) {
 
-            // Get telemetry context
-            String iKey = null;
-            if(this.instrumentationKey != null){
-                iKey = this.instrumentationKey;
-            }else{
-                iKey = readInstrumentationKey(this.context);
+            if(this.instrumentationKey == null){
+                this.instrumentationKey = readInstrumentationKey(this.context);
             }
 
-            TelemetryContext telemetryContext = new TelemetryContext(this.context, iKey);
+            TelemetryContext telemetryContext = new TelemetryContext(this.context, this.instrumentationKey);
             EnvelopeFactory.INSTANCE.configure(telemetryContext, this.commonProperties);
+
+            Persistence.initialize(this.context);
             Sender.initialize(this.senderConfig);
             Channel.initialize(this.queueConfig);
 
@@ -394,5 +392,9 @@ public enum ApplicationInsights {
 
     public static void setSenderConfig(SenderConfig senderConfig) {
         INSTANCE.senderConfig = senderConfig;
+    }
+
+    protected static String getInstrumentationKey(){
+        return INSTANCE.instrumentationKey;
     }
 }
