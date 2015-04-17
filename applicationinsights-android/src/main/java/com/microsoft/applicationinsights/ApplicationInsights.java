@@ -348,7 +348,7 @@ public enum ApplicationInsights {
      * @return context the Context that's used by the Application Insights SDK
      */
     public Context getContext() {
-        return context;
+        return this.context;
     }
 
 public static void setDeveloperMode(boolean developerMode) {
