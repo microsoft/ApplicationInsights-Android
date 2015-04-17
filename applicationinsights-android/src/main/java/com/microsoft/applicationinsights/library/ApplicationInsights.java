@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.microsoft.applicationinsights.library.config.QueueConfig;
+import com.microsoft.applicationinsights.internal.EnvelopeFactory;
+import com.microsoft.applicationinsights.internal.Sender;
 import com.microsoft.applicationinsights.library.config.SenderConfig;
 import com.microsoft.applicationinsights.library.config.SessionConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
@@ -322,6 +324,40 @@ public enum ApplicationInsights {
         INSTANCE.commonProperties = commonProperties;
     }
 
+ /**
+     * Gets the session configuration for the instance
+     * @return the instance session configuration
+     */
+    public static SessionConfig getConfig() {
+        return INSTANCE.config;
+    }
+
+ /**
+     * Gets the session configuration for the instance
+     * @return the instance session configuration
+     */
+    public static SessionConfig getConfig() {
+        return INSTANCE.config;
+    }
+
+   /**
+     * Sets the session configuration for the instance
+     */
+    public void setConfig(SessionConfig config) {
+        if(!isSetup){
+            InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
+                    "ApplicationInsights has not been setup correctly.");
+            return;
+        }
+        if(isRunning){
+            InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
+                    "ApplicationInsights has already been started.");
+            return;
+        }
+        INSTANCE.config = config;
+    }
+
+
     public static void setDeveloperMode(boolean developerMode) {
         DEVELOPER_MODE = developerMode;
     }
@@ -357,9 +393,18 @@ public enum ApplicationInsights {
 
         return iKey;
     }
+ /**
+     * Returns the application context that Application Insights uses.
+     *
+     * @return context the Context that's used by the Application Insights SDK
+     */
+ public Context getContext() {
+        return this.context;
+    }
 
-    /**
-     * Writes instructions on how to configure the instrumentation key.
+
+
+ * Writes instructions on how to configure the instrumentation key.
      */
     private static void logInstrumentationInstructions() {
         String instructions = "No instrumentation key found.\n" +
@@ -370,15 +415,7 @@ public enum ApplicationInsights {
         InternalLogging.error("MissingInstrumentationkey", instructions + "\n" + manifestSnippet);
     }
 
-    public static SessionConfig getSessionConfig() {
-        return INSTANCE.sessionConfig;
-    }
-
-    public static void setSessionConfig(SessionConfig sessionConfig) {
-        INSTANCE.sessionConfig = sessionConfig;
-    }
-
-    public static QueueConfig getQueueConfig() {
+       public static QueueConfig getQueueConfig() {
         return INSTANCE.queueConfig;
     }
 
