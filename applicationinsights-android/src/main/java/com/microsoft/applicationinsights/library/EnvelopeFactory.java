@@ -1,7 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-
-import com.microsoft.applicationinsights.ApplicationInsights;
 import com.microsoft.applicationinsights.contracts.CrashData;
 import com.microsoft.applicationinsights.contracts.CrashDataHeaders;
 import com.microsoft.applicationinsights.contracts.CrashDataThread;
@@ -132,8 +130,8 @@ enum EnvelopeFactory {
      * @return an Envelope object, which contains an event
      */
     protected Envelope createEventEnvelope(String eventName,
-                                        Map<String, String> properties,
-                                        Map<String, Double> measurements) {
+                                           Map<String, String> properties,
+                                           Map<String, Double> measurements) {
         Envelope envelope = null;
         if (isConfigured()) {
             EventData telemetry = new EventData();
