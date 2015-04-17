@@ -103,24 +103,24 @@ class TelemetryContext {
      */
     protected TelemetryContext(Context appContext, String instrumentationKey) {
 
-        this.operation = new Operation();
+
         // get an INSTANCE of the shared preferences manager for persistent context fields
         this.settings = appContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-
-        // initialize static context
+        this.operation = new Operation();
         this.device = new Device();
+        configDeviceContext(appContext);
         this.session = new Session();
+        configSessionContext();
         this.user = new User();
+        configUserContext();
         this.internal = new Internal();
+        configInternalContext(appContext);
         this.application = new Application();
+        configAppContext(appContext);
+
         this.lastSessionId = null;
         this.instrumentationKey = instrumentationKey;
         this.cachedTags = getCachedTags();
-        configDeviceContext(appContext);
-        configSessionContext();
-        configUserContext();
-        configAppContext(appContext);
-        configInternalContext(appContext);
     }
 
     /**
