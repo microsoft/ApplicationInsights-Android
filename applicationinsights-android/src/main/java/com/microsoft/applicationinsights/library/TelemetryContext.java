@@ -196,7 +196,7 @@ class TelemetryContext {
 
     protected Map<String, String> getContextTags() {
         Map<String, String> contextTags = new LinkedHashMap<String, String>();
-        this.cachedTags.putAll(contextTags);
+        contextTags.putAll(getCachedTags());
         this.device.addToHashMap(contextTags);
         this.application.addToHashMap(contextTags);
         this.session.addToHashMap(contextTags);
