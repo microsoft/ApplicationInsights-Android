@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.library;
 
 import android.annotation.TargetApi;
 import android.content.ComponentName;
@@ -14,11 +14,6 @@ import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
-import com.microsoft.applicationinsights.library.ApplicationInsights;
-import com.microsoft.mocks.MockActivity;
-import com.microsoft.mocks.MockApplication;
-import com.microsoft.mocks.MockLifeCycleTracking;
-import com.microsoft.mocks.MockTelemetryClient;
 
 import junit.framework.Assert;
 
@@ -172,7 +167,7 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
 
-        this.mockLifeCycleTracking.currentTime += ApplicationInsights.INSTANCE.config.getSessionIntervalMs();
+        this.mockLifeCycleTracking.currentTime += ApplicationInsights.getSessionConfig().getSessionIntervalMs();
         getInstrumentation().callActivityOnResume(activity1);
         getInstrumentation().callActivityOnResume(activity2);
 

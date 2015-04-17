@@ -1,6 +1,6 @@
 package com.microsoft.applicationinsights.library.config;
 
-abstract class Config {
+public abstract class Config {
 
     /**
      * Lock object to ensure thread safety of the configuration

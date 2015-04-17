@@ -1,11 +1,8 @@
-package com.microsoft.mocks;
+package com.microsoft.applicationinsights.library;
 
 import android.app.Activity;
 
-import com.microsoft.applicationinsights.library.LifeCycleTracking;
-import com.microsoft.applicationinsights.library.SessionConfig;
-import com.microsoft.applicationinsights.library.TelemetryClient;
-import com.microsoft.applicationinsights.library.TelemetryContext;
+import com.microsoft.applicationinsights.library.config.SessionConfig;
 
 public class MockLifeCycleTracking extends LifeCycleTracking {
 

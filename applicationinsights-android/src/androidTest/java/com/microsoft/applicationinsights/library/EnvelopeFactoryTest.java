@@ -7,20 +7,18 @@ import com.microsoft.applicationinsights.contracts.Data;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.EventData;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
-import com.microsoft.mocks.MockActivity;
-import com.microsoft.mocks.MockTelemetryContext;
 
 import junit.framework.Assert;
 
 public class EnvelopeFactoryTest extends ActivityUnitTestCase<MockActivity> {
 
     public EnvelopeFactoryTest() {
-        super(com.microsoft.mocks.MockActivity.class);
+        super(MockActivity.class);
     }
 
     public void setUp() throws Exception {
         super.setUp();
-        Intent intent = new Intent(getInstrumentation().getTargetContext(), com.microsoft.mocks.MockActivity.class);
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
         this.setActivity(this.startActivity(intent, null, null));
         TelemetryContext mockContext = new MockTelemetryContext(this.getActivity(), "testIKey");
         EnvelopeFactory.INSTANCE.configure(mockContext);

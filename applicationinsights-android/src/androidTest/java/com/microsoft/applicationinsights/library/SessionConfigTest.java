@@ -1,10 +1,7 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.library;
 
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
-
-import com.microsoft.applicationinsights.library.ApplicationInsights;
-import com.microsoft.mocks.MockActivity;
 
 public class SessionConfigTest extends ActivityUnitTestCase<MockActivity> {
 
@@ -22,6 +19,6 @@ public class SessionConfigTest extends ActivityUnitTestCase<MockActivity> {
     public void testRegister() throws Exception {
         ApplicationInsights.setup(getActivity());
         ApplicationInsights.start();
-        assertNotNull("iKey is initialized", ApplicationInsights.getConfig().getInstrumentationKey());
+        assertNotNull("iKey is initialized", ApplicationInsights.getInstrumentationKey());
     }
 }

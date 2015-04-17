@@ -163,5 +163,9 @@ class ChannelQueue {
             return null;
         }
     }
+
+    protected QueueConfig getQueueConfig(){
+        return this.config;
+    }
 }
 

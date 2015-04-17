@@ -1,7 +1,10 @@
 package com.microsoft.applicationinsights.library;
 
+import android.test.AndroidTestCase;
+
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.library.config.QueueConfig;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -12,7 +15,7 @@ import java.util.Timer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class ChannelQueueTest extends TestCase {
+public class ChannelQueueTest extends AndroidTestCase {
 
     private TestQueue queue;
     private IJsonSerializable item;
@@ -23,16 +26,13 @@ public class ChannelQueueTest extends TestCase {
         super.setUp();
         this.queue = new TestQueue();
         int batchInterval = 100;
-        this.queue.getConfig().setMaxBatchIntervalMs(batchInterval);
+        this.queue.getQueueConfig().setMaxBatchIntervalMs(batchInterval);
         this.item = new Envelope();
-    }
-
-    public void tearDown() throws Exception {
-
+        Persistence.initialize(this.getContext());
     }
 
     public void testGetConfig() throws Exception {
-        Assert.assertNotNull("Sender constructor should initialize config", this.queue.getConfig());
+        Assert.assertNotNull("Sender constructor should initialize config", this.queue.getQueueConfig());
     }
 
     public void testQueue() throws Exception {
@@ -48,7 +48,7 @@ public class ChannelQueueTest extends TestCase {
     }
 
     public void testBatchingLimit() {
-        this.queue.getConfig().setMaxBatchCount(3);
+        this.queue.getQueueConfig().setMaxBatchCount(3);
         this.queue.enqueue(this.item);
 
         // enqueue one item and verify that it did not trigger a enqueue
@@ -77,7 +77,7 @@ public class ChannelQueueTest extends TestCase {
     }
 
     public void testBatchingLimitExceed() {
-        this.queue.getConfig().setMaxBatchCount(3);
+        this.queue.getQueueConfig().setMaxBatchCount(3);
 
         // enqueue 4 items (exceeding maxBatchCount is supported) and verify that data was flushed
         this.queue.enqueue(this.item);
@@ -97,12 +97,12 @@ public class ChannelQueueTest extends TestCase {
     }
 
     public void testBatchingTimer() {
-        this.queue.getConfig().setMaxBatchCount(3);
+        this.queue.getQueueConfig().setMaxBatchCount(3);
 
         // enqueue one item and wait for the queue to sendPendingData via the timer
         this.queue.enqueue(this.item);
         try {
-            this.queue.sendSignal.await(batchMargin + this.queue.getConfig().getMaxBatchIntervalMs() + 1, TimeUnit.MILLISECONDS);
+            this.queue.sendSignal.await(batchMargin + this.queue.getQueueConfig().getMaxBatchIntervalMs() + 1, TimeUnit.MILLISECONDS);
             Assert.assertEquals("single item was sent after reaching MaxInterval",
                     0, this.queue.sendSignal.getCount());
             Assert.assertEquals("queue is empty after sending data",
@@ -113,7 +113,7 @@ public class ChannelQueueTest extends TestCase {
     }
 
     public void testBatchingFlush() {
-        this.queue.getConfig().setMaxBatchCount(3);
+        this.queue.getQueueConfig().setMaxBatchCount(3);
 
         // enqueue one item and sendPendingData it to bypass the timer
         this.queue.enqueue(this.item);
@@ -157,12 +157,9 @@ public class ChannelQueueTest extends TestCase {
         public StringWriter writer;
 
         public TestQueue() {
-            super();
-            TelemetryConfig config = new TelemetryConfig();
-
+            super(new QueueConfig());
             this.sendSignal = new CountDownLatch(1);
             this.responseSignal = new CountDownLatch(1);
-            //this.sender = new TestSender(sendSignal, config);
         }
 
         public LinkedList<IJsonSerializable> getQueue() {

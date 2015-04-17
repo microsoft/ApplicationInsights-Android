@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights_e2e;
+package com.microsoft.applicationinsights.library;
 
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
@@ -6,12 +6,12 @@ import android.util.Log;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
 import com.microsoft.applicationinsights.library.Channel;
-import com.microsoft.applicationinsights.library.ChannelConfig;
-import com.microsoft.applicationinsights.library.TelemetryConfig;
-import com.microsoft.mocks.MockActivity;
-import com.microsoft.mocks.MockChannel;
-import com.microsoft.mocks.MockQueue;
-import com.microsoft.mocks.MockTelemetryClient;
+import com.microsoft.applicationinsights.library.MockActivity;
+import com.microsoft.applicationinsights.library.MockChannel;
+import com.microsoft.applicationinsights.library.MockQueue;
+import com.microsoft.applicationinsights.library.MockTelemetryClient;
+import com.microsoft.applicationinsights.library.config.QueueConfig;
+import com.microsoft.applicationinsights.library.config.SenderConfig;
 
 import junit.framework.Assert;
 
@@ -37,11 +37,10 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
         this.setActivity(this.startActivity(intent, null, null));
 
         MockTelemetryClient.getInstance().mockTrackMethod = false;
-        TelemetryConfig config = Channel.getInstance().getQueue().getConfig();
-        config.setMaxBatchIntervalMs(20);
+        Channel.initialize(new QueueConfig());
+        Channel.getInstance().getQueue().getQueueConfig().setMaxBatchIntervalMs(20);
 
-        // use http for tests
-        config.setEndpointUrl(config.getEndpointUrl().replace("https", "http"));
+        Sender.initialize(new SenderConfig());
 
         this.properties = new LinkedHashMap<String, String>();
         this.properties.put("core property", "core value");
@@ -102,7 +101,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             exception = e;
         }
 
-        ChannelConfig.getStaticConfig().setMaxBatchCount(10);
+        Channel.getInstance().getQueue().getQueueConfig().setMaxBatchCount(10);
         for (int i = 0; i < 10; i++) {
             this.client.trackEvent("android event");
             this.client.trackTrace("android trace");

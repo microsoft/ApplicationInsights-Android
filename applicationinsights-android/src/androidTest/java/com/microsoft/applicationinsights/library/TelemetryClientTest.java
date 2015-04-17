@@ -1,10 +1,7 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.library;
 
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
-
-import com.microsoft.applicationinsights.library.TelemetryClient;
-import com.microsoft.mocks.MockActivity;
 
 import junit.framework.Assert;
 

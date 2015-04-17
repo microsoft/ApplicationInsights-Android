@@ -1,5 +1,7 @@
 package com.microsoft.applicationinsights.library;
 
+import com.microsoft.applicationinsights.library.config.SenderConfig;
+
 import junit.framework.TestCase;
 
 public class SenderTest extends TestCase {
@@ -10,7 +12,7 @@ public class SenderTest extends TestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        TelemetryConfig config = new TelemetryConfig();
+        SenderConfig config = new SenderConfig();
         this.sender = new Sender(config);
     }
 

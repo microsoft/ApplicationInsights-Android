@@ -1,12 +1,7 @@
-package com.microsoft.applicationinsights;
+package com.microsoft.applicationinsights.library;
 
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
-
-import com.microsoft.applicationinsights.library.ApplicationInsights;
-import com.microsoft.applicationinsights.library.ChannelQueue;
-import com.microsoft.applicationinsights.library.ExceptionTracking;
-import com.microsoft.mocks.MockActivity;
 
 import junit.framework.Assert;
 
@@ -20,14 +15,14 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
     public void setUp() throws Exception {
         super.setUp();
         originalHandler = Thread.getDefaultUncaughtExceptionHandler();
-        Intent intent = new Intent(getInstrumentation().getTargetContext(), com.microsoft.mocks.MockActivity.class);
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
         this.setActivity(this.startActivity(intent, null, null));
     }
 
     public void tearDown() throws Exception {
         super.tearDown();
         Thread.setDefaultUncaughtExceptionHandler(originalHandler);
-        ChannelQueue.INSTANCE.setIsCrashing(false);
+        Channel.getInstance().getQueue().setIsCrashing(false);
         ApplicationInsights.setDeveloperMode(false);
     }
 

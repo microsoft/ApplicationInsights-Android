@@ -1,6 +1,6 @@
-package com.microsoft.mocks;
+package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.library.ChannelQueue;
+import com.microsoft.applicationinsights.library.config.QueueConfig;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -12,12 +12,10 @@ public class MockQueue extends ChannelQueue {
     public MockSender sender;
 
     public MockQueue(int expectedSendCount) {
-        super();
+        super(new QueueConfig());
         this.responseCode = 0;
         this.sendSignal = new CountDownLatch(expectedSendCount);
         this.responseSignal = new CountDownLatch(expectedSendCount);
-        this.sender = new MockSender(sendSignal, responseSignal, this.config);
-        super.sender = this.sender;
     }
 
     public long getQueueSize() {

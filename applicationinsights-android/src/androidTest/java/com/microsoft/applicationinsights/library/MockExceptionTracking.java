@@ -1,4 +1,4 @@
-package com.microsoft.mocks;
+package com.microsoft.applicationinsights.library;
 
 import android.content.Context;
 

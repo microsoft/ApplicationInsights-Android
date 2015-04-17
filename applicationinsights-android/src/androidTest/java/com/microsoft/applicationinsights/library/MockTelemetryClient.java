@@ -1,8 +1,6 @@
-package com.microsoft.mocks;
+package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.library.TelemetryClient;
 import com.microsoft.applicationinsights.contracts.Envelope;
-import com.microsoft.applicationinsights.library.EnvelopeFactory;
 
 import java.util.ArrayList;
 import java.util.Map;
