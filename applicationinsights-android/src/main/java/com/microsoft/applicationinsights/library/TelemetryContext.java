@@ -326,8 +326,7 @@ class TelemetryContext {
         }
 
         // detect emulator
-        //TODO use util method
-        if (Build.FINGERPRINT.startsWith("generic")) {
+        if (Util.isEmulator()) {
             this.device.setModel("[Emulator]" + device.getModel());
         }
     }
