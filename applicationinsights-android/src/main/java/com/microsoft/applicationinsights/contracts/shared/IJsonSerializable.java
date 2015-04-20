@@ -17,5 +17,5 @@ public interface IJsonSerializable {
      * @throws IOException will be thrown if the data format is not correct
      *             JSON format.
      */
-    public void serialize(Writer writer) throws IOException;
+    void serialize(Writer writer) throws IOException;
 }
