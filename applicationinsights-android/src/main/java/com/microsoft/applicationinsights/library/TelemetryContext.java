@@ -42,64 +42,54 @@ class TelemetryContext {
     private static final String TAG = "TelemetryContext";
 
     /**
-     * Synchronization LOCK for setting static context
-     */
-    private static final Object LOCK = new Object();
-
-    /**
-     * Volatile boolean for double checked synchronize block
-     */
-    private static volatile boolean isContextLoaded = false;
-
-    /**
      * The shared preferences INSTANCE for reading persistent context
      */
-    private static SharedPreferences settings;
+    private SharedPreferences settings;
 
     /**
      * Content for tags field of an envelope
      */
-    private static Map<String, String> cachedTags;
+    private Map<String, String> cachedTags;
 
     /**
      * Device telemetryContext.
      */
-    private static String instrumentationKey;
+    private String instrumentationKey;
 
     /**
      * Device telemetryContext.
      */
-    private static Device device;
+    private Device device;
 
     /**
      * Session telemetryContext.
      */
-    private static Session session;
+    private Session session;
 
     /**
      * User telemetryContext.
      */
-    private static User user;
+    private User user;
 
     /**
      * Application telemetryContext.
      */
-    private static Application application;
+    private Application application;
 
     /**
      * Internal telemetryContext.
      */
-    private static Internal internal;
+    private Internal internal;
 
     /**
      * The last session ID
      */
-    private static String lastSessionId;
+    private String lastSessionId;
 
     /**
      * The App ID for the envelope (defined as PackageInfo.packageName by CLL team)
      */
-    private static String appIdForEnvelope;
+    private String appIdForEnvelope;
 
     /**
      * Operation telemetryContext.
@@ -111,51 +101,42 @@ class TelemetryContext {
      *
      * @param appContext the context for this telemetryContext
      */
-    protected TelemetryContext(Context appContext, String instrumentationKey) {
+    public TelemetryContext(Context appContext, String instrumentationKey, String userId) {
 
+        // TODO: Why does everything in here have to be static? Constructor is used to create new instance rather than setting static fields
         this.operation = new Operation();
 
-        // note: isContextLoaded must be volatile for the double-checked LOCK to work
-        if (!TelemetryContext.isContextLoaded && appContext != null) {
-            synchronized (TelemetryContext.LOCK) {
-                if (!TelemetryContext.isContextLoaded) {
-                    TelemetryContext.isContextLoaded = true;
+        // get an INSTANCE of the shared preferences manager for persistent context fields
+        this.settings = appContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+        this.operation = new Operation();
+        this.device = new Device();
+        configDeviceContext(appContext);
+        this.session = new Session();
+        configSessionContext();
+        this.user = new User();
+        configUserContext(userId);
+        this.internal = new Internal();
+        configInternalContext(appContext);
+        this.application = new Application();
+        configAppContext(appContext);
 
-                    // get an INSTANCE of the shared preferences manager for persistent context fields
-                    TelemetryContext.settings = appContext.getSharedPreferences(
-                          TelemetryContext.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-
-                    // initialize static context
-                    TelemetryContext.device = new Device();
-                    TelemetryContext.session = new Session();
-                    TelemetryContext.user = new User();
-                    TelemetryContext.internal = new Internal();
-                    TelemetryContext.application = new Application();
-                    TelemetryContext.lastSessionId = null;
-                    TelemetryContext.instrumentationKey = instrumentationKey;
-                    TelemetryContext.cachedTags = getCachedTags();
-                    TelemetryContext.setDeviceContext(appContext);
-                    TelemetryContext.setSessionContext();
-                    TelemetryContext.setUserContext();
-                    TelemetryContext.setAppContext(appContext);
-                    TelemetryContext.setInternalContext(appContext);
-                }
-
-            }
-        }
+        this.lastSessionId = null;
+        this.instrumentationKey = instrumentationKey;
+        this.cachedTags = getCachedTags();
     }
 
     /**
      * Get user the instrumentationKey.
+     *
      * @return the instrumentation key
      */
     protected String getInstrumentationKey() {
         return instrumentationKey;
     }
 
-
     /**
      * Get user telemetryContext.
+     *
      * @return the user object
      */
     protected User getUser() {
@@ -164,6 +145,7 @@ class TelemetryContext {
 
     /**
      * Get device telemetryContext.
+     *
      * @return the device object
      */
     protected Device getDevice() {
@@ -172,6 +154,7 @@ class TelemetryContext {
 
     /**
      * Operation telemetryContext.
+     *
      * @return the operation
      */
     protected Operation getOperation() {
@@ -180,6 +163,7 @@ class TelemetryContext {
 
     /**
      * Session telemetryContext.
+     *
      * @return the session
      */
     protected Session getSession() {
@@ -188,6 +172,7 @@ class TelemetryContext {
 
     /**
      * Application telemetryContext.
+     *
      * @return the application
      */
     protected Application getApplication() {
@@ -207,27 +192,27 @@ class TelemetryContext {
      * @return a map of the context tags assembled in the required data contract format.
      */
     private Map<String, String> getCachedTags() {
-        if (cachedTags == null) {
+        if (this.cachedTags == null) {
             // create a new hash map and add all context to it
-            cachedTags = new LinkedHashMap<String, String>();
-            TelemetryContext.application.addToHashMap(cachedTags);
-            TelemetryContext.internal.addToHashMap(cachedTags);
+            this.cachedTags = new LinkedHashMap<String, String>();
+            this.application.addToHashMap(cachedTags);
+            this.internal.addToHashMap(cachedTags);
             this.operation.addToHashMap(cachedTags);
         }
-        return cachedTags;
+        return this.cachedTags;
     }
 
     protected Map<String, String> getContextTags() {
         Map<String, String> contextTags = new LinkedHashMap<String, String>();
-        TelemetryContext.cachedTags.putAll(contextTags);
-        TelemetryContext.device.addToHashMap(contextTags);
-        TelemetryContext.application.addToHashMap(contextTags);
-        TelemetryContext.session.addToHashMap(contextTags);
-        TelemetryContext.user.addToHashMap(contextTags);
-        TelemetryContext.internal.addToHashMap(contextTags);
+        contextTags.putAll(getCachedTags());
+        this.device.addToHashMap(contextTags);
+        this.session.addToHashMap(contextTags);
+        this.user.addToHashMap(contextTags);
 
         return contextTags;
     }
+
+    // TODO: Synchronize session renewal
 
     /**
      * Renews the session context
@@ -236,29 +221,39 @@ class TelemetryContext {
      * found in settings and the isNew flag is set each time a new UUID is
      * generated.
      */
-    protected static void renewSessionId() {
+    protected void renewSessionId() {
         String newId = UUID.randomUUID().toString();
-        TelemetryContext.session.setId(newId);
+        this.session.setId(newId);
+    }
+
+    /**
+     * Renews the session context with a custom session ID.
+     *
+     * @param sessionId a custom session ID
+     */
+    public void renewSessionId(String sessionId) {
+        this.session.setId(sessionId);
     }
 
     /**
      * Sets the session context
      */
-    protected static void setSessionContext() {
-        if (TelemetryContext.lastSessionId == null) {
-            TelemetryContext.renewSessionId();
+    protected void configSessionContext() {
+        if (this.lastSessionId == null) {
+            renewSessionId();
         } else {
-            TelemetryContext.session.setId(TelemetryContext.lastSessionId);
+            this.session.setId(this.lastSessionId);
         }
     }
 
     /**
      * Sets the application telemetryContext tags
+     *
      * @param appContext the android context
      */
-    protected static void setAppContext(Context appContext) {
+    protected void configAppContext(Context appContext) {
         String version = "unknown";
-        TelemetryContext.appIdForEnvelope = "";
+        this.appIdForEnvelope = "";
 
         try {
             final PackageManager manager = appContext.getPackageManager();
@@ -266,69 +261,84 @@ class TelemetryContext {
                   .getPackageInfo(appContext.getPackageName(), 0);
 
             if (info.packageName != null) {
-                TelemetryContext.appIdForEnvelope = info.packageName;
+                this.appIdForEnvelope = info.packageName;
             }
 
             String appBuild = Integer.toString(info.versionCode);
-            version = String.format("%s (%S)", TelemetryContext.appIdForEnvelope, appBuild);
+            version = String.format("%s (%S)", this.appIdForEnvelope, appBuild);
         } catch (PackageManager.NameNotFoundException e) {
-            InternalLogging.warn("TelemetryContext", "Could not collect application context");
+            InternalLogging.warn(TAG, "Could not collect application context");
         } finally {
-            Application context = TelemetryContext.application;
-            context.setVer(version);
+            this.application.setVer(version);
         }
     }
 
     /**
      * Sets the user context
      */
-    protected static void setUserContext() {
-        String userId = TelemetryContext.settings.getString(TelemetryContext.USER_ID_KEY, null);
-        String userAcq = TelemetryContext.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
+    public void configUserContext(String userId) {
+        String userAcq;
 
-        if (userId == null || userAcq == null) {
-            userId = UUID.randomUUID().toString();
+        if (userId == null) {
+            // No custom user Id is given, so get this info from settings
+            userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
+            userAcq = this.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
+
+            if (userId == null || userAcq == null) {
+                // No settings available, generate new user info
+                userId = UUID.randomUUID().toString();
+                userAcq = Util.dateToISO8601(new Date());
+                saveUserInfo(userId, userAcq);
+            }
+        } else {
+            // UserId provided by the User, generate date
             userAcq = Util.dateToISO8601(new Date());
-
-            SharedPreferences.Editor editor = TelemetryContext.settings.edit();
-            editor.putString(TelemetryContext.USER_ID_KEY, userId);
-            editor.putString(TelemetryContext.USER_ACQ_KEY, userAcq);
-            editor.apply();
+            saveUserInfo(userId, userAcq);
         }
 
-        User context = TelemetryContext.user;
-        context.setId(userId);
-        context.setAccountAcquisitionDate(userAcq);
+        this.user.setId(userId);
+        this.user.setAccountAcquisitionDate(userAcq);
+    }
 
+    /**
+     * Write user information to shared preferences.
+     *
+     * @param userId        the user ID
+     * @param acqDateString the date of the acquisition as string
+     */
+    private void saveUserInfo(String userId, String acqDateString) {
+        SharedPreferences.Editor editor = this.settings.edit();
+        editor.putString(TelemetryContext.USER_ID_KEY, userId);
+        editor.putString(TelemetryContext.USER_ACQ_KEY, acqDateString);
+        editor.apply();
     }
 
     /**
      * Sets the device telemetryContext tags
+     *
      * @param appContext the android Context
      */
-    protected static void setDeviceContext(Context appContext) {
-        Device device = TelemetryContext.device;
-
-        device.setOsVersion(Build.VERSION.RELEASE);
-        device.setOs("Android");
-        device.setModel(Build.MODEL);
-        device.setOemName(Build.MANUFACTURER);
-        device.setLocale(Locale.getDefault().toString());
-        setScreenResolution(appContext);
+    protected void configDeviceContext(Context appContext) {
+        this.device.setOsVersion(Build.VERSION.RELEASE);
+        this.device.setOs("Android");
+        this.device.setModel(Build.MODEL);
+        this.device.setOemName(Build.MANUFACTURER);
+        this.device.setLocale(Locale.getDefault().toString());
+        updateScreenResolution(appContext);
         // get device ID
         ContentResolver resolver = appContext.getContentResolver();
         String deviceIdentifier = Settings.Secure.getString(resolver, Settings.Secure.ANDROID_ID);
         if (deviceIdentifier != null) {
-            device.setId(Util.tryHashStringSha256(deviceIdentifier));
+            this.device.setId(Util.tryHashStringSha256(deviceIdentifier));
         }
 
         // check device type
         final TelephonyManager telephonyManager = (TelephonyManager)
               appContext.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE) {
-            device.setType("Phone");
+            this.device.setType("Phone");
         } else {
-            device.setType("Tablet");
+            this.device.setType("Tablet");
         }
 
         // check network type
@@ -337,28 +347,30 @@ class TelemetryContext {
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null) {
             int networkType = activeNetwork.getType();
+            String networkString;
             switch (networkType) {
                 case ConnectivityManager.TYPE_WIFI:
-                    device.setNetwork("WiFi");
+                    networkString = "WiFi";
                     break;
                 case ConnectivityManager.TYPE_MOBILE:
-                    device.setNetwork("Mobile");
+                    networkString = "Mobile";
                     break;
                 default:
-                    device.setNetwork("Unknown");
+                    networkString = "Unknown";
                     InternalLogging.warn(TAG, "Unknown network type:" + networkType);
                     break;
             }
+            this.device.setNetwork(networkString);
         }
 
         // detect emulator
-        //TODO use util method
-        if (Build.FINGERPRINT.startsWith("generic")) {
-            device.setModel("[Emulator]" + device.getModel());
+        if (Util.isEmulator()) {
+            this.device.setModel("[Emulator]" + device.getModel());
         }
     }
 
-    protected static void setScreenResolution(Context context) {
+    // TODO: Synchronize resolution update
+    protected void updateScreenResolution(Context context) {
         String resolutionString = "";
         int width = 0;
         int height = 0;
@@ -393,17 +405,14 @@ class TelemetryContext {
 
         resolutionString = String.valueOf(height) + "x" + String.valueOf(width);
 
-        TelemetryContext.device.setScreenResolution(resolutionString);
+        this.device.setScreenResolution(resolutionString);
     }
 
     /**
      * Sets the internal package context
      */
-    protected static void setInternalContext(Context appContext) {
-        Internal context = TelemetryContext.internal;
-
+    protected void configInternalContext(Context appContext) {
         String sdkVersionString = "";
-        String packageName = appContext.getPackageName();
         if (appContext != null) {
             try {
                 Bundle bundle = appContext.getPackageManager()
@@ -419,6 +428,6 @@ class TelemetryContext {
                 Log.v(TAG, exception.toString());
             }
         }
-        context.setSdkVersion("android:" + sdkVersionString);
+        this.internal.setSdkVersion("android:" + sdkVersionString);
     }
 }
