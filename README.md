@@ -131,11 +131,16 @@ public class MyActivity extends Activity {
 
 ## <a name="2"></a> Automatic collection of life-cycle events
 
-This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default.
-If you want to **Disable** automatic collection of life-cycle events call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
+This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default. Don't forget to set the Application instance when setting up ApplicationInsights (otherwise auto collection will be disabled):
 
 ```java
 	ApplicationInsights.setup(this, getApplication()); //setup
+```
+
+If you want to explicitly **Disable** automatic collection of life-cycle events, call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
+
+```java
+	ApplicationInsights.setup(this); //setup
 
 	ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
 	
