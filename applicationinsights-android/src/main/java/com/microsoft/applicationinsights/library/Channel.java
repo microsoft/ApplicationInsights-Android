@@ -31,7 +31,6 @@ class Channel {
      */
     private static Channel instance;
 
-
     /**
      * Instantiates a new INSTANCE of Sender
      */

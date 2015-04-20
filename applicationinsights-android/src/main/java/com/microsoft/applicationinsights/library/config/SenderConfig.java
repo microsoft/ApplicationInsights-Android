@@ -15,7 +15,7 @@ public class SenderConfig extends Config{
      * The timeout for reading the response from the data collector endpoint
      */
 
-    private int senderReadTimeoutMs;
+    private final int senderReadTimeoutMs;
 
     /**
      * The timeout for connecting to the data collector endpoint

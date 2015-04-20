@@ -27,7 +27,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
     /**
      * The configuration for tracking sessions
      */
-    protected SessionConfig config;
+    protected final SessionConfig config;
 
     /**
      * The timestamp of the last activity

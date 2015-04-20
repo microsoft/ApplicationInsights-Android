@@ -44,7 +44,7 @@ class TelemetryContext {
     /**
      * The shared preferences INSTANCE for reading persistent context
      */
-    private SharedPreferences settings;
+    private final SharedPreferences settings;
 
     /**
      * Content for tags field of an envelope
@@ -54,37 +54,37 @@ class TelemetryContext {
     /**
      * Device telemetryContext.
      */
-    private String instrumentationKey;
+    private final String instrumentationKey;
 
     /**
      * Device telemetryContext.
      */
-    private Device device;
+    private final Device device;
 
     /**
      * Session telemetryContext.
      */
-    private Session session;
+    private final Session session;
 
     /**
      * User telemetryContext.
      */
-    private User user;
+    private final User user;
 
     /**
      * Application telemetryContext.
      */
-    private Application application;
+    private final Application application;
 
     /**
      * Internal telemetryContext.
      */
-    private Internal internal;
+    private final Internal internal;
 
     /**
      * The last session ID
      */
-    private String lastSessionId;
+    private final String lastSessionId;
 
     /**
      * The App ID for the envelope (defined as PackageInfo.packageName by CLL team)

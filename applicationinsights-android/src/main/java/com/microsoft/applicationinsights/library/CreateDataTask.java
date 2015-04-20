@@ -22,7 +22,7 @@ class CreateDataTask extends AsyncTask<Void, Void, Void> {
     private String name;
     private Map<String,String> properties;
     private Map<String, Double> measurements;
-    private DataType type;
+    private final DataType type;
     private double metric;
     private Throwable exception;
 

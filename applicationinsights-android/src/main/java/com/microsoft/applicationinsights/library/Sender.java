@@ -49,7 +49,7 @@ class Sender {
      */
     private static Sender instance;
 
-    private HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
+    private final HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
 
     /**
      * Restrict access to the default constructor
@@ -296,7 +296,7 @@ class Sender {
 
     private class SendingTask extends TimerTask {
         private String payload;
-        private File fileToSend;
+        private final File fileToSend;
 
         public SendingTask(String payload, File fileToSend) {
             this.payload = payload;
