@@ -1,6 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-Beta.1)
+# Application Insights for Android (1.0-Beta.2)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
@@ -11,16 +11,22 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 **Release Notes**
 
-* Renamed umbrella class for setting up and starting the SDK to ```ApplicationInsights```
-* Developer Mode for improved logging and shorter default interval and batch size for sending telemetry
-* Exception tracking and telemetry are now enabled by default
-* Source compatibility with Java 6
-* Performance improvements and bug fixes 
+* SDK has been compiled using Android SDK 22
+* Resolution tracking (full resolution of the device in physical pixels)  
+* Exposed property for UserID so it can set it manually
+* Exposed property for SessionID so it can be overwriten e.g. on app start by the developer
+* Internal APIs and properties are now hidden from the developer so the SDK can be used in a safe way
+* Simplified configuration of the SDK using the SessionConfig, QueueConfig or SenderConfig classes (see [Usage](#1))
+* Developer Mode now has to be activated by the developer (see [Developer Mode](#2))
+* Minor bugfixes
 
 
 **Breaking Changes**
 
+* **[1.0-Beta.2]** To enable automatic lifecycle-tracking, Application Insights has to be set up with an instance of Application (see [Life-cycle tracking] (#2)), otherwise, lifecycle-tracking is disabled.
+
 * **[1.0-Beta.1]** Setup and start of the Application Insights SDK are now done using the new umbrella class `ApplicationInsights` instead of `AppInsights `
+
 * **[1.0-Alpha.5]** Setup and start of the Application Insights SDK are now done using the new umbrella class `AppInsights` instead of `TelemetryClient`
 
 ## Setup ##
@@ -79,16 +85,16 @@ android {
 It is also possible to set the instrumentation key of your app in code. This will override the one you might have set in your gradle or manifest file. Setting the instrumentation key programmatically can be done while setting up Application Insights:
 
 ```java
-ApplicationInsights.setup(this, "<YOUR-IKEY-GOES-HERE>");
+ApplicationInsights.setup(this, getApplication(), "<YOUR-IKEY-GOES-HERE>");
 ApplicationInsights.start();
 ```
 
-## Usage ##
+## <a name="1"></a>Usage ##
 
-Add the following import to your apps root activity
+Add the following import to your app's root activity
 
 ```java
-import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.library.ApplicationInsights;
 ```
 
 And add 
@@ -108,7 +114,7 @@ public class MyActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         
 
-        ApplicationInsights.setup(this);
+        ApplicationInsights.setup(this, getApplication());
         //... other initialization code ...//
         ApplicationInsights.start();
         
@@ -123,24 +129,67 @@ public class MyActivity extends Activity {
 }
 ```
 
-## Automatic collection of life-cycle events ##
+## <a name="2"></a> Automatic collection of life-cycle events
 
 This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default.
 If you want to **Disable** automatic collection of life-cycle events call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
 
 ```java
-	ApplicationInsights.setup(this); //setup
+	ApplicationInsights.setup(this, getApplication()); //setup
 
 	ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
 	
 	ApplicationInsights.start(); //start
 ```
 
-## Documentation ##
+## <a name="3"></a> Additional configuration
+
+To configure Application Insights according to your need, first, call
+
+```java
+	ApplicationInsights.setup(this, getApplication()); //setup
+
+```
+
+And then use the different configuration objects to set your individual values.
+
+```java
+ 	SessionConfig sessionConfig = ApplicationInsights.getSessionConfig();
+ 	sessionConfig.setSessionIntervalMs(20000);
+
+ 	SenderConfig senderConfig = ApplicationInsights.getSenderConfig();
+ 	senderConfig.setEndpointUrl("http://dc-int.services.visualstudio.com/v2/track");
+
+```
+
+```java
+     QueueConfig queueConfig = ApplicationInsights.getQueueConfig();
+       queueConfig.setMaxBatchCount(45);
+       queueConfig.setMaxBatchIntervalMs(3000);
+
+```
+
+```java
+
+     QueueConfig queueConfig = ApplicationInsights.getQueueConfig();
+       queueConfig.setMaxBatchCount(45);
+       queueConfig.setMaxBatchIntervalMs(3000);
+
+```
+
+## <a name="4"></a> Developer Mode
+
+```java
+	 ApplicationInsights.setDeveloperMode(false);
+
+```
+
+
+## Documentation
 
 [http://microsoft.github.io/ApplicationInsights-Android/]()
 
-## Contributing ##
+## Contributing
 
 **Development environment**
 
