@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.microsoft.applicationinsights.ApplicationInsights;
-import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.library.ApplicationInsights;
+import com.microsoft.applicationinsights.library.TelemetryClient;
 import com.microsoft.applicationinsights.appsample.dummy.DummyContent;
 
 import java.util.ArrayList;
