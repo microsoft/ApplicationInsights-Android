@@ -113,7 +113,7 @@ class ChannelQueue {
             this.scheduledPersistenceTask.cancel();
         }
 
-        IJsonSerializable[] data = null;
+        IJsonSerializable[] data;
         synchronized (this.LOCK) {
             if (!list.isEmpty()) {
                 data = new IJsonSerializable[list.size()];
