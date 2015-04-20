@@ -383,7 +383,6 @@ public class TelemetryContext {
         Internal context = TelemetryContext.internal;
 
         String sdkVersionString = "";
-        String packageName = appContext.getPackageName();
         if (appContext != null) {
             try {
                 Bundle bundle = appContext.getPackageManager()
