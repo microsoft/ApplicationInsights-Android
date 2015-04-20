@@ -98,8 +98,9 @@ import com.microsoft.applicationinsights.library.ApplicationInsights;
 ```
 
 And add 
+
 ```java
-ApplicationInsights.setup(this);
+ApplicationInsights.setup(this, getApplication());
 ApplicationInsights.start();
 ```
 
@@ -112,7 +113,6 @@ public class MyActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        
 
         ApplicationInsights.setup(this, getApplication());
         //... other initialization code ...//
