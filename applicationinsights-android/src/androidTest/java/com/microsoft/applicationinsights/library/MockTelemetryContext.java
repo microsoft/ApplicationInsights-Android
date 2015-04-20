@@ -6,11 +6,11 @@ import com.microsoft.applicationinsights.library.TelemetryContext;
 
 public class MockTelemetryContext extends TelemetryContext {
 
-    public MockTelemetryContext(Context context, String instrumentationKey) {
-        super(context, instrumentationKey);
+    public MockTelemetryContext(Context context, String instrumentationKey,  String userId) {
+        super(context, instrumentationKey, userId);
         TelemetryContext.setDeviceContext(context);
         TelemetryContext.setSessionContext();
-        TelemetryContext.setUserContext();
+        TelemetryContext.setUserContext(userId);
         TelemetryContext.setAppContext(context);
         TelemetryContext.setInternalContext(context);
     }

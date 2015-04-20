@@ -111,8 +111,9 @@ class TelemetryContext {
      *
      * @param appContext the context for this telemetryContext
      */
-    protected TelemetryContext(Context appContext, String instrumentationKey) {
+    public TelemetryContext(Context appContext, String instrumentationKey, String userId) {
 
+        // TODO: Why does everything in here have to be static? Constructor is used to create new instance rather than setting static fields
         this.operation = new Operation();
 
         // note: isContextLoaded must be volatile for the double-checked LOCK to work
@@ -136,7 +137,7 @@ class TelemetryContext {
                     TelemetryContext.cachedTags = getCachedTags();
                     TelemetryContext.setDeviceContext(appContext);
                     TelemetryContext.setSessionContext();
-                    TelemetryContext.setUserContext();
+                    TelemetryContext.setUserContext(userId);
                     TelemetryContext.setAppContext(appContext);
                     TelemetryContext.setInternalContext(appContext);
                 }
@@ -238,7 +239,16 @@ class TelemetryContext {
      */
     protected static void renewSessionId() {
         String newId = UUID.randomUUID().toString();
-        TelemetryContext.session.setId(newId);
+       renewSessionId(newId);
+    }
+
+    /**
+     * Renews the session context with a custom session ID.
+     *
+     * @param sessionId a custom session ID
+     */
+    public static void renewSessionId(String sessionId) {
+        TelemetryContext.session.setId(sessionId);
     }
 
     /**
@@ -282,26 +292,44 @@ class TelemetryContext {
     /**
      * Sets the user context
      */
-    protected static void setUserContext() {
-        String userId = TelemetryContext.settings.getString(TelemetryContext.USER_ID_KEY, null);
-        String userAcq = TelemetryContext.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
+    public static void setUserContext(String userId) {
+        String userAcq = null;
 
-        if (userId == null || userAcq == null) {
-            userId = UUID.randomUUID().toString();
+        if(userId == null){
+            // No custom user Id is given, so get this info from settings
+            userId = TelemetryContext.settings.getString(TelemetryContext.USER_ID_KEY, null);
+            userAcq = TelemetryContext.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
+
+            if (userId == null || userAcq == null) {
+                // No settings available, generate new user info
+                userId = UUID.randomUUID().toString();
+                userAcq = Util.dateToISO8601(new Date());
+                saveUserInfo(userId, userAcq);
+            }
+        }else{
+            // UserId provided by the User, generate date
             userAcq = Util.dateToISO8601(new Date());
-
-            SharedPreferences.Editor editor = TelemetryContext.settings.edit();
-            editor.putString(TelemetryContext.USER_ID_KEY, userId);
-            editor.putString(TelemetryContext.USER_ACQ_KEY, userAcq);
-            editor.apply();
+            saveUserInfo(userId, userAcq);
         }
 
+        // Update user context
         User context = TelemetryContext.user;
         context.setId(userId);
         context.setAccountAcquisitionDate(userAcq);
-
     }
 
+    /**
+     * Write user information to shared preferences.
+     *
+     * @param userId the user ID
+     * @param acqDateString the date of the acquisition as string
+     */
+    private static void saveUserInfo(String userId, String acqDateString) {
+        SharedPreferences.Editor editor = TelemetryContext.settings.edit();
+        editor.putString(TelemetryContext.USER_ID_KEY, userId);
+        editor.putString(TelemetryContext.USER_ACQ_KEY, acqDateString);
+        editor.apply();
+    }
     /**
      * Sets the device telemetryContext tags
      * @param appContext the android Context
@@ -403,7 +431,6 @@ class TelemetryContext {
         Internal context = TelemetryContext.internal;
 
         String sdkVersionString = "";
-        String packageName = appContext.getPackageName();
         if (appContext != null) {
             try {
                 Bundle bundle = appContext.getPackageManager()
