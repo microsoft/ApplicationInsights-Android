@@ -208,7 +208,7 @@ public class ExceptionDetails implements
         writer.write(JsonHelper.convert(this.message));
         prefix = ",";
         
-        if (!(this.hasFullStack == false))
+        if (this.hasFullStack)
         {
             writer.write(prefix + "\"hasFullStack\":");
             writer.write(JsonHelper.convert(this.hasFullStack));
