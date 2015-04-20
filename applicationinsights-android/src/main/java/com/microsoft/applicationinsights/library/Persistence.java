@@ -28,6 +28,8 @@ class Persistence {
      */
     private static final Object LOCK = new Object();
 
+    private static final String AI_SDK_DIRECTORY = "/com.microsoft.applicationinsights";
+
     private static final String HIGH_PRIO_DIRECTORY = "/highpriority/";
 
     private static final String REGULAR_PRIO_DIRECTORY = "/regularpriority/";
@@ -152,10 +154,10 @@ class Persistence {
             try {
                 File filesDir = getContext().getFilesDir();
                 if (highPriority) {
-                    filesDir = new File(filesDir + HIGH_PRIO_DIRECTORY + uuid);
+                    filesDir = new File(filesDir + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY + uuid);
                     outputStream = new FileOutputStream(filesDir, true);
                 } else {
-                    filesDir = new File(filesDir + REGULAR_PRIO_DIRECTORY + uuid);
+                    filesDir = new File(filesDir + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY + uuid);
                     outputStream = new FileOutputStream(filesDir, true);
                 }
                 outputStream.write(data.getBytes());
@@ -216,7 +218,7 @@ class Persistence {
     private File nextHighPrioFile() {
         Context context = getContext();
         if (context != null) {
-            String path = context.getFilesDir() + HIGH_PRIO_DIRECTORY;
+            String path = context.getFilesDir() + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY;
             File directory = new File(path);
             return this.nextAvailableFileInDirectory(directory);
         }
@@ -229,7 +231,7 @@ class Persistence {
     private File nextRegularPrioFile() {
         Context context = getContext();
         if (context != null) {
-            String path = context.getFilesDir() + REGULAR_PRIO_DIRECTORY;
+            String path = context.getFilesDir() + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY;
             File directory = new File(path);
             return this.nextAvailableFileInDirectory(directory);
         }
@@ -303,11 +305,11 @@ class Persistence {
      * @param highPriority indicates which directory to check for available files
      */
     private Boolean isFreeSpaceAvailable(Boolean highPriority) {
-        synchronized (Persistence.LOCK) {
-            Context context = getContext();
+            synchronized (Persistence.LOCK) {
+                Context context = getContext();
             if (context != null) {
-                String path = highPriority ? (context.getFilesDir() + HIGH_PRIO_DIRECTORY) :
-                      (getContext().getFilesDir() + REGULAR_PRIO_DIRECTORY);
+                String path = highPriority ? (context.getFilesDir() + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY) :
+                      (getContext().getFilesDir() + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY);
                 File dir = new File(path);
                 return (dir.listFiles().length < MAX_FILE_COUNT);
             }
@@ -322,12 +324,12 @@ class Persistence {
     private void createDirectoriesIfNecessary() {
         String filesDirPath = getContext().getFilesDir().getPath();
         //create high prio directory
-        File dir = new File(filesDirPath + HIGH_PRIO_DIRECTORY);
+        File dir = new File(filesDirPath + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY);
         if (!dir.exists()) {
             dir.mkdirs();
         }
         //create high prio directory
-        dir = new File(filesDirPath + REGULAR_PRIO_DIRECTORY);
+        dir = new File(filesDirPath + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY);
         if (!dir.exists()) {
             dir.mkdirs();
         }
