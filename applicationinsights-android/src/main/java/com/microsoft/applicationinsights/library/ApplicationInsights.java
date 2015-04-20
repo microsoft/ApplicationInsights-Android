@@ -446,7 +446,7 @@ public enum ApplicationInsights {
      */
     public static void setUserId(String userId){
         if(isRunning){
-            TelemetryContext.setUserContext(userId);
+            INSTANCE.telemetryContext.configUserContext(userId);
         }else{
             INSTANCE.userId = userId;
         }

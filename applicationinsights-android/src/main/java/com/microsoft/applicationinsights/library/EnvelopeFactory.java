@@ -79,7 +79,7 @@ enum EnvelopeFactory {
      */
     protected Envelope createEnvelope() {
         Envelope envelope = new Envelope();
-        this.context.setScreenResolution(ApplicationInsights.INSTANCE.getContext());
+        this.context.updateScreenResolution(ApplicationInsights.INSTANCE.getContext());
         envelope.setAppId(this.context.getPackageName());
         envelope.setAppVer(this.context.getApplication().getVer());
         envelope.setTime(Util.dateToISO8601(new Date()));
