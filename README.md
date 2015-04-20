@@ -98,8 +98,9 @@ import com.microsoft.applicationinsights.library.ApplicationInsights;
 ```
 
 And add 
+
 ```java
-ApplicationInsights.setup(this);
+ApplicationInsights.setup(this, getApplication());
 ApplicationInsights.start();
 ```
 
@@ -112,7 +113,6 @@ public class MyActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        
 
         ApplicationInsights.setup(this, getApplication());
         //... other initialization code ...//
@@ -131,15 +131,20 @@ public class MyActivity extends Activity {
 
 ## <a name="2"></a> Automatic collection of life-cycle events
 
-This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default.
-If you want to **Disable** automatic collection of life-cycle events call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
+This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default. Don't forget to set the Application instance when setting up ApplicationInsights (otherwise auto collection will be disabled):
 
 ```java
-	ApplicationInsights.setup(this, getApplication()); //setup
+ApplicationInsights.setup(this, getApplication()); //setup
+```
 
-	ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
+If you want to explicitly **Disable** automatic collection of life-cycle events, call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
+
+```java
+ApplicationInsights.setup(this); //setup
+
+ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
 	
-	ApplicationInsights.start(); //start
+ApplicationInsights.start(); //start
 ```
 
 ## <a name="3"></a> Additional configuration
@@ -147,43 +152,52 @@ If you want to **Disable** automatic collection of life-cycle events call ```set
 To configure Application Insights according to your need, first, call
 
 ```java
-	ApplicationInsights.setup(this, getApplication()); //setup
-
+ApplicationInsights.setup(this, getApplication()); //setup
 ```
 
 And then use the different configuration objects to set your individual values.
 
+The default time the users entering the app counts as a new session is 20s. If you want to set it to a different value, use the ```SessionConigf```:
+
 ```java
- 	SessionConfig sessionConfig = ApplicationInsights.getSessionConfig();
- 	sessionConfig.setSessionIntervalMs(20000);
-
- 	SenderConfig senderConfig = ApplicationInsights.getSenderConfig();
- 	senderConfig.setEndpointUrl("http://dc-int.services.visualstudio.com/v2/track");
-
+SessionConfig sessionConfig = ApplicationInsights.getSessionConfig(); //get the SessionConfig
+sessionConfig.setSessionIntervalMs(40000); //set the session's interval to 40s (aka. 40,000 ms)
 ```
 
-```java
-     QueueConfig queueConfig = ApplicationInsights.getQueueConfig();
-       queueConfig.setMaxBatchCount(45);
-       queueConfig.setMaxBatchIntervalMs(3000);
+To configure a differen server endpoint for the SDK, use the ```SenderConfig````:
 
+```java
+SenderConfig senderConfig = ApplicationInsights.getSenderConfig(); //get the SenderConfig
+senderConfig.setEndpointUrl("http://yourawsomeserver.com/applicationInsights"); //set the config to a custom endpoint 
 ```
 
+Unhandled exceptions (your app is crashing) are sent out immediately at the next app start, while regular telemetry data is send out in batches or after a specified interval.
+
+[**NOTE**] The [developer mode](#4) will automatically set the batching interval to 3s.
+
+ The default interval until a batch of telemetry is sent to the server is 15s. To set to 3s, you can use the ```QueueConfig````:
+
 ```java
+QueueConfig queueConfig = ApplicationInsights.getQueueConfig(); //get the QueueConfig
+queueConfig.setMaxBatchIntervalMs(3000); //set the interval to e.g. 3s (3,000ms)
+```
 
-     QueueConfig queueConfig = ApplicationInsights.getQueueConfig();
-       queueConfig.setMaxBatchCount(45);
-       queueConfig.setMaxBatchIntervalMs(3000);
+After all custom configurations have been made, just start `ApplicationInsights`:
 
+```java
+ApplicationInsights.start(); //start
 ```
 
 ## <a name="4"></a> Developer Mode
 
+The **developer mode** is enabled automatically in case the debugger is attached or if the app is running in the emulator. This will enable the console logging and decrease the number of telemetry items sent in a batch (5 items) as well as the interval items will be sent (3 seconds).
+
+You can explicitly enable/disable the developer mode like this:
+
 ```java
-	 ApplicationInsights.setDeveloperMode(false);
+ApplicationInsights.setDeveloperMode(false);
 
 ```
-
 
 ## Documentation
 
