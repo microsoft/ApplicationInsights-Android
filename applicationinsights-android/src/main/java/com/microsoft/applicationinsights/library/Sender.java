@@ -150,9 +150,8 @@ class Sender {
      * @param responseCode the response code from the connection
      * @param payload      the payload which generated this response
      * @param fileToSend reference to the file we want to send
-     * @return null if the request was successful, the server response otherwise
      */
-    protected String onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
+    protected void onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
         this.removeFromRunning(fileToSend.toString());
 
         StringBuilder builder = new StringBuilder();
@@ -185,8 +184,6 @@ class Sender {
         if (!isExpected) {
             this.onUnexpected(connection, responseCode, builder);
         }
-
-        return builder.toString();
     }
 
     /**

@@ -100,11 +100,11 @@ class Persistence {
      *
      * @return indicate if persisting data worked
      */
-    protected boolean persist(IJsonSerializable[] data, Boolean highPriority) {
+    protected void persist(IJsonSerializable[] data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
             Sender.getInstance().send();
-            return false;
+            return; //return immediately,as no free space is available
         }
 
         StringBuilder buffer = new StringBuilder();
@@ -132,10 +132,7 @@ class Persistence {
             }
         } catch (IOException e) {
             InternalLogging.error(TAG, e.toString());
-            return false;
         }
-
-        return isSuccess;
     }
 
     /**
