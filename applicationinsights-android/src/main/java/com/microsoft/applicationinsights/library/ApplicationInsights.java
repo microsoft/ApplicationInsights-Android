@@ -53,6 +53,11 @@ public enum ApplicationInsights {
      */
     private String instrumentationKey;
 
+    private TelemetryContext telemetryContext;
+
+    private String userId;
+
+
     /**
      * The context associated with Application Insights.
      */
@@ -175,7 +180,7 @@ public enum ApplicationInsights {
                 this.instrumentationKey = readInstrumentationKey(this.context);
             }
 
-            TelemetryContext telemetryContext = new TelemetryContext(this.context, this.instrumentationKey);
+            this.telemetryContext = new TelemetryContext(this.context, this.instrumentationKey, userId);
             EnvelopeFactory.INSTANCE.configure(telemetryContext, this.commonProperties);
 
             Persistence.initialize(this.context);
@@ -228,7 +233,7 @@ public enum ApplicationInsights {
      * @deprecated This method is deprecated: Use setAutoCollectionDisabled instead.
      */
     public static void enableActivityTracking(Application application) {
-        if (!isRunning) {
+        if (!isRunning) { //TODO fix log warning
             InternalLogging.warn(TAG, "Could not set exception tracking, because " +
                   "ApplicationInsights has not been started, yet.");
             return;
@@ -422,7 +427,34 @@ public enum ApplicationInsights {
         INSTANCE.sessionConfig = config;
     }
 
+    /**
+     * Force Application Insights to create a new session with a custom sessionID.
+     *
+     * @param sessionId a custom session ID used of the session to create
+     */
+    public static void renewSession(String sessionId){
+        if(!INSTANCE.telemetryDisabled && INSTANCE.telemetryContext != null){
+            INSTANCE.telemetryContext.renewSessionId(sessionId);
+        }
+    }
+
+    /**
+     * Set the user Id associated with the telemetry data. If userId == null, ApplicationInsights
+     * will generate a random ID.
+     *
+     * @param userId a user ID associated with the telemetry data
+     */
+    public static void setUserId(String userId){
+        if(isRunning){
+            INSTANCE.telemetryContext.configUserContext(userId);
+        }else{
+            INSTANCE.userId = userId;
+        }
+    }
+
     protected static String getInstrumentationKey() {
         return INSTANCE.instrumentationKey;
     }
+
+
 }

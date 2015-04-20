@@ -101,8 +101,10 @@ class TelemetryContext {
      *
      * @param appContext the context for this telemetryContext
      */
-    protected TelemetryContext(Context appContext, String instrumentationKey) {
+    public TelemetryContext(Context appContext, String instrumentationKey, String userId) {
 
+        // TODO: Why does everything in here have to be static? Constructor is used to create new instance rather than setting static fields
+        this.operation = new Operation();
 
         // get an INSTANCE of the shared preferences manager for persistent context fields
         this.settings = appContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
@@ -112,7 +114,7 @@ class TelemetryContext {
         this.session = new Session();
         configSessionContext();
         this.user = new User();
-        configUserContext();
+        configUserContext(userId);
         this.internal = new Internal();
         configInternalContext(appContext);
         this.application = new Application();
@@ -125,6 +127,7 @@ class TelemetryContext {
 
     /**
      * Get user the instrumentationKey.
+     *
      * @return the instrumentation key
      */
     protected String getInstrumentationKey() {
@@ -133,6 +136,7 @@ class TelemetryContext {
 
     /**
      * Get user telemetryContext.
+     *
      * @return the user object
      */
     protected User getUser() {
@@ -141,6 +145,7 @@ class TelemetryContext {
 
     /**
      * Get device telemetryContext.
+     *
      * @return the device object
      */
     protected Device getDevice() {
@@ -149,6 +154,7 @@ class TelemetryContext {
 
     /**
      * Operation telemetryContext.
+     *
      * @return the operation
      */
     protected Operation getOperation() {
@@ -157,6 +163,7 @@ class TelemetryContext {
 
     /**
      * Session telemetryContext.
+     *
      * @return the session
      */
     protected Session getSession() {
@@ -165,6 +172,7 @@ class TelemetryContext {
 
     /**
      * Application telemetryContext.
+     *
      * @return the application
      */
     protected Application getApplication() {
@@ -205,6 +213,7 @@ class TelemetryContext {
     }
 
     // TODO: Synchronize session renewal
+
     /**
      * Renews the session context
      * <p/>
@@ -215,6 +224,15 @@ class TelemetryContext {
     protected void renewSessionId() {
         String newId = UUID.randomUUID().toString();
         this.session.setId(newId);
+    }
+
+    /**
+     * Renews the session context with a custom session ID.
+     *
+     * @param sessionId a custom session ID
+     */
+    public void renewSessionId(String sessionId) {
+        this.session.setId(sessionId);
     }
 
     /**
@@ -230,6 +248,7 @@ class TelemetryContext {
 
     /**
      * Sets the application telemetryContext tags
+     *
      * @param appContext the android context
      */
     protected void configAppContext(Context appContext) {
@@ -257,18 +276,24 @@ class TelemetryContext {
     /**
      * Sets the user context
      */
-    protected void configUserContext() {
-        String userId = this.settings.getString(USER_ID_KEY, null);
-        String userAcq = this.settings.getString(USER_ACQ_KEY, null);
+    public void configUserContext(String userId) {
+        String userAcq;
 
-        if (userId == null || userAcq == null) {
-            userId = UUID.randomUUID().toString();
+        if (userId == null) {
+            // No custom user Id is given, so get this info from settings
+            userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
+            userAcq = this.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
+
+            if (userId == null || userAcq == null) {
+                // No settings available, generate new user info
+                userId = UUID.randomUUID().toString();
+                userAcq = Util.dateToISO8601(new Date());
+                saveUserInfo(userId, userAcq);
+            }
+        } else {
+            // UserId provided by the User, generate date
             userAcq = Util.dateToISO8601(new Date());
-
-            SharedPreferences.Editor editor = this.settings.edit();
-            editor.putString(USER_ID_KEY, userId);
-            editor.putString(USER_ACQ_KEY, userAcq);
-            editor.apply();
+            saveUserInfo(userId, userAcq);
         }
 
         this.user.setId(userId);
@@ -276,7 +301,21 @@ class TelemetryContext {
     }
 
     /**
+     * Write user information to shared preferences.
+     *
+     * @param userId        the user ID
+     * @param acqDateString the date of the acquisition as string
+     */
+    private void saveUserInfo(String userId, String acqDateString) {
+        SharedPreferences.Editor editor = this.settings.edit();
+        editor.putString(TelemetryContext.USER_ID_KEY, userId);
+        editor.putString(TelemetryContext.USER_ACQ_KEY, acqDateString);
+        editor.apply();
+    }
+
+    /**
      * Sets the device telemetryContext tags
+     *
      * @param appContext the android Context
      */
     protected void configDeviceContext(Context appContext) {
@@ -308,7 +347,7 @@ class TelemetryContext {
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null) {
             int networkType = activeNetwork.getType();
-            String networkString = null;
+            String networkString;
             switch (networkType) {
                 case ConnectivityManager.TYPE_WIFI:
                     networkString = "WiFi";
@@ -374,7 +413,6 @@ class TelemetryContext {
      */
     protected void configInternalContext(Context appContext) {
         String sdkVersionString = "";
-        String packageName = appContext.getPackageName();
         if (appContext != null) {
             try {
                 Bundle bundle = appContext.getPackageManager()
