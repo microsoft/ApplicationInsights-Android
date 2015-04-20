@@ -70,7 +70,7 @@ class Channel {
      * @return the sender for this channel.
      */
     protected ChannelQueue getQueue() {
-        return this.queue;
+        return queue;
     }
 
     /**
@@ -79,7 +79,7 @@ class Channel {
      * @param queue the queue to use for this channel
      */
     protected void setQueue(ChannelQueue queue) {
-        this.queue = queue;
+        Channel.queue = queue;
     }
 
     /**
@@ -88,17 +88,17 @@ class Channel {
      * @param envelope the envelope object to record
      */
     protected void enqueue(Envelope envelope) {
-        this.queue.isCrashing = false;
+        queue.isCrashing = false;
 
         // enqueue to queue
-        this.queue.enqueue(envelope);
+        queue.enqueue(envelope);
 
         InternalLogging.info(TAG, "enqueued telemetry", envelope.getName());
     }
 
     protected void processUnhandledException(Envelope envelope) {
-        this.queue.isCrashing = true;
-        this.queue.flush();
+        queue.isCrashing = true;
+        queue.flush();
 
         IJsonSerializable[] data = new IJsonSerializable[1];
         data[0] = envelope;
