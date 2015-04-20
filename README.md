@@ -152,34 +152,33 @@ If you want to explicitly **Disable** automatic collection of life-cycle events,
 To configure Application Insights according to your need, first, call
 
 ```java
-	ApplicationInsights.setup(this, getApplication()); //setup
-
+ApplicationInsights.setup(this, getApplication()); //setup
 ```
 
 And then use the different configuration objects to set your individual values.
 
 ```java
- 	SessionConfig sessionConfig = ApplicationInsights.getSessionConfig();
- 	sessionConfig.setSessionIntervalMs(20000);
-
- 	SenderConfig senderConfig = ApplicationInsights.getSenderConfig();
- 	senderConfig.setEndpointUrl("http://dc-int.services.visualstudio.com/v2/track");
-
+SessionConfig sessionConfig = ApplicationInsights.getSessionConfig();
+// How long should the app stay in background until a new session gets created (20s by default)?
+sessionConfig.setSessionIntervalMs(40000);
 ```
 
 ```java
-     QueueConfig queueConfig = ApplicationInsights.getQueueConfig();
-       queueConfig.setMaxBatchCount(45);
-       queueConfig.setMaxBatchIntervalMs(3000);
-
+SenderConfig senderConfig = ApplicationInsights.getSenderConfig();
+// By default the endpoint URL points to the production environment
+senderConfig.setEndpointUrl("http://dc-int.services.visualstudio.com/v2/track");
 ```
 
 ```java
+QueueConfig queueConfig = ApplicationInsights.getQueueConfig();
+// Interval for collecting and sending out telemetry data (unhandled exceptions are sent out immediately)
+// 15s by default
+queueConfig.setMaxBatchIntervalMs(3000);
+```
+After all configurations have been made, just start `ApplicationInsights`:
 
-     QueueConfig queueConfig = ApplicationInsights.getQueueConfig();
-       queueConfig.setMaxBatchCount(45);
-       queueConfig.setMaxBatchIntervalMs(3000);
-
+```java
+ApplicationInsights.start(); //start
 ```
 
 ## <a name="4"></a> Developer Mode
