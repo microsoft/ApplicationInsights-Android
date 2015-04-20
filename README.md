@@ -179,11 +179,14 @@ And then use the different configuration objects to set your individual values.
 
 ## <a name="4"></a> Developer Mode
 
+The **developer mode** is enabled if the debugger is attached or if the app is running in the emulator. This will enable the console logging and decrease the number of telemetry items sent in a batch (5 items) as well as the interval items will be sent (3 seconds).
+
+Feel free to explicitly enable/disable the developer mode:
+
 ```java
 	 ApplicationInsights.setDeveloperMode(false);
 
 ```
-
 
 ## Documentation
 
