@@ -322,13 +322,25 @@ class Persistence {
         String filesDirPath = getContext().getFilesDir().getPath();
         //create high prio directory
         File dir = new File(filesDirPath + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY);
+        String successMessage = "Successfully created regular directory";
+        String errorMessage = "Error creating directory";
         if (!dir.exists()) {
-            dir.mkdirs();
+            if(dir.mkdirs()) {
+                InternalLogging.info(TAG, successMessage, "high priority");
+            }
+            else {
+                InternalLogging.info(TAG, errorMessage, "high priority");
+            }
         }
-        //create high prio directory
+        //create regular prio directory
         dir = new File(filesDirPath + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY);
         if (!dir.exists()) {
-            dir.mkdirs();
+            if(dir.mkdirs()) {
+                InternalLogging.info(TAG, successMessage, "regular priority");
+            }
+            else {
+                InternalLogging.info(TAG, errorMessage, "regular priority");
+            }
         }
     }
 
