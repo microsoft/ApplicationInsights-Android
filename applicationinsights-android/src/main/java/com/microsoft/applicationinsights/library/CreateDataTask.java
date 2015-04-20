@@ -17,7 +17,7 @@ class CreateDataTask extends AsyncTask<Void, Void, Void> {
         HANDLED_EXCEPTION,
         UNHANDLED_EXCEPTION,
         NEW_SESSION
-    };
+    }
 
     private String name;
     private Map<String,String> properties;
