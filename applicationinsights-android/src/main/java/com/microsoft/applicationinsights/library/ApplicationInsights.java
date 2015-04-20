@@ -79,7 +79,7 @@ public enum ApplicationInsights {
     /**
      * Create ApplicationInsights instance
      */
-    private ApplicationInsights() {
+    ApplicationInsights() {
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
         this.autoCollectionDisabled = false;
