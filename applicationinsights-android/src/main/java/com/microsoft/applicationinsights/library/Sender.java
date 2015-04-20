@@ -164,7 +164,7 @@ class Sender {
 
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
-            this.onExpected(connection, builder, fileToSend);
+            this.onExpected(connection, builder);
             this.send();
         }
 
@@ -191,9 +191,8 @@ class Sender {
      * response and log it.
      *  @param connection a connection containing a response
      * @param builder    a string builder for storing the response
-     * @param fileToSend reference to the file we sent
      */
-    protected void onExpected(HttpURLConnection connection, StringBuilder builder, File fileToSend) {
+    protected void onExpected(HttpURLConnection connection, StringBuilder builder) {
         if (ApplicationInsights.isDeveloperMode()) {
             this.readResponse(connection, builder);
         }
