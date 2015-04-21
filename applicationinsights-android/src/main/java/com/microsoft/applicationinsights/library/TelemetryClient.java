@@ -26,7 +26,7 @@ public class TelemetryClient {
     /**
      * A flag, which determines telemetry data can be tracked.
      */
-    private boolean telemetryEnabled;
+    private final boolean telemetryEnabled;
 
     /**
      * Volatile boolean for double checked synchronize block

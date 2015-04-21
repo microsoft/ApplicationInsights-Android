@@ -36,7 +36,7 @@ class Persistence {
 
     private static final Integer MAX_FILE_COUNT = 50;
 
-    private ArrayList<File> servedFiles;
+    private final ArrayList<File> servedFiles;
 
     /**
      * The tag for logging
@@ -100,11 +100,11 @@ class Persistence {
      *
      * @return indicate if persisting data worked
      */
-    protected boolean persist(IJsonSerializable[] data, Boolean highPriority) {
+    protected void persist(IJsonSerializable[] data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
             Sender.getInstance().send();
-            return false;
+            return; //return immediately,as no free space is available
         }
 
         StringBuilder buffer = new StringBuilder();
@@ -132,10 +132,7 @@ class Persistence {
             }
         } catch (IOException e) {
             InternalLogging.error(TAG, e.toString());
-            return false;
         }
-
-        return isSuccess;
     }
 
     /**
@@ -325,13 +322,25 @@ class Persistence {
         String filesDirPath = getContext().getFilesDir().getPath();
         //create high prio directory
         File dir = new File(filesDirPath + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY);
+        String successMessage = "Successfully created regular directory";
+        String errorMessage = "Error creating directory";
         if (!dir.exists()) {
-            dir.mkdirs();
+            if(dir.mkdirs()) {
+                InternalLogging.info(TAG, successMessage, "high priority");
+            }
+            else {
+                InternalLogging.info(TAG, errorMessage, "high priority");
+            }
         }
-        //create high prio directory
+        //create regular prio directory
         dir = new File(filesDirPath + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY);
         if (!dir.exists()) {
-            dir.mkdirs();
+            if(dir.mkdirs()) {
+                InternalLogging.info(TAG, successMessage, "regular priority");
+            }
+            else {
+                InternalLogging.info(TAG, errorMessage, "regular priority");
+            }
         }
     }
 

@@ -18,12 +18,12 @@ class CreateDataTask extends AsyncTask<Void, Void, Void> {
         HANDLED_EXCEPTION,
         UNHANDLED_EXCEPTION,
         NEW_SESSION
-    };
+    }
 
     private String name;
     private Map<String,String> properties;
     private Map<String, Double> measurements;
-    private DataType type;
+    private final DataType type;
     private double metric;
     private Throwable exception;
     private ITelemetry telemetry;
@@ -102,10 +102,5 @@ class CreateDataTask extends AsyncTask<Void, Void, Void> {
             }
         }
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void result) {
-        return ;
     }
 }

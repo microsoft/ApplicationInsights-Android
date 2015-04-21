@@ -39,7 +39,7 @@ class ChannelQueue {
     /**
      * The linked list for this queue
      */
-    protected List<IJsonSerializable> list;
+    protected final List<IJsonSerializable> list;
 
     /**
      * If true the app is crashing and data should be persisted instead of sent
@@ -113,7 +113,7 @@ class ChannelQueue {
             this.scheduledPersistenceTask.cancel();
         }
 
-        IJsonSerializable[] data = null;
+        IJsonSerializable[] data;
         synchronized (this.LOCK) {
             if (!list.isEmpty()) {
                 data = new IJsonSerializable[list.size()];

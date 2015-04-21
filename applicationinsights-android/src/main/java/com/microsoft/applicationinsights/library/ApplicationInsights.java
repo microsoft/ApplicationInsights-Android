@@ -79,7 +79,7 @@ public enum ApplicationInsights {
     /**
      * Create ApplicationInsights instance
      */
-    private ApplicationInsights() {
+    ApplicationInsights() {
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
         this.autoCollectionDisabled = false;
@@ -146,7 +146,7 @@ public enum ApplicationInsights {
                 this.context = context;
                 this.instrumentationKey = instrumentationKey;
                 this.application = application;
-                this.isSetup = true;
+                isSetup = true;
                 InternalLogging.info(TAG, "ApplicationInsights has been setup correctly.", null);
             } else {
                 InternalLogging.warn(TAG, "ApplicationInsights could not be setup correctly " +

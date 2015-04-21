@@ -27,7 +27,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
     /**
      * The configuration for tracking sessions
      */
-    protected SessionConfig config;
+    protected final SessionConfig config;
 
     /**
      * The timestamp of the last activity
@@ -103,7 +103,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
     /**
      * Enables lifecycle event tracking for the provided application
      *
-     * @param application
+     * @param application the application object
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerActivityLifecycleCallbacks(Application application) {
@@ -115,8 +115,8 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
     /**
      * This is called each time an activity is created.
      *
-     * @param activity
-     * @param savedInstanceState
+     * @param activity the Android Activity that's created
+     * @param savedInstanceState the bundle
      */
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         int count = this.activityCount.getAndIncrement();
