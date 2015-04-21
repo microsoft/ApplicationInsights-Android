@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.library.Sender;
 import com.microsoft.applicationinsights.library.config.SenderConfig;
+import com.microsoft.applicationinsights.library.config.ISenderConfig;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -16,7 +17,7 @@ public class MockSender extends Sender {
 
     public MockSender(CountDownLatch sendSignal,
                       CountDownLatch responseSignal,
-                      SenderConfig config) {
+                      ISenderConfig config) {
         super(config);
         this.responseCode = 0;
         this.sendSignal = sendSignal;
