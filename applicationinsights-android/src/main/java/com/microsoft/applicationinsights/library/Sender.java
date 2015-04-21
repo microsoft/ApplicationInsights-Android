@@ -49,7 +49,7 @@ class Sender {
      */
     private static Sender instance;
 
-    private HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
+    private final HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
 
     /**
      * Restrict access to the default constructor
@@ -150,9 +150,8 @@ class Sender {
      * @param responseCode the response code from the connection
      * @param payload      the payload which generated this response
      * @param fileToSend reference to the file we want to send
-     * @return null if the request was successful, the server response otherwise
      */
-    protected String onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
+    protected void onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
         this.removeFromRunning(fileToSend.toString());
 
         StringBuilder builder = new StringBuilder();
@@ -165,7 +164,7 @@ class Sender {
 
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
-            this.onExpected(connection, builder, fileToSend);
+            this.onExpected(connection, builder);
             this.send();
         }
 
@@ -185,8 +184,6 @@ class Sender {
         if (!isExpected) {
             this.onUnexpected(connection, responseCode, builder);
         }
-
-        return builder.toString();
     }
 
     /**
@@ -194,9 +191,8 @@ class Sender {
      * response and log it.
      *  @param connection a connection containing a response
      * @param builder    a string builder for storing the response
-     * @param fileToSend reference to the file we sent
      */
-    protected void onExpected(HttpURLConnection connection, StringBuilder builder, File fileToSend) {
+    protected void onExpected(HttpURLConnection connection, StringBuilder builder) {
         if (ApplicationInsights.isDeveloperMode()) {
             this.readResponse(connection, builder);
         }
@@ -296,7 +292,7 @@ class Sender {
 
     private class SendingTask extends TimerTask {
         private String payload;
-        private File fileToSend;
+        private final File fileToSend;
 
         public SendingTask(String payload, File fileToSend) {
             this.payload = payload;

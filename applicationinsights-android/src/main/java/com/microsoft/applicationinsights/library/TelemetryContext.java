@@ -44,7 +44,7 @@ class TelemetryContext {
     /**
      * The shared preferences INSTANCE for reading persistent context
      */
-    private SharedPreferences settings;
+    private final SharedPreferences settings;
 
     /**
      * Content for tags field of an envelope
@@ -54,37 +54,37 @@ class TelemetryContext {
     /**
      * Device telemetryContext.
      */
-    private String instrumentationKey;
+    private final String instrumentationKey;
 
     /**
      * Device telemetryContext.
      */
-    private Device device;
+    private final Device device;
 
     /**
      * Session telemetryContext.
      */
-    private Session session;
+    private final Session session;
 
     /**
      * User telemetryContext.
      */
-    private User user;
+    private final User user;
 
     /**
      * Application telemetryContext.
      */
-    private Application application;
+    private final Application application;
 
     /**
      * Internal telemetryContext.
      */
-    private Internal internal;
+    private final Internal internal;
 
     /**
      * The last session ID
      */
-    private String lastSessionId;
+    private final String lastSessionId;
 
     /**
      * The App ID for the envelope (defined as PackageInfo.packageName by CLL team)
@@ -371,9 +371,9 @@ class TelemetryContext {
 
     // TODO: Synchronize resolution update
     protected void updateScreenResolution(Context context) {
-        String resolutionString = "";
-        int width = 0;
-        int height = 0;
+        String resolutionString;
+        int width;
+        int height;
 
         WindowManager wm = (WindowManager) context.getSystemService(
               Context.WINDOW_SERVICE);
@@ -384,6 +384,9 @@ class TelemetryContext {
             height = size.y;
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             try {
+                //We have to use undocumented API here. Android 4.0 introduced soft buttons for
+                //back, home and menu, but there's no API present to get the real display size
+                //all available methods only return the size of the contentview.
                 Method mGetRawW = Display.class.getMethod("getRawWidth");
                 Method mGetRawH = Display.class.getMethod("getRawHeight");
                 Display display = wm.getDefaultDisplay();
@@ -398,6 +401,7 @@ class TelemetryContext {
             }
 
         } else {
+            //Use old, and now deprecated API to get width and height of the display
             Display d = wm.getDefaultDisplay();
             width = d.getWidth();
             height = d.getHeight();
