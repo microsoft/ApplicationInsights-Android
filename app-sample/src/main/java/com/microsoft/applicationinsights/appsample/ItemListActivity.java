@@ -56,7 +56,7 @@ public class ItemListActivity extends FragmentActivity
 
         ApplicationInsightsConfig config = ApplicationInsights.getConfig();
         config.setSessionIntervalMs(30000);
-        config.setEndpointUrl("http://dc.services.visualstudio.com/v2/track");
+        config.setEndpointUrl("https://myserver.com/v2/track");
         config.setMaxBatchCount(45);
 
         ApplicationInsights.setDeveloperMode(false);

@@ -170,7 +170,7 @@ config.setSessionIntervalMs(30000); //set intercal to 30s (30,000ms)
 You can also configure a different server endpoint for the SDK if needed:
 
 ```java
-config.setEndpointUrl("http://dc.services.visualstudio.com/v2/track");
+config.setEndpointUrl("https://myserver.com/v2/track");
 ```
 
 Unhandled exceptions (aka ”your app is crashing“) are sent out immediately at the next app start, while regular telemetry data is send out in batches or after a specified interval.
