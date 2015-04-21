@@ -100,6 +100,7 @@ public class TelemetryClient {
      */
     public void track(ITelemetry telemetry){
         if(isTelemetryEnabled()){
+            new CreateDataTask(telemetry).execute();
         }
     }
 
