@@ -155,31 +155,32 @@ To configure Application Insights according to your need, first, call
 ApplicationInsights.setup(this, getApplication()); //setup
 ```
 
-And then use the different configuration objects to set your individual values.
-
-The default time the users entering the app counts as a new session is 20s. If you want to set it to a different value, use the ```SessionConigf```:
+After that you can use `ApplicationInsightsConfig` to set your individual values.
 
 ```java
-SessionConfig sessionConfig = ApplicationInsights.getSessionConfig(); //get the SessionConfig
-sessionConfig.setSessionIntervalMs(40000); //set the session's interval to 40s (aka. 40,000 ms)
+ApplicationInsightsConfig config = ApplicationInsights.getConfig();
 ```
 
-To configure a differen server endpoint for the SDK, use the ```SenderConfig````:
+The default time the users entering the app counts as a new session is 20s. If you want to set it to a different value, do the following:
 
 ```java
-SenderConfig senderConfig = ApplicationInsights.getSenderConfig(); //get the SenderConfig
-senderConfig.setEndpointUrl("http://yourawsomeserver.com/applicationInsights"); //set the config to a custom endpoint 
+config.setSessionIntervalMs(30000);
+```
+
+You can also configure a differenz server endpoint for the SDKif needed:
+
+```java
+config.setEndpointUrl("http://dc.services.visualstudio.com/v2/track");
 ```
 
 Unhandled exceptions (your app is crashing) are sent out immediately at the next app start, while regular telemetry data is send out in batches or after a specified interval.
 
 [**NOTE**] The [developer mode](#4) will automatically set the batching interval to 3s.
 
- The default interval until a batch of telemetry is sent to the server is 15s. To set to 3s, you can use the ```QueueConfig````:
+The default interval until a batch of telemetry is sent to the server is 15s. The following will change it to 3s:
 
 ```java
-QueueConfig queueConfig = ApplicationInsights.getQueueConfig(); //get the QueueConfig
-queueConfig.setMaxBatchIntervalMs(3000); //set the interval to e.g. 3s (3,000ms)
+config.setMaxBatchIntervalMs(3000); //set the interval to e.g. 3s (3,000ms)
 ```
 
 After all custom configurations have been made, just start `ApplicationInsights`:
