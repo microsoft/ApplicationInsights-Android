@@ -65,6 +65,11 @@ class CreateDataTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... params) {
         Envelope envelope = null;
         switch (this.type){
+            case NONE:
+                if(this.telemetry != null){
+                    envelope = EnvelopeFactory.INSTANCE.createEnvelope(this.telemetry);
+                }
+                break;
             case EVENT:
                 envelope = EnvelopeFactory.INSTANCE.createEventEnvelope(this.name, this.properties, this.measurements);
                 break;
