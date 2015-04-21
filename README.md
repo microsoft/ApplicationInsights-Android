@@ -45,7 +45,7 @@ dependencies {
 
 Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
-Plase add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` into your app's `AndroidManifest.xml` as well as the property for your instrumentation key as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key or the variable leave it and use gradle.properties to set it. 
+Add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` into your app's `AndroidManifest.xml` as well as the property for your instrumentation key as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key or the variable leave it and use gradle.properties to set it. 
 
 ```xml
 <manifest>
@@ -131,7 +131,7 @@ public class MyActivity extends Activity {
 
 ## <a name="2"></a> Automatic collection of life-cycle events
 
-This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default. Don't forget to set the Application instance when setting up ApplicationInsights (otherwise auto collection will be disabled):
+This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default. Don't forget to set the Application instance when setting up Application Insights (otherwise auto collection will be disabled):
 
 ```java
 ApplicationInsights.setup(this, getApplication()); //setup
@@ -164,20 +164,20 @@ ApplicationInsightsConfig config = ApplicationInsights.getConfig();
 The default time the users entering the app counts as a new session is 20s. If you want to set it to a different value, do the following:
 
 ```java
-config.setSessionIntervalMs(30000);
+config.setSessionIntervalMs(30000); //set intercal to 30s (30,000ms)
 ```
 
-You can also configure a differenz server endpoint for the SDKif needed:
+You can also configure a different server endpoint for the SDK if needed:
 
 ```java
 config.setEndpointUrl("http://dc.services.visualstudio.com/v2/track");
 ```
 
-Unhandled exceptions (your app is crashing) are sent out immediately at the next app start, while regular telemetry data is send out in batches or after a specified interval.
+Unhandled exceptions (aka ”your app is crashing“) are sent out immediately at the next app start, while regular telemetry data is send out in batches or after a specified interval.
 
 [**NOTE**] The [developer mode](#4) will automatically set the batching interval to 3s.
 
-The default interval until a batch of telemetry is sent to the server is 15s. The following will change it to 3s:
+The default interval until a batch of telemetry is sent to the server is 15s. The following code will change it to 3s:
 
 ```java
 config.setMaxBatchIntervalMs(3000); //set the interval to e.g. 3s (3,000ms)
