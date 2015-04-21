@@ -16,7 +16,7 @@ public class ApplicationInsightsConfig implements ISenderConfig, ISessionConfig,
     private static final int DEFAULTSENDER_CONNECT_TIMEOUT = 15 * 1000;
 
     // Default values for session config
-    protected static final int SESSION_INTERVAL = 20 * 1000; // 20 seconds
+    protected static final int DEFAULT_SESSION_INTERVAL = 20 * 1000; // 20 seconds
     
     /**
      * Lock object to ensure thread safety of the configuration
@@ -70,7 +70,7 @@ public class ApplicationInsightsConfig implements ISenderConfig, ISessionConfig,
         this.senderConnectTimeoutMs = DEFAULTSENDER_CONNECT_TIMEOUT;
 
         // Initialize default values for session config
-        this.sessionIntervalMs = SessionConfig.SESSION_INTERVAL;
+        this.sessionIntervalMs = DEFAULT_SESSION_INTERVAL;
     }
 
     /**
