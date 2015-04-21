@@ -2,7 +2,6 @@ package com.microsoft.applicationinsights.library;
 
 import android.app.Activity;
 
-import com.microsoft.applicationinsights.library.config.SessionConfig;
 import com.microsoft.applicationinsights.library.config.ISessionConfig;
 
 public class MockLifeCycleTracking extends LifeCycleTracking {

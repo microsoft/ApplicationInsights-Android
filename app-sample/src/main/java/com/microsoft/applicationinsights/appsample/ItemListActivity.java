@@ -6,8 +6,6 @@ import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
-import com.microsoft.applicationinsights.library.config.QueueConfig;
-import com.microsoft.applicationinsights.library.config.SenderConfig;
 
 import java.util.HashMap;
 

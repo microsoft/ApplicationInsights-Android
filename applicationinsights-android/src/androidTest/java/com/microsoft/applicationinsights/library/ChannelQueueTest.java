@@ -4,11 +4,9 @@ import android.test.AndroidTestCase;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.library.config.QueueConfig;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import java.io.StringWriter;
 import java.util.LinkedList;

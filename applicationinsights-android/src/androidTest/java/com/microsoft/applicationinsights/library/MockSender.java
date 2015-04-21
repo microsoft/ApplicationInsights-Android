@@ -1,7 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.library.Sender;
-import com.microsoft.applicationinsights.library.config.SenderConfig;
 import com.microsoft.applicationinsights.library.config.ISenderConfig;
 
 import java.io.IOException;

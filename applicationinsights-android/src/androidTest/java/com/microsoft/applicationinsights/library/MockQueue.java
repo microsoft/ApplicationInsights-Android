@@ -1,6 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.library.config.QueueConfig;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
 import java.util.concurrent.CountDownLatch;

@@ -4,14 +4,6 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.library.ApplicationInsights;
-import com.microsoft.applicationinsights.library.Channel;
-import com.microsoft.applicationinsights.library.MockActivity;
-import com.microsoft.applicationinsights.library.MockChannel;
-import com.microsoft.applicationinsights.library.MockQueue;
-import com.microsoft.applicationinsights.library.MockTelemetryClient;
-import com.microsoft.applicationinsights.library.config.QueueConfig;
-import com.microsoft.applicationinsights.library.config.SenderConfig;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
 import junit.framework.Assert;

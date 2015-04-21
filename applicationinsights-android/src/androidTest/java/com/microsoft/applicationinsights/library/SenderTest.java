@@ -1,6 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.library.config.SenderConfig;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
 import junit.framework.TestCase;
