@@ -2,7 +2,7 @@ package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.library.config.QueueConfig;
+import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 /**
@@ -38,14 +38,14 @@ class Channel {
     protected Channel() {
     }
 
-    protected static void initialize(QueueConfig queueConfig) {
+    protected static void initialize(IQueueConfig config) {
         // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
         if (!isChannelLoaded) {
             synchronized (Channel.LOCK) {
                 if (!isChannelLoaded) {
                     isChannelLoaded = true;
                     instance = new Channel();
-                    instance.setQueue(new ChannelQueue(queueConfig));
+                    instance.setQueue(new ChannelQueue(config));
                 }
             }
         }
