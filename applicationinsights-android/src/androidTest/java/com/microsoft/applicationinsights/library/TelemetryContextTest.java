@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.library.config.SessionConfig;
-
 import junit.framework.Assert;
 
 import java.util.Map;

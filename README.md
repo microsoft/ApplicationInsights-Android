@@ -45,7 +45,7 @@ dependencies {
 
 Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
-Plase add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` into your app's `AndroidManifest.xml` as well as the property for your instrumentation key as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key or the variable leave it and use gradle.properties to set it. 
+Add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` into your app's `AndroidManifest.xml` as well as the property for your instrumentation key as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key or the variable leave it and use gradle.properties to set it. 
 
 ```xml
 <manifest>
@@ -131,7 +131,7 @@ public class MyActivity extends Activity {
 
 ## <a name="2"></a> Automatic collection of life-cycle events
 
-This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default. Don't forget to set the Application instance when setting up ApplicationInsights (otherwise auto collection will be disabled):
+This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is enabled by default. Don't forget to set the Application instance when setting up Application Insights (otherwise auto collection will be disabled):
 
 ```java
 ApplicationInsights.setup(this, getApplication()); //setup
@@ -155,31 +155,32 @@ To configure Application Insights according to your need, first, call
 ApplicationInsights.setup(this, getApplication()); //setup
 ```
 
-And then use the different configuration objects to set your individual values.
-
-The default time the users entering the app counts as a new session is 20s. If you want to set it to a different value, use the ```SessionConigf```:
+After that you can use `ApplicationInsightsConfig` to set your individual values.
 
 ```java
-SessionConfig sessionConfig = ApplicationInsights.getSessionConfig(); //get the SessionConfig
-sessionConfig.setSessionIntervalMs(40000); //set the session's interval to 40s (aka. 40,000 ms)
+ApplicationInsightsConfig config = ApplicationInsights.getConfig();
 ```
 
-To configure a differen server endpoint for the SDK, use the ```SenderConfig````:
+The default time the users entering the app counts as a new session is 20s. If you want to set it to a different value, do the following:
 
 ```java
-SenderConfig senderConfig = ApplicationInsights.getSenderConfig(); //get the SenderConfig
-senderConfig.setEndpointUrl("http://yourawsomeserver.com/applicationInsights"); //set the config to a custom endpoint 
+config.setSessionIntervalMs(30000); //set intercal to 30s (30,000ms)
 ```
 
-Unhandled exceptions (your app is crashing) are sent out immediately at the next app start, while regular telemetry data is send out in batches or after a specified interval.
+You can also configure a different server endpoint for the SDK if needed:
+
+```java
+config.setEndpointUrl("https://myserver.com/v2/track");
+```
+
+Unhandled exceptions (aka ”your app is crashing“) are sent out immediately at the next app start, while regular telemetry data is send out in batches or after a specified interval.
 
 [**NOTE**] The [developer mode](#4) will automatically set the batching interval to 3s.
 
- The default interval until a batch of telemetry is sent to the server is 15s. To set to 3s, you can use the ```QueueConfig````:
+The default interval until a batch of telemetry is sent to the server is 15s. The following code will change it to 3s:
 
 ```java
-QueueConfig queueConfig = ApplicationInsights.getQueueConfig(); //get the QueueConfig
-queueConfig.setMaxBatchIntervalMs(3000); //set the interval to e.g. 3s (3,000ms)
+config.setMaxBatchIntervalMs(3000); //set the interval to e.g. 3s (3,000ms)
 ```
 
 After all custom configurations have been made, just start `ApplicationInsights`:

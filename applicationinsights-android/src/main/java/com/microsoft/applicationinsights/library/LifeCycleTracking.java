@@ -6,7 +6,7 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.microsoft.applicationinsights.library.config.SessionConfig;
+import com.microsoft.applicationinsights.library.config.ISessionConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Date;
@@ -27,7 +27,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
     /**
      * The configuration for tracking sessions
      */
-    protected final SessionConfig config;
+    protected ISessionConfig config;
 
     /**
      * The timestamp of the last activity
@@ -65,7 +65,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      * @param config the session configuration for session tracking
      * @param telemetryContext the context, which is needed to renew sessions
      */
-    protected LifeCycleTracking(SessionConfig config, TelemetryContext telemetryContext) {
+    protected LifeCycleTracking(ISessionConfig config, TelemetryContext telemetryContext) {
         this.activityCount = new AtomicInteger(0);
         this.lastBackground = new AtomicLong(this.getTime());
         this.config = config;
@@ -77,7 +77,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      *
      * @param telemetryContext the context, which is needed to renew sessions
      */
-    protected static void initialize(TelemetryContext telemetryContext, SessionConfig config) {
+    protected static void initialize(TelemetryContext telemetryContext, ISessionConfig config) {
         // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
         if (!LifeCycleTracking.isLoaded) {
             synchronized (LifeCycleTracking.LOCK) {

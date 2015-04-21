@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
 
-import com.microsoft.applicationinsights.library.config.SenderConfig;
+import com.microsoft.applicationinsights.library.config.ISenderConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.io.BufferedReader;
@@ -42,7 +42,7 @@ class Sender {
     /**
      * The configuration for this sender.
      */
-    protected final SenderConfig config;
+    protected final ISenderConfig config;
 
     /**
      * The shared Sender instance.
@@ -55,14 +55,14 @@ class Sender {
      * Restrict access to the default constructor
      * @param config the telemetryconfig object used to configure the telemetry module
      */
-    protected Sender(SenderConfig config) {
+    protected Sender(ISenderConfig config) {
         this.config = config;
     }
 
     /**
      * Initialize the INSTANCE of sender.
      */
-    protected static void initialize(SenderConfig config) {
+    protected static void initialize(ISenderConfig config) {
         // note: isSenderLoaded must be volatile for the double-checked LOCK to work
         if (!Sender.isSenderLoaded) {
             synchronized (Sender.LOCK) {

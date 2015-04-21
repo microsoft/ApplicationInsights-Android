@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
-import com.microsoft.applicationinsights.library.config.QueueConfig;
-import com.microsoft.applicationinsights.library.config.SenderConfig;
-import com.microsoft.applicationinsights.library.config.SessionConfig;
+import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
 import java.util.HashMap;
 
@@ -56,14 +54,10 @@ public class ItemListActivity extends FragmentActivity
         }
         ApplicationInsights.setup(this, getApplication());
 
-        SessionConfig sessionConfig = ApplicationInsights.getSessionConfig();
-        sessionConfig.setSessionIntervalMs(30000);
-
-        SenderConfig senderConfig = ApplicationInsights.getSenderConfig();
-        senderConfig.setEndpointUrl("http://dc.services.visualstudio.com/v2/track");
-
-        QueueConfig queueConfig = ApplicationInsights.getQueueConfig();
-        queueConfig.setMaxBatchCount(45);
+        ApplicationInsightsConfig config = ApplicationInsights.getConfig();
+        config.setSessionIntervalMs(30000);
+        config.setEndpointUrl("https://myserver.com/v2/track");
+        config.setMaxBatchCount(45);
 
         ApplicationInsights.setDeveloperMode(false);
 

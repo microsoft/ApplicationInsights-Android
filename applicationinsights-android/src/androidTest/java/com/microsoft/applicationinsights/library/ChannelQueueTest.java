@@ -4,10 +4,9 @@ import android.test.AndroidTestCase;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.library.config.QueueConfig;
+import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 import java.io.StringWriter;
 import java.util.LinkedList;
@@ -157,7 +156,7 @@ public class ChannelQueueTest extends AndroidTestCase {
         public StringWriter writer;
 
         public TestQueue() {
-            super(new QueueConfig());
+            super(new ApplicationInsightsConfig());
             this.sendSignal = new CountDownLatch(1);
             this.responseSignal = new CountDownLatch(1);
         }
