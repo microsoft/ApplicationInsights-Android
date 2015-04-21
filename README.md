@@ -201,7 +201,7 @@ ApplicationInsights.setDeveloperMode(false);
 
 ## Documentation
 
-[http://microsoft.github.io/ApplicationInsights-Android/]()
+[http://microsoft.github.io/ApplicationInsights-Android/](http://microsoft.github.io/ApplicationInsights-Android/)
 
 ## Contributing
 
