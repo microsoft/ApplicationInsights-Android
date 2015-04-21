@@ -21,7 +21,7 @@ public class InternalLogging {
      */
     public static void info(String tag, String message, String payload) {
         if (ApplicationInsights.isDeveloperMode()) {
-            Log.i(PREFIX + tag, message + ":" + payload);
+            Log.i(PREFIX + " " + tag, message + ":" + payload);
         }
     }
 
@@ -33,7 +33,7 @@ public class InternalLogging {
      */
     public static void warn(String tag, String message) {
         if (ApplicationInsights.isDeveloperMode()) {
-            Log.w(PREFIX + tag, message);
+            Log.w(PREFIX + " " + tag, message);
         }
     }
 
@@ -44,7 +44,7 @@ public class InternalLogging {
      * @param message the log message
      */
     public static void error(String tag, String message) {
-        Log.e(PREFIX + tag, message);
+        Log.e(PREFIX + " " + tag, message);
     }
 }
 
