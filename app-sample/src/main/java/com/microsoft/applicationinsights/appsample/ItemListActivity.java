@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
+import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.applicationinsights.library.config.QueueConfig;
+import com.microsoft.applicationinsights.library.config.SenderConfig;
 
 import java.util.HashMap;
 
@@ -52,6 +55,11 @@ public class ItemListActivity extends FragmentActivity
                     .setActivateOnItemClick(true);
         }
         ApplicationInsights.setup(this, getApplication());
+
+        ApplicationInsightsConfig config = ApplicationInsights.getConfig();
+        config.setSessionIntervalMs(30000);
+        config.setEndpointUrl("http://dc.services.visualstudio.com/v2/track");
+        config.setMaxBatchCount(45);
 
         ApplicationInsights.setDeveloperMode(false);
 
