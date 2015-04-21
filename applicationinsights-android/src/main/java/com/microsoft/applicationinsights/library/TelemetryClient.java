@@ -95,6 +95,8 @@ public class TelemetryClient {
 
     /**
      * Sends information about any object that implements the ITelemetry interface to Application Insights.
+     * For most use-cases, the other tracking methods will be sufficient. Providing this generic method
+     * for very specific uses.
      *
      * @param telemetry an object that implements the ITelemetry interface
      */
