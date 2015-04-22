@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import com.microsoft.applicationinsights.contracts.Application;
 import com.microsoft.applicationinsights.library.ApplicationInsights;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
@@ -54,17 +55,19 @@ public class ItemListActivity extends FragmentActivity
         }
         ApplicationInsights.setup(this, getApplication());
 
-        ApplicationInsightsConfig config = ApplicationInsights.getConfig();
-        config.setSessionIntervalMs(30000);
-        config.setEndpointUrl("https://myserver.com/v2/track");
-        config.setMaxBatchCount(45);
+        //ApplicationInsightsConfig config = ApplicationInsights.getConfig();
+        //config.setSessionIntervalMs(30000);
+        //config.setEndpointUrl("https://myserver.com/v2/track");
+        //config.setMaxBatchCount(45);
 
-        ApplicationInsights.setDeveloperMode(false);
+        ApplicationInsights.setUserId("New user ID");
+        ApplicationInsights.renewSession("New session ID");
+
+        //ApplicationInsights.setDeveloperMode(false);
 
         HashMap<String, String> properties = new HashMap<String,String>();
         properties.put("Hometown", "Karlsruhe");
         ApplicationInsights.setCommonProperties(properties);
-
         ApplicationInsights.start();
     }
 
