@@ -6,11 +6,17 @@ import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * The public API for recording application insights telemetry.
  */
 public class TelemetryClient {
+
+    public static final int THREADS = 10;
     public static final String TAG = "TelemetryClient";
 
     /**
@@ -39,12 +45,25 @@ public class TelemetryClient {
     private static final Object LOCK = new Object();
 
     /**
+     * Executor service for running track operations on several threads.
+     */
+    private ExecutorService executorService;
+
+    /**
      * Restrict access to the default constructor
      *
      * @param telemetryEnabled YES if tracking telemetry data manually should be enabled
      */
     protected TelemetryClient(boolean telemetryEnabled) {
         this.telemetryEnabled = telemetryEnabled;
+        this.executorService = Executors.newFixedThreadPool(THREADS, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r);
+                thread.setDaemon(false);
+                return thread;
+            }
+        });
     }
 
     /**
