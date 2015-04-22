@@ -121,7 +121,7 @@ public class TelemetryClient {
      */
     public void track(ITelemetry telemetry){
         if(isTelemetryEnabled()){
-            new CreateDataTask(telemetry).execute();
+            this.executorService.execute(new TrackDataOperation(telemetry));
         }
     }
 
@@ -138,7 +138,8 @@ public class TelemetryClient {
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.EVENT, eventName, properties, measurements).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.EVENT,
+                    eventName, properties, measurements));
         }
 
     }
@@ -161,7 +162,8 @@ public class TelemetryClient {
      */
     public void trackTrace(String message, Map<String, String> properties) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.TRACE, message, properties, null).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.TRACE,
+                    message, properties, null));
         }
     }
 
@@ -175,7 +177,7 @@ public class TelemetryClient {
      */
     public void trackMetric(String name, double value) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.METRIC, name, value).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value));
         }
     }
 
@@ -198,7 +200,8 @@ public class TelemetryClient {
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.HANDLED_EXCEPTION, handledException, properties).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
+                    handledException, properties));
         }
     }
 
@@ -234,7 +237,8 @@ public class TelemetryClient {
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.PAGE_VIEW, pageName, properties, null).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
+                    pageName, properties, null));
         }
     }
 
@@ -243,7 +247,7 @@ public class TelemetryClient {
      */
     public void trackNewSession() {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION));
         }
     }
 
