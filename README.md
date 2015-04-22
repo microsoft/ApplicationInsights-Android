@@ -94,7 +94,7 @@ Add the following import to your app's root activity
 import com.microsoft.applicationinsights.library.ApplicationInsights;
 ```
 
-And add 
+and add 
 
 ```java
 ApplicationInsights.setup(this, getApplication());
@@ -116,7 +116,7 @@ ai_instrumentation_key=<KEY_PLACEHOLDER>
 ```
 
 and replace ```<KEY_PLACEHOLDER>``` with your instrumentation key.
-After that, open your top-level ```build.gradle```and a the mainfest placeholder as follows:
+After that, open your top-level ```build.gradle```and add the mainfest placeholder as follows:
 
 ```groovy
 android {
@@ -141,8 +141,6 @@ ApplicationInsights.start();
 
 The **developer mode** is enabled automatically in case the debugger is attached or if the app is running in the emulator. This will enable the console logging and decrease the number of telemetry items sent in a batch (5 items) as well as the interval items will be sent (3 seconds). If you don't want this behavior, disable the **developer mode**.
 
-If **developer mode** is enabled, your other configured interval for sending telemetry as well as the batch size will be ignored. 
-
 You can explicitly enable/disable the developer mode like this:
 
 ```java
@@ -156,7 +154,7 @@ ApplicationInsights.setDeveloperMode(false);
 
 ## <a name="6"></a> 6. Basic Usage  ##
 
-The ```TelemetryClient```-instance provides various methods to track events, traces, metrics and handled exceptions.
+The ```TelemetryClient```-instance provides various methods to track events, traces, metrics page views, and handled exceptions.
 
 ```java
 	
@@ -176,7 +174,7 @@ client.trackTrace("sample trace");
 client.trackMetric("sample metric", 3);
 ```
 
-Events allow for custom properties.
+Some data types allow for custom properties.
 
 ```java
 
@@ -197,20 +195,20 @@ client.trackEvent("sample event", properties);
 This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is **enabled by default**. Don't forget to set the Application instance when setting up Application Insights (otherwise auto collection will be disabled):
 
 ```java
-ApplicationInsights.setup(this, getApplication()); //setup
+ApplicationInsights.setup(this, getApplication());
 ```
 
 If you want to explicitly **Disable** automatic collection of life-cycle events, call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
 
 ```java
-ApplicationInsights.setup(this); //setup
+ApplicationInsights.setup(this);
 ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
-ApplicationInsights.start(); //start
+ApplicationInsights.start();
 ```
 
 ## <a name="8"></a> Exception Handling (Crashes)
 
-The Application Insights SDK enables crash logging **per default**. Unhandled exceptions (aka Crashes) will be sent to the server during the next start of the app.
+The Application Insights SDK enables crash reporting **per default**. Unhandled exceptions (aka crashes) will be immediately sent to the server if a connection is available.
 
 This feature can be disabled as follows:
 
@@ -250,7 +248,7 @@ config.setSessionIntervalMs(30000); //set intercal to 30s (30,000ms)
 
 ### 9.2 Batch size for a bundle of telemetry
 
-Unhandled exceptions (aka ”your app is crashing!“) are sent out immediately at the next app start, while regular telemetry data is send out in batches or after a specified interval.
+Unhandled exceptions (aka ”your app is crashing!“) are sent out immediately, while regular telemetry data is send out in batches or after a specified interval.
 
 [**NOTE**] The [developer mode](#4) will automatically set the batching interval to 3s and the size of a batch to 5 items.
 
@@ -281,6 +279,7 @@ Application Insights manages IDs for a session and for individual users for you.
 ApplicationInsights.setUserId("New user ID");
 ApplicationInsights.renewSession("New session ID");
 ```
+[**NOTE**] If you want to manage sessions manually, please disable [Automatic Collection of Lifecycle Events](#7).
 
 ### 9.5 Other
 
