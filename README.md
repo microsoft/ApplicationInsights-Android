@@ -57,7 +57,7 @@ dependencies {
 }
 ```
 
-### 2. **Configure the instrumentation key
+### 2. Configure the instrumentation key
 
 Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
@@ -74,7 +74,7 @@ Add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` to your app's 
 
 ### 4. Add your instrumentation key to Manifest
 
-Ad the _instrumentation key_ for your app to your Android Manifest as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key. You can leave the variable as is if you want to use your ```gradle.properties``` to set it (see [Advanced Setup](#4)). 
+Add the _instrumentation key_ for your app to your Android Manifest as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key. You can leave the variable as is if you want to use your ```gradle.properties``` to set it (see [Advanced Setup](#4)). 
 
 ```xml
 <manifest>
