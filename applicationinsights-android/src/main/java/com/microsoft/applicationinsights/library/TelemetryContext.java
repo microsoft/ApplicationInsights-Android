@@ -421,7 +421,7 @@ class TelemetryContext {
                       .getApplicationInfo(appContext.getPackageName(), PackageManager.GET_META_DATA)
                       .metaData;
                 if (bundle != null) {
-                    sdkVersionString = bundle.getString("com.microsoft.applicationinsights.internal.sdkVersion");
+                    sdkVersionString = bundle.getString("com.microsoft.applicationinsights.library.sdkVersion");
                 } else {
                     InternalLogging.warn(TAG, "Could not load sdk version from gradle.properties or manifest");
                 }
