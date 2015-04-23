@@ -104,8 +104,6 @@ class TelemetryContext {
      */
     public TelemetryContext(Context appContext, String instrumentationKey, String userId) {
 
-        // TODO: Why does everything in here have to be static? Constructor is used to create new instance rather than setting static fields
-        this.operation = new Operation();
 
         // get an INSTANCE of the shared preferences manager for persistent context fields
         this.settings = appContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
@@ -266,7 +264,7 @@ class TelemetryContext {
             }
 
             String appBuild = Integer.toString(info.versionCode);
-            version = String.format("%s (%S)", this.appIdForEnvelope, appBuild);
+            version = String.format("%s (%S)", info.versionName, appBuild);
         } catch (PackageManager.NameNotFoundException e) {
             InternalLogging.warn(TAG, "Could not collect application context");
         } finally {
