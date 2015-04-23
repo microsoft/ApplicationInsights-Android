@@ -142,7 +142,7 @@ public class ItemListFragment extends ListFragment {
                 crashMe1();
                 break;
             case 4:
-                ApplicationInsights.INSTANCE.sendPendingData();
+                ApplicationInsights.sendPendingData();
                 break;
 
             default:
