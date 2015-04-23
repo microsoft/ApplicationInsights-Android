@@ -263,7 +263,7 @@ class TelemetryContext {
             }
 
             String appBuild = Integer.toString(info.versionCode);
-            version = String.format("%s (%S)", this.appIdForEnvelope, appBuild);
+            version = String.format("%s (%S)", info.versionName, appBuild);
         } catch (PackageManager.NameNotFoundException e) {
             InternalLogging.warn(TAG, "Could not collect application context");
         } finally {
