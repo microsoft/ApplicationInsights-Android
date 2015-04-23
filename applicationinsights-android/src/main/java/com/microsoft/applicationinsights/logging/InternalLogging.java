@@ -47,9 +47,8 @@ public class InternalLogging {
         if (ApplicationInsights.isDeveloperMode()) {
             Log.e(PREFIX + tag, message);
             throw new UserActionableSDKException(PREFIX + tag + "\n" + message);
-        } else {
-            // todo: track SDK misuse as an event to the user's channel
         }
+        //TODO: track SDK misuse as an event to the user's channel
     }
 }
 

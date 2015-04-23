@@ -111,8 +111,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     private String checkSessionTags(TelemetryContext tc) {
         Map<String, String> tags = tc.getContextTags();
         String sessionIdKey = "ai.session.id";
-        String _id = tags.get(sessionIdKey);
-        return _id;
+        return tags.get(sessionIdKey);
     }
 
     private class MockActivity extends Activity {
