@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-import com.microsoft.applicationinsights.contracts.Application;
 import com.microsoft.applicationinsights.library.ApplicationInsights;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
