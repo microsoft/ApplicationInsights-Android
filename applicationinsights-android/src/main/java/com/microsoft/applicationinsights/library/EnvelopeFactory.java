@@ -327,7 +327,7 @@ enum EnvelopeFactory {
         String message = localException.getMessage();
         crashDataHeaders.setExceptionReason(ensureNotNull(message));
         crashDataHeaders.setExceptionType(localException.getClass().getName());
-        crashDataHeaders.setApplicationPath(this.context.getPackageName());
+        crashDataHeaders.setApplicationIdentifier(this.context.getPackageName());
 
         CrashData crashData = new CrashData();
         crashData.setThreads(threads);
