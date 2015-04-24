@@ -189,15 +189,13 @@ public enum ApplicationInsights {
 
             // Start autocollection feature
             TelemetryClient.initialize(!telemetryDisabled);
-            if (!this.telemetryDisabled && !this.autoCollectionDisabled) {
-                LifeCycleTracking.initialize(telemetryContext, this.config);
-                if (this.application != null) {
-                    LifeCycleTracking.registerPageViewCallbacks(this.application);
-                    LifeCycleTracking.registerSessionManagementCallbacks(this.application);
-                } else {
-                    InternalLogging.warn(TAG, "Auto collection of page views could not be " +
+            LifeCycleTracking.initialize(telemetryContext, this.config);
+            if (this.application != null && !this.autoCollectionDisabled) {
+                LifeCycleTracking.registerPageViewCallbacks(this.application);
+                LifeCycleTracking.registerSessionManagementCallbacks(this.application);
+            } else {
+                InternalLogging.warn(TAG, "Auto collection of page views could not be " +
                           "started, since the given application was null");
-                }
             }
 
             // Start crash reporting
