@@ -59,7 +59,14 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     private static final String TAG = "LifeCycleTracking";
 
+    /**
+     * A flag which determines whether auto page view tracking has been enabled or not.
+     */
     private static boolean autoPageViewsEnabled;
+
+    /**
+     * A flag which determines whether session management has been enabled or not.
+     */
     private static boolean autoSessionManagementEnabled;
 
     /**
@@ -76,9 +83,10 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
     }
 
     /**
-     * Initialize the INSTANCE of lifecycle event tracking
+     * Initialize the INSTANCE of lifecycle event tracking.
      *
      * @param telemetryContext the context, which is needed to renew sessions
+     * @param config the session configuration for session tracking
      */
     protected static void initialize(TelemetryContext telemetryContext, ISessionConfig config) {
         // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
