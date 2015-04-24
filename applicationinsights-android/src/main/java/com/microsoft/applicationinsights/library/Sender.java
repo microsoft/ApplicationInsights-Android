@@ -256,13 +256,13 @@ class Sender {
                 builder.append(connection.getResponseMessage());
             }
         } catch (IOException e) {
-            InternalLogging.error(TAG, e.toString());
+            InternalLogging.warn(TAG, e.toString());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    InternalLogging.error(TAG, e.toString());
+                    InternalLogging.warn(TAG, e.toString());
                 }
             }
         }
@@ -306,7 +306,7 @@ class Sender {
                     InternalLogging.info(TAG, "sending persisted data", payload);
                     this.sendRequestWithPayload(payload);
                 } catch (IOException e) {
-                    InternalLogging.error(TAG, e.toString());
+                    InternalLogging.warn(TAG,"Couldn't send request with IOException: " + e.toString());
                 }
             }
         }
@@ -338,7 +338,7 @@ class Sender {
                 // process the response
                 onResponse(connection, responseCode, payload, fileToSend);
             } catch (IOException e) {
-                InternalLogging.error(TAG, e.toString());
+                InternalLogging.warn(TAG, "Couldn't send data with IOException: " + e.toString());
                 Persistence persistence = Persistence.getInstance();
                 if (persistence != null) {
                     persistence.makeAvailable(fileToSend); //send again later

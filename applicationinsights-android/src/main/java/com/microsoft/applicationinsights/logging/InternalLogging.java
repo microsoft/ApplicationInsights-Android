@@ -21,7 +21,7 @@ public class InternalLogging {
      */
     public static void info(String tag, String message, String payload) {
         if (ApplicationInsights.isDeveloperMode()) {
-            Log.i(PREFIX + tag, message + ":" + payload);
+            Log.i(PREFIX + " " + tag, message + ":" + payload);
         }
     }
 
@@ -33,22 +33,18 @@ public class InternalLogging {
      */
     public static void warn(String tag, String message) {
         if (ApplicationInsights.isDeveloperMode()) {
-            Log.w(PREFIX + tag, message);
+            Log.w(PREFIX + " " + tag, message);
         }
     }
 
     /**
-     * Log critical SDK misuse, throw if developer mode is enabled
+     * Log critical SDK error
      *
      * @param tag     the log context
      * @param message the log message
      */
     public static void error(String tag, String message) {
-        if (ApplicationInsights.isDeveloperMode()) {
-            Log.e(PREFIX + tag, message);
-            throw new UserActionableSDKException(PREFIX + tag + "\n" + message);
-        }
-        //TODO: track SDK misuse as an event to the user's channel
+        Log.e(PREFIX + " " + tag, message);
     }
 }
 

@@ -397,7 +397,7 @@ class TelemetryContext {
                 wm.getDefaultDisplay().getSize(size);
                 width = size.x;
                 height = size.y;
-                InternalLogging.error(TAG, ex.toString());
+                InternalLogging.warn(TAG, "Couldn't determine screen resolution: " + ex.toString());
             }
 
         } else {
