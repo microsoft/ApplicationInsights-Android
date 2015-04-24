@@ -147,7 +147,7 @@ public class ItemListFragment extends ListFragment {
             case 5:
                 crashMe1();
                 break;
-            case 4:
+            case 6:
                 ApplicationInsights.sendPendingData();
                 break;
             case 7:
