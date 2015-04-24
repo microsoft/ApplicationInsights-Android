@@ -59,6 +59,9 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     private static final String TAG = "LifeCycleTracking";
 
+    private static boolean autoPageViewsEnabled;
+    private static boolean autoSessionManagementEnabled;
+
     /**
      * Create a new INSTANCE of the lifecycle event tracking
      *
