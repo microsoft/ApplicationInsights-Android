@@ -97,8 +97,6 @@ class Persistence {
      * @param data         the data to serialize and save to disk
      * @param highPriority the priority to save the data with
      * @see Persistence#persist(String, Boolean)
-     *
-     * @return indicate if persisting data worked
      */
     protected void persist(IJsonSerializable[] data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {

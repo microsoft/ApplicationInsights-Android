@@ -142,15 +142,11 @@ public class ItemListFragment extends ListFragment {
                 crashMe1();
                 break;
             case 4:
-                ApplicationInsights.INSTANCE.sendPendingData();
+                ApplicationInsights.sendPendingData();
                 break;
 
             default:
                 break;
-        }
-
-        if(position == 1) {
-
         }
 
         // Notify the active callbacks interface (the activity, if the

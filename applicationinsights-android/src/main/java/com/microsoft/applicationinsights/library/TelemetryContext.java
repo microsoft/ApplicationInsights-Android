@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights.library;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -368,6 +369,7 @@ class TelemetryContext {
     }
 
     // TODO: Synchronize resolution update
+    @SuppressLint("NewApi")
     protected void updateScreenResolution(Context context) {
         String resolutionString;
         int width;
