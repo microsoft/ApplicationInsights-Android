@@ -27,7 +27,8 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 * Cleaned code
 * Single configuration class ```ApplicationInsightsConfig```
 * Generic tracking method for ```TelemetryClient```
-* Improved sending when the app is in background  
+* Separate methods for enabling/disabling auto collection features (auto page view tracking, auto session renewal)
+* Fixed context fields in telemetry data payload
 
 ##<a name="2"></a>Breaking Changes
 
