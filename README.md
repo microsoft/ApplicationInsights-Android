@@ -27,7 +27,8 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 * Cleaned code
 * Single configuration class ```ApplicationInsightsConfig```
 * Generic tracking method for ```TelemetryClient```
-* Improved sending when the app is in background  
+* Separate methods for enabling/disabling auto collection features (auto page view tracking, auto session renewal)
+* Fixed context fields in telemetry data payload
 
 ##<a name="2"></a>Breaking Changes
 
@@ -190,7 +191,7 @@ client.trackEvent("sample event", properties);
 
 ```
 
-## <a name="7"></a>7. Automatic collection of life-cycle events
+## <a name="7"></a>7. Automatic collection of life-cycle events (Sessions & Page Views)
 
 This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is **enabled by default**. Don't forget to set the Application instance when setting up Application Insights (otherwise auto collection will be disabled):
 
@@ -198,12 +199,22 @@ This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is **
 ApplicationInsights.setup(this, getApplication());
 ```
 
-If you want to explicitly **Disable** automatic collection of life-cycle events, call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
+If you want to explicitly **Disable** automatic collection of life-cycle events (auto session tracking and auto page view tracking), call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
 
 ```java
 ApplicationInsights.setup(this);
 ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
 ApplicationInsights.start();
+```
+
+After `ApplicationInsights.start()` was called you can enable or disable thos features at any point:
+
+```java
+// Disable automatic session renewal & tracking
+ApplicationInsights.disableAutoSessionManagement();
+
+// Enable automatic page view tracking
+ApplicationInsights.enableAutoPageViewTracking();
 ```
 
 ## <a name="8"></a> Exception Handling (Crashes)
@@ -222,7 +233,7 @@ This feature can be disabled as follows:
 To configure Application Insights according to your needs, first, call
 
 ```java
-ApplicationInsights.setup(this, getApplication()); //setup
+ApplicationInsights.setup(this, getApplication());
 ```
 
 After that you can use `ApplicationInsightsConfig` to customize the behavior and values of the SDK.
