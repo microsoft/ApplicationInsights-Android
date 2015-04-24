@@ -36,7 +36,7 @@ class Persistence {
 
     private static final Integer MAX_FILE_COUNT = 50;
 
-    private ArrayList<File> servedFiles;
+    private final ArrayList<File> servedFiles;
 
     /**
      * The tag for logging
@@ -55,6 +55,7 @@ class Persistence {
 
     /**
      * Restrict access to the default constructor
+     *
      * @param context android Context object
      */
     protected Persistence(Context context) {
@@ -97,14 +98,12 @@ class Persistence {
      * @param data         the data to serialize and save to disk
      * @param highPriority the priority to save the data with
      * @see Persistence#persist(String, Boolean)
-     *
-     * @return indicate if persisting data worked
      */
-    protected boolean persist(IJsonSerializable[] data, Boolean highPriority) {
+    protected void persist(IJsonSerializable[] data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
             Sender.getInstance().send();
-            return false;
+            return; //return immediately,as no free space is available
         }
 
         StringBuilder buffer = new StringBuilder();
@@ -124,18 +123,15 @@ class Persistence {
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData, highPriority);
 
-            if(isSuccess) {
+            if (isSuccess) {
                 Sender sender = Sender.getInstance();
-                if(sender != null) {
+                if (sender != null) {
                     sender.send();
                 }
             }
         } catch (IOException e) {
-            InternalLogging.error(TAG, e.toString());
-            return false;
+            InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
         }
-
-        return isSuccess;
     }
 
     /**
@@ -165,7 +161,7 @@ class Persistence {
                 isSuccess = true;
             } catch (Exception e) {
                 //Do nothing
-                InternalLogging.error(TAG, "Error writing telemetry data to file");
+                InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
             }
         }
 
@@ -193,7 +189,8 @@ class Persistence {
 
                 reader.close();
             } catch (Exception e) {
-                InternalLogging.error(TAG, "Error reading telemetry data from file");
+                InternalLogging.warn(TAG, "Error reading telemetry data from file with exception message "
+                      + e.getMessage());
             }
         }
 
@@ -223,7 +220,7 @@ class Persistence {
             return this.nextAvailableFileInDirectory(directory);
         }
 
-        InternalLogging.error(TAG, "The context for persistence is null");
+        InternalLogging.warn(TAG, "Couldn't provide next file, the context for persistence is null");
         return null;
     }
 
@@ -236,7 +233,7 @@ class Persistence {
             return this.nextAvailableFileInDirectory(directory);
         }
 
-        InternalLogging.error(TAG, "The context for persistence is null");
+        InternalLogging.warn(TAG, "Couldn't provide next file, the context for persistence is null");
         return null;
     }
 
@@ -276,13 +273,13 @@ class Persistence {
                 // always delete the file
                 boolean deletedFile = file.delete();
                 if (!deletedFile) {
-                    InternalLogging.error(TAG, "Error deleting telemetry file " + file.toString());
+                    InternalLogging.warn(TAG, "Error deleting telemetry file " + file.toString());
                 } else {
                     servedFiles.remove(file);
                 }
             }
         } else {
-            InternalLogging.error(TAG, "Couldn't delete file, the reference to the file was null");
+            InternalLogging.warn(TAG, "Couldn't delete file, the reference to the file was null");
         }
     }
 
@@ -305,8 +302,8 @@ class Persistence {
      * @param highPriority indicates which directory to check for available files
      */
     private Boolean isFreeSpaceAvailable(Boolean highPriority) {
-            synchronized (Persistence.LOCK) {
-                Context context = getContext();
+        synchronized (Persistence.LOCK) {
+            Context context = getContext();
             if (context != null) {
                 String path = highPriority ? (context.getFilesDir() + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY) :
                       (getContext().getFilesDir() + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY);
@@ -325,13 +322,23 @@ class Persistence {
         String filesDirPath = getContext().getFilesDir().getPath();
         //create high prio directory
         File dir = new File(filesDirPath + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY);
+        String successMessage = "Successfully created regular directory";
+        String errorMessage = "Error creating directory";
         if (!dir.exists()) {
-            dir.mkdirs();
+            if (dir.mkdirs()) {
+                InternalLogging.info(TAG, successMessage, "high priority");
+            } else {
+                InternalLogging.info(TAG, errorMessage, "high priority");
+            }
         }
-        //create high prio directory
+        //create regular prio directory
         dir = new File(filesDirPath + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY);
         if (!dir.exists()) {
-            dir.mkdirs();
+            if (dir.mkdirs()) {
+                InternalLogging.info(TAG, successMessage, "regular priority");
+            } else {
+                InternalLogging.info(TAG, errorMessage, "regular priority");
+            }
         }
     }
 

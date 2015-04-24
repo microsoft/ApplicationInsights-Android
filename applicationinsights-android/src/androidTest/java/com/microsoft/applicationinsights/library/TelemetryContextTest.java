@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.test.ActivityUnitTestCase;
 
-import com.microsoft.applicationinsights.library.config.SessionConfig;
-
 import junit.framework.Assert;
 
 import java.util.Map;
@@ -113,8 +111,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     private String checkSessionTags(TelemetryContext tc) {
         Map<String, String> tags = tc.getContextTags();
         String sessionIdKey = "ai.session.id";
-        String _id = tags.get(sessionIdKey);
-        return _id;
+        return tags.get(sessionIdKey);
     }
 
     private class MockActivity extends Activity {

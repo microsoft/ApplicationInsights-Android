@@ -60,8 +60,7 @@ public class Domain implements
      */
     protected String serializeContent(Writer writer) throws IOException
     {
-        String prefix = "";
-        return prefix;
+        return "";
     }
     
     /**

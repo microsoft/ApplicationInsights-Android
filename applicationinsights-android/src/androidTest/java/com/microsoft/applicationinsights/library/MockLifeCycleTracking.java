@@ -2,7 +2,7 @@ package com.microsoft.applicationinsights.library;
 
 import android.app.Activity;
 
-import com.microsoft.applicationinsights.library.config.SessionConfig;
+import com.microsoft.applicationinsights.library.config.ISessionConfig;
 
 public class MockLifeCycleTracking extends LifeCycleTracking {
 
@@ -15,7 +15,7 @@ public class MockLifeCycleTracking extends LifeCycleTracking {
         return (MockLifeCycleTracking)LifeCycleTracking.getInstance();
     }
 
-    protected MockLifeCycleTracking(SessionConfig config, TelemetryContext telemetryContext) {
+    protected MockLifeCycleTracking(ISessionConfig config, TelemetryContext telemetryContext) {
         super(config, telemetryContext);
         currentTime = 0;
         this.tc = new MockTelemetryClient(true);

@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.library;
 
 import android.app.Application;
 
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Map;
@@ -18,14 +19,9 @@ public class TelemetryClient {
     private static TelemetryClient instance;
 
     /**
-     * A flag, which determines if page views should be tracked automatically.
-     */
-    private boolean activityTrackingEnabled;
-
-    /**
      * A flag, which determines telemetry data can be tracked.
      */
-    private boolean telemetryEnabled;
+    private final boolean telemetryEnabled;
 
     /**
      * Volatile boolean for double checked synchronize block
@@ -90,6 +86,19 @@ public class TelemetryClient {
      */
     public void trackEvent(String eventName, Map<String, String> properties) {
         trackEvent(eventName, properties, null);
+    }
+
+    /**
+     * Sends information about any object that implements the ITelemetry interface to Application Insights.
+     * For most use-cases, the other tracking methods will be sufficient. Providing this generic method
+     * for very specific uses.
+     *
+     * @param telemetry an object that implements the ITelemetry interface
+     */
+    public void track(ITelemetry telemetry){
+        if(isTelemetryEnabled()){
+            new CreateDataTask(telemetry).execute();
+        }
     }
 
     /**
@@ -211,18 +220,6 @@ public class TelemetryClient {
     public void trackNewSession() {
         if(isTelemetryEnabled()){
             new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
-        }
-    }
-
-    /**
-     * Registers an activity life cycle callback handler to track page views and sessions.
-     *
-     * @param application the application used to register the life cycle callbacks
-     */
-    protected void enableActivityTracking(Application application) {
-        if(!activityTrackingEnabled){
-            activityTrackingEnabled = true;
-            LifeCycleTracking.registerActivityLifecycleCallbacks(application);
         }
     }
 

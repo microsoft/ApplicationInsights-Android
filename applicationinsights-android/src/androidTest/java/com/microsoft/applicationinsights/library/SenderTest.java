@@ -1,6 +1,6 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.library.config.SenderConfig;
+import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
 import junit.framework.TestCase;
 
@@ -12,7 +12,7 @@ public class SenderTest extends TestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        SenderConfig config = new SenderConfig();
+        ApplicationInsightsConfig config = new ApplicationInsightsConfig();
         this.sender = new Sender(config);
     }
 

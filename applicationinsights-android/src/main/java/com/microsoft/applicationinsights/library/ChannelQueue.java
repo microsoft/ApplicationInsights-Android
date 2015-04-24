@@ -3,7 +3,7 @@ package com.microsoft.applicationinsights.library;
 import android.os.AsyncTask;
 
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.library.config.QueueConfig;
+import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.LinkedList;
@@ -29,7 +29,7 @@ class ChannelQueue {
     /**
      * The configuration for this queue
      */
-    protected final QueueConfig config;
+    protected final IQueueConfig config;
 
     /**
      * The timer for this queue
@@ -39,7 +39,7 @@ class ChannelQueue {
     /**
      * The linked list for this queue
      */
-    protected List<IJsonSerializable> list;
+    protected final List<IJsonSerializable> list;
 
     /**
      * If true the app is crashing and data should be persisted instead of sent
@@ -54,10 +54,10 @@ class ChannelQueue {
     /**
      * Prevent external instantiation
      */
-    protected ChannelQueue(QueueConfig queueConfig) {
+    protected ChannelQueue(IQueueConfig config) {
         this.list = new LinkedList<IJsonSerializable>();
         this.timer = new Timer("Application Insights Sender Queue", true);
-        this.config = queueConfig;
+        this.config = config;
         this.isCrashing = false;
     }
 
@@ -113,7 +113,7 @@ class ChannelQueue {
             this.scheduledPersistenceTask.cancel();
         }
 
-        IJsonSerializable[] data = null;
+        IJsonSerializable[] data;
         synchronized (this.LOCK) {
             if (!list.isEmpty()) {
                 data = new IJsonSerializable[list.size()];
@@ -164,7 +164,7 @@ class ChannelQueue {
         }
     }
 
-    protected QueueConfig getQueueConfig(){
+    protected IQueueConfig getQueueConfig(){
         return this.config;
     }
 }

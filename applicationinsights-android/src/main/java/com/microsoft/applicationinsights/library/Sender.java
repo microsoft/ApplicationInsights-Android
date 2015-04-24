@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
 
-import com.microsoft.applicationinsights.library.config.SenderConfig;
+import com.microsoft.applicationinsights.library.config.ISenderConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.io.BufferedReader;
@@ -42,27 +42,27 @@ class Sender {
     /**
      * The configuration for this sender.
      */
-    protected final SenderConfig config;
+    protected final ISenderConfig config;
 
     /**
      * The shared Sender instance.
      */
     private static Sender instance;
 
-    private HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
+    private final HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
 
     /**
      * Restrict access to the default constructor
      * @param config the telemetryconfig object used to configure the telemetry module
      */
-    protected Sender(SenderConfig config) {
+    protected Sender(ISenderConfig config) {
         this.config = config;
     }
 
     /**
      * Initialize the INSTANCE of sender.
      */
-    protected static void initialize(SenderConfig config) {
+    protected static void initialize(ISenderConfig config) {
         // note: isSenderLoaded must be volatile for the double-checked LOCK to work
         if (!Sender.isSenderLoaded) {
             synchronized (Sender.LOCK) {
@@ -150,9 +150,8 @@ class Sender {
      * @param responseCode the response code from the connection
      * @param payload      the payload which generated this response
      * @param fileToSend reference to the file we want to send
-     * @return null if the request was successful, the server response otherwise
      */
-    protected String onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
+    protected void onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
         this.removeFromRunning(fileToSend.toString());
 
         StringBuilder builder = new StringBuilder();
@@ -165,7 +164,7 @@ class Sender {
 
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
-            this.onExpected(connection, builder, fileToSend);
+            this.onExpected(connection, builder);
             this.send();
         }
 
@@ -185,8 +184,6 @@ class Sender {
         if (!isExpected) {
             this.onUnexpected(connection, responseCode, builder);
         }
-
-        return builder.toString();
     }
 
     /**
@@ -194,9 +191,8 @@ class Sender {
      * response and log it.
      *  @param connection a connection containing a response
      * @param builder    a string builder for storing the response
-     * @param fileToSend reference to the file we sent
      */
-    protected void onExpected(HttpURLConnection connection, StringBuilder builder, File fileToSend) {
+    protected void onExpected(HttpURLConnection connection, StringBuilder builder) {
         if (ApplicationInsights.isDeveloperMode()) {
             this.readResponse(connection, builder);
         }
@@ -260,13 +256,13 @@ class Sender {
                 builder.append(connection.getResponseMessage());
             }
         } catch (IOException e) {
-            InternalLogging.error(TAG, e.toString());
+            InternalLogging.warn(TAG, e.toString());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    InternalLogging.error(TAG, e.toString());
+                    InternalLogging.warn(TAG, e.toString());
                 }
             }
         }
@@ -296,7 +292,7 @@ class Sender {
 
     private class SendingTask extends TimerTask {
         private String payload;
-        private File fileToSend;
+        private final File fileToSend;
 
         public SendingTask(String payload, File fileToSend) {
             this.payload = payload;
@@ -310,7 +306,7 @@ class Sender {
                     InternalLogging.info(TAG, "sending persisted data", payload);
                     this.sendRequestWithPayload(payload);
                 } catch (IOException e) {
-                    InternalLogging.error(TAG, e.toString());
+                    InternalLogging.warn(TAG,"Couldn't send request with IOException: " + e.toString());
                 }
             }
         }
@@ -342,7 +338,7 @@ class Sender {
                 // process the response
                 onResponse(connection, responseCode, payload, fileToSend);
             } catch (IOException e) {
-                InternalLogging.error(TAG, e.toString());
+                InternalLogging.warn(TAG, "Couldn't send data with IOException: " + e.toString());
                 Persistence persistence = Persistence.getInstance();
                 if (persistence != null) {
                     persistence.makeAvailable(fileToSend); //send again later

@@ -23,11 +23,14 @@ public class DummyContent {
     public static Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
 
     static {
-        addItem(new DummyItem("1", "Send event"));
-        addItem(new DummyItem("2", "Send trace"));
-        addItem(new DummyItem("3", "Send handled exception"));
-        addItem(new DummyItem("4", "Crash the App!"));
-        addItem(new DummyItem("5", "Trigger Synchronize"));
+        addItem(new DummyItem("1", "Enable page view tracking"));
+        addItem(new DummyItem("2", "Disable page view tracking"));
+        addItem(new DummyItem("3", "Enable session management"));
+        addItem(new DummyItem("4", "Disable session management"));
+        addItem(new DummyItem("5", "Send handled exception"));
+        addItem(new DummyItem("6", "Crash the App!"));
+        addItem(new DummyItem("7", "Trigger Synchronize"));
+        addItem(new DummyItem("8", "Track event"));
     }
 
     private static void addItem(DummyItem item) {

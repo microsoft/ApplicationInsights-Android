@@ -2,7 +2,7 @@ package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.library.config.QueueConfig;
+import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 /**
@@ -31,21 +31,20 @@ class Channel {
      */
     private static Channel instance;
 
-
     /**
      * Instantiates a new INSTANCE of Sender
      */
     protected Channel() {
     }
 
-    protected static void initialize(QueueConfig queueConfig) {
+    protected static void initialize(IQueueConfig config) {
         // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
         if (!isChannelLoaded) {
             synchronized (Channel.LOCK) {
                 if (!isChannelLoaded) {
                     isChannelLoaded = true;
                     instance = new Channel();
-                    instance.setQueue(new ChannelQueue(queueConfig));
+                    instance.setQueue(new ChannelQueue(config));
                 }
             }
         }
@@ -70,7 +69,7 @@ class Channel {
      * @return the sender for this channel.
      */
     protected ChannelQueue getQueue() {
-        return this.queue;
+        return queue;
     }
 
     /**
@@ -79,7 +78,7 @@ class Channel {
      * @param queue the queue to use for this channel
      */
     protected void setQueue(ChannelQueue queue) {
-        this.queue = queue;
+        Channel.queue = queue;
     }
 
     /**
@@ -88,17 +87,17 @@ class Channel {
      * @param envelope the envelope object to record
      */
     protected void enqueue(Envelope envelope) {
-        this.queue.isCrashing = false;
+        queue.isCrashing = false;
 
         // enqueue to queue
-        this.queue.enqueue(envelope);
+        queue.enqueue(envelope);
 
         InternalLogging.info(TAG, "enqueued telemetry", envelope.getName());
     }
 
     protected void processUnhandledException(Envelope envelope) {
-        this.queue.isCrashing = true;
-        this.queue.flush();
+        queue.isCrashing = true;
+        queue.flush();
 
         IJsonSerializable[] data = new IJsonSerializable[1];
         data[0] = envelope;

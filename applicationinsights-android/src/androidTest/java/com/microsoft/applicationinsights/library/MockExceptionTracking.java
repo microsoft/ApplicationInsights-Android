@@ -2,8 +2,6 @@ package com.microsoft.applicationinsights.library;
 
 import android.content.Context;
 
-import com.microsoft.applicationinsights.library.ExceptionTracking;
-
 public class MockExceptionTracking extends ExceptionTracking {
 
     public int processKillCount;

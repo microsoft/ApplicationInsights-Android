@@ -4,14 +4,7 @@ import android.content.Intent;
 import android.test.ActivityUnitTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.library.ApplicationInsights;
-import com.microsoft.applicationinsights.library.Channel;
-import com.microsoft.applicationinsights.library.MockActivity;
-import com.microsoft.applicationinsights.library.MockChannel;
-import com.microsoft.applicationinsights.library.MockQueue;
-import com.microsoft.applicationinsights.library.MockTelemetryClient;
-import com.microsoft.applicationinsights.library.config.QueueConfig;
-import com.microsoft.applicationinsights.library.config.SenderConfig;
+import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
 import junit.framework.Assert;
 
@@ -37,10 +30,11 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
         this.setActivity(this.startActivity(intent, null, null));
 
         MockTelemetryClient.getInstance().mockTrackMethod = false;
-        Channel.initialize(new QueueConfig());
+        ApplicationInsightsConfig config = new ApplicationInsightsConfig();
+        Channel.initialize(config);
         Channel.getInstance().getQueue().getQueueConfig().setMaxBatchIntervalMs(20);
 
-        Sender.initialize(new SenderConfig());
+        Sender.initialize(config);
 
         this.properties = new LinkedHashMap<String, String>();
         this.properties.put("core property", "core value");
@@ -111,7 +105,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             Thread.sleep(10);
         }
 
-        ApplicationInsights.INSTANCE.sendPendingData();
+        ApplicationInsights.sendPendingData();
         Thread.sleep(10);
         this.validate();
     }
