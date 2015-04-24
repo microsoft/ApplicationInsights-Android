@@ -219,18 +219,20 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      * @param activity the activity which left the foreground
      */
     public void onActivityResumed(Activity activity) {
-
         // check if the session should be renewed
         long now = this.getTime();
         long then = this.lastBackground.getAndSet(this.getTime());
         boolean shouldRenew = now - then >= this.config.getSessionIntervalMs();
-        if (shouldRenew) {
-            this.telemetryContext.renewSessionId();
-            new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
-        }
 
-        // track the page view
-        new CreateDataTask(CreateDataTask.DataType.PAGE_VIEW, activity.getClass().getName(), null, null).execute();
+        synchronized (LifeCycleTracking.LOCK) {
+            if(autoSessionManagementEnabled && shouldRenew){
+                this.telemetryContext.renewSessionId();
+                new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
+            }
+            if(autoPageViewsEnabled){
+                new CreateDataTask(CreateDataTask.DataType.PAGE_VIEW, activity.getClass().getName(), null, null).execute();
+            }
+        }
     }
 
     /**
