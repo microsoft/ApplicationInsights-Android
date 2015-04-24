@@ -199,8 +199,10 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         int count = this.activityCount.getAndIncrement();
-        if (count == 0) {
-            new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
+        synchronized (LifeCycleTracking.LOCK) {
+            if (count == 0 && autoSessionManagementEnabled) {
+                new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
+            }
         }
     }
 
