@@ -23,7 +23,10 @@ public enum ApplicationInsights {
      * A flag which determines, if developer mode (logging) should be enabled.
      */
     private static boolean DEVELOPER_MODE;
-    
+
+    /**
+     * The configuration of the SDK.
+     */
     private ApplicationInsightsConfig config;
 
     /**
@@ -47,10 +50,15 @@ public enum ApplicationInsights {
      */
     private String instrumentationKey;
 
+    /**
+     * The context which contains additional information for the telemetry data sent out.
+     */
     private TelemetryContext telemetryContext;
 
+    /**
+     * A custom user ID used for sending telemetry data.
+     */
     private String userId;
-
 
     /**
      * The context associated with Application Insights.
@@ -181,14 +189,13 @@ public enum ApplicationInsights {
 
             // Start autocollection feature
             TelemetryClient.initialize(!telemetryDisabled);
-            if (!this.telemetryDisabled && !this.autoCollectionDisabled) {
-                LifeCycleTracking.initialize(telemetryContext, this.config);
-                if (this.application != null) {
-                    TelemetryClient.getInstance().enableActivityTracking(this.application);
-                } else {
-                    InternalLogging.warn(TAG, "Auto collection of page views could not be " +
+            LifeCycleTracking.initialize(telemetryContext, this.config);
+            if (this.application != null && !this.autoCollectionDisabled) {
+                LifeCycleTracking.registerPageViewCallbacks(this.application);
+                LifeCycleTracking.registerSessionManagementCallbacks(this.application);
+            } else {
+                InternalLogging.warn(TAG, "Auto collection of page views could not be " +
                           "started, since the given application was null");
-                }
             }
 
             // Start crash reporting
@@ -226,12 +233,88 @@ public enum ApplicationInsights {
      */
     public static void enableActivityTracking(Application application) {
         if (!isRunning) { //TODO fix log warning
-            InternalLogging.warn(TAG, "Could not set exception tracking, because " +
+            InternalLogging.warn(TAG, "Could not set activity tracking, because " +
                   "ApplicationInsights has not been started, yet.");
             return;
         }
         if (!INSTANCE.telemetryDisabled) {
-            TelemetryClient.getInstance().enableActivityTracking(application);
+            LifeCycleTracking.registerActivityLifecycleCallbacks(application);
+        }
+    }
+
+    /**
+     * Enable auto page view tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void enableAutoPageViewTracking() {
+        if(!isRunning){
+            InternalLogging.warn(TAG, "Could not set page view tracking, because " +
+                    "ApplicationInsights has not been started yet.");
+            return;
+        }else if (INSTANCE.application == null) {
+            InternalLogging.warn(TAG, "Could not set page view tracking, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return;
+        }else{
+            LifeCycleTracking.registerPageViewCallbacks(INSTANCE.application);
+        }
+    }
+
+    /**
+     * Disable auto page view tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void disableAutoPageViewTracking() {
+        if(!isRunning){
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                    "ApplicationInsights has not been started yet.");
+            return;
+        }else if (INSTANCE.application == null) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return;
+        }else{
+            LifeCycleTracking.unregisterPageViewCallbacks(INSTANCE.application);
+        }
+    }
+
+    /**
+     * Enable auto session tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void enableAutoSessionManagement() {
+        if(!isRunning){
+            InternalLogging.warn(TAG, "Could not set session management, because " +
+                    "ApplicationInsights has not been started yet.");
+            return;
+        }else if (INSTANCE.application == null) {
+            InternalLogging.warn(TAG, "Could not set session management, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return;
+        }else{
+            LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.application);
+        }
+    }
+
+    /**
+     * Disable auto session tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void disableAutoSessionManagement() {
+        if(!isRunning){
+            InternalLogging.warn(TAG, "Could not unset session management, because " +
+                    "ApplicationInsights has not been started yet.");
+            return;
+        }else if (INSTANCE.application == null) {
+            InternalLogging.warn(TAG, "Could not unset session management, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return;
+        }else{
+            LifeCycleTracking.unregisterSessionManagementCallbacks(INSTANCE.application);
         }
     }
 
@@ -428,9 +511,12 @@ public enum ApplicationInsights {
         }
     }
 
+    /**
+     * Get the instrumentation key associated with this app.
+     *
+     * @return the Application Insights instrumentation key set for this app
+     */
     protected static String getInstrumentationKey() {
         return INSTANCE.instrumentationKey;
     }
-
-
 }
