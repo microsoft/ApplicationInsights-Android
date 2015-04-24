@@ -110,8 +110,84 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerActivityLifecycleCallbacks(Application application) {
+        if(!autoPageViewsEnabled && !autoSessionManagementEnabled){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                application.registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
+            }
+        }
+    }
+
+    /**
+     * Enables lifecycle event tracking for the provided application
+     *
+     * @param application the application object
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    private static void unregisterActivityLifecycleCallbacks(Application application) {
+        if(autoPageViewsEnabled ^ autoSessionManagementEnabled){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                application.unregisterActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
+            }
+        }
+    }
+
+    /**
+     * Enables page view event tracking for the provided application
+     *
+     * @param application the application object
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public static void registerPageViewCallbacks(Application application) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            application.registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
+            synchronized (LifeCycleTracking.LOCK) {
+                registerActivityLifecycleCallbacks(application);
+                autoPageViewsEnabled = true;
+            }
+        }
+    }
+
+    /**
+     * Disables page view event tracking for the provided application
+     *
+     * @param application the application object
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public static void unregisterPageViewCallbacks(Application application) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            synchronized (LifeCycleTracking.LOCK) {
+                unregisterActivityLifecycleCallbacks(application);
+                autoPageViewsEnabled = false;
+            }
+        }
+    }
+
+    /**
+     * Enables session event tracking for the provided application
+     *
+     * @param application the application object
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public static void registerSessionManagementCallbacks(Application application) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            synchronized (LifeCycleTracking.LOCK) {
+                registerActivityLifecycleCallbacks(application);
+                autoSessionManagementEnabled = true;
+            }
+        }
+    }
+
+    /**
+     * Disables session event tracking for the provided application
+     *
+     * @param application the application object
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    public static void unregisterSessionManagementCallbacks(Application application) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            synchronized (LifeCycleTracking.LOCK) {
+                unregisterActivityLifecycleCallbacks(application);
+                autoSessionManagementEnabled = false;
+            }
         }
     }
 
