@@ -23,7 +23,10 @@ public enum ApplicationInsights {
      * A flag which determines, if developer mode (logging) should be enabled.
      */
     private static boolean DEVELOPER_MODE;
-    
+
+    /**
+     * The configuration of the SDK.
+     */
     private ApplicationInsightsConfig config;
 
     /**
@@ -47,10 +50,15 @@ public enum ApplicationInsights {
      */
     private String instrumentationKey;
 
+    /**
+     * The context which contains additional information for the telemetry data sent out.
+     */
     private TelemetryContext telemetryContext;
 
+    /**
+     * A custom user ID used for sending telemetry data.
+     */
     private String userId;
-
 
     /**
      * The context associated with Application Insights.
@@ -428,9 +436,12 @@ public enum ApplicationInsights {
         }
     }
 
+    /**
+     * Get the instrumentation key associated with this app.
+     *
+     * @return the Application Insights instrumentation key set for this app
+     */
     protected static String getInstrumentationKey() {
         return INSTANCE.instrumentationKey;
     }
-
-
 }
