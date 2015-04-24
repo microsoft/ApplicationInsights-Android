@@ -234,12 +234,88 @@ public enum ApplicationInsights {
      */
     public static void enableActivityTracking(Application application) {
         if (!isRunning) { //TODO fix log warning
-            InternalLogging.warn(TAG, "Could not set exception tracking, because " +
+            InternalLogging.warn(TAG, "Could not set activity tracking, because " +
                   "ApplicationInsights has not been started, yet.");
             return;
         }
         if (!INSTANCE.telemetryDisabled) {
-            TelemetryClient.getInstance().enableActivityTracking(application);
+            LifeCycleTracking.registerActivityLifecycleCallbacks(application);
+        }
+    }
+
+    /**
+     * Enable auto page view tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void enableAutoPageViewTracking() {
+        if(!isRunning){
+            InternalLogging.warn(TAG, "Could not set page view tracking, because " +
+                    "ApplicationInsights has not been started yet.");
+            return;
+        }else if (INSTANCE.application == null) {
+            InternalLogging.warn(TAG, "Could not set page view tracking, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return;
+        }else{
+            LifeCycleTracking.registerPageViewCallbacks(INSTANCE.application);
+        }
+    }
+
+    /**
+     * Disable auto page view tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void disableAutoPageViewTracking() {
+        if(!isRunning){
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                    "ApplicationInsights has not been started yet.");
+            return;
+        }else if (INSTANCE.application == null) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return;
+        }else{
+            LifeCycleTracking.unregisterPageViewCallbacks(INSTANCE.application);
+        }
+    }
+
+    /**
+     * Enable auto session tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void enableAutoSessionManagement() {
+        if(!isRunning){
+            InternalLogging.warn(TAG, "Could not set session management, because " +
+                    "ApplicationInsights has not been started yet.");
+            return;
+        }else if (INSTANCE.application == null) {
+            InternalLogging.warn(TAG, "Could not set session management, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return;
+        }else{
+            LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.application);
+        }
+    }
+
+    /**
+     * Disable auto session tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void disableAutoSessionManagement() {
+        if(!isRunning){
+            InternalLogging.warn(TAG, "Could not unset session management, because " +
+                    "ApplicationInsights has not been started yet.");
+            return;
+        }else if (INSTANCE.application == null) {
+            InternalLogging.warn(TAG, "Could not unset session management, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return;
+        }else{
+            LifeCycleTracking.unregisterSessionManagementCallbacks(INSTANCE.application);
         }
     }
 
