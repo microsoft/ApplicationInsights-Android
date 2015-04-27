@@ -1,8 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-import android.content.Intent;
-import android.test.ActivityUnitTestCase;
-import android.test.AndroidTestCase;
 import android.test.InstrumentationTestCase;
 
 import com.microsoft.applicationinsights.contracts.Application;
@@ -36,7 +33,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     public void setUp() throws Exception {
         super.setUp();
         System.setProperty("dexmaker.dexcache",getInstrumentation().getTargetContext().getCacheDir().getPath());
-        TelemetryContext telemetryContext = getMockContext();
+        PublicTelemetryContext telemetryContext = getMockContext();
         HashMap<String,String> commonProperties = getCommonProperties();
         sut = new EnvelopeFactory(telemetryContext, commonProperties);
     }
@@ -213,7 +210,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     private static final String MOCK_TAGS_KEY = "tagsKey";
     private static final String MOCK_TAGS_VALUE = "tagsValue";
 
-    private static TelemetryContext getMockContext(){
+    private static PublicTelemetryContext getMockContext(){
         HashMap<String,String> tags = new HashMap<String,String>();
         tags.put(MOCK_TAGS_KEY, MOCK_TAGS_VALUE);
 
@@ -228,7 +225,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         when(mockDevice.getOsVersion()).thenReturn(MOCK_OS_VER);
         when(mockDevice.getOs()).thenReturn(MOCK_OS);
 
-        TelemetryContext mockContext = mock(TelemetryContext.class);
+        PublicTelemetryContext mockContext = mock(PublicTelemetryContext.class);
         when(mockContext.getPackageName()).thenReturn(MOCK_APP_ID);
         when(mockContext.getContextTags()).thenReturn(tags);
         when(mockContext.getApplication()).thenReturn(mockApplication);
