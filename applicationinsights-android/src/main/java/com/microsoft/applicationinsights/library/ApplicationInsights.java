@@ -181,7 +181,7 @@ public enum ApplicationInsights {
             }
 
             this.telemetryContext = new TelemetryContext(this.context, this.instrumentationKey, userId);
-            EnvelopeFactory.INSTANCE.configure(telemetryContext, this.commonProperties);
+            EnvelopeFactory.initialize(telemetryContext, this.commonProperties);
 
             Persistence.initialize(this.context);
             Sender.initialize(this.config);

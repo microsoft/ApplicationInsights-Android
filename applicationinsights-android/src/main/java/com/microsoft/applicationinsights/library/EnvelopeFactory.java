@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-enum EnvelopeFactory {
-    INSTANCE;
+class EnvelopeFactory {
 
+    /**
+     * The scham version of
+     */
     protected static final int CONTRACT_VERSION = 2;
 
     /**
@@ -40,6 +42,21 @@ enum EnvelopeFactory {
     private boolean configured;
 
     /**
+     * Volatile boolean for double checked synchronize block
+     */
+    private static volatile boolean isLoaded = false;
+
+    /**
+     * Synchronization LOCK for setting static context
+     */
+    private static final Object LOCK = new Object();
+
+    /**
+     * The singleton INSTANCE of this class
+     */
+    private static EnvelopeFactory instance;
+
+    /**
      * The context for this recorder
      */
     private TelemetryContext context;
@@ -50,13 +67,26 @@ enum EnvelopeFactory {
     private Map<String, String> commonProperties;
 
     /**
-     * Configures the shared instance with a telemetry context, which is needed to create envelops.
-     * Warning: Method should be called before creating envelops.
+     * Create an instance of EnvelopeFactory
      *
-     * @param context the telemetry context, which is used to create envelops with proper context information.
+     * @param telemetryContext the telemetry context
+     * @param commonProperties a map of common properties which should be set for all envelopes
      */
-    protected void configure(TelemetryContext context) {
-        this.configure(context, null);
+    protected EnvelopeFactory(TelemetryContext telemetryContext, Map<String,String> commonProperties){
+        this.context = telemetryContext;
+        this.commonProperties = commonProperties;
+        this.configured = true;
+    }
+
+    /**
+     * @return the INSTANCE of EnvelopeFactory or null if not yet initialized
+     */
+    protected static EnvelopeFactory getInstance() {
+        if (EnvelopeFactory.instance == null) {
+            InternalLogging.error(TAG, "getInstance was called before initialization");
+        }
+
+        return EnvelopeFactory.instance;
     }
 
     /**
@@ -66,10 +96,16 @@ enum EnvelopeFactory {
      * @param context          the telemetry context, which is used to create envelops with proper context information.
      * @param commonProperties Map of properties
      */
-    protected void configure(TelemetryContext context, Map<String, String> commonProperties) {
-        this.context = context;
-        this.commonProperties = commonProperties;
-        this.configured = true;
+    protected static void initialize(TelemetryContext context, Map<String, String> commonProperties) {
+        // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
+        if (!isLoaded) {
+            synchronized (EnvelopeFactory.LOCK) {
+                if (!isLoaded) {
+                    isLoaded = true;
+                    instance = new EnvelopeFactory(context, commonProperties);
+                }
+            }
+        }
     }
 
     /**
