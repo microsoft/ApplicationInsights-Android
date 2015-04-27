@@ -23,7 +23,7 @@ public enum ApplicationInsights {
     /**
      * A flag which determines, if developer mode (logging) should be enabled.
      */
-    private static AtomicBoolean DEVELOPER_MODE;
+    private static AtomicBoolean DEVELOPER_MODE = new AtomicBoolean(Util.isEmulator() || Util.isDebuggerAttached());
 
     /**
      * The configuration of the SDK.
@@ -87,7 +87,6 @@ public enum ApplicationInsights {
         this.exceptionTrackingDisabled = false;
         this.autoCollectionDisabled = false;
         this.config = new ApplicationInsightsConfig();
-        setDeveloperMode(Util.isEmulator() || Util.isDebuggerAttached());
     }
 
     /**
