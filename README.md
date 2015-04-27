@@ -22,7 +22,7 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 10. [Documentation](#10)
 11. [Contributing](#11) 
 
-## <a name="1"></a>Release Notes
+## <a name="1"></a> 1. Release Notes
 
 * Cleaned code
 * Single configuration class ```ApplicationInsightsConfig```
@@ -30,7 +30,7 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 * Separate methods for enabling/disabling auto collection features (auto page view tracking, auto session renewal)
 * Fixed context fields in telemetry data payload
 
-##<a name="2"></a>Breaking Changes
+##<a name="2"></a> 2. Breaking Changes
 
 Starting with the first 1.0 stable release, we will start deprecating API instead of breaking old ones.
 
@@ -42,13 +42,13 @@ Starting with the first 1.0 stable release, we will start deprecating API instea
 
 * **[1.0-Alpha.5]** Setup and start of the Application Insights SDK are now done using the new umbrella class `AppInsights` instead of `TelemetryClient`
 
-##<a name="3"></a> Setup
+##<a name="3"></a> 3. Setup
 
 This is the recommended way to setup Application Insights for your Android app. For other ways to setup the SDK, see [Advanced Setup](#4).
 
 We're assuming you are using Android Studio and gradle to build your Android application.
 
-### 1. **Add a compile dependency for the SDK**
+### 3.1 **Add a compile dependency for the SDK**
 
 In your module's ```build.gradle```add a dependency for Application Insights 
 
@@ -58,11 +58,11 @@ dependencies {
 }
 ```
 
-### 2. Configure the instrumentation key
+### 3.2 Configure the instrumentation key
 
 Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
-### 3. Add permissions
+### 3.3 Add permissions
 
 Add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` to your app's `AndroidManifest.xml`
 
@@ -73,7 +73,7 @@ Add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` to your app's 
 </manifest>
 ```
 
-### 4. Add your instrumentation key to Manifest
+### 3.4 Add your instrumentation key to manifest
 
 Add the _instrumentation key_ for your app to your Android Manifest as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key. You can leave the variable as is if you want to use your ```gradle.properties``` to set it (see [Advanced Setup](#4)). 
 
@@ -87,7 +87,7 @@ Add the _instrumentation key_ for your app to your Android Manifest as follows. 
 </manifest>
 ```
 
-### 5. Add code to setup and start Application Insights
+### 3.5 Add code to setup and start Application Insights
 
 Add the following import to your app's root activity
 
