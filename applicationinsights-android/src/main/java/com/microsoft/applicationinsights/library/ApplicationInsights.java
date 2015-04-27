@@ -10,6 +10,7 @@ import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfi
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public enum ApplicationInsights {
     INSTANCE;
@@ -22,7 +23,7 @@ public enum ApplicationInsights {
     /**
      * A flag which determines, if developer mode (logging) should be enabled.
      */
-    private static boolean DEVELOPER_MODE;
+    private static AtomicBoolean DEVELOPER_MODE;
 
     /**
      * The configuration of the SDK.
@@ -404,11 +405,11 @@ public enum ApplicationInsights {
     }
 
        public static void setDeveloperMode(boolean developerMode) {
-        DEVELOPER_MODE = developerMode;
+        DEVELOPER_MODE.set(developerMode);
     }
 
     public static boolean isDeveloperMode() {
-        return DEVELOPER_MODE;
+        return DEVELOPER_MODE.get();
     }
 
     /**
