@@ -100,10 +100,20 @@ class Util {
         }
     }
 
+    /**
+     * Determines whether the app is running on aan emulator or on a real device.
+     *
+     * @return YES if the app is running on an emulator, NO if it is running on a real device
+     */
     protected static boolean isEmulator() {
         return Build.BRAND.equalsIgnoreCase("generic");
     }
 
+    /**
+     * Determines whether a debugger is attached while running the app.
+     *
+     * @return YES the debugger is attached, otherwise NO
+     */
     protected static boolean isDebuggerAttached() {
         return Debug.isDebuggerConnected();
     }
