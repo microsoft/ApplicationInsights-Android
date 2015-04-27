@@ -52,7 +52,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testUserContextInitialization() {
-        TelemetryContext tc = new MockTelemetryContext(this.getActivity(), "iKey", "1234");
+        TelemetryContext tc = new PublicTelemetryContext(this.getActivity(), "iKey", "1234");
 
         String id = tc.getContextTags().get(userIdKey);
         try {
@@ -71,7 +71,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
         editor.commit();
 
         // this should load context from shared storage to match firstId
-        TelemetryContext tc = new MockTelemetryContext(this.getActivity(), "iKey", "1234");
+        TelemetryContext tc = new PublicTelemetryContext(this.getActivity(), "iKey", "1234");
         Map<String, String> tags = tc.getContextTags();
         String newId = tags.get(userIdKey);
         String newAcq = tags.get(userAcqKey);
@@ -80,7 +80,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testSessionContextInitialization() throws Exception {
-        TelemetryContext tc = new MockTelemetryContext(this.getActivity(), "iKey", "1234");
+        TelemetryContext tc = new PublicTelemetryContext(this.getActivity(), "iKey", "1234");
 
         String firstId = checkSessionTags(tc);
         try {
@@ -90,12 +90,12 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
         }
 
         // this should load context from shared storage to match firstId
-        TelemetryContext newerTc = new MockTelemetryContext(this.getActivity(), "iKey", "1234");
+        TelemetryContext newerTc = new PublicTelemetryContext(this.getActivity(), "iKey", "1234");
         checkSessionTags(newerTc);
     }
 
     public void testSessionContextRenewal() throws Exception {
-        TelemetryContext tc = new MockTelemetryContext(this.getActivity(), "iKey", "1234");
+        TelemetryContext tc = new PublicTelemetryContext(this.getActivity(), "iKey", "1234");
         String firstId = checkSessionTags(tc);
 
         // trigger renewal
