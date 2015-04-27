@@ -2,6 +2,9 @@ package com.microsoft.applicationinsights.library.config;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 public class ApplicationInsightsConfig implements ISenderConfig, ISessionConfig, IQueueConfig {
 
     // Default values for queue config
@@ -17,21 +20,16 @@ public class ApplicationInsightsConfig implements ISenderConfig, ISessionConfig,
 
     // Default values for session config
     protected static final int DEFAULT_SESSION_INTERVAL = 20 * 1000; // 20 seconds
-    
-    /**
-     * Lock object to ensure thread safety of the configuration
-     */
-    protected final Object lock;
 
     /**
      * The maximum size of a batch in bytes
      */
-    private int maxBatchCount;
+    private AtomicInteger maxBatchCount;
 
     /**
      * The maximum interval allowed between calls to batchInvoke
      */
-    private int maxBatchIntervalMs;
+    private AtomicInteger maxBatchIntervalMs;
 
     /**
      * The url to which payloads will be sent
@@ -42,123 +40,149 @@ public class ApplicationInsightsConfig implements ISenderConfig, ISessionConfig,
      * The timeout for reading the response from the data collector endpoint
      */
 
-    private int senderReadTimeoutMs;
+    private AtomicInteger senderReadTimeoutMs;
 
     /**
      * The timeout for connecting to the data collector endpoint
      */
-    private int senderConnectTimeoutMs;
+    private AtomicInteger senderConnectTimeoutMs;
 
     /**
      * The interval at which sessions are renewed
      */
-    private long sessionIntervalMs;
+    private AtomicLong sessionIntervalMs;
 
     /**
      * Constructs a new INSTANCE of a config
      */
     public ApplicationInsightsConfig() {
-        this.lock = new Object();
+
 
         // Initialize default values for queue config
         //TODO: If running on a device with developer mode enabled, the default values will be set (move to getter)
-        this.maxBatchCount = (ApplicationInsights.isDeveloperMode()) ? DEBUG_MAX_BATCH_COUNT : DEFAULT_MAX_BATCH_COUNT;
-        this.maxBatchIntervalMs = (ApplicationInsights.isDeveloperMode()) ? DEBUG_MAX_BATCH_INTERVAL_MS : DEFAULT_MAX_BATCH_INTERVAL_MS;
+        this.maxBatchCount = new AtomicInteger(DEFAULT_MAX_BATCH_COUNT);
+        this.maxBatchIntervalMs = new AtomicInteger(DEFAULT_MAX_BATCH_INTERVAL_MS);
 
         // Initialize default values for sender config
         this.endpointUrl = DEFAULT_ENDPOINT_URL;
-        this.senderReadTimeoutMs = DEFAULT_SENDER_READ_TIMEOUT;
-        this.senderConnectTimeoutMs = DEFAULTSENDER_CONNECT_TIMEOUT;
+        this.senderReadTimeoutMs = new AtomicInteger(DEFAULT_SENDER_READ_TIMEOUT);
+        this.senderConnectTimeoutMs = new AtomicInteger(DEFAULTSENDER_CONNECT_TIMEOUT);
 
         // Initialize default values for session config
-        this.sessionIntervalMs = DEFAULT_SESSION_INTERVAL;
+        this.sessionIntervalMs = new AtomicLong(DEFAULT_SESSION_INTERVAL);
     }
 
     /**
-     * Gets the maximum size of a batch in bytes
+     * Get the maximum size of a batch in bytes.
+     *
      * @return the max batch count until we send a bundle of data to the server
      */
     public int getMaxBatchCount() {
-        return this.maxBatchCount;
+        if(ApplicationInsights.isDeveloperMode()){
+            return DEBUG_MAX_BATCH_COUNT;
+        }else{
+            return this.maxBatchCount.get();
+        }
     }
 
     /**
-     * Sets the maximum size of a batch in bytes
+     * Set the maximum size of a batch in bytes.
+     *
      * @param maxBatchCount the batchsize of data that will be queued until we send/persist it
      */
     public void setMaxBatchCount(int maxBatchCount) {
-        synchronized (this.lock) {
-            this.maxBatchCount = maxBatchCount;
-        }
+        this.maxBatchCount.set(maxBatchCount);
     }
 
     /**
-     * Gets the maximum interval allowed between calls to batchInvoke
+     * Get the maximum interval allowed between calls to batchInvoke.
+     *
      * @return the interval until we send/persist queued up data
      */
     public int getMaxBatchIntervalMs() {
-        return this.maxBatchIntervalMs;
-    }
-
-    /**
-     * Sets the maximum interval allowed between calls to batchInvoke
-     * @param maxBatchIntervalMs the amount of MS until we want to send out a batch of data
-     */
-    public void setMaxBatchIntervalMs(int maxBatchIntervalMs) {
-        synchronized (this.lock) {
-            this.maxBatchIntervalMs = maxBatchIntervalMs;
+        if(ApplicationInsights.isDeveloperMode()){
+            return DEBUG_MAX_BATCH_INTERVAL_MS;
+        }else{
+            return this.maxBatchIntervalMs.get();
         }
     }
 
     /**
-     * Gets the url to which payloads will be sent
+     * Set the maximum interval allowed between calls to batchInvoke.
+     *
+     * @param maxBatchIntervalMs the amount of MS until we want to send out a batch of data
+     */
+    public void setMaxBatchIntervalMs(int maxBatchIntervalMs) {
+        this.maxBatchIntervalMs.set(maxBatchIntervalMs);
+    }
+
+    /**
+     * Get the url to which payloads will be sent.
      *
      * @return the server's endpoint URL
      */
-    public String getEndpointUrl() {
+    public synchronized String getEndpointUrl() {
         return this.endpointUrl;
     }
 
     /**
-     * Sets the url to which payloads will be sent
+     * Set the url to which payloads will be sent.
      *
      * @param endpointUrl url of the server that receives our data
      */
-    public void setEndpointUrl(String endpointUrl) {
-        synchronized (this.lock) {
-            this.endpointUrl = endpointUrl;
-        }
+    public synchronized void setEndpointUrl(String endpointUrl) {
+        this.endpointUrl = endpointUrl;
     }
 
     /**
-     * Gets the timeout for reading the response from the data collector endpoint
+     * Get the timeout for reading the response from the data collector endpoint.
      *
      * @return configured timeout in ms for reading
      */
     public int getSenderReadTimeout() {
-        return this.senderReadTimeoutMs;
+        return this.senderReadTimeoutMs.get();
     }
 
     /**
-     * Gets the timeout for connecting to the data collector endpoint
+     * Set the timeout for reading the response from the data collector endpoint.
+     *
+     * @param senderReadTimeout the timeout for reading the response from the endpoint
+     */
+    public void setSenderReadTimeout(int senderReadTimeout) {
+        this.senderReadTimeoutMs.set(senderReadTimeout);
+    }
+
+    /**
+     * Get the timeout for connecting to the data collector endpoint.
      *
      * @return configured timeout in ms for sending
      */
     public int getSenderConnectTimeout() {
-        return this.senderConnectTimeoutMs;
+        return this.senderConnectTimeoutMs.get();
     }
 
     /**
-     * Gets the interval at which sessions are renewed
+     * Set the timeout for connecting to the data collector endpoint.
+     *
+     * @param senderConnectTimeout the timeout for connecting to the data collector endpoint in Ms
+     */
+    public void setSenderConnectTimeout(int senderConnectTimeout) {
+        this.senderConnectTimeoutMs.set(senderConnectTimeout);
+    }
+
+    /**
+     * Get the interval at which sessions are renewed.
      */
     public long getSessionIntervalMs() {
-        return sessionIntervalMs;
+        return sessionIntervalMs.get();
     }
 
     /**
-     * Sets the interval at which sessions are renewed
+     * Set the interval at which sessions are renewed.
+     *
+     * @param sessionIntervalMs  the interval at which sessions are renewed in Ms
      */
     public void setSessionIntervalMs(long sessionIntervalMs) {
-        this.sessionIntervalMs = sessionIntervalMs;
+        this.sessionIntervalMs.set(sessionIntervalMs);
     }
 }
