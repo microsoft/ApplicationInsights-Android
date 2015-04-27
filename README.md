@@ -34,11 +34,11 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 Starting with the first 1.0 stable release, we will start deprecating API instead of breaking old ones.
 
-* **[1.0-Beta.3]** Configuration of the Application Insights SDK is now done using ```ApplicationInsightsConfig```. The previous config-classes have been removed
+* **[1.0-beta.3]** Configuration of the Application Insights SDK is now done using ```ApplicationInsightsConfig```. The previous config-classes have been removed
 
-* **[1.0-Beta.2]** To enable automatic lifecycle-tracking, Application Insights has to be set up with an instance of Application (see [Life-cycle tracking] (#2)), otherwise, lifecycle-tracking is disabled.
+* **[1.0-beta.2]** To enable automatic lifecycle-tracking, Application Insights has to be set up with an instance of Application (see [Life-cycle tracking] (#2)), otherwise, lifecycle-tracking is disabled.
 
-* **[1.0-Beta.1]** Setup and start of the Application Insights SDK are now done using the new umbrella class `ApplicationInsights` instead of `AppInsights `
+* **[1.0-beta.1]** Setup and start of the Application Insights SDK are now done using the new umbrella class `ApplicationInsights` instead of `AppInsights `
 
 * **[1.0-Alpha.5]** Setup and start of the Application Insights SDK are now done using the new umbrella class `AppInsights` instead of `TelemetryClient`
 
