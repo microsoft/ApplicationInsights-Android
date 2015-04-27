@@ -51,7 +51,7 @@ class Channel {
     }
 
     /**
-     * @return the INSTANCE of persistence or null if not yet initialized
+     * @return the INSTANCE of Channel or null if not yet initialized
      */
     protected static Channel getInstance() {
         if (Channel.instance == null) {
