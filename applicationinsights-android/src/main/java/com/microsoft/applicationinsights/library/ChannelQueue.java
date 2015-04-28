@@ -1,7 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-import android.os.AsyncTask;
-
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
@@ -133,12 +131,14 @@ class ChannelQueue {
 
     /**
      * Initiates persisting the content queue.
-     *
-     * @see com.microsoft.applicationinsights.library.ChannelQueue.PersistenceTask
      */
     protected void executePersistenceTask(IJsonSerializable[] data){
-        PersistenceTask persistTask = new PersistenceTask(data);
-        persistTask.execute();
+        if (data != null) {
+
+            if (persistence != null) {
+                persistence.persist(data, false);
+            }
+        }
     }
 
     /**
@@ -181,28 +181,6 @@ class ChannelQueue {
         @Override
         public void run() {
             flush();
-        }
-    }
-
-    /**
-     * A task to initiate flushing the queue and persisting it's data
-     */
-    private class PersistenceTask extends AsyncTask<Void, Void, Void> {
-        private IJsonSerializable[] data;
-        public PersistenceTask(IJsonSerializable[] data) {
-            this.data = data;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-                if (this.data != null) {
-
-                if (persistence != null) {
-                    persistence.persist(this.data, false);
-                }
-            }
-
-            return null;
         }
     }
 }
