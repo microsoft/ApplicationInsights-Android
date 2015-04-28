@@ -4,17 +4,15 @@ import android.test.InstrumentationTestCase;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
 
 import junit.framework.Assert;
-
-import java.util.LinkedList;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -66,12 +64,12 @@ public class ChannelQueueTest extends InstrumentationTestCase {
 
         // Verify
         Assert.assertEquals(2, sut.list.size());
-        verify(mockPersistence,after(100).never()).persist(any(IJsonSerializable[].class), anyBoolean());
+        verify(mockPersistence,never()).persist(any(IJsonSerializable[].class), anyBoolean());
 
         sut.enqueue(new Envelope());
 
         Assert.assertEquals(0, sut.list.size());
-        verify(mockPersistence,after(100).times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
+        verify(mockPersistence,times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
     }
 
     public void testQueueFlushedAfterBatchIntervalReached() {
@@ -84,9 +82,26 @@ public class ChannelQueueTest extends InstrumentationTestCase {
 
         // Verify
         Assert.assertEquals(1, sut.list.size());
-        verify(mockPersistence,after(100).never()).persist(any(IJsonSerializable[].class), anyBoolean());
-        verify(mockPersistence,after(200).times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
+        verify(mockPersistence,never()).persist(any(IJsonSerializable[].class), anyBoolean());
+        verify(mockPersistence,after(250).times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
         Assert.assertEquals(0, sut.list.size());
+    }
+
+    public void testFlushingQueueWorks() {
+        //Setup
+        when(mockConfig.getMaxBatchIntervalMs()).thenReturn(200);
+        when(mockConfig.getMaxBatchCount()).thenReturn(3);
+
+        sut.enqueue(new Envelope());
+        Assert.assertEquals(1, sut.list.size());
+        verify(mockPersistence,never()).persist(any(IJsonSerializable[].class), anyBoolean());
+
+        // Test
+        sut.flush();
+
+        // Verify
+        Assert.assertEquals(0, sut.list.size());
+        verify(mockPersistence,times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
     }
 
 
