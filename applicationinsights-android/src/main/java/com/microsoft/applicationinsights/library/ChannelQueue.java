@@ -29,7 +29,7 @@ class ChannelQueue {
     /**
      * The configuration for this queue
      */
-    protected final IQueueConfig config;
+    protected IQueueConfig config;
 
     /**
      * The timer for this queue
@@ -52,6 +52,11 @@ class ChannelQueue {
     private TimerTask scheduledPersistenceTask;
 
     /**
+     * Persistence used for saving queue items.
+     */
+    private Persistence persistence;
+
+    /**
      * Prevent external instantiation
      */
     protected ChannelQueue(IQueueConfig config) {
@@ -59,15 +64,7 @@ class ChannelQueue {
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = config;
         this.isCrashing = false;
-    }
-
-    /**
-     * Set the isCrashing flag
-     *
-     * @param isCrashing if true the app is assumed to be crashing and data will be written to disk
-     */
-    protected void setIsCrashing(Boolean isCrashing) {
-        this.isCrashing = isCrashing;
+        this.persistence = Persistence.getInstance();
     }
 
     /**
@@ -90,11 +87,9 @@ class ChannelQueue {
             if (success) {
                 if ((this.list.size() >= this.config.getMaxBatchCount()) || isCrashing) {
                     // persisting if the queue is full
-                    this.flush();
+                    flush();
                 } else if (this.list.size() == 1) {
-                    // schedule a FlushTask if this is the first item in the queue
-                    this.scheduledPersistenceTask = new TriggerPersistTask();
-                    this.timer.schedule(this.scheduledPersistenceTask, this.config.getMaxBatchIntervalMs());
+                    schedulePersitenceTask();
                 }
             } else {
                 InternalLogging.warn(TAG, "Unable to add item to queue");
@@ -120,10 +115,57 @@ class ChannelQueue {
                 list.toArray(data);
                 list.clear();
 
-                PersistenceTask persistTask = new PersistenceTask(data);
-                persistTask.execute();
+                executePersistenceTask(data);
             }
         }
+    }
+
+    /**
+     * Schedules a persistence task based on max maxBatchIntervalMs.
+     *
+     * @see com.microsoft.applicationinsights.library.ChannelQueue.TriggerPersistTask
+     */
+    protected void schedulePersitenceTask(){
+        // schedule a FlushTask if this is the first item in the queue
+        this.scheduledPersistenceTask = new TriggerPersistTask();
+        this.timer.schedule(this.scheduledPersistenceTask, this.config.getMaxBatchIntervalMs());
+    }
+
+    /**
+     * Initiates persisting the content queue.
+     *
+     * @see com.microsoft.applicationinsights.library.ChannelQueue.PersistenceTask
+     */
+    protected void executePersistenceTask(IJsonSerializable[] data){
+        PersistenceTask persistTask = new PersistenceTask(data);
+        persistTask.execute();
+    }
+
+    /**
+     * Set the isCrashing flag
+     *
+     * @param isCrashing if true the app is assumed to be crashing and data will be written to disk
+     */
+    protected void setIsCrashing(Boolean isCrashing) {
+        this.isCrashing = isCrashing;
+    }
+
+    /**
+     * Set the persistence instance used to save items.
+     *
+     * @param persistence the persitence instance which should be used
+     */
+    protected void setPersistence(Persistence persistence) {
+        this.persistence = persistence;
+    }
+
+    /**
+     * Set the config for this queue.
+     *
+     * @param config a config which contains information about how this queue should behave.
+     */
+    protected void setQueueConfig(IQueueConfig config){
+        this.config = config;
     }
 
     /**
@@ -154,7 +196,7 @@ class ChannelQueue {
         @Override
         protected Void doInBackground(Void... params) {
                 if (this.data != null) {
-                Persistence persistence = Persistence.getInstance();
+
                 if (persistence != null) {
                     persistence.persist(this.data, false);
                 }
@@ -162,10 +204,6 @@ class ChannelQueue {
 
             return null;
         }
-    }
-
-    protected IQueueConfig getQueueConfig(){
-        return this.config;
     }
 }
 
