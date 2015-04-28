@@ -10,11 +10,6 @@ public class MockChannel extends Channel {
         super.setQueue(queue);
     }
 
-    @Override
-    public MockQueue getQueue() {
-        return (MockQueue)super.getQueue();
-    }
-
     public static MockChannel getInstance() {
         return (MockChannel)Channel.getInstance();
     }
