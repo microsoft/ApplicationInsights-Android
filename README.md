@@ -207,7 +207,7 @@ ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collecti
 ApplicationInsights.start();
 ```
 
-After `ApplicationInsights.start()` was called you can enable or disable thos features at any point:
+After `ApplicationInsights.start()` was called, you can enable or disable those features at any point:
 
 ```java
 // Disable automatic session renewal & tracking
