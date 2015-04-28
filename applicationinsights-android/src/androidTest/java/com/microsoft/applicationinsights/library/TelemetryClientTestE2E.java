@@ -2,16 +2,11 @@ package com.microsoft.applicationinsights.library;
 
 import android.content.Intent;
 import android.test.ActivityUnitTestCase;
-import android.util.Log;
 
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
-import junit.framework.Assert;
-
 import java.io.InvalidObjectException;
 import java.util.LinkedHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
 
@@ -32,7 +27,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
         MockTelemetryClient.getInstance().mockTrackMethod = false;
         ApplicationInsightsConfig config = new ApplicationInsightsConfig();
         Channel.initialize(config);
-        Channel.getInstance().getQueue().config.setMaxBatchIntervalMs(20);
+        Channel.getInstance().queue.config.setMaxBatchIntervalMs(20);
 
         Sender.initialize(config);
 
@@ -95,7 +90,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             exception = e;
         }
 
-        Channel.getInstance().getQueue().config.setMaxBatchCount(10);
+        Channel.getInstance().queue.config.setMaxBatchCount(10);
         for (int i = 0; i < 10; i++) {
             this.client.trackEvent("android event");
             this.client.trackTrace("android trace");
