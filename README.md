@@ -217,7 +217,7 @@ ApplicationInsights.disableAutoSessionManagement();
 ApplicationInsights.enableAutoPageViewTracking();
 ```
 
-## <a name="8"></a> Exception Handling (Crashes)
+## <a name="8"></a>8.  Exception Handling (Crashes)
 
 The Application Insights SDK enables crash reporting **per default**. Unhandled exceptions (aka crashes) will be immediately sent to the server if a connection is available.
 
