@@ -1,172 +1,93 @@
 package com.microsoft.applicationinsights.library;
 
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.applicationinsights.library.config.IQueueConfig;
 
 import junit.framework.Assert;
 
-import java.io.StringWriter;
 import java.util.LinkedList;
-import java.util.Timer;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-public class ChannelQueueTest extends AndroidTestCase {
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.after;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-    private TestQueue queue;
-    private IJsonSerializable item;
+public class ChannelQueueTest extends InstrumentationTestCase {
 
-    private final int batchMargin = 50;
+    private PublicChannelQueue sut;
+    private IQueueConfig mockConfig;
+    private PublicPersistence mockPersistence;
 
     public void setUp() throws Exception {
         super.setUp();
-        this.queue = new TestQueue();
-        int batchInterval = 100;
-        this.queue.getQueueConfig().setMaxBatchIntervalMs(batchInterval);
-        this.item = new Envelope();
-        Persistence.initialize(this.getContext());
+        System.setProperty("dexmaker.dexcache",getInstrumentation().getTargetContext().getCacheDir().getPath());
+        mockConfig = mock(IQueueConfig.class);
+        sut = new PublicChannelQueue(mockConfig);
+        mockPersistence = mock(PublicPersistence.class);
+        sut.setPersistence(mockPersistence);
     }
 
-    public void testGetConfig() throws Exception {
-        Assert.assertNotNull("Sender constructor should initialize config", this.queue.getQueueConfig());
+    public void testInitialisationWorks() {
+        Assert.assertNotNull(sut.config);
+        Assert.assertNotNull(sut.timer);
+        Assert.assertNotNull(sut.list);
+        Assert.assertEquals(0, sut.list.size());
+        Assert.assertFalse(sut.isCrashing);
     }
 
-    public void testQueue() throws Exception {
-        Envelope env = new Envelope();
-        this.queue.enqueue(env);
-        this.queue.getTimer().cancel();
-        IJsonSerializable env2 = this.queue.getQueue().peek();
-        Assert.assertTrue("item was successfully queued", env == env2);
+    public void testItemGetsEnqueued(){
+        // Setup
+        when(mockConfig.getMaxBatchIntervalMs()).thenReturn(10000);
+        when(mockConfig.getMaxBatchCount()).thenReturn(3);
+
+        // Test
+        sut.enqueue(new Envelope());
+        sut.enqueue(new Envelope());
+
+        // Verify
+        Assert.assertEquals(2, sut.list.size());
     }
 
-    public void testFlush() throws Exception {
+    public void testQueueFlushedIfMaxBatchCountReached() {
+        // Setup
+        when(mockConfig.getMaxBatchIntervalMs()).thenReturn(10000);
+        when(mockConfig.getMaxBatchCount()).thenReturn(3);
 
+        // Test
+        sut.enqueue(new Envelope());
+        sut.enqueue(new Envelope());
+
+        // Verify
+        Assert.assertEquals(2, sut.list.size());
+        verify(mockPersistence,after(100).never()).persist(any(IJsonSerializable[].class), anyBoolean());
+
+        sut.enqueue(new Envelope());
+
+        Assert.assertEquals(0, sut.list.size());
+        verify(mockPersistence,after(100).times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
     }
 
-    public void testBatchingLimit() {
-        this.queue.getQueueConfig().setMaxBatchCount(3);
-        this.queue.enqueue(this.item);
+    public void testQueueFlushedAfterBatchIntervalReached() {
+        // Setup
+        when(mockConfig.getMaxBatchIntervalMs()).thenReturn(200);
+        when(mockConfig.getMaxBatchCount()).thenReturn(3);
 
-        // enqueue one item and verify that it did not trigger a enqueue
-        try {
-            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
-            Assert.assertEquals("batch was not sent before MaxIntervalMs",
-                    1, this.queue.sendSignal.getCount());
-            Assert.assertNotSame("queue is not empty prior to sending data",
-                    this.queue.getQueue().size(), 0);
-        } catch (InterruptedException e) {
-            Assert.fail("Failed to validate API\n\n" + e.toString());
-        }
+        // Test
+        sut.enqueue(new Envelope());
 
-        // enqueue two items (to reach maxBatchCount) and verify that data was flushed
-        this.queue.enqueue(this.item);
-        this.queue.enqueue(this.item);
-        try {
-            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
-            Assert.assertEquals("batch was sent before maxIntervalMs after reaching MaxBatchCount",
-                    0, this.queue.sendSignal.getCount());
-            Assert.assertEquals("queue is empty after sending data",
-                    this.queue.getQueue().size(), 0);
-        } catch (InterruptedException e) {
-            Assert.fail("Failed to validate API\n\n" + e.toString());
-        }
+        // Verify
+        Assert.assertEquals(1, sut.list.size());
+        verify(mockPersistence,after(100).never()).persist(any(IJsonSerializable[].class), anyBoolean());
+        verify(mockPersistence,after(200).times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
+        Assert.assertEquals(0, sut.list.size());
     }
 
-    public void testBatchingLimitExceed() {
-        this.queue.getQueueConfig().setMaxBatchCount(3);
 
-        // enqueue 4 items (exceeding maxBatchCount is supported) and verify that data was flushed
-        this.queue.enqueue(this.item);
-        this.queue.enqueue(this.item);
-        this.queue.enqueue(this.item);
-        this.queue.enqueue(this.item);
-
-        try {
-            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
-            Assert.assertEquals("second batch was sent before maxIntervalMs after reaching MaxBatchCount",
-                    0, this.queue.sendSignal.getCount());
-            Assert.assertEquals("queue is empty after sending data",
-                    this.queue.getQueue().size(), 0);
-        } catch (InterruptedException e) {
-            Assert.fail("Failed to validate API\n\n" + e.toString());
-        }
-    }
-
-    public void testBatchingTimer() {
-        this.queue.getQueueConfig().setMaxBatchCount(3);
-
-        // enqueue one item and wait for the queue to sendPendingData via the timer
-        this.queue.enqueue(this.item);
-        try {
-            this.queue.sendSignal.await(batchMargin + this.queue.getQueueConfig().getMaxBatchIntervalMs() + 1, TimeUnit.MILLISECONDS);
-            Assert.assertEquals("single item was sent after reaching MaxInterval",
-                    0, this.queue.sendSignal.getCount());
-            Assert.assertEquals("queue is empty after sending data",
-                    this.queue.getQueue().size(), 0);
-        } catch (InterruptedException e) {
-            Assert.fail("Failed to validate API\n\n" + e.toString());
-        }
-    }
-
-    public void testBatchingFlush() {
-        this.queue.getQueueConfig().setMaxBatchCount(3);
-
-        // enqueue one item and sendPendingData it to bypass the timer
-        this.queue.enqueue(this.item);
-        try {
-
-            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
-            Assert.assertEquals("single item was not sent before reaching MaxInterval",
-                    1, this.queue.sendSignal.getCount());
-            Assert.assertNotSame("queue is not empty prior to sending data",
-                    this.queue.getQueue().size(), 0);
-
-            this.queue.flush();
-            this.queue.sendSignal.await(batchMargin, TimeUnit.MILLISECONDS);
-            Assert.assertEquals("single item was sent after calling sender.sendPendingData",
-                    0, this.queue.sendSignal.getCount());
-            Assert.assertEquals("queue is empty after sending data",
-                    this.queue.getQueue().size(), 0);
-        } catch (InterruptedException e) {
-            Assert.fail("Failed to validate API\n\n" + e.toString());
-        }
-    }
-
-    public void testDisableTelemetry() {
-        ApplicationInsights.setTelemetryDisabled(true);
-
-        this.queue.enqueue(this.item);
-        long queueSize = this.queue.getQueue().size();
-        Assert.assertEquals("item is not queued when telemetry is disabled", 0, queueSize);
-
-        ApplicationInsights.setTelemetryDisabled(false);
-
-        this.queue.enqueue(this.item);
-        queueSize = this.queue.getQueue().size();
-        Assert.assertEquals("item is queued when telemetry is enabled", 1, queueSize);
-    }
-
-    private class TestQueue extends ChannelQueue {
-
-        public CountDownLatch sendSignal;
-        public CountDownLatch responseSignal;
-        public StringWriter writer;
-
-        public TestQueue() {
-            super(new ApplicationInsightsConfig());
-            this.sendSignal = new CountDownLatch(1);
-            this.responseSignal = new CountDownLatch(1);
-        }
-
-        public LinkedList<IJsonSerializable> getQueue() {
-            return (LinkedList) this.list;
-        }
-
-        public Timer getTimer() {
-            return this.timer;
-        }
-    }
 }
