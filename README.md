@@ -152,7 +152,6 @@ ApplicationInsights.setDeveloperMode(false);
 
 ```
 
-
 ## <a name="6"></a> 6. Basic Usage  ##
 
 The ```TelemetryClient```-instance provides various methods to track events, traces, metrics page views, and handled exceptions.
@@ -228,7 +227,7 @@ This feature can be disabled as follows:
 
 ```
 
-## <a name="9"></a>9. Additional configuration
+## <a name="9"></a>9. Additional Configuration
 
 To configure Application Insights according to your needs, first, call
 
@@ -249,7 +248,7 @@ After all custom configurations have been made, just start `ApplicationInsights`
 ApplicationInsights.start();
 ```
 
-### 9.1 Set user session time
+### 9.1 Set User Session Time
 
 The default time the users entering the app counts as a new session is 20s. If you want to set it to a different value, do the following:
 
@@ -257,7 +256,7 @@ The default time the users entering the app counts as a new session is 20s. If y
 config.setSessionIntervalMs(30000); //set intercal to 30s (30,000ms)
 ```
 
-### 9.2 Batch size for a bundle of telemetry
+### 9.2 Batch Size for a Bundle of Telemetry
 
 Unhandled exceptions (aka ”your app is crashing!“) are sent out immediately, while regular telemetry data is send out in batches or after a specified interval.
 
@@ -274,7 +273,7 @@ To set the maxBatchSize to a different value (default is 100) like this:
 config.setMaxBatchCount(20); //set batch size to 20.
 ```
 
-### 9.3 Set different endpoint
+### 9.3 Set Different Endpoint
 
 You can also configure a different server endpoint for the SDK if needed:
 
@@ -308,3 +307,9 @@ Our Javadoc can be found at [http://microsoft.github.io/ApplicationInsights-Andr
 * Install <a href="http://developer.android.com/sdk/index.html" target="_blank">Android studio</a>
 * [Get an instrumentation key](/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key) and set it in the manifest
 * Run tests from Android Studio
+
+<a id="contact"></a>
+## 12. Contact
+
+If you have further questions or are running into trouble that cannot be resolved by any of the steps here, feel free to contact us at [AppInsights-Android@microsoft.com](mailto:AppInsights-Android@microsoft.com)
+
