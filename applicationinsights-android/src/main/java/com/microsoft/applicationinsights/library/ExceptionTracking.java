@@ -30,7 +30,7 @@ class ExceptionTracking implements UncaughtExceptionHandler {
         if (context != null) {
             this.ignoreDefaultHandler = ignoreDefaultHandler;
         } else {
-            InternalLogging.error(TAG, "Failed to initialize ExceptionHandler with null Context");
+            InternalLogging.error(TAG, "Failed to initialize ExceptionHandler because the provided Context was null");
         }
     }
 

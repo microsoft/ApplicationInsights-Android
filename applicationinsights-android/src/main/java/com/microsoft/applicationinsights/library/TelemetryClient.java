@@ -19,11 +19,6 @@ public class TelemetryClient {
     private static TelemetryClient instance;
 
     /**
-     * A flag, which determines if page views should be tracked automatically.
-     */
-    private boolean activityTrackingEnabled;
-
-    /**
      * A flag, which determines telemetry data can be tracked.
      */
     private final boolean telemetryEnabled;
@@ -225,18 +220,6 @@ public class TelemetryClient {
     public void trackNewSession() {
         if(isTelemetryEnabled()){
             new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
-        }
-    }
-
-    /**
-     * Registers an activity life cycle callback handler to track page views and sessions.
-     *
-     * @param application the application used to register the life cycle callbacks
-     */
-    protected void enableActivityTracking(Application application) {
-        if(!activityTrackingEnabled){
-            activityTrackingEnabled = true;
-            LifeCycleTracking.registerActivityLifecycleCallbacks(application);
         }
     }
 
