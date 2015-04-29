@@ -89,7 +89,7 @@ class ExceptionTracking implements UncaughtExceptionHandler {
         }
 
         // track the crash
-        new CreateDataTask(CreateDataTask.DataType.UNHANDLED_EXCEPTION, exception, properties).execute();
+        new TrackDataTask(TrackDataTask.DataType.UNHANDLED_EXCEPTION, exception, properties).execute();
 
         // invoke the existing handler if requested and if it exists
         if (!this.ignoreDefaultHandler && this.preexistingExceptionHandler != null) {

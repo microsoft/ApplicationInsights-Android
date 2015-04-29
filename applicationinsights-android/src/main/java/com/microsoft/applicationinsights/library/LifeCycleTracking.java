@@ -209,7 +209,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
         int count = this.activityCount.getAndIncrement();
         synchronized (LifeCycleTracking.LOCK) {
             if (count == 0 && autoSessionManagementEnabled) {
-                new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
+                new TrackDataTask(TrackDataTask.DataType.NEW_SESSION).execute();
             }
         }
     }
@@ -237,10 +237,10 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
         synchronized (LifeCycleTracking.LOCK) {
             if(autoSessionManagementEnabled && shouldRenew){
                 this.telemetryContext.renewSessionId();
-                new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
+                new TrackDataTask(TrackDataTask.DataType.NEW_SESSION).execute();
             }
             if(autoPageViewsEnabled){
-                new CreateDataTask(CreateDataTask.DataType.PAGE_VIEW, activity.getClass().getName(), null, null).execute();
+                new TrackDataTask(TrackDataTask.DataType.PAGE_VIEW, activity.getClass().getName(), null, null).execute();
             }
         }
     }

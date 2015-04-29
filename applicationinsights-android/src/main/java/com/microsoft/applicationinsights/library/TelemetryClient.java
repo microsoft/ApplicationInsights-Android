@@ -95,7 +95,7 @@ public class TelemetryClient {
      */
     public void track(ITelemetry telemetry){
         if(isTelemetryEnabled()){
-            new CreateDataTask(telemetry).execute();
+            new TrackDataTask(telemetry).execute();
         }
     }
 
@@ -112,7 +112,7 @@ public class TelemetryClient {
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.EVENT, eventName, properties, measurements).execute();
+            new TrackDataTask(TrackDataTask.DataType.EVENT, eventName, properties, measurements).execute();
         }
 
     }
@@ -135,7 +135,7 @@ public class TelemetryClient {
      */
     public void trackTrace(String message, Map<String, String> properties) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.TRACE, message, properties, null).execute();
+            new TrackDataTask(TrackDataTask.DataType.TRACE, message, properties, null).execute();
         }
     }
 
@@ -149,7 +149,7 @@ public class TelemetryClient {
      */
     public void trackMetric(String name, double value) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.METRIC, name, value).execute();
+            new TrackDataTask(TrackDataTask.DataType.METRIC, name, value).execute();
         }
     }
 
@@ -172,7 +172,7 @@ public class TelemetryClient {
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.HANDLED_EXCEPTION, handledException, properties).execute();
+            new TrackDataTask(TrackDataTask.DataType.HANDLED_EXCEPTION, handledException, properties).execute();
         }
     }
 
@@ -208,7 +208,7 @@ public class TelemetryClient {
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.PAGE_VIEW, pageName, properties, null).execute();
+            new TrackDataTask(TrackDataTask.DataType.PAGE_VIEW, pageName, properties, null).execute();
         }
     }
 
@@ -217,7 +217,7 @@ public class TelemetryClient {
      */
     public void trackNewSession() {
         if(isTelemetryEnabled()){
-            new CreateDataTask(CreateDataTask.DataType.NEW_SESSION).execute();
+            new TrackDataTask(TrackDataTask.DataType.NEW_SESSION).execute();
         }
     }
 
