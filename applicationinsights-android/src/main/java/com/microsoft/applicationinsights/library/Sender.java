@@ -52,6 +52,10 @@ class Sender {
      * Persistence object used to reserve, free, or delete files.
      */
     protected Persistence persistence;
+
+    /**
+     * Thread safe counter to keep track of num of operations
+     */
     private AtomicInteger operationsCount;
 
     /**
