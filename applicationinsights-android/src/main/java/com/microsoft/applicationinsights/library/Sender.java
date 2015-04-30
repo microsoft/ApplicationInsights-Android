@@ -124,6 +124,7 @@ class Sender {
                 this.sendRequestWithPayload(persistedData, fileToSend);
             } catch (IOException e) {
                 InternalLogging.warn(TAG,"Couldn't send request with IOException: " + e.toString());
+                this.operationsCount.getAndDecrement();
             }
         }else{
             persistence.deleteFile(fileToSend);
