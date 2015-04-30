@@ -1,0 +1,5 @@
+[caps]
+platformName = "android"
+app = "app-sample/build/outputs/apk/app-sample-debug.apk"
+deviceName = "Android"
+avd = "appinsights-appium"
