@@ -26,47 +26,47 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
     /**
      * The type to create.
      */
-    private final DataType type;
+    protected final DataType type;
 
     /**
      * Name of event, page view, metric, or trace.
      */
-    private String name;
+    protected String name;
 
     /**
      * Custom properties of an telemetry item.
      */
-    private Map<String,String> properties;
+    protected Map<String,String> properties;
 
     /**
      * Measurements, which can be set for events and page views.
      */
-    private Map<String, Double> measurements;
+    protected Map<String, Double> measurements;
 
     /**
      * The numeric value of an metric item.
      */
-    private double metric;
+    protected double metric;
 
     /**
      * A handled or unhandled exception.
      */
-    private Throwable exception;
+    protected Throwable exception;
 
     /**
      * Generic telemetry data.
      */
-    private ITelemetry telemetry;
+    protected ITelemetry telemetry;
 
     /**
      * The envelope factory to use for creating a telemetry item.
      */
-    private EnvelopeFactory envelopeFactory;
+    protected EnvelopeFactory envelopeFactory;
 
     /**
      * The channel to use for processing a telemetry item.
      */
-    private Channel channel;
+    protected Channel channel;
 
     /**
      * Create a TrackDataTask.
@@ -157,6 +157,13 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
+
+        trackEnvelope();
+
+        return null;
+    }
+
+    protected void trackEnvelope(){
         Envelope envelope = null;
         switch (this.type){
             case NONE:
@@ -165,16 +172,24 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
                 }
                 break;
             case EVENT:
-                envelope = this.envelopeFactory.createEventEnvelope(this.name, this.properties, this.measurements);
+                if(this.name != null){
+                    envelope = this.envelopeFactory.createEventEnvelope(this.name, this.properties, this.measurements);
+                }
                 break;
             case PAGE_VIEW:
-                envelope = this.envelopeFactory.createPageViewEnvelope(this.name, this.properties, this.measurements);
+                if(this.name != null){
+                    envelope = this.envelopeFactory.createPageViewEnvelope(this.name, this.properties, this.measurements);
+                }
                 break;
             case TRACE:
-                envelope = this.envelopeFactory.createTraceEnvelope(this.name, this.properties);
+                if(this.name != null){
+                    envelope = this.envelopeFactory.createTraceEnvelope(this.name, this.properties);
+                }
                 break;
             case METRIC:
-                envelope = this.envelopeFactory.createMetricEnvelope(this.name, this.metric);
+                if(this.name != null){
+                    envelope = this.envelopeFactory.createMetricEnvelope(this.name, this.metric);
+                }
                 break;
             case NEW_SESSION:
                 envelope = this.envelopeFactory.createNewSessionEnvelope();
@@ -182,19 +197,23 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
             case HANDLED_EXCEPTION:
             case UNHANDLED_EXCEPTION:
                 //TODO: Unhandled exceptions should not be processed asynchronously
-                envelope = this.envelopeFactory.createExceptionEnvelope(this.exception, this.properties);
+                if(exception != null){
+                    envelope = this.envelopeFactory.createExceptionEnvelope(this.exception, this.properties);
+                }
                 break;
             default:
                 break;
         }
-
         if(envelope != null){
-            if(type == DataType.UNHANDLED_EXCEPTION){
-                this.channel.processUnhandledException(envelope);
-            }else{
-                this.channel.enqueue(envelope);
-            }
+            forwardEnvelope(envelope);
         }
-        return null;
+    }
+
+    protected void forwardEnvelope(Envelope envelope){
+        if(type == DataType.UNHANDLED_EXCEPTION){
+            this.channel.processUnhandledException(envelope);
+        }else{
+            this.channel.enqueue(envelope);
+        }
     }
 }
