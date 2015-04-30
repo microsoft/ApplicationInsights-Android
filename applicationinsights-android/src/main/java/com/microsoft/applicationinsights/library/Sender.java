@@ -50,6 +50,10 @@ class Sender {
      */
     private static Sender instance;
 
+    /**
+     * Persistence object used to reserve, free, or delete files.
+     */
+    protected Persistence persistence;
     private AtomicInteger operationsCount;
 
     /**
@@ -59,6 +63,7 @@ class Sender {
     protected Sender(ISenderConfig config) {
         this.config = config;
         this.operationsCount = new AtomicInteger(0);
+        this.persistence = Persistence.getInstance();
     }
 
     /**
@@ -101,9 +106,9 @@ class Sender {
     protected void sendNextFile(){
         if(runningRequestCount() < 10) {
             // Send the persisted data
-            Persistence persistence = Persistence.getInstance();
-            if (persistence != null) {
-                File fileToSend = persistence.nextAvailableFile();
+
+            if (this.persistence != null) {
+                File fileToSend = this.persistence.nextAvailableFile();
                 if(fileToSend != null) {
                     send(fileToSend);
                 }
@@ -115,8 +120,8 @@ class Sender {
     }
 
     protected void send(File fileToSend) {
-        Persistence persistence = Persistence.getInstance();
-        String persistedData = persistence.load(fileToSend);
+
+        String persistedData = this.persistence.load(fileToSend);
         if (!persistedData.isEmpty()) {
             InternalLogging.info(TAG, "sending persisted data", persistedData);
             try {
@@ -128,7 +133,7 @@ class Sender {
                 this.operationsCount.getAndDecrement();
             }
         }else{
-            persistence.deleteFile(fileToSend);
+            this.persistence.deleteFile(fileToSend);
             sendNextFile();
         }
     }
@@ -165,9 +170,8 @@ class Sender {
             onResponse(connection, responseCode, payload, fileToSend);
         } catch (IOException e) {
             InternalLogging.warn(TAG, "Couldn't send data with IOException: " + e.toString());
-            Persistence persistence = Persistence.getInstance();
-            if (persistence != null) {
-                persistence.makeAvailable(fileToSend); //send again later
+            if (this.persistence != null) {
+                this.persistence.makeAvailable(fileToSend); //send again later
             }
         } finally {
             if (writer != null) {
@@ -206,9 +210,8 @@ class Sender {
         }
 
         if(deleteFile) {
-            Persistence persistence = Persistence.getInstance();
-            if(persistence != null) {
-                persistence.deleteFile(fileToSend);
+            if(this.persistence != null) {
+                this.persistence.deleteFile(fileToSend);
             }
         }
 
@@ -261,9 +264,8 @@ class Sender {
      */
     protected void onRecoverable(String payload, File fileToSend) {
         InternalLogging.info(TAG, "Server error, persisting data", payload);
-        Persistence persistence = Persistence.getInstance();
-        if (persistence != null) {
-            persistence.makeAvailable(fileToSend);
+        if (this.persistence != null) {
+            this.persistence.makeAvailable(fileToSend);
         }
     }
 
@@ -324,6 +326,15 @@ class Sender {
             // no GZIP for older devices
             return new OutputStreamWriter(connection.getOutputStream());
         }
+    }
+
+    /**
+     * Set persistence used to reserve, free, or delete files (enables dependency injection).
+     *
+     * @param persistence a persistence used to reserve, free, or delete files
+     */
+    protected void setPersistence(Persistence persistence) {
+        this.persistence = persistence;
     }
 }
 
