@@ -104,7 +104,6 @@ class TelemetryContext {
      */
     public TelemetryContext(Context appContext, String instrumentationKey, String userId) {
 
-
         // get an INSTANCE of the shared preferences manager for persistent context fields
         this.settings = appContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         this.operation = new Operation();

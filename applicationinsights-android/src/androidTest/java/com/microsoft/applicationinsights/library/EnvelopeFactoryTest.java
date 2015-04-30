@@ -38,7 +38,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         sut = new EnvelopeFactory(telemetryContext, commonProperties);
     }
 
-    public void testCreatedEnvelopeIsInitialized() {
+    public void testCreateEnvelopeWorks() {
         Envelope envelope = sut.createEnvelope();
         validateEnvelopeTemplate(envelope);
     }
