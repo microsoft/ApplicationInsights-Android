@@ -91,39 +91,43 @@ class Sender {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                send();
+                sendNextFile();
                 return null;
             }
         }.execute();
     }
 
-    protected void send() {
+    protected void sendNextFile(){
         if(runningRequestCount() < 10) {
             // Send the persisted data
             Persistence persistence = Persistence.getInstance();
             if (persistence != null) {
                 File fileToSend = persistence.nextAvailableFile();
                 if(fileToSend != null) {
-                    String persistedData = persistence.load(fileToSend);
-                    if (!persistedData.isEmpty()) {
-                        InternalLogging.info(TAG, "sending persisted data", persistedData);
-                        try {
-                            InternalLogging.info(TAG, "sending persisted data", persistedData);
-                            this.operationsCount.getAndIncrement();
-                            this.sendRequestWithPayload(persistedData, fileToSend);
-                        } catch (IOException e) {
-                            InternalLogging.warn(TAG,"Couldn't send request with IOException: " + e.toString());
-                            this.operationsCount.getAndDecrement();
-                        }
-                    }else{
-                        persistence.deleteFile(fileToSend);
-                        send();
-                    }
+                    send(fileToSend);
                 }
             }
         }
         else {
             InternalLogging.info(TAG, "We have already 10 pending reguests", "");
+        }
+    }
+
+    protected void send(File fileToSend) {
+        Persistence persistence = Persistence.getInstance();
+        String persistedData = persistence.load(fileToSend);
+        if (!persistedData.isEmpty()) {
+            InternalLogging.info(TAG, "sending persisted data", persistedData);
+            try {
+                InternalLogging.info(TAG, "sending persisted data", persistedData);
+                this.operationsCount.getAndIncrement();
+                this.sendRequestWithPayload(persistedData, fileToSend);
+            } catch (IOException e) {
+                InternalLogging.warn(TAG,"Couldn't send request with IOException: " + e.toString());
+            }
+        }else{
+            persistence.deleteFile(fileToSend);
+            sendNextFile();
         }
     }
 
@@ -196,7 +200,7 @@ class Sender {
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
             this.onExpected(connection, builder);
-            this.send();
+            this.sendNextFile();
         }
 
         if(deleteFile) {
