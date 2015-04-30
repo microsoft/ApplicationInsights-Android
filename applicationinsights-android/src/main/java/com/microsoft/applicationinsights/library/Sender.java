@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -49,7 +50,7 @@ class Sender {
      */
     private static Sender instance;
 
-    private final HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
+    private AtomicInteger operationsCount;
 
     /**
      * Restrict access to the default constructor
@@ -107,7 +108,7 @@ class Sender {
                     if (!persistedData.isEmpty()) {
                         InternalLogging.info(TAG, "sending persisted data", persistedData);
                         SendingTask sendingTask = new SendingTask(persistedData, fileToSend);
-                        this.addToRunning(fileToSend.toString(), sendingTask);
+                        this.operationsCount.getAndIncrement();
                         sendingTask.run();
 
                         //TODO add comment for this
@@ -123,24 +124,10 @@ class Sender {
         else {
             InternalLogging.info(TAG, "We have already 10 pending reguests", "");
         }
-}
-
-    protected void addToRunning(String key, SendingTask task) {
-        synchronized (Sender.LOCK) {
-            this.currentTasks.put(key, task);
-        }
-    }
-
-    protected void removeFromRunning(String key) {
-        synchronized (Sender.LOCK) {
-            this.currentTasks.remove(key);
-        }
     }
 
     protected int runningRequestCount() {
-        synchronized (Sender.LOCK) {
-            return getInstance().currentTasks.size();
-        }
+        return this.operationsCount.get();
     }
 
     /**
@@ -152,7 +139,7 @@ class Sender {
      * @param fileToSend reference to the file we want to send
      */
     protected void onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
-        this.removeFromRunning(fileToSend.toString());
+        this.operationsCount.getAndDecrement();
 
         StringBuilder builder = new StringBuilder();
 
