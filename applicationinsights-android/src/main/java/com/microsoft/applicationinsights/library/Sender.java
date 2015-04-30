@@ -58,6 +58,7 @@ class Sender {
      */
     protected Sender(ISenderConfig config) {
         this.config = config;
+        this.operationsCount = new AtomicInteger(0);
     }
 
     /**
