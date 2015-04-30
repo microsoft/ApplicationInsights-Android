@@ -45,10 +45,18 @@ class Sender {
     protected final ISenderConfig config;
 
     /**
+     * Persistence used for saving queue items.
+     */
+    private Persistence persistence;
+
+    /**
      * The shared Sender instance.
      */
     private static Sender instance;
 
+    /**
+     * A map used to keep track of running send operations.
+     */
     private final HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
 
     /**
@@ -57,6 +65,7 @@ class Sender {
      */
     protected Sender(ISenderConfig config) {
         this.config = config;
+        this.persistence = Persistence.getInstance();
     }
 
     /**
@@ -99,11 +108,10 @@ class Sender {
     protected void send() {
         if(runningRequestCount() < 10) {
             // Send the persisted data
-            Persistence persistence = Persistence.getInstance();
-            if (persistence != null) {
-                File fileToSend = persistence.nextAvailableFile();
+            if (this.persistence != null) {
+                File fileToSend = this.persistence.nextAvailableFile();
                 if(fileToSend != null) {
-                    String persistedData = persistence.load(fileToSend);
+                    String persistedData = this.persistence.load(fileToSend);
                     if (!persistedData.isEmpty()) {
                         InternalLogging.info(TAG, "sending persisted data", persistedData);
                         SendingTask sendingTask = new SendingTask(persistedData, fileToSend);
@@ -114,7 +122,7 @@ class Sender {
                         Thread sendingThread = new Thread(sendingTask);
                         sendingThread.setDaemon(false);
                     }else{
-                        persistence.deleteFile(fileToSend);
+                        this.persistence.deleteFile(fileToSend);
                         send();
                     }
                 }
@@ -169,9 +177,8 @@ class Sender {
         }
 
         if(deleteFile) {
-            Persistence persistence = Persistence.getInstance();
-            if(persistence != null) {
-                persistence.deleteFile(fileToSend);
+            if(this.persistence != null) {
+                this.persistence.deleteFile(fileToSend);
             }
         }
 
@@ -224,9 +231,8 @@ class Sender {
      */
     protected void onRecoverable(String payload, File fileToSend) {
         InternalLogging.info(TAG, "Server error, persisting data", payload);
-        Persistence persistence = Persistence.getInstance();
-        if (persistence != null) {
-            persistence.makeAvailable(fileToSend);
+        if (this.persistence != null) {
+            this.persistence.makeAvailable(fileToSend);
         }
     }
 
@@ -289,6 +295,15 @@ class Sender {
         }
     }
 
+    /**
+     * Set the persistence instance used to save items.
+     *
+     * @param persistence the persitence instance which should be used
+     */
+    protected void setPersistence(Persistence persistence) {
+        this.persistence = persistence;
+    }
+
 
     private class SendingTask extends TimerTask {
         private String payload;
@@ -339,7 +354,6 @@ class Sender {
                 onResponse(connection, responseCode, payload, fileToSend);
             } catch (IOException e) {
                 InternalLogging.warn(TAG, "Couldn't send data with IOException: " + e.toString());
-                Persistence persistence = Persistence.getInstance();
                 if (persistence != null) {
                     persistence.makeAvailable(fileToSend); //send again later
                 }
