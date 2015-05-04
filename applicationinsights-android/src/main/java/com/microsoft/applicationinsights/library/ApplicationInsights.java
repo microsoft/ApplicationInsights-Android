@@ -94,7 +94,8 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context the weakContext associated with Application Insights
+     * @param context     the context associated with Application Insights
+     * @param context the application context associated with Application Insights
      */
     public static void setup(Context context) {
         ApplicationInsights.INSTANCE.setupInstance(context, null, null);
@@ -104,8 +105,7 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context     the weakContext associated with Application Insights
-     * @param application the application needed for auto collecting telemetry data
+     * @param application the application context the application needed for auto collecting telemetry data
      */
     public static void setup(Context context, Application application) {
         ApplicationInsights.INSTANCE.setupInstance(context, application, null);
@@ -115,7 +115,7 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context            the weakContext associated with Application Insights
+     * @param context            the application context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
      */
     public static void setup(Context context, String instrumentationKey) {
@@ -126,7 +126,7 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context            the weakContext associated with Application Insights
+     * @param context            the application context associated with Application Insights
      * @param application        the application needed for auto collecting telemetry data
      * @param instrumentationKey the instrumentation key associated with the app
      */
@@ -138,7 +138,7 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context            the weakContext associated with Application Insights
+     * @param context            the application context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
      */
     public void setupInstance(Context context, Application application, String instrumentationKey) {
