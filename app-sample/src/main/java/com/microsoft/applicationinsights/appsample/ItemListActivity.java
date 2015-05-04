@@ -1,6 +1,5 @@
 package com.microsoft.applicationinsights.appsample;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -53,7 +52,7 @@ public class ItemListActivity extends FragmentActivity
                     .findFragmentById(R.id.item_list))
                     .setActivateOnItemClick(true);
         }
-        ApplicationInsights.setup(this.getApplicationContext(), getApplication());
+        ApplicationInsights.setup(this, getApplication());
 
         //ApplicationInsightsConfig config = ApplicationInsights.getConfig();
         //config.setSessionIntervalMs(30000);
