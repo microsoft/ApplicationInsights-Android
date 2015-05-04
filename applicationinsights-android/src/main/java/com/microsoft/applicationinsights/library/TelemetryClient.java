@@ -1,7 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-import android.app.Application;
-
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
