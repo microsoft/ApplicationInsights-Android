@@ -27,7 +27,7 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testRegisterExceptionHandler() throws Exception {
-        ExceptionTracking.registerExceptionHandler();
+        ExceptionTracking.registerExceptionHandler(this.getActivity());
         Thread.UncaughtExceptionHandler handler =
                 Thread.getDefaultUncaughtExceptionHandler();
         Assert.assertNotNull("handler is set", handler);
@@ -35,14 +35,14 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
 
         // double register without debug mode
         ApplicationInsights.setDeveloperMode(false);
-        ExceptionTracking.registerExceptionHandler();
+        ExceptionTracking.registerExceptionHandler(this.getActivity());
         Assert.assertTrue("no exception for multiple registration without debug mode", true);
 
         // double register with debug mode and verify runtime exception
         ApplicationInsights.setDeveloperMode(true);
         RuntimeException exception = null;
         try {
-            ExceptionTracking.registerExceptionHandler();
+            ExceptionTracking.registerExceptionHandler(this.getActivity());
         } catch (RuntimeException e) {
             exception = e;
         }
