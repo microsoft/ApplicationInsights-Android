@@ -208,7 +208,7 @@ public enum ApplicationInsights {
 
             // Start crash reporting
             if (!this.exceptionTrackingDisabled) {
-                ExceptionTracking.registerExceptionHandler(context);
+                ExceptionTracking.registerExceptionHandler();
             }
 
             isRunning = true;
