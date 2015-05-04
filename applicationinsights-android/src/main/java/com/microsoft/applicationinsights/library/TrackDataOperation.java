@@ -1,7 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-import android.os.AsyncTask;
-
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 
