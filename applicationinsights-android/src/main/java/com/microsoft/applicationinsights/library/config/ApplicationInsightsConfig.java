@@ -61,6 +61,7 @@ public class ApplicationInsightsConfig implements ISenderConfig, ISessionConfig,
         this.lock = new Object();
 
         // Initialize default values for queue config
+        //TODO: If running on a device with developer mode enabled, the default values will be set (move to getter)
         this.maxBatchCount = (ApplicationInsights.isDeveloperMode()) ? DEBUG_MAX_BATCH_COUNT : DEFAULT_MAX_BATCH_COUNT;
         this.maxBatchIntervalMs = (ApplicationInsights.isDeveloperMode()) ? DEBUG_MAX_BATCH_INTERVAL_MS : DEFAULT_MAX_BATCH_INTERVAL_MS;
 

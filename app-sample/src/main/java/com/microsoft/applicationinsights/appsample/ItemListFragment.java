@@ -124,33 +124,37 @@ public class ItemListFragment extends ListFragment {
 
         switch (position) {
             case 0:
-                client.trackEvent("something wicked this way comes");
+                ApplicationInsights.enableAutoPageViewTracking();
                 break;
             case 1:
-                client.trackTrace("something wicked this way comes");
+                ApplicationInsights.disableAutoPageViewTracking();
                 break;
             case 2:
+                ApplicationInsights.enableAutoSessionManagement();
+                break;
+            case 3:
+                ApplicationInsights.disableAutoSessionManagement();
+                break;
+            case 4:
 
                 ArrayList<Object> myList = new ArrayList<Object>();
                 try{
                     Object test = myList.get(2);
                 }catch(Exception e){
-                    client.trackHandledException(e);
+                    TelemetryClient.getInstance().trackHandledException(e);
                 }
                 break;
-            case 3:
+            case 5:
                 crashMe1();
                 break;
-            case 4:
-                ApplicationInsights.INSTANCE.sendPendingData();
+            case 6:
+                ApplicationInsights.sendPendingData();
                 break;
-
+            case 7:
+                TelemetryClient.getInstance().trackEvent("My Event");
+                break;
             default:
                 break;
-        }
-
-        if(position == 1) {
-
         }
 
         // Notify the active callbacks interface (the activity, if the

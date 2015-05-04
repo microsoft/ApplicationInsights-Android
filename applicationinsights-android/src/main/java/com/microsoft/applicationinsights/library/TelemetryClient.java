@@ -1,7 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-import android.app.Application;
-
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
@@ -23,11 +21,6 @@ public class TelemetryClient {
      * The shared TelemetryClient instance.
      */
     private static TelemetryClient instance;
-
-    /**
-     * A flag, which determines if page views should be tracked automatically.
-     */
-    private boolean activityTrackingEnabled;
 
     /**
      * A flag, which determines telemetry data can be tracked.
@@ -248,18 +241,6 @@ public class TelemetryClient {
     public void trackNewSession() {
         if(isTelemetryEnabled()){
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION));
-        }
-    }
-
-    /**
-     * Registers an activity life cycle callback handler to track page views and sessions.
-     *
-     * @param application the application used to register the life cycle callbacks
-     */
-    protected void enableActivityTracking(Application application) {
-        if(!activityTrackingEnabled){
-            activityTrackingEnabled = true;
-            LifeCycleTracking.registerActivityLifecycleCallbacks(application);
         }
     }
 

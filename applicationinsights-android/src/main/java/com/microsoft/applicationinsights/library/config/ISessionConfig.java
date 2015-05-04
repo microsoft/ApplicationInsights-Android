@@ -1,8 +1,5 @@
 package com.microsoft.applicationinsights.library.config;
 
-/**
- * Created by christophwendt on 21/04/15.
- */
 public interface ISessionConfig {
 
     /**
