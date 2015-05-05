@@ -27,7 +27,7 @@ import java.util.UUID;
 class EnvelopeFactory {
 
     /**
-     * The scham version of
+     * The schema version
      */
     protected static final int CONTRACT_VERSION = 2;
 
