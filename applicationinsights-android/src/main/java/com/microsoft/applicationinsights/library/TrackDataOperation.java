@@ -1,13 +1,11 @@
 package com.microsoft.applicationinsights.library;
 
-import android.os.AsyncTask;
-
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 
 import java.util.Map;
 
-class CreateDataTask extends AsyncTask<Void, Void, Void> {
+class TrackDataOperation implements Runnable {
 
     protected enum DataType {
         NONE,
@@ -28,41 +26,41 @@ class CreateDataTask extends AsyncTask<Void, Void, Void> {
     private Throwable exception;
     private ITelemetry telemetry;
 
-    protected CreateDataTask(ITelemetry telemetry){
+    protected TrackDataOperation(ITelemetry telemetry){
         this.type = DataType.NONE;
         this.telemetry = telemetry;
     }
 
-    protected CreateDataTask(DataType type){
+    protected TrackDataOperation(DataType type){
         this.type = type;
     }
 
-    protected CreateDataTask(DataType type, String metricName, double metric){
+    protected TrackDataOperation(DataType type, String metricName, double metric){
         this.type = type;
         this.name = metricName;
         this.metric = metric;
     }
 
-    protected CreateDataTask(DataType type,
-                                    String name,
-                                    Map<String,String> properties,
-                                    Map<String, Double> measurements){
+    protected TrackDataOperation(DataType type,
+                                 String name,
+                                 Map<String, String> properties,
+                                 Map<String, Double> measurements){
         this.type = type;
         this.name = name;
         this.properties = properties;
         this.measurements = measurements;
     }
 
-    protected CreateDataTask(DataType type,
-                                    Throwable exception,
-                                    Map<String,String> properties){
+    protected TrackDataOperation(DataType type,
+                                 Throwable exception,
+                                 Map<String, String> properties){
         this.type = type;
         this.exception = exception;
         this.properties = properties;
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    public void run() {
         Envelope envelope = null;
         switch (this.type){
             case NONE:
@@ -101,6 +99,5 @@ class CreateDataTask extends AsyncTask<Void, Void, Void> {
                 channel.enqueue(envelope);
             }
         }
-        return null;
     }
 }

@@ -1,7 +1,5 @@
 package com.microsoft.applicationinsights.library;
 
-import android.content.Context;
-
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -19,38 +17,29 @@ class ExceptionTracking implements UncaughtExceptionHandler {
     /**
      * Constructs a new instance of the ExceptionTracking class
      *
-     * @param context                     The context associated with this tracker
      * @param preexistingExceptionHandler the pre-existing exception handler
      * @param ignoreDefaultHandler        indicates that the pre-existing handler should be ignored
      */
-    protected ExceptionTracking(Context context,
-                                UncaughtExceptionHandler preexistingExceptionHandler,
+    protected ExceptionTracking(UncaughtExceptionHandler preexistingExceptionHandler,
                                 boolean ignoreDefaultHandler) {
         this.preexistingExceptionHandler = preexistingExceptionHandler;
-        if (context != null) {
-            this.ignoreDefaultHandler = ignoreDefaultHandler;
-        } else {
-            InternalLogging.error(TAG, "Failed to initialize ExceptionHandler because the provided Context was null");
-        }
+        this.ignoreDefaultHandler = ignoreDefaultHandler;
     }
 
     /**
      * Registers the application insights exception handler to track uncaught exceptions
      * {@code ignoreDefaulthandler} defaults to {@literal false}
-     *
-     * @param context the context associated with uncaught exceptions
      */
-    protected static void registerExceptionHandler(Context context) {
-        ExceptionTracking.registerExceptionHandler(context, false);
+    protected static void registerExceptionHandler() {
+        ExceptionTracking.registerExceptionHandler(false);
     }
 
     /**
      * Registers the application insights exception handler to track uncaught exceptions
      *
-     * @param context              the context associated with uncaught exceptions
      * @param ignoreDefaultHandler if true the default exception handler will be ignored
      */
-    protected static void registerExceptionHandler(Context context, boolean ignoreDefaultHandler) {
+    protected static void registerExceptionHandler(boolean ignoreDefaultHandler) {
         synchronized (ExceptionTracking.LOCK) {
             UncaughtExceptionHandler preexistingExceptionHandler =
                   Thread.getDefaultUncaughtExceptionHandler();
@@ -60,7 +49,6 @@ class ExceptionTracking implements UncaughtExceptionHandler {
                       "ExceptionHandler was already registered for this thread");
             } else {
                 ExceptionTracking handler = new ExceptionTracking(
-                      context,
                       preexistingExceptionHandler,
                       ignoreDefaultHandler);
 
@@ -89,7 +77,10 @@ class ExceptionTracking implements UncaughtExceptionHandler {
         }
 
         // track the crash
-        new CreateDataTask(CreateDataTask.DataType.UNHANDLED_EXCEPTION, exception, properties).execute();
+        Thread executor = new Thread(new TrackDataOperation(TrackDataOperation.DataType.UNHANDLED_EXCEPTION,
+                exception, properties));
+        executor.setDaemon(false);
+        executor.start();
 
         // invoke the existing handler if requested and if it exists
         if (!this.ignoreDefaultHandler && this.preexistingExceptionHandler != null) {

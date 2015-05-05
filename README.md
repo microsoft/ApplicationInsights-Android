@@ -1,6 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-Beta.3)
+# Application Insights for Android (1.0-beta.3)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
@@ -22,7 +22,7 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 10. [Documentation](#10)
 11. [Contributing](#11) 
 
-## <a name="1"></a>Release Notes
+## <a name="1"></a> 1. Release Notes
 
 * Cleaned code
 * Single configuration class ```ApplicationInsightsConfig```
@@ -30,25 +30,25 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 * Separate methods for enabling/disabling auto collection features (auto page view tracking, auto session renewal)
 * Fixed context fields in telemetry data payload
 
-##<a name="2"></a>Breaking Changes
+##<a name="2"></a> 2. Breaking Changes
 
 Starting with the first 1.0 stable release, we will start deprecating API instead of breaking old ones.
 
-* **[1.0-Beta.3]** Configuration of the Application Insights SDK is now done using ```ApplicationInsightsConfig```. The previous config-classes have been removed
+* **[1.0-beta.3]** Configuration of the Application Insights SDK is now done using ```ApplicationInsightsConfig```. The previous config-classes have been removed
 
-* **[1.0-Beta.2]** To enable automatic lifecycle-tracking, Application Insights has to be set up with an instance of Application (see [Life-cycle tracking] (#2)), otherwise, lifecycle-tracking is disabled.
+* **[1.0-beta.2]** To enable automatic lifecycle-tracking, Application Insights has to be set up with an instance of Application (see [Life-cycle tracking] (#2)), otherwise, lifecycle-tracking is disabled.
 
-* **[1.0-Beta.1]** Setup and start of the Application Insights SDK are now done using the new umbrella class `ApplicationInsights` instead of `AppInsights `
+* **[1.0-beta.1]** Setup and start of the Application Insights SDK are now done using the new umbrella class `ApplicationInsights` instead of `AppInsights `
 
 * **[1.0-Alpha.5]** Setup and start of the Application Insights SDK are now done using the new umbrella class `AppInsights` instead of `TelemetryClient`
 
-##<a name="3"></a> Setup
+##<a name="3"></a> 3. Setup
 
 This is the recommended way to setup Application Insights for your Android app. For other ways to setup the SDK, see [Advanced Setup](#4).
 
 We're assuming you are using Android Studio and gradle to build your Android application.
 
-### 1. **Add a compile dependency for the SDK**
+### 3.1 **Add a compile dependency for the SDK**
 
 In your module's ```build.gradle```add a dependency for Application Insights 
 
@@ -58,11 +58,11 @@ dependencies {
 }
 ```
 
-### 2. Configure the instrumentation key
+### 3.2 Configure the instrumentation key
 
 Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
 
-### 3. Add permissions
+### 3.3 Add permissions
 
 Add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` to your app's `AndroidManifest.xml`
 
@@ -73,7 +73,7 @@ Add the two permissions for `INTERNET` and `ACCESS_NETWORK_STATE` to your app's 
 </manifest>
 ```
 
-### 4. Add your instrumentation key to Manifest
+### 3.4 Add your instrumentation key to manifest
 
 Add the _instrumentation key_ for your app to your Android Manifest as follows. Replace `${AI_INSTRUMENTATION_KEY}` with your instrumentation key. You can leave the variable as is if you want to use your ```gradle.properties``` to set it (see [Advanced Setup](#4)). 
 
@@ -87,7 +87,7 @@ Add the _instrumentation key_ for your app to your Android Manifest as follows. 
 </manifest>
 ```
 
-### 5. Add code to setup and start Application Insights
+### 3.5 Add code to setup and start Application Insights
 
 Add the following import to your app's root activity
 
@@ -98,7 +98,7 @@ import com.microsoft.applicationinsights.library.ApplicationInsights;
 and add 
 
 ```java
-ApplicationInsights.setup(this, getApplication());
+ApplicationInsights.setup(this.getApplicationContext(), getApplication());
 ApplicationInsights.start();
 ```
 
@@ -134,7 +134,7 @@ android {
 It is also possible to set the instrumentation key of your app in code. This will override the one you might have set in your gradle or manifest file. Setting the instrumentation key programmatically can be done while setting up Application Insights:
 
 ```java
-ApplicationInsights.setup(this, getApplication(), "<YOUR-INSTRUMENTATION-KEY>");
+ApplicationInsights.setup(this.getApplicationContext(), getApplication(), "<YOUR-INSTRUMENTATION-KEY>");
 ApplicationInsights.start();
 ```
 
@@ -145,13 +145,12 @@ The **developer mode** is enabled automatically in case the debugger is attached
 You can explicitly enable/disable the developer mode like this:
 
 ```java
-//do this after ApplicationInsights.setup(this, getApplication())
+//do this after ApplicationInsights.setup(this.getApplicationContext(), getApplication())
 //and before ApplicationInsights.start()
 
 ApplicationInsights.setDeveloperMode(false);
 
 ```
-
 
 ## <a name="6"></a> 6. Basic Usage  ##
 
@@ -193,7 +192,7 @@ client.trackEvent("sample event", properties);
 
 ## <a name="7"></a>7. Automatic collection of life-cycle events (Sessions & Page Views)
 
-This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is **enabled by default**. Don't forget to set the Application instance when setting up Application Insights (otherwise auto collection will be disabled):
+This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is **enabled by default**. Don't forget to provide an Application instance when setting up Application Insights (otherwise auto collection will be disabled):
 
 ```java
 ApplicationInsights.setup(this, getApplication());
@@ -202,12 +201,12 @@ ApplicationInsights.setup(this, getApplication());
 If you want to explicitly **Disable** automatic collection of life-cycle events (auto session tracking and auto page view tracking), call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
 
 ```java
-ApplicationInsights.setup(this);
+ApplicationInsights.setup(this.getApplicationContext());
 ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
 ApplicationInsights.start();
 ```
 
-After `ApplicationInsights.start()` was called you can enable or disable thos features at any point:
+After `ApplicationInsights.start()` was called, you can enable or disable those features at any point:
 
 ```java
 // Disable automatic session renewal & tracking
@@ -217,7 +216,7 @@ ApplicationInsights.disableAutoSessionManagement();
 ApplicationInsights.enableAutoPageViewTracking();
 ```
 
-## <a name="8"></a> Exception Handling (Crashes)
+## <a name="8"></a>8.  Exception Handling (Crashes)
 
 The Application Insights SDK enables crash reporting **per default**. Unhandled exceptions (aka crashes) will be immediately sent to the server if a connection is available.
 
@@ -228,7 +227,7 @@ This feature can be disabled as follows:
 
 ```
 
-## <a name="9"></a>9. Additional configuration
+## <a name="9"></a>9. Additional Configuration
 
 To configure Application Insights according to your needs, first, call
 
@@ -249,7 +248,7 @@ After all custom configurations have been made, just start `ApplicationInsights`
 ApplicationInsights.start();
 ```
 
-### 9.1 Set user session time
+### 9.1 Set User Session Time
 
 The default time the users entering the app counts as a new session is 20s. If you want to set it to a different value, do the following:
 
@@ -257,7 +256,7 @@ The default time the users entering the app counts as a new session is 20s. If y
 config.setSessionIntervalMs(30000); //set intercal to 30s (30,000ms)
 ```
 
-### 9.2 Batch size for a bundle of telemetry
+### 9.2 Batch Size for a Bundle of Telemetry
 
 Unhandled exceptions (aka ”your app is crashing!“) are sent out immediately, while regular telemetry data is send out in batches or after a specified interval.
 
@@ -274,7 +273,7 @@ To set the maxBatchSize to a different value (default is 100) like this:
 config.setMaxBatchCount(20); //set batch size to 20.
 ```
 
-### 9.3 Set different endpoint
+### 9.3 Set Different Endpoint
 
 You can also configure a different server endpoint for the SDK if needed:
 
@@ -308,3 +307,9 @@ Our Javadoc can be found at [http://microsoft.github.io/ApplicationInsights-Andr
 * Install <a href="http://developer.android.com/sdk/index.html" target="_blank">Android studio</a>
 * [Get an instrumentation key](/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key) and set it in the manifest
 * Run tests from Android Studio
+
+<a id="contact"></a>
+## 12. Contact
+
+If you have further questions or are running into trouble that cannot be resolved by any of the steps here, feel free to contact us at [AppInsights-Android@microsoft.com](mailto:AppInsights-Android@microsoft.com)
+
