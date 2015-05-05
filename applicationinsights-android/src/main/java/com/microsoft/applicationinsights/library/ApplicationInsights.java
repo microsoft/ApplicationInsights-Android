@@ -448,9 +448,9 @@ public enum ApplicationInsights {
     }
 
     /**
-     * Returns the application weakContext that Application Insights uses.
+     * Returns the application reference that Application Insights needs.
      *
-     * @return weakContext the Context that's used by the Application Insights SDK
+     * @return the Context that's used by the Application Insights SDK
      */
     protected Context getContext() {
         Context context = null;
@@ -461,6 +461,10 @@ public enum ApplicationInsights {
         return context;
     }
 
+    /**
+     * Get the reference to the Application (used for life-cycle tracking)
+     * @return the reference to the application that was used during initialization of the SDK
+     */
     protected Application getApplication() {
         Application application = null;
         if(weakApplication != null) {
