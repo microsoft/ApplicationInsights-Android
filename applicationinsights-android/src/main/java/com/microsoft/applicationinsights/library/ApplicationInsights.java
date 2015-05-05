@@ -11,6 +11,7 @@ import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public enum ApplicationInsights {
     INSTANCE;
@@ -23,7 +24,7 @@ public enum ApplicationInsights {
     /**
      * A flag which determines, if developer mode (logging) should be enabled.
      */
-    private static boolean DEVELOPER_MODE;
+    private static AtomicBoolean DEVELOPER_MODE = new AtomicBoolean(Util.isEmulator() || Util.isDebuggerAttached());
 
     /**
      * The configuration of the SDK.
@@ -87,7 +88,6 @@ public enum ApplicationInsights {
         this.exceptionTrackingDisabled = false;
         this.autoCollectionDisabled = false;
         this.config = new ApplicationInsightsConfig();
-        setDeveloperMode(Util.isEmulator() || Util.isDebuggerAttached());
     }
 
     /**
@@ -412,11 +412,11 @@ public enum ApplicationInsights {
     }
 
        public static void setDeveloperMode(boolean developerMode) {
-        DEVELOPER_MODE = developerMode;
+        DEVELOPER_MODE.set(developerMode);
     }
 
     public static boolean isDeveloperMode() {
-        return DEVELOPER_MODE;
+        return DEVELOPER_MODE.get();
     }
 
     /**
