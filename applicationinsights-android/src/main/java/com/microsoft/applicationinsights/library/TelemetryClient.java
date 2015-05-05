@@ -4,11 +4,17 @@ import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * The public API for recording application insights telemetry.
  */
 public class TelemetryClient {
+
+    public static final int THREADS = 10;
     public static final String TAG = "TelemetryClient";
 
     /**
@@ -32,12 +38,25 @@ public class TelemetryClient {
     private static final Object LOCK = new Object();
 
     /**
+     * Executor service for running track operations on several threads.
+     */
+    private ExecutorService executorService;
+
+    /**
      * Restrict access to the default constructor
      *
      * @param telemetryEnabled YES if tracking telemetry data manually should be enabled
      */
     protected TelemetryClient(boolean telemetryEnabled) {
         this.telemetryEnabled = telemetryEnabled;
+        this.executorService = Executors.newFixedThreadPool(THREADS, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r);
+                thread.setDaemon(false);
+                return thread;
+            }
+        });
     }
 
     /**
@@ -95,7 +114,7 @@ public class TelemetryClient {
      */
     public void track(ITelemetry telemetry){
         if(isTelemetryEnabled()){
-            new TrackDataTask(telemetry).execute();
+            this.executorService.execute(new TrackDataOperation(telemetry));
         }
     }
 
@@ -112,7 +131,8 @@ public class TelemetryClient {
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
-            new TrackDataTask(TrackDataTask.DataType.EVENT, eventName, properties, measurements).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.EVENT,
+                    eventName, properties, measurements));
         }
 
     }
@@ -135,7 +155,8 @@ public class TelemetryClient {
      */
     public void trackTrace(String message, Map<String, String> properties) {
         if(isTelemetryEnabled()){
-            new TrackDataTask(TrackDataTask.DataType.TRACE, message, properties, null).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.TRACE,
+                    message, properties, null));
         }
     }
 
@@ -149,7 +170,7 @@ public class TelemetryClient {
      */
     public void trackMetric(String name, double value) {
         if(isTelemetryEnabled()){
-            new TrackDataTask(TrackDataTask.DataType.METRIC, name, value).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value));
         }
     }
 
@@ -172,7 +193,8 @@ public class TelemetryClient {
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
         if(isTelemetryEnabled()){
-            new TrackDataTask(TrackDataTask.DataType.HANDLED_EXCEPTION, handledException, properties).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
+                    handledException, properties));
         }
     }
 
@@ -208,7 +230,8 @@ public class TelemetryClient {
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
-            new TrackDataTask(TrackDataTask.DataType.PAGE_VIEW, pageName, properties, null).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
+                    pageName, properties, null));
         }
     }
 
@@ -217,7 +240,7 @@ public class TelemetryClient {
      */
     public void trackNewSession() {
         if(isTelemetryEnabled()){
-            new TrackDataTask(TrackDataTask.DataType.NEW_SESSION).execute();
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION));
         }
     }
 

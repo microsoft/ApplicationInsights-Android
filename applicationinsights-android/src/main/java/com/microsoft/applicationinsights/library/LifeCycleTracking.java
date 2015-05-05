@@ -68,11 +68,12 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      * A flag which determines whether session management has been enabled or not.
      */
     private static boolean autoSessionManagementEnabled;
+    ;
 
     /**
      * Create a new INSTANCE of the lifecycle event tracking
      *
-     * @param config the session configuration for session tracking
+     * @param config           the session configuration for session tracking
      * @param telemetryContext the context, which is needed to renew sessions
      */
     protected LifeCycleTracking(ISessionConfig config, TelemetryContext telemetryContext) {
@@ -86,7 +87,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      * Initialize the INSTANCE of lifecycle event tracking.
      *
      * @param telemetryContext the context, which is needed to renew sessions
-     * @param config the session configuration for session tracking
+     * @param config           the session configuration for session tracking
      */
     protected static void initialize(TelemetryContext telemetryContext, ISessionConfig config) {
         // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
@@ -118,7 +119,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerActivityLifecycleCallbacks(Application application) {
-        if(!autoPageViewsEnabled && !autoSessionManagementEnabled){
+        if (!autoPageViewsEnabled && !autoSessionManagementEnabled) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 application.registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
             }
@@ -132,7 +133,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private static void unregisterActivityLifecycleCallbacks(Application application) {
-        if(autoPageViewsEnabled ^ autoSessionManagementEnabled){
+        if (autoPageViewsEnabled ^ autoSessionManagementEnabled) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 application.unregisterActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
             }
@@ -202,14 +203,15 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
     /**
      * This is called each time an activity is created.
      *
-     * @param activity the Android Activity that's created
+     * @param activity           the Android Activity that's created
      * @param savedInstanceState the bundle
      */
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         int count = this.activityCount.getAndIncrement();
         synchronized (LifeCycleTracking.LOCK) {
             if (count == 0 && autoSessionManagementEnabled) {
-                new TrackDataTask(TrackDataTask.DataType.NEW_SESSION).execute();
+                TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
+                new Thread(sessionOp).start();
             }
         }
     }
@@ -235,12 +237,15 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
         boolean shouldRenew = now - then >= this.config.getSessionIntervalMs();
 
         synchronized (LifeCycleTracking.LOCK) {
-            if(autoSessionManagementEnabled && shouldRenew){
+            if (autoSessionManagementEnabled && shouldRenew) {
                 this.telemetryContext.renewSessionId();
-                new TrackDataTask(TrackDataTask.DataType.NEW_SESSION).execute();
+                TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
+                new Thread(sessionOp).start();
             }
-            if(autoPageViewsEnabled){
-                new TrackDataTask(TrackDataTask.DataType.PAGE_VIEW, activity.getClass().getName(), null, null).execute();
+
+            if (autoPageViewsEnabled) {
+                TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName(), null, null);
+                new Thread(pageViewOp).start();
             }
         }
     }

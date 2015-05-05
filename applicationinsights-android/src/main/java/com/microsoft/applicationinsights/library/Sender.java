@@ -16,9 +16,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -45,19 +44,19 @@ class Sender {
     protected final ISenderConfig config;
 
     /**
-     * Persistence used for saving queue items.
-     */
-    private Persistence persistence;
-
-    /**
      * The shared Sender instance.
      */
     private static Sender instance;
 
     /**
-     * A map used to keep track of running send operations.
+     * Persistence object used to reserve, free, or delete files.
      */
-    private final HashMap<String, TimerTask> currentTasks = new HashMap<String, TimerTask>(10);
+    protected Persistence persistence;
+
+    /**
+     * Thread safe counter to keep track of num of operations
+     */
+    private AtomicInteger operationsCount;
 
     /**
      * Restrict access to the default constructor
@@ -65,6 +64,7 @@ class Sender {
      */
     protected Sender(ISenderConfig config) {
         this.config = config;
+        this.operationsCount = new AtomicInteger(0);
         this.persistence = Persistence.getInstance();
     }
 
@@ -99,60 +99,95 @@ class Sender {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                send();
+                sendNextFile();
                 return null;
             }
         }.execute();
     }
 
-    protected void send() {
+    protected void sendNextFile(){
         if(runningRequestCount() < 10) {
             // Send the persisted data
+
             if (this.persistence != null) {
                 File fileToSend = this.persistence.nextAvailableFile();
                 if(fileToSend != null) {
-                    String persistedData = this.persistence.load(fileToSend);
-                    if (!persistedData.isEmpty()) {
-                        InternalLogging.info(TAG, "sending persisted data", persistedData);
-                        SendingTask sendingTask = new SendingTask(persistedData, fileToSend);
-                        this.addToRunning(fileToSend.toString(), sendingTask);
-                        sendingTask.run();
-
-                        //TODO add comment for this
-                        Thread sendingThread = new Thread(sendingTask);
-                        sendingThread.setDaemon(false);
-                    }else{
-                        this.persistence.deleteFile(fileToSend);
-                        send();
-                    }
+                    send(fileToSend);
                 }
             }
         }
         else {
             InternalLogging.info(TAG, "We have already 10 pending reguests", "");
         }
-}
-
-    protected void addToRunning(String key, SendingTask task) {
-        synchronized (Sender.LOCK) {
-            this.currentTasks.put(key, task);
-        }
     }
 
-    protected void removeFromRunning(String key) {
-        synchronized (Sender.LOCK) {
-            this.currentTasks.remove(key);
+    protected void send(File fileToSend) {
+
+        String persistedData = this.persistence.load(fileToSend);
+        if (!persistedData.isEmpty()) {
+            InternalLogging.info(TAG, "sending persisted data", persistedData);
+            try {
+                InternalLogging.info(TAG, "sending persisted data", persistedData);
+                this.operationsCount.getAndIncrement();
+                this.sendRequestWithPayload(persistedData, fileToSend);
+            } catch (IOException e) {
+                InternalLogging.warn(TAG,"Couldn't send request with IOException: " + e.toString());
+                this.operationsCount.getAndDecrement();
+            }
+        }else{
+            this.persistence.deleteFile(fileToSend);
+            sendNextFile();
         }
     }
 
     protected int runningRequestCount() {
-        synchronized (Sender.LOCK) {
-            return getInstance().currentTasks.size();
+        return this.operationsCount.get();
+    }
+
+    protected void sendRequestWithPayload(String payload, File fileToSend) throws IOException {
+        Writer writer = null;
+        URL url = new URL(config.getEndpointUrl());
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setReadTimeout(config.getSenderReadTimeout());
+        connection.setConnectTimeout(config.getSenderConnectTimeout());
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
+        connection.setDoInput(true);
+        connection.setUseCaches(false);
+
+        try {
+            InternalLogging.info(TAG, "writing payload", payload);
+            writer = getWriter(connection);
+            writer.write(payload);
+            writer.flush();
+
+            // Starts the query
+            connection.connect();
+
+            // read the response code while we're ready to catch the IO exception
+            int responseCode = connection.getResponseCode();
+
+            // process the response
+            onResponse(connection, responseCode, payload, fileToSend);
+        } catch (IOException e) {
+            InternalLogging.warn(TAG, "Couldn't send data with IOException: " + e.toString());
+            if (this.persistence != null) {
+                this.persistence.makeAvailable(fileToSend); //send again later
+            }
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    // no-op
+                }
+            }
         }
     }
 
     /**
-     * Handler for the http response from the sender
+     * Callback for the http response from the sender
      *
      * @param connection   a connection containing a response
      * @param responseCode the response code from the connection
@@ -160,7 +195,7 @@ class Sender {
      * @param fileToSend reference to the file we want to send
      */
     protected void onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
-        this.removeFromRunning(fileToSend.toString());
+        this.operationsCount.getAndDecrement();
 
         StringBuilder builder = new StringBuilder();
 
@@ -173,7 +208,7 @@ class Sender {
         // If this was expected and developer mode is enabled, read the response
         if(isExpected) {
             this.onExpected(connection, builder);
-            this.send();
+            this.sendNextFile();
         }
 
         if(deleteFile) {
@@ -296,78 +331,11 @@ class Sender {
     }
 
     /**
-     * Set the persistence instance used to save items.
+     * Set persistence used to reserve, free, or delete files (enables dependency injection).
      *
-     * @param persistence the persitence instance which should be used
+     * @param persistence a persistence used to reserve, free, or delete files
      */
     protected void setPersistence(Persistence persistence) {
         this.persistence = persistence;
     }
-
-
-    private class SendingTask extends TimerTask {
-        private String payload;
-        private final File fileToSend;
-
-        public SendingTask(String payload, File fileToSend) {
-            this.payload = payload;
-            this.fileToSend = fileToSend;
-        }
-
-        @Override
-        public void run() {
-            if (this.payload != null) {
-                try {
-                    InternalLogging.info(TAG, "sending persisted data", payload);
-                    this.sendRequestWithPayload(payload);
-                } catch (IOException e) {
-                    InternalLogging.warn(TAG,"Couldn't send request with IOException: " + e.toString());
-                }
-            }
-        }
-
-        protected void sendRequestWithPayload(String payload) throws IOException {
-            Writer writer = null;
-            URL url = new URL(config.getEndpointUrl());
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setReadTimeout(config.getSenderReadTimeout());
-            connection.setConnectTimeout(config.getSenderConnectTimeout());
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setUseCaches(false);
-
-            try {
-                InternalLogging.info(TAG, "writing payload", payload);
-                writer = getWriter(connection);
-                writer.write(payload);
-                writer.flush();
-
-                // Starts the query
-                connection.connect();
-
-                // read the response code while we're ready to catch the IO exception
-                int responseCode = connection.getResponseCode();
-
-                // process the response
-                onResponse(connection, responseCode, payload, fileToSend);
-            } catch (IOException e) {
-                InternalLogging.warn(TAG, "Couldn't send data with IOException: " + e.toString());
-                if (persistence != null) {
-                    persistence.makeAvailable(fileToSend); //send again later
-                }
-            } finally {
-                if (writer != null) {
-                    try {
-                        writer.close();
-                    } catch (IOException e) {
-                        // no-op
-                    }
-                }
-            }
-        }
-    }
 }
-
-
