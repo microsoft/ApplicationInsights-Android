@@ -69,7 +69,7 @@ public enum ApplicationInsights {
     /**
      * The application needed for auto collecting telemetry data
      */
-    private Application application;
+    private WeakReference<Application> weakApplication;
 
     /**
      * Properties associated with this telemetryContext.
@@ -146,7 +146,7 @@ public enum ApplicationInsights {
             if (context != null) {
                 this.weakContext = new WeakReference<Context>(context);
                 this.instrumentationKey = instrumentationKey;
-                this.application = application;
+                this.weakApplication = new WeakReference<Application>(application);
                 isSetup = true;
                 InternalLogging.info(TAG, "ApplicationInsights has been setup correctly.", null);
             } else {
@@ -176,7 +176,7 @@ public enum ApplicationInsights {
             return;
         }
         if (!isRunning) {
-            Context context = this.getContext();
+            Context context = INSTANCE.getContext();
 
             if(context == null) {
                 InternalLogging.warn(TAG, "Could not start Application Insights as context is null");
@@ -198,9 +198,9 @@ public enum ApplicationInsights {
             // Start autocollection feature
             TelemetryClient.initialize(!telemetryDisabled);
             LifeCycleTracking.initialize(telemetryContext, this.config);
-            if (this.application != null && !this.autoCollectionDisabled) {
-                LifeCycleTracking.registerPageViewCallbacks(this.application);
-                LifeCycleTracking.registerSessionManagementCallbacks(this.application);
+            if (INSTANCE.getApplication() != null && !this.autoCollectionDisabled) {
+                LifeCycleTracking.registerPageViewCallbacks(INSTANCE.getApplication());
+                LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.getApplication());
             } else {
                 InternalLogging.warn(TAG, "Auto collection of page views could not be " +
                           "started, since the given application was null");
@@ -260,12 +260,12 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not set page view tracking, because " +
                     "ApplicationInsights has not been started yet.");
             return;
-        }else if (INSTANCE.application == null) {
+        }else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not set page view tracking, because " +
                     "ApplicationInsights has not been setup with an application.");
             return;
         }else{
-            LifeCycleTracking.registerPageViewCallbacks(INSTANCE.application);
+            LifeCycleTracking.registerPageViewCallbacks(INSTANCE.getApplication());
         }
     }
 
@@ -279,12 +279,12 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
                     "ApplicationInsights has not been started yet.");
             return;
-        }else if (INSTANCE.application == null) {
+        }else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
                     "ApplicationInsights has not been setup with an application.");
             return;
         }else{
-            LifeCycleTracking.unregisterPageViewCallbacks(INSTANCE.application);
+            LifeCycleTracking.unregisterPageViewCallbacks(INSTANCE.getApplication());
         }
     }
 
@@ -298,12 +298,12 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not set session management, because " +
                     "ApplicationInsights has not been started yet.");
             return;
-        }else if (INSTANCE.application == null) {
+        }else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not set session management, because " +
                     "ApplicationInsights has not been setup with an application.");
             return;
         }else{
-            LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.application);
+            LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.getApplication());
         }
     }
 
@@ -317,12 +317,12 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not unset session management, because " +
                     "ApplicationInsights has not been started yet.");
             return;
-        }else if (INSTANCE.application == null) {
+        }else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not unset session management, because " +
                     "ApplicationInsights has not been setup with an application.");
             return;
         }else{
-            LifeCycleTracking.unregisterSessionManagementCallbacks(INSTANCE.application);
+            LifeCycleTracking.unregisterSessionManagementCallbacks(INSTANCE.getApplication());
         }
     }
 
@@ -452,7 +452,7 @@ public enum ApplicationInsights {
      *
      * @return weakContext the Context that's used by the Application Insights SDK
      */
-    public Context getContext() {
+    protected Context getContext() {
         Context context = null;
         if (weakContext != null) {
             context = weakContext.get();
@@ -460,6 +460,16 @@ public enum ApplicationInsights {
 
         return context;
     }
+
+    protected Application getApplication() {
+        Application application = null;
+        if(weakApplication != null) {
+            application = weakApplication.get();
+        }
+
+        return application;
+    }
+
 
     /* Writes instructions on how to configure the instrumentation key.
         */
@@ -531,4 +541,6 @@ public enum ApplicationInsights {
     protected static String getInstrumentationKey() {
         return INSTANCE.instrumentationKey;
     }
+
+
 }
