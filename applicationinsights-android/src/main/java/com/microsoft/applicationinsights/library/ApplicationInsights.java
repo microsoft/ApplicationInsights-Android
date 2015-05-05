@@ -96,6 +96,9 @@ public enum ApplicationInsights {
      *
      * @param context     the context associated with Application Insights
      * @param context the application context associated with Application Insights
+     * @warning auto-collection of lifecycle-events is disabled when using this method
+     * @deprecated This method is deprecated: Use setup(Context context, Application application) instead.
+
      */
     public static void setup(Context context) {
         ApplicationInsights.INSTANCE.setupInstance(context, null, null);
@@ -117,11 +120,12 @@ public enum ApplicationInsights {
      *
      * @param context            the application context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
+     * @warning auto-collection of lifecycle-events is disabled when using this method
+     * @deprecated This method is deprecated: Use setup(Context context, Application application) instead.
      */
     public static void setup(Context context, String instrumentationKey) {
         ApplicationInsights.INSTANCE.setupInstance(context, null, instrumentationKey);
     }
-
     /**
      * Configure Application Insights
      * Note: This should be called before start
@@ -283,7 +287,7 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
                     "ApplicationInsights has not been setup with an application.");
             return;
-        }else{
+        } else {
             LifeCycleTracking.unregisterPageViewCallbacks(INSTANCE.getApplication());
         }
     }
@@ -302,7 +306,7 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not set session management, because " +
                     "ApplicationInsights has not been setup with an application.");
             return;
-        }else{
+        } else {
             LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.getApplication());
         }
     }
@@ -321,7 +325,7 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not unset session management, because " +
                     "ApplicationInsights has not been setup with an application.");
             return;
-        }else{
+        } else {
             LifeCycleTracking.unregisterSessionManagementCallbacks(INSTANCE.getApplication());
         }
     }
