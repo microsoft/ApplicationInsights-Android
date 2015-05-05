@@ -301,7 +301,7 @@ class Persistence {
      *
      * @param highPriority indicates which directory to check for available files
      */
-    private Boolean isFreeSpaceAvailable(Boolean highPriority) {
+    protected Boolean isFreeSpaceAvailable(Boolean highPriority) {
         synchronized (Persistence.LOCK) {
             Context context = getContext();
             if (context != null) {
