@@ -339,5 +339,3 @@ class Sender {
         this.persistence = persistence;
     }
 }
-
-
