@@ -9,7 +9,7 @@ public class MockExceptionTracking extends ExceptionTracking {
     public MockExceptionTracking(Context context,
                                  Thread.UncaughtExceptionHandler preexistingExceptionHandler,
                                  boolean ignoreDefaultHandler) {
-        super(context, preexistingExceptionHandler, ignoreDefaultHandler);
+        super(preexistingExceptionHandler, ignoreDefaultHandler);
         this.processKillCount = 0;
     }
 
