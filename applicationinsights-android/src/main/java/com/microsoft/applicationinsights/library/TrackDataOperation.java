@@ -63,28 +63,28 @@ class TrackDataOperation implements Runnable {
     public void run() {
         Envelope envelope = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
-            envelope = EnvelopeFactory.INSTANCE.createExceptionEnvelope(this.exception, this.properties);
+            envelope = EnvelopeFactory.getInstance().createExceptionEnvelope(this.exception, this.properties);
         } else if (Persistence.getInstance().isFreeSpaceAvailable(false)) {
             switch (this.type) {
                 case NONE:
                     if (this.telemetry != null) {
-                        envelope = EnvelopeFactory.INSTANCE.createEnvelope(this.telemetry);
+                        envelope = EnvelopeFactory.getInstance().createEnvelope(this.telemetry);
                     }
                     break;
                 case EVENT:
-                    envelope = EnvelopeFactory.INSTANCE.createEventEnvelope(this.name, this.properties, this.measurements);
+                    envelope = EnvelopeFactory.getInstance().createEventEnvelope(this.name, this.properties, this.measurements);
                     break;
                 case PAGE_VIEW:
-                    envelope = EnvelopeFactory.INSTANCE.createPageViewEnvelope(this.name, this.properties, this.measurements);
+                    envelope = EnvelopeFactory.getInstance().createPageViewEnvelope(this.name, this.properties, this.measurements);
                     break;
                 case TRACE:
-                    envelope = EnvelopeFactory.INSTANCE.createTraceEnvelope(this.name, this.properties);
+                    envelope = EnvelopeFactory.getInstance().createTraceEnvelope(this.name, this.properties);
                     break;
                 case METRIC:
-                    envelope = EnvelopeFactory.INSTANCE.createMetricEnvelope(this.name, this.metric);
+                    envelope = EnvelopeFactory.getInstance().createMetricEnvelope(this.name, this.metric);
                     break;
                 case NEW_SESSION:
-                    envelope = EnvelopeFactory.INSTANCE.createNewSessionEnvelope();
+                    envelope = EnvelopeFactory.getInstance().createNewSessionEnvelope();
                     break;
                 case HANDLED_EXCEPTION:
                 case UNHANDLED_EXCEPTION:

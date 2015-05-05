@@ -98,7 +98,7 @@ import com.microsoft.applicationinsights.library.ApplicationInsights;
 and add 
 
 ```java
-ApplicationInsights.setup(this, getApplication());
+ApplicationInsights.setup(this.getApplicationContext(), getApplication());
 ApplicationInsights.start();
 ```
 
@@ -134,7 +134,7 @@ android {
 It is also possible to set the instrumentation key of your app in code. This will override the one you might have set in your gradle or manifest file. Setting the instrumentation key programmatically can be done while setting up Application Insights:
 
 ```java
-ApplicationInsights.setup(this, getApplication(), "<YOUR-INSTRUMENTATION-KEY>");
+ApplicationInsights.setup(this.getApplicationContext(), getApplication(), "<YOUR-INSTRUMENTATION-KEY>");
 ApplicationInsights.start();
 ```
 
@@ -145,7 +145,7 @@ The **developer mode** is enabled automatically in case the debugger is attached
 You can explicitly enable/disable the developer mode like this:
 
 ```java
-//do this after ApplicationInsights.setup(this, getApplication())
+//do this after ApplicationInsights.setup(this.getApplicationContext(), getApplication())
 //and before ApplicationInsights.start()
 
 ApplicationInsights.setDeveloperMode(false);
@@ -192,7 +192,7 @@ client.trackEvent("sample event", properties);
 
 ## <a name="7"></a>7. Automatic collection of life-cycle events (Sessions & Page Views)
 
-This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is **enabled by default**. Don't forget to set the Application instance when setting up Application Insights (otherwise auto collection will be disabled):
+This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is **enabled by default**. Don't forget to provide an Application instance when setting up Application Insights (otherwise auto collection will be disabled):
 
 ```java
 ApplicationInsights.setup(this, getApplication());
@@ -201,7 +201,7 @@ ApplicationInsights.setup(this, getApplication());
 If you want to explicitly **Disable** automatic collection of life-cycle events (auto session tracking and auto page view tracking), call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
 
 ```java
-ApplicationInsights.setup(this);
+ApplicationInsights.setup(this.getApplicationContext());
 ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
 ApplicationInsights.start();
 ```

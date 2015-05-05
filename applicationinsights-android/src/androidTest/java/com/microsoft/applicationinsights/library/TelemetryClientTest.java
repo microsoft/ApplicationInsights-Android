@@ -29,7 +29,7 @@ public class TelemetryClientTest extends ActivityUnitTestCase<MockActivity> {
     //TODO test at applicable location
 //    public void testGetContext() throws Exception {
 //        TelemetryClient client = TelemetryClient.getInstance();
-//        Assert.assertNotNull("context is initialized", client.getContext());
+//        Assert.assertNotNull("context is initialized", client.getWeakContext());
 //    }
 
     //TODO test at applicable location
