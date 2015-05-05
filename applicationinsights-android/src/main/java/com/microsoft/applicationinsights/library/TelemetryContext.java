@@ -100,24 +100,24 @@ class TelemetryContext {
     /**
      * Constructs a new INSTANCE of the Telemetry telemetryContext tag keys
      *
-     * @param context the context for this telemetryContext
+     * @param appContext the context for this telemetryContext
      */
-    public TelemetryContext(Context context, String instrumentationKey, String userId) {
+    public TelemetryContext(Context appContext, String instrumentationKey, String userId) {
 
 
         // get an INSTANCE of the shared preferences manager for persistent context fields
-        this.settings = context.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+        this.settings = appContext.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         this.operation = new Operation();
         this.device = new Device();
-        configDeviceContext(context);
+        configDeviceContext(appContext);
         this.session = new Session();
         configSessionContext();
         this.user = new User();
         configUserContext(userId);
         this.internal = new Internal();
-        configInternalContext(context);
+        configInternalContext(appContext);
         this.application = new Application();
-        configAppContext(context);
+        configAppContext(appContext);
 
         this.lastSessionId = null;
         this.instrumentationKey = instrumentationKey;

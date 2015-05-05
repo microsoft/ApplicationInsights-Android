@@ -187,7 +187,7 @@ class Sender {
     }
 
     /**
-     * Callback for the http response from the sender
+     * Handler for the http response from the sender
      *
      * @param connection   a connection containing a response
      * @param responseCode the response code from the connection

@@ -9,7 +9,6 @@ import android.util.Log;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
 
 public enum ApplicationInsights {
@@ -52,7 +51,7 @@ public enum ApplicationInsights {
     private String instrumentationKey;
 
     /**
-     * The weakContext which contains additional information for the telemetry data sent out.
+     * The context which contains additional information for the telemetry data sent out.
      */
     private TelemetryContext telemetryContext;
 
@@ -62,9 +61,9 @@ public enum ApplicationInsights {
     private String userId;
 
     /**
-     * The weakContext associated with Application Insights.
+     * The context associated with Application Insights.
      */
-    private WeakReference<Context> weakContext;
+    private Context context;
 
     /**
      * The application needed for auto collecting telemetry data
@@ -94,8 +93,7 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context     the context associated with Application Insights
-     * @param context the application context associated with Application Insights
+     * @param context the context associated with Application Insights
      */
     public static void setup(Context context) {
         ApplicationInsights.INSTANCE.setupInstance(context, null, null);
@@ -105,7 +103,8 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param application the application context the application needed for auto collecting telemetry data
+     * @param context     the context associated with Application Insights
+     * @param application the application needed for auto collecting telemetry data
      */
     public static void setup(Context context, Application application) {
         ApplicationInsights.INSTANCE.setupInstance(context, application, null);
@@ -115,7 +114,7 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context            the application context associated with Application Insights
+     * @param context            the context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
      */
     public static void setup(Context context, String instrumentationKey) {
@@ -126,7 +125,7 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context            the application context associated with Application Insights
+     * @param context            the context associated with Application Insights
      * @param application        the application needed for auto collecting telemetry data
      * @param instrumentationKey the instrumentation key associated with the app
      */
@@ -138,20 +137,20 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context            the application context associated with Application Insights
+     * @param context            the context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
      */
     public void setupInstance(Context context, Application application, String instrumentationKey) {
         if (!isSetup) {
             if (context != null) {
-                this.weakContext = new WeakReference<Context>(context);
+                this.context = context;
                 this.instrumentationKey = instrumentationKey;
                 this.application = application;
                 isSetup = true;
                 InternalLogging.info(TAG, "ApplicationInsights has been setup correctly.", null);
             } else {
                 InternalLogging.warn(TAG, "ApplicationInsights could not be setup correctly " +
-                      "because the given weakContext was null");
+                      "because the given context was null");
             }
         }
 
@@ -171,27 +170,20 @@ public enum ApplicationInsights {
      */
     public void startInstance() {
         if (!isSetup) {
-            InternalLogging.warn(TAG, "Could not start Application Insights since it has not been " +
+            InternalLogging.warn(TAG, "Could not start ApplicationInsight since it has not been " +
                   "setup correctly.");
             return;
         }
         if (!isRunning) {
-            Context context = this.getContext();
-
-            if(context == null) {
-                InternalLogging.warn(TAG, "Could not start Application Insights as context is null");
-                return;
-            }
-
 
             if (this.instrumentationKey == null) {
-                this.instrumentationKey = readInstrumentationKey(context);
+                this.instrumentationKey = readInstrumentationKey(this.context);
             }
 
-            this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, userId);
+            this.telemetryContext = new TelemetryContext(this.context, this.instrumentationKey, userId);
             EnvelopeFactory.INSTANCE.configure(telemetryContext, this.commonProperties);
 
-            Persistence.initialize(context);
+            Persistence.initialize(this.context);
             Sender.initialize(this.config);
             Channel.initialize(this.config);
 
@@ -208,7 +200,7 @@ public enum ApplicationInsights {
 
             // Start crash reporting
             if (!this.exceptionTrackingDisabled) {
-                ExceptionTracking.registerExceptionHandler();
+                ExceptionTracking.registerExceptionHandler(this.context);
             }
 
             isRunning = true;
@@ -422,7 +414,7 @@ public enum ApplicationInsights {
     /**
      * Reads the instrumentation key from AndroidManifest.xml if it is available
      *
-     * @param context the application weakContext to check the manifest from
+     * @param context the application context to check the manifest from
      * @return the instrumentation key configured for the application
      */
     private String readInstrumentationKey(Context context) {
@@ -448,18 +440,14 @@ public enum ApplicationInsights {
     }
 
     /**
-     * Returns the application weakContext that Application Insights uses.
+     * Returns the application context that Application Insights uses.
      *
-     * @return weakContext the Context that's used by the Application Insights SDK
+     * @return context the Context that's used by the Application Insights SDK
      */
     public Context getContext() {
-        Context context = null;
-        if (weakContext != null) {
-            context = weakContext.get();
-        }
-
-        return context;
+        return this.context;
     }
+
 
     /* Writes instructions on how to configure the instrumentation key.
         */
