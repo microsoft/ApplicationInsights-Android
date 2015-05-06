@@ -24,9 +24,19 @@ public interface ISenderConfig{
     public int getSenderReadTimeout();
 
     /**
+     * Set the timeout for reading the response from the data collector endpoint
+     */
+    public void setSenderReadTimeout(int senderReadTimeout);
+
+    /**
      * Gets the timeout for connecting to the data collector endpoint
      *
      * @return configured timeout in ms for sending
      */
     public int getSenderConnectTimeout();
+
+    /**
+     * Set the timeout for connecting to the data collector endpoint
+     */
+    public void setSenderConnectTimeout(int senderConnectTimeout);
 }

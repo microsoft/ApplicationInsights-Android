@@ -24,7 +24,7 @@ class Channel {
     /**
      * Test hook to the sender
      */
-    private static ChannelQueue queue;
+    protected ChannelQueue queue;
 
     /**
      * The singleton INSTANCE of this class
@@ -32,9 +32,15 @@ class Channel {
     private static Channel instance;
 
     /**
+     * Persistence used for saving unhandled exceptions.
+     */
+    private Persistence persistence;
+
+    /**
      * Instantiates a new INSTANCE of Sender
      */
     protected Channel() {
+        this.persistence = Persistence.getInstance();
     }
 
     protected static void initialize(IQueueConfig config) {
@@ -51,7 +57,7 @@ class Channel {
     }
 
     /**
-     * @return the INSTANCE of persistence or null if not yet initialized
+     * @return the INSTANCE of Channel or null if not yet initialized
      */
     protected static Channel getInstance() {
         if (Channel.instance == null) {
@@ -61,24 +67,11 @@ class Channel {
         return Channel.instance;
     }
 
+    /**
+     * Persist all pending items.
+     */
     protected void synchronize() {
-        getQueue().flush();
-    }
-
-    /**
-     * @return the sender for this channel.
-     */
-    protected ChannelQueue getQueue() {
-        return queue;
-    }
-
-    /**
-     * Test hook to set the queue for this channel
-     *
-     * @param queue the queue to use for this channel
-     */
-    protected void setQueue(ChannelQueue queue) {
-        Channel.queue = queue;
+        this.queue.flush();
     }
 
     /**
@@ -87,8 +80,6 @@ class Channel {
      * @param envelope the envelope object to record
      */
     protected void enqueue(Envelope envelope) {
-        queue.isCrashing = false;
-
         // enqueue to queue
         queue.enqueue(envelope);
 
@@ -102,14 +93,31 @@ class Channel {
         IJsonSerializable[] data = new IJsonSerializable[1];
         data[0] = envelope;
 
-        Persistence persistence = Persistence.getInstance();
-        if (persistence != null) {
-            persistence.persist(data, true);
+        if (this.persistence != null) {
+            this.persistence.persist(data, true);
         }
         else {
             InternalLogging.info(TAG, "error persisting crash", envelope.toString());
         }
 
+    }
+
+    /**
+     * Test hook to set the queue for this channel
+     *
+     * @param queue the queue to use for this channel
+     */
+    protected void setQueue(ChannelQueue queue) {
+        this.queue = queue;
+    }
+
+    /**
+     * Set the persistence instance used to save unhandled exceptions.
+     *
+     * @param persistence the persitence instance which should be used
+     */
+    protected void setPersistence(Persistence persistence) {
+        this.persistence = persistence;
     }
 
 }

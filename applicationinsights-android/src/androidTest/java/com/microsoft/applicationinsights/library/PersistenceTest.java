@@ -4,14 +4,20 @@ import android.test.AndroidTestCase;
 
 import junit.framework.Assert;
 
+import java.io.File;
+
 public class PersistenceTest extends AndroidTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-
-        //TODO add clear all here
-
         Persistence.initialize(this.getContext());
+        Persistence persistence = Persistence.getInstance();
+
+        while(persistence.nextAvailableFile() != null) {
+            File file = persistence.nextAvailableFile();
+            persistence.deleteFile(file);
+        }
+
     }
 
     public void testGetInstance() throws Exception {
@@ -24,7 +30,7 @@ public class PersistenceTest extends AndroidTestCase {
 
         String data = "SAVE THIS DATA";
         persistence.persist(data, false);
-
-        Assert.assertEquals("Data retrieved from file is equal to data saved", data, persistence.nextAvailableFile());
+        File file = persistence.nextAvailableFile();
+        Assert.assertEquals("Data retrieved from file is equal to data saved", data, persistence.load(file));
     }
 }
