@@ -3,6 +3,7 @@ package com.microsoft.applicationinsights.library;
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Looper;
 
 import com.microsoft.applicationinsights.library.config.ISenderConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
@@ -96,33 +97,44 @@ class Sender {
 
 
     protected void sendDataOnAppStart() {
-        new AsyncTask<Void, Void, Void>() {
+       kickOffAsyncSendingTask().execute();
+    }
+
+    private AsyncTask<Void, Void, Void> kickOffAsyncSendingTask() {
+        return  new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 sendNextFile();
                 return null;
             }
-        }.execute();
+        };
     }
 
     protected void sendNextFile(){
-        if(runningRequestCount() < 10) {
-            // Send the persisted data
-
-            if (this.persistence != null) {
-                File fileToSend = this.persistence.nextAvailableFile();
-                if(fileToSend != null) {
-                    send(fileToSend);
-                }
-            }
+        //as sendNextFile() NOT guarranteed to be executed from a background thread, we need to
+        //create an async task if necessary
+        if(Looper.myLooper() == Looper.getMainLooper()) {
+            InternalLogging.info(TAG, "Kick of new async task", "");
+            kickOffAsyncSendingTask().execute();
         }
         else {
-            InternalLogging.info(TAG, "We have already 10 pending reguests", "");
+            if(runningRequestCount() < 10) {
+                // Send the persisted data
+                if (this.persistence != null) {
+                    File fileToSend = this.persistence.nextAvailableFile();
+                    if(fileToSend != null) {
+                        send(fileToSend);
+                    }
+                }
+            }
+            else {
+                InternalLogging.info(TAG, "We have already 10 pending reguests", "");
+            }
         }
     }
 
-    protected void send(File fileToSend) {
 
+    protected void send(File fileToSend) {
         String persistedData = this.persistence.load(fileToSend);
         if (!persistedData.isEmpty()) {
             InternalLogging.info(TAG, "sending persisted data", persistedData);
