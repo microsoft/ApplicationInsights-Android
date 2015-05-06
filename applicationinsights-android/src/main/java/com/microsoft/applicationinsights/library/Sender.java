@@ -3,6 +3,7 @@ package com.microsoft.applicationinsights.library;
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Looper;
 
 import com.microsoft.applicationinsights.library.config.ISenderConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
@@ -26,28 +27,22 @@ import java.util.zip.GZIPOutputStream;
 class Sender {
 
     private static final String TAG = "Sender";
-
-    /**
-     * Volatile boolean for double checked synchronize block.
-     */
-    private static volatile boolean isSenderLoaded = false;
-
-
     /**
      * Synchronization LOCK for setting static config.
      */
     private static final Object LOCK = new Object();
-
     /**
-     * The configuration for this sender.
+     * Volatile boolean for double checked synchronize block.
      */
-    protected final ISenderConfig config;
-
+    private static volatile boolean isSenderLoaded = false;
     /**
      * The shared Sender instance.
      */
     private static Sender instance;
-
+    /**
+     * The configuration for this sender.
+     */
+    protected final ISenderConfig config;
     /**
      * Persistence object used to reserve, free, or delete files.
      */
@@ -60,6 +55,7 @@ class Sender {
 
     /**
      * Restrict access to the default constructor
+     *
      * @param config the telemetryconfig object used to configure the telemetry module
      */
     protected Sender(ISenderConfig config) {
@@ -93,33 +89,42 @@ class Sender {
 
         return Sender.instance;
     }
-
-
+    
     protected void sendDataOnAppStart() {
-        new AsyncTask<Void, Void, Void>() {
+        kickOffAsyncSendingTask().execute();
+    }
+
+    private AsyncTask<Void, Void, Void> kickOffAsyncSendingTask() {
+        return new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 sendNextFile();
                 return null;
             }
-        }.execute();
+        };
     }
 
-    protected void sendNextFile(){
-        if(runningRequestCount() < 10) {
-            // Send the persisted data
-
-            if (this.persistence != null) {
-                File fileToSend = this.persistence.nextAvailableFile();
-                if(fileToSend != null) {
-                    send(fileToSend);
+    protected void sendNextFile() {
+        //as sendNextFile() NOT guarranteed to be executed from a background thread, we need to
+        //create an async task if necessary
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            InternalLogging.info(TAG, "Kick of new async task", "");
+            kickOffAsyncSendingTask().execute();
+        } else {
+            if (runningRequestCount() < 10) {
+                // Send the persisted data
+                if (this.persistence != null) {
+                    File fileToSend = this.persistence.nextAvailableFile();
+                    if (fileToSend != null) {
+                        send(fileToSend);
+                    }
                 }
+            } else {
+                InternalLogging.info(TAG, "We have already 10 pending reguests", "");
             }
         }
-        else {
-            InternalLogging.info(TAG, "We have already 10 pending reguests", "");
-        }
     }
+
 
     protected void send(File fileToSend) {
         String persistedData = this.persistence.load(fileToSend);
@@ -130,10 +135,10 @@ class Sender {
                 this.operationsCount.getAndIncrement();
                 this.sendRequestWithPayload(persistedData, fileToSend);
             } catch (IOException e) {
-                InternalLogging.warn(TAG,"Couldn't send request with IOException: " + e.toString());
+                InternalLogging.warn(TAG, "Couldn't send request with IOException: " + e.toString());
                 this.operationsCount.getAndDecrement();
             }
-        }else{
+        } else {
             this.persistence.deleteFile(fileToSend);
             sendNextFile();
         }
@@ -191,7 +196,7 @@ class Sender {
      * @param connection   a connection containing a response
      * @param responseCode the response code from the connection
      * @param payload      the payload which generated this response
-     * @param fileToSend reference to the file we want to send
+     * @param fileToSend   reference to the file we want to send
      */
     protected void onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
         this.operationsCount.getAndDecrement();
@@ -205,13 +210,13 @@ class Sender {
         boolean deleteFile = isExpected || !isRecoverableError;
 
         // If this was expected and developer mode is enabled, read the response
-        if(isExpected) {
+        if (isExpected) {
             this.onExpected(connection, builder);
             this.sendNextFile();
         }
 
-        if(deleteFile) {
-            if(this.persistence != null) {
+        if (deleteFile) {
+            if (this.persistence != null) {
                 this.persistence.deleteFile(fileToSend);
             }
         }
@@ -230,7 +235,8 @@ class Sender {
     /**
      * Process the expected response. If {code:TelemetryChannelConfig.isDeveloperMode}, read the
      * response and log it.
-     *  @param connection a connection containing a response
+     *
+     * @param connection a connection containing a response
      * @param builder    a string builder for storing the response
      */
     protected void onExpected(HttpURLConnection connection, StringBuilder builder) {
@@ -240,7 +246,7 @@ class Sender {
     }
 
     /**
-     *  @param connection   a connection containing a response
+     * @param connection   a connection containing a response
      * @param responseCode the response code from the connection
      * @param builder      a string builder for storing the response
      */
@@ -260,7 +266,7 @@ class Sender {
      * Writes the payload to disk if the response code indicates that the server or network caused
      * the failure instead of the client.
      *
-     * @param payload the payload which generated this response
+     * @param payload    the payload which generated this response
      * @param fileToSend reference to the file we sent
      */
     protected void onRecoverable(String payload, File fileToSend) {
@@ -274,7 +280,7 @@ class Sender {
      * Reads the response from a connection.
      *
      * @param connection the connection which will read the response
-     * @param builder a string builder for storing the response
+     * @param builder    a string builder for storing the response
      */
     private void readResponse(HttpURLConnection connection, StringBuilder builder) {
         BufferedReader reader = null;
