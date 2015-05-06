@@ -99,7 +99,7 @@ class Persistence {
      * @param highPriority the priority to save the data with
      * @see Persistence#persist(String, Boolean)
      */
-    protected void persist(IJsonSerializable[] data, Boolean highPriority, Boolean shouldSend) {
+    protected void persist(IJsonSerializable[] data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
             Sender.getInstance().sendNextFile();
@@ -122,7 +122,7 @@ class Persistence {
             buffer.append(']');
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData, highPriority);
-            if (isSuccess && shouldSend) {
+            if (isSuccess) {
                 Sender sender = Sender.getInstance();
                 if (sender != null) {
                     sender.sendNextFile();

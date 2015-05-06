@@ -218,7 +218,7 @@ public enum ApplicationInsights {
 
             isRunning = true;
             Sender.getInstance().sendDataOnAppStart();
-            InternalLogging.info(TAG, "ApplicationInsights has been started.", null);
+            InternalLogging.info(TAG, "ApplicationInsights has been started.", "");
         }
     }
 
@@ -234,7 +234,7 @@ public enum ApplicationInsights {
                   "ApplicationInsights has not been started, yet.");
             return;
         }
-        Channel.getInstance().synchronize(true);
+        Channel.getInstance().synchronize();
     }
 
     /**

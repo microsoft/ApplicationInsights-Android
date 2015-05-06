@@ -64,12 +64,12 @@ public class ChannelQueueTest extends InstrumentationTestCase {
 
         // Verify
         Assert.assertEquals(2, sut.list.size());
-        verify(mockPersistence,never()).persist(any(IJsonSerializable[].class), anyBoolean(), anyBoolean());
+        verify(mockPersistence,never()).persist(any(IJsonSerializable[].class), anyBoolean());
 
         sut.enqueue(new Envelope());
 
         Assert.assertEquals(0, sut.list.size());
-        verify(mockPersistence,times(1)).persist(any(IJsonSerializable[].class), anyBoolean(), anyBoolean());
+        verify(mockPersistence,times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
     }
 
     public void testQueueFlushedAfterBatchIntervalReached() {
@@ -82,8 +82,8 @@ public class ChannelQueueTest extends InstrumentationTestCase {
 
         // Verify
         Assert.assertEquals(1, sut.list.size());
-        verify(mockPersistence,never()).persist(any(IJsonSerializable[].class), anyBoolean(), anyBoolean());
-        verify(mockPersistence,after(250).times(1)).persist(any(IJsonSerializable[].class), anyBoolean(), anyBoolean());
+        verify(mockPersistence,never()).persist(any(IJsonSerializable[].class), anyBoolean());
+        verify(mockPersistence,after(250).times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
         Assert.assertEquals(0, sut.list.size());
     }
 
@@ -94,14 +94,14 @@ public class ChannelQueueTest extends InstrumentationTestCase {
 
         sut.enqueue(new Envelope());
         Assert.assertEquals(1, sut.list.size());
-        verify(mockPersistence,never()).persist(any(IJsonSerializable[].class), anyBoolean(), anyBoolean());
+        verify(mockPersistence,never()).persist(any(IJsonSerializable[].class), anyBoolean());
 
         // Test
-        sut.flush(true);
+        sut.flush();
 
         // Verify
         Assert.assertEquals(0, sut.list.size());
-        verify(mockPersistence,times(1)).persist(any(IJsonSerializable[].class), anyBoolean(), anyBoolean());
+        verify(mockPersistence,times(1)).persist(any(IJsonSerializable[].class), anyBoolean());
     }
 
 

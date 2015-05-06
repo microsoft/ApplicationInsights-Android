@@ -70,8 +70,8 @@ class Channel {
     /**
      * Persist all pending items.
      */
-    protected void synchronize(Boolean shouldSend) {
-        this.queue.flush(shouldSend);
+    protected void synchronize() {
+        this.queue.flush();
     }
 
     /**
@@ -88,13 +88,13 @@ class Channel {
 
     protected void processUnhandledException(Envelope envelope) {
         queue.isCrashing = true;
-        queue.flush(true);
+        queue.flush();
 
         IJsonSerializable[] data = new IJsonSerializable[1];
         data[0] = envelope;
 
         if (this.persistence != null) {
-            this.persistence.persist(data, true , false);
+            this.persistence.persist(data, true);
         }
         else {
             InternalLogging.info(TAG, "error persisting crash", envelope.toString());

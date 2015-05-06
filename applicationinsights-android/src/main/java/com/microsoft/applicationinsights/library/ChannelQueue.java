@@ -85,7 +85,7 @@ class ChannelQueue {
             if (success) {
                 if ((this.list.size() >= this.config.getMaxBatchCount()) || isCrashing) {
                     // persisting if the queue is full
-                    flush(true);
+                    flush();
                 } else if (this.list.size() == 1) {
                     schedulePersitenceTask();
                 }
@@ -100,7 +100,7 @@ class ChannelQueue {
     /**
      * Empties the queue and sends all items to persistence
      */
-    protected void flush(Boolean shouldSend) {
+    protected void flush() {
         // cancel the scheduled persistence task if it exists
         if (this.scheduledPersistenceTask != null) {
             this.scheduledPersistenceTask.cancel();
@@ -113,7 +113,7 @@ class ChannelQueue {
                 list.toArray(data);
                 list.clear();
 
-                executePersistenceTask(data, shouldSend);
+                executePersistenceTask(data);
             }
         }
     }
@@ -132,10 +132,10 @@ class ChannelQueue {
     /**
      * Initiates persisting the content queue.
      */
-    protected void executePersistenceTask(IJsonSerializable[] data, Boolean shouldSend){
+    protected void executePersistenceTask(IJsonSerializable[] data){
         if (data != null) {
             if (persistence != null) {
-                persistence.persist(data, false, shouldSend);
+                persistence.persist(data, false);
             }
         }
     }
@@ -179,7 +179,7 @@ class ChannelQueue {
 
         @Override
         public void run() {
-            flush(true);
+            flush();
         }
     }
 }

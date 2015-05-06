@@ -25,10 +25,10 @@ public class ChannelTest extends InstrumentationTestCase {
 
     public void testSynchronizeFlushesQueue(){
         // Test
-        sut.synchronize(true);
+        sut.synchronize();
 
         // Verify
-        verify(mockQueue, times(1)).flush(true);
+        verify(mockQueue, times(1)).flush();
     }
 
     public void testEnqueuedItemIsAddedToQueue(){
@@ -50,7 +50,7 @@ public class ChannelTest extends InstrumentationTestCase {
 
         // Verify
         verify(mockQueue, times(0)).enqueue(testItem1);
-        verify(mockPersistence, times(1)).persist(any(IJsonSerializable[].class), eq(true), anyBoolean());
+        verify(mockPersistence, times(1)).persist(any(IJsonSerializable[].class), eq(true));
     }
 
     public void testQueueFlushesWhenProcessingCrash(){
@@ -62,6 +62,6 @@ public class ChannelTest extends InstrumentationTestCase {
 
         // Verify
         verify(mockQueue, times(0)).enqueue(testItem1);
-        verify(mockQueue, times(1)).flush(true);
+        verify(mockQueue, times(1)).flush();
     }
 }
