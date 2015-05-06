@@ -56,14 +56,14 @@ public class ItemListActivity extends FragmentActivity
         ApplicationInsights.setup(this.getApplicationContext(), getApplication());
 
         ApplicationInsightsConfig config = ApplicationInsights.getConfig();
-        config.setSessionIntervalMs(30000);
+        //config.setSessionIntervalMs(30000);
         //config.setEndpointUrl("https://myserver.com/v2/track");
         config.setMaxBatchCount(45);
 
         //ApplicationInsights.setUserId("New user ID");
         //ApplicationInsights.renewSession("New session ID");
 
-        //ApplicationInsights.setDeveloperMode(false);
+        ApplicationInsights.setDeveloperMode(true);
 
         HashMap<String, String> properties = new HashMap<String,String>();
         properties.put("Hometown", "Karlsruhe");

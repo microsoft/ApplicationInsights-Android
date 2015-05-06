@@ -122,8 +122,6 @@ class Persistence {
             buffer.append(']');
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData, highPriority);
-            InternalLogging.warn(TAG, "Flubber");
-
             if (isSuccess && shouldSend) {
                 Sender sender = Sender.getInstance();
                 if (sender != null) {

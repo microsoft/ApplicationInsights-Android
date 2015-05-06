@@ -133,7 +133,6 @@ class ChannelQueue {
      * Initiates persisting the content queue.
      */
     protected void executePersistenceTask(IJsonSerializable[] data, Boolean shouldSend){
-        InternalLogging.warn(TAG, "Flubber");
         if (data != null) {
             if (persistence != null) {
                 persistence.persist(data, false, shouldSend);

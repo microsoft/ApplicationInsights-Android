@@ -71,7 +71,6 @@ class Channel {
      * Persist all pending items.
      */
     protected void synchronize(Boolean shouldSend) {
-        InternalLogging.warn(TAG, "Flubber");
         this.queue.flush(shouldSend);
     }
 
