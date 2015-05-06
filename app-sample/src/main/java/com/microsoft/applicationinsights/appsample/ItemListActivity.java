@@ -55,13 +55,13 @@ public class ItemListActivity extends FragmentActivity
         }
         ApplicationInsights.setup(this.getApplicationContext(), getApplication());
 
-        //ApplicationInsightsConfig config = ApplicationInsights.getConfig();
-        //config.setSessionIntervalMs(30000);
+        ApplicationInsightsConfig config = ApplicationInsights.getConfig();
+        config.setSessionIntervalMs(30000);
         //config.setEndpointUrl("https://myserver.com/v2/track");
-        //config.setMaxBatchCount(45);
+        config.setMaxBatchCount(45);
 
-        ApplicationInsights.setUserId("New user ID");
-        ApplicationInsights.renewSession("New session ID");
+        //ApplicationInsights.setUserId("New user ID");
+        //ApplicationInsights.renewSession("New session ID");
 
         //ApplicationInsights.setDeveloperMode(false);
 

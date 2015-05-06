@@ -122,7 +122,6 @@ class Sender {
     }
 
     protected void send(File fileToSend) {
-
         String persistedData = this.persistence.load(fileToSend);
         if (!persistedData.isEmpty()) {
             InternalLogging.info(TAG, "sending persisted data", persistedData);
