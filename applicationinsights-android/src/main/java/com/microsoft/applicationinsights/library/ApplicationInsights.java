@@ -93,10 +93,10 @@ public enum ApplicationInsights {
     /**
      * Configure Application Insights
      * Note: This should be called before start
+     * auto-collection of lifecycle-events is disabled when using this method
      *
      * @param context the context associated with Application Insights
      * @param context the application context associated with Application Insights
-     * @warning auto-collection of lifecycle-events is disabled when using this method
      * @deprecated This method is deprecated: Use setup(Context context, Application application) instead.
      */
     public static void setup(Context context) {
@@ -116,10 +116,10 @@ public enum ApplicationInsights {
     /**
      * Configure Application Insights
      * Note: This should be called before start
-     *
+     * warning! auto-collection of lifecycle-events is disabled when using this method
+     * 
      * @param context            the application context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
-     * @warning auto-collection of lifecycle-events is disabled when using this method
      * @deprecated This method is deprecated: Use setup(Context context, Application application) instead.
      */
     public static void setup(Context context, String instrumentationKey) {
