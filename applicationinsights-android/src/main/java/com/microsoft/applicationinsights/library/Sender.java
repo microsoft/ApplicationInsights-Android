@@ -177,6 +177,7 @@ class Sender {
         } catch (IOException e) {
             InternalLogging.warn(TAG, "Couldn't send data with IOException: " + e.toString());
             if (this.persistence != null) {
+                InternalLogging.info(TAG, "Persisting because of IOException: ", "We're probably offline =)");
                 this.persistence.makeAvailable(fileToSend); //send again later
             }
         } finally {
