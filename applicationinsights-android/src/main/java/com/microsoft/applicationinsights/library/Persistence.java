@@ -109,17 +109,13 @@ class Persistence {
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess;
         try {
-            buffer.append('[');
             for (int i = 0; i < data.length; i++) {
-                if (i > 0) {
-                    buffer.append(',');
-                }
+                buffer.append('\n');
                 StringWriter stringWriter = new StringWriter();
                 data[i].serialize(stringWriter);
                 buffer.append(stringWriter.toString());
             }
 
-            buffer.append(']');
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData, highPriority);
 
