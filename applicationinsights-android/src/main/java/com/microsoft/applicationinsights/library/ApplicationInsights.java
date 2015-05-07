@@ -94,11 +94,10 @@ public enum ApplicationInsights {
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param context     the context associated with Application Insights
+     * @param context the context associated with Application Insights
      * @param context the application context associated with Application Insights
      * @warning auto-collection of lifecycle-events is disabled when using this method
      * @deprecated This method is deprecated: Use setup(Context context, Application application) instead.
-
      */
     public static void setup(Context context) {
         ApplicationInsights.INSTANCE.setupInstance(context, null, null);
@@ -126,6 +125,7 @@ public enum ApplicationInsights {
     public static void setup(Context context, String instrumentationKey) {
         ApplicationInsights.INSTANCE.setupInstance(context, null, instrumentationKey);
     }
+
     /**
      * Configure Application Insights
      * Note: This should be called before start
@@ -182,11 +182,10 @@ public enum ApplicationInsights {
         if (!isRunning) {
             Context context = INSTANCE.getContext();
 
-            if(context == null) {
+            if (context == null) {
                 InternalLogging.warn(TAG, "Could not start Application Insights as context is null");
                 return;
             }
-
 
             if (this.instrumentationKey == null) {
                 this.instrumentationKey = readInstrumentationKey(context);
@@ -199,15 +198,17 @@ public enum ApplicationInsights {
             Sender.initialize(this.config);
             Channel.initialize(this.config);
 
-            // Start autocollection feature
+            // Initialize Telemetry
             TelemetryClient.initialize(!telemetryDisabled);
             LifeCycleTracking.initialize(telemetryContext, this.config);
+            Application application = INSTANCE.getApplication();
+            LifeCycleTracking.registerForPersistingWhenInBackground(application);
             if (INSTANCE.getApplication() != null && !this.autoCollectionDisabled) {
-                LifeCycleTracking.registerPageViewCallbacks(INSTANCE.getApplication());
-                LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.getApplication());
+                LifeCycleTracking.registerPageViewCallbacks(application);
+                LifeCycleTracking.registerSessionManagementCallbacks(application);
             } else {
                 InternalLogging.warn(TAG, "Auto collection of page views could not be " +
-                          "started, since the given application was null");
+                      "started, since the given application was null");
             }
 
             // Start crash reporting
@@ -217,7 +218,7 @@ public enum ApplicationInsights {
 
             isRunning = true;
             Sender.getInstance().sendDataOnAppStart();
-            InternalLogging.info(TAG, "ApplicationInsights has been started.", null);
+            InternalLogging.info(TAG, "ApplicationInsights has been started.", "");
         }
     }
 
@@ -260,15 +261,15 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoPageViewTracking() {
-        if(!isRunning){
+        if (!isRunning) {
             InternalLogging.warn(TAG, "Could not set page view tracking, because " +
-                    "ApplicationInsights has not been started yet.");
+                  "ApplicationInsights has not been started yet.");
             return;
-        }else if (INSTANCE.getApplication() == null) {
+        } else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not set page view tracking, because " +
-                    "ApplicationInsights has not been setup with an application.");
+                  "ApplicationInsights has not been setup with an application.");
             return;
-        }else{
+        } else {
             LifeCycleTracking.registerPageViewCallbacks(INSTANCE.getApplication());
         }
     }
@@ -279,13 +280,13 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoPageViewTracking() {
-        if(!isRunning){
+        if (!isRunning) {
             InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
-                    "ApplicationInsights has not been started yet.");
+                  "ApplicationInsights has not been started yet.");
             return;
-        }else if (INSTANCE.getApplication() == null) {
+        } else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
-                    "ApplicationInsights has not been setup with an application.");
+                  "ApplicationInsights has not been setup with an application.");
             return;
         } else {
             LifeCycleTracking.unregisterPageViewCallbacks(INSTANCE.getApplication());
@@ -298,13 +299,13 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoSessionManagement() {
-        if(!isRunning){
+        if (!isRunning) {
             InternalLogging.warn(TAG, "Could not set session management, because " +
-                    "ApplicationInsights has not been started yet.");
+                  "ApplicationInsights has not been started yet.");
             return;
-        }else if (INSTANCE.getApplication() == null) {
+        } else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not set session management, because " +
-                    "ApplicationInsights has not been setup with an application.");
+                  "ApplicationInsights has not been setup with an application.");
             return;
         } else {
             LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.getApplication());
@@ -317,13 +318,13 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoSessionManagement() {
-        if(!isRunning){
+        if (!isRunning) {
             InternalLogging.warn(TAG, "Could not unset session management, because " +
-                    "ApplicationInsights has not been started yet.");
+                  "ApplicationInsights has not been started yet.");
             return;
-        }else if (INSTANCE.getApplication() == null) {
+        } else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not unset session management, because " +
-                    "ApplicationInsights has not been setup with an application.");
+                  "ApplicationInsights has not been setup with an application.");
             return;
         } else {
             LifeCycleTracking.unregisterSessionManagementCallbacks(INSTANCE.getApplication());
@@ -415,7 +416,7 @@ public enum ApplicationInsights {
         INSTANCE.commonProperties = commonProperties;
     }
 
-       public static void setDeveloperMode(boolean developerMode) {
+    public static void setDeveloperMode(boolean developerMode) {
         DEVELOPER_MODE.set(developerMode);
     }
 
@@ -467,11 +468,12 @@ public enum ApplicationInsights {
 
     /**
      * Get the reference to the Application (used for life-cycle tracking)
+     *
      * @return the reference to the application that was used during initialization of the SDK
      */
     protected Application getApplication() {
         Application application = null;
-        if(weakApplication != null) {
+        if (weakApplication != null) {
             application = weakApplication.get();
         }
 
@@ -521,8 +523,8 @@ public enum ApplicationInsights {
      *
      * @param sessionId a custom session ID used of the session to create
      */
-    public static void renewSession(String sessionId){
-        if(!INSTANCE.telemetryDisabled && INSTANCE.telemetryContext != null){
+    public static void renewSession(String sessionId) {
+        if (!INSTANCE.telemetryDisabled && INSTANCE.telemetryContext != null) {
             INSTANCE.telemetryContext.renewSessionId(sessionId);
         }
     }
@@ -533,10 +535,10 @@ public enum ApplicationInsights {
      *
      * @param userId a user ID associated with the telemetry data
      */
-    public static void setUserId(String userId){
-        if(isRunning){
+    public static void setUserId(String userId) {
+        if (isRunning) {
             INSTANCE.telemetryContext.configUserContext(userId);
-        }else{
+        } else {
             INSTANCE.userId = userId;
         }
     }

@@ -122,7 +122,6 @@ class Persistence {
             buffer.append(']');
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData, highPriority);
-
             if (isSuccess) {
                 Sender sender = Sender.getInstance();
                 if (sender != null) {
