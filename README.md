@@ -1,6 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-beta.3)
+# Application Insights for Android (1.0-beta.4)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
@@ -24,15 +24,21 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 ## <a name="1"></a> 1. Release Notes
 
-* Cleaned code
-* Single configuration class ```ApplicationInsightsConfig```
-* Generic tracking method for ```TelemetryClient```
-* Separate methods for enabling/disabling auto collection features (auto page view tracking, auto session renewal)
-* Fixed context fields in telemetry data payload
+* Improvements regarding threat safety
+* Improved unit tests (now using Mockito)
+* Simplified threading model (still deferring work to background tasks)
+* Bugfix for sending logic (number of running operations wasn't decremented when we don't have a connection)
+* Fix for potential memory leaks
+* Updated code in sample app
+* Data is now persisted when the user sends the app into the background (requires API level 14)
+* Data is now persisted when the device is low on memory
 
 ##<a name="2"></a> 2. Breaking Changes
 
 Starting with the first 1.0 stable release, we will start deprecating API instead of breaking old ones.
+
+* **[1.0-beta.4]** **No breaking API changes**.
+* Two setup-methods for ```ApplicationInsights```have been deprecated and will be removed in the next beta
 
 * **[1.0-beta.3]** Configuration of the Application Insights SDK is now done using ```ApplicationInsightsConfig```. The previous config-classes have been removed
 
@@ -98,7 +104,7 @@ import com.microsoft.applicationinsights.library.ApplicationInsights;
 and add 
 
 ```java
-ApplicationInsights.setup(this.getApplicationContext(), getApplication());
+ApplicationInsights.setup(this.getApplicationContext(), this.getApplication());
 ApplicationInsights.start();
 ```
 
@@ -145,7 +151,7 @@ The **developer mode** is enabled automatically in case the debugger is attached
 You can explicitly enable/disable the developer mode like this:
 
 ```java
-//do this after ApplicationInsights.setup(this.getApplicationContext(), getApplication())
+//do this after ApplicationInsights.setup(this.getApplicationContext(), this.getApplication())
 //and before ApplicationInsights.start()
 
 ApplicationInsights.setDeveloperMode(false);
@@ -195,7 +201,7 @@ client.trackEvent("sample event", properties);
 This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is **enabled by default**. Don't forget to provide an Application instance when setting up Application Insights (otherwise auto collection will be disabled):
 
 ```java
-ApplicationInsights.setup(this, getApplication());
+ApplicationInsights.setup(this.getApplicationContext(), this.getApplication());
 ```
 
 If you want to explicitly **Disable** automatic collection of life-cycle events (auto session tracking and auto page view tracking), call ```setAutoCollectionDisabled``` inbetween setup and start of Application Insights. 
@@ -232,7 +238,7 @@ This feature can be disabled as follows:
 To configure Application Insights according to your needs, first, call
 
 ```java
-ApplicationInsights.setup(this, getApplication());
+ApplicationInsights.setup(this.getApplicationContext(), this.getApplication());
 ```
 
 After that you can use `ApplicationInsightsConfig` to customize the behavior and values of the SDK.
