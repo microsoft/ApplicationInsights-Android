@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights.appsample;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -52,17 +53,17 @@ public class ItemListActivity extends FragmentActivity
                     .findFragmentById(R.id.item_list))
                     .setActivateOnItemClick(true);
         }
-        ApplicationInsights.setup(this, getApplication());
+        ApplicationInsights.setup(this.getApplicationContext(), getApplication());
 
-        //ApplicationInsightsConfig config = ApplicationInsights.getConfig();
+        ApplicationInsightsConfig config = ApplicationInsights.getConfig();
         //config.setSessionIntervalMs(30000);
         //config.setEndpointUrl("https://myserver.com/v2/track");
-        //config.setMaxBatchCount(45);
+        config.setMaxBatchCount(45);
 
-        ApplicationInsights.setUserId("New user ID");
-        ApplicationInsights.renewSession("New session ID");
+        //ApplicationInsights.setUserId("New user ID");
+        //ApplicationInsights.renewSession("New session ID");
 
-        //ApplicationInsights.setDeveloperMode(false);
+        ApplicationInsights.setDeveloperMode(true);
 
         HashMap<String, String> properties = new HashMap<String,String>();
         properties.put("Hometown", "Karlsruhe");

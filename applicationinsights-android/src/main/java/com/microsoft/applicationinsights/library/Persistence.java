@@ -102,7 +102,7 @@ class Persistence {
     protected void persist(IJsonSerializable[] data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
-            Sender.getInstance().send();
+            Sender.getInstance().sendNextFile();
             return; //return immediately,as no free space is available
         }
 
@@ -122,11 +122,10 @@ class Persistence {
             buffer.append(']');
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData, highPriority);
-
             if (isSuccess) {
                 Sender sender = Sender.getInstance();
                 if (sender != null) {
-                    sender.send();
+                    sender.sendNextFile();
                 }
             }
         } catch (IOException e) {
@@ -301,7 +300,7 @@ class Persistence {
      *
      * @param highPriority indicates which directory to check for available files
      */
-    private Boolean isFreeSpaceAvailable(Boolean highPriority) {
+    protected Boolean isFreeSpaceAvailable(Boolean highPriority) {
         synchronized (Persistence.LOCK) {
             Context context = getContext();
             if (context != null) {
