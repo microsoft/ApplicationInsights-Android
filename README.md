@@ -60,7 +60,7 @@ In your module's ```build.gradle```add a dependency for Application Insights
 
 ```groovy
 dependencies {
-    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.3'
+    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.4'
 }
 ```
 
