@@ -122,7 +122,6 @@ class Persistence {
             buffer.append(']');
             String serializedData = buffer.toString();
             isSuccess = this.persist(serializedData, highPriority);
-
             if (isSuccess) {
                 Sender sender = Sender.getInstance();
                 if (sender != null) {
@@ -275,6 +274,7 @@ class Persistence {
                 if (!deletedFile) {
                     InternalLogging.warn(TAG, "Error deleting telemetry file " + file.toString());
                 } else {
+                    InternalLogging.info(TAG, "Successfully deleted telemetry file ", file.toString());
                     servedFiles.remove(file);
                 }
             }

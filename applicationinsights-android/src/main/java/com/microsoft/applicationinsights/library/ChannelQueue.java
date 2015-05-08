@@ -134,7 +134,6 @@ class ChannelQueue {
      */
     protected void executePersistenceTask(IJsonSerializable[] data){
         if (data != null) {
-
             if (persistence != null) {
                 persistence.persist(data, false);
             }
