@@ -46,7 +46,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     public void testCreateEventEnvelope() {
         String expectedName = "EVENT";
-        Envelope envelope = sut.createEventEnvelope(expectedName, getCustomProperties(), getMeasurements());
+        Envelope envelope = sut.createEnvelope(sut.createEventData(expectedName, getCustomProperties(), getMeasurements()));
 
         // Validate
         validateEnvelopeTemplate(envelope);
@@ -63,7 +63,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     public void testTraceEnvelope() {
         String expectedName = "TRACE";
-        Envelope envelope = sut.createTraceEnvelope(expectedName, getCustomProperties());
+        Envelope envelope = sut.createEnvelope(sut.createTraceData(expectedName, getCustomProperties()));
 
         // Validate
         validateEnvelopeTemplate(envelope);
@@ -79,7 +79,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     public void testPageViewEnvelope() {
         String expectedName = "PAGEVIEW";
-        Envelope envelope = sut.createPageViewEnvelope(expectedName, getCustomProperties(), getMeasurements());
+        Envelope envelope = sut.createEnvelope(sut.createPageViewData(expectedName, getCustomProperties(), getMeasurements()));
 
         // Validate
         validateEnvelopeTemplate(envelope);
@@ -95,7 +95,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     }
 
     public void testCreateSessionEnvelope() {
-        Envelope envelope = sut.createNewSessionEnvelope();
+        Envelope envelope = sut.createEnvelope(sut.createNewSessionData());
 
         // Validate
         validateEnvelopeTemplate(envelope);
@@ -115,7 +115,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         eventData.setMeasurements(getMeasurements());
         eventData.setProperties(getCustomProperties());
 
-        Envelope envelope = sut.createEnvelope(eventData);
+        Envelope envelope = sut.createEnvelope(sut.createData(eventData));
 
         // Validate
         validateEnvelopeTemplate(envelope);
@@ -133,7 +133,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     public void testCreateMetricEnvelope() {
         String expectedName = "METRIC";
         double expectedValue = 2.0;
-        Envelope envelope = sut.createMetricEnvelope(expectedName, expectedValue);
+        Envelope envelope = sut.createEnvelope(sut.createMetricData(expectedName, expectedValue));
 
         // Validate
         validateEnvelopeTemplate(envelope);

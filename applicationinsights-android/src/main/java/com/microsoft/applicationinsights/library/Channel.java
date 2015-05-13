@@ -1,14 +1,17 @@
 package com.microsoft.applicationinsights.library;
 
+import com.microsoft.applicationinsights.contracts.Base;
+import com.microsoft.applicationinsights.contracts.Data;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 /**
  * This class records telemetry for application insights.
  */
-class Channel {
+class Channel implements IChannel {
     private static final String TAG = "Channel";
 
     /**
@@ -77,24 +80,31 @@ class Channel {
     /**
      * Records the passed in data.
      *
-     * @param envelope the envelope object to record
+     * @param data the base object to record
      */
-    protected void enqueue(Envelope envelope) {
-        // enqueue to queue
-        queue.enqueue(envelope);
+    public void log(Base data) {
+        if(data instanceof Data) {
+            Envelope envelope = EnvelopeFactory.getInstance().createEnvelope((Data) data);
 
-        InternalLogging.info(TAG, "enqueued telemetry", envelope.getName());
+            // log to queue
+            queue.enqueue(envelope);
+            InternalLogging.info(TAG, "enqueued telemetry", envelope.getName());
+        } else {
+            InternalLogging.warn(TAG, "telemetry not enqueued, must be of type ITelemetry");
+        }
     }
 
-    protected void processUnhandledException(Envelope envelope) {
+    protected void processUnhandledException(Data<ITelemetryData> data) {
+        Envelope envelope = EnvelopeFactory.getInstance().createEnvelope(data);
+
         queue.isCrashing = true;
         queue.flush();
 
-        IJsonSerializable[] data = new IJsonSerializable[1];
-        data[0] = envelope;
+        IJsonSerializable[] rawData = new IJsonSerializable[1];
+        rawData[0] = envelope;
 
         if (this.persistence != null) {
-            this.persistence.persist(data, true);
+            this.persistence.persist(rawData, true);
         }
         else {
             InternalLogging.info(TAG, "error persisting crash", envelope.toString());

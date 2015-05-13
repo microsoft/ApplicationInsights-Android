@@ -400,7 +400,7 @@ public enum ApplicationInsights {
     /**
      * Sets properties which are common to all telemetry sent form this client.
      *
-     * @param commonProperties a dictionary of properties to enqueue with all telemetry.
+     * @param commonProperties a dictionary of properties to log with all telemetry.
      */
     public static void setCommonProperties(Map<String, String> commonProperties) {
         if (!isSetup) {

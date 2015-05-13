@@ -162,7 +162,7 @@ public class TelemetryClient {
 
     /**
      * Sends information about an aggregated metric to Application Insights. Note: all data sent via
-     * this method will be aggregated. To enqueue non-aggregated data use
+     * this method will be aggregated. To log non-aggregated data use
      * {@link TelemetryClient#trackEvent(String, Map, Map)} with measurements.
      *
      * @param name  The name of the metric

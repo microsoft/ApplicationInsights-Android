@@ -135,25 +135,40 @@ class EnvelopeFactory {
     /**
      * Create an envelope with the given object as its base data
      *
-     * @param telemetryData The telemetry we want to wrap inside an Enevelope and send to the server
+     * @param data The telemetry we want to wrap inside an Enevelope and send to the server
      * @return the envelope that includes the telemetry data
      */
-    protected Envelope createEnvelope(ITelemetry telemetryData) {
-        addCommonProperties(telemetryData);
-
-        Data<ITelemetryData> data = new Data<ITelemetryData>();
-        data.setBaseData(telemetryData);
-        data.setBaseType(telemetryData.getBaseType());
+    protected Envelope createEnvelope(Data<ITelemetryData> data) {
 
         Envelope envelope = createEnvelope();
         envelope.setData(data);
-        envelope.setName(telemetryData.getEnvelopeName());
+        ITelemetryData baseData = data.getBaseData();
+        if(baseData instanceof ITelemetry) {
+            String envelopeName = ((ITelemetry) baseData).getEnvelopeName();
+            envelope.setName(envelopeName);
+        }
 
         // todo: read sample rate from settings store and set sampleRate(percentThrottled)
         // todo: set flags from settings store and set flags(persistence, latency)
         //envelope.setSeq(this.channelId + ":" + this.seqCounter.incrementAndGet());
 
         return envelope;
+    }
+
+    /**
+     * Create an envelope with the given object as its base data
+     *
+     * @param telemetryData The telemetry we want to wrap inside an Enevelope and send to the server
+     * @return the envelope that includes the telemetry data
+     */
+    protected Data<ITelemetryData> createData(ITelemetry telemetryData) {
+        addCommonProperties(telemetryData);
+
+        Data<ITelemetryData> data = new Data<ITelemetryData>();
+        data.setBaseData(telemetryData);
+        data.setBaseType(telemetryData.getBaseType());
+
+        return data;
     }
 
     /**
@@ -165,19 +180,19 @@ class EnvelopeFactory {
      * @param measurements Custom measurements associated with the event
      * @return an Envelope object, which contains an event
      */
-    protected Envelope createEventEnvelope(String eventName,
+    protected Data<ITelemetryData> createEventData(String eventName,
                                            Map<String, String> properties,
                                            Map<String, Double> measurements) {
-        Envelope envelope = null;
+        Data<ITelemetryData> data = null;
         if (isConfigured()) {
             EventData telemetry = new EventData();
             telemetry.setName(ensureNotNull(eventName));
             telemetry.setProperties(properties);
             telemetry.setMeasurements(measurements);
 
-            envelope = createEnvelope(telemetry);
+            data = createData(telemetry);
         }
-        return envelope;
+        return data;
     }
 
     /**
@@ -188,16 +203,16 @@ class EnvelopeFactory {
      * @param properties Custom properties associated with the event
      * @return an Envelope object, which contains a trace
      */
-    protected Envelope createTraceEnvelope(String message, Map<String, String> properties) {
-        Envelope envelope = null;
+    protected Data<ITelemetryData> createTraceData(String message, Map<String, String> properties) {
+        Data<ITelemetryData> data = null;
         if (isConfigured()) {
             MessageData telemetry = new MessageData();
             telemetry.setMessage(this.ensureNotNull(message));
             telemetry.setProperties(properties);
 
-            envelope = createEnvelope(telemetry);
+            data = createData(telemetry);
         }
-        return envelope;
+        return data;
     }
 
     /**
@@ -208,24 +223,24 @@ class EnvelopeFactory {
      * @param value The value of the metric
      * @return an Envelope object, which contains a metric
      */
-    protected Envelope createMetricEnvelope(String name, double value) {
-        Envelope envelope = null;
+    protected Data<ITelemetryData> createMetricData(String name, double value) {
+        Data<ITelemetryData> data = null;
         if (isConfigured()) {
             MetricData telemetry = new MetricData();
-            DataPoint data = new DataPoint();
-            data.setCount(1);
-            data.setKind(DataPointType.Measurement);
-            data.setMax(value);
-            data.setMax(value);
-            data.setName(ensureNotNull(name));
-            data.setValue(value);
+            DataPoint dataPoint = new DataPoint();
+            dataPoint.setCount(1);
+            dataPoint.setKind(DataPointType.Measurement);
+            dataPoint.setMax(value);
+            dataPoint.setMax(value);
+            dataPoint.setName(ensureNotNull(name));
+            dataPoint.setValue(value);
             List<DataPoint> metricsList = new ArrayList<DataPoint>();
-            metricsList.add(data);
+            metricsList.add(dataPoint);
             telemetry.setMetrics(metricsList);
 
-            envelope = createEnvelope(telemetry);
+            data = createData(telemetry);
         }
-        return envelope;
+        return data;
     }
 
     /**
@@ -237,14 +252,14 @@ class EnvelopeFactory {
      * @param properties Custom properties associated with the event
      * @return an Envelope object, which contains a handled or unhandled exception
      */
-    protected Envelope createExceptionEnvelope(Throwable exception, Map<String, String> properties) {
-        Envelope envelope = null;
+    protected Data<ITelemetryData> createExceptionData(Throwable exception, Map<String, String> properties) {
+        Data<ITelemetryData> data = null;
         if (isConfigured()) {
             CrashData telemetry = this.getCrashData(exception, properties);
 
-            envelope = createEnvelope(telemetry);
+            data = createData(telemetry);
         }
-        return envelope;
+        return data;
     }
 
     /**
@@ -256,11 +271,11 @@ class EnvelopeFactory {
      * @param measurements Custom measurements associated with the event
      * @return an Envelope object, which contains a page view
      */
-    protected Envelope createPageViewEnvelope(
+    protected Data<ITelemetryData> createPageViewData(
           String pageName,
           Map<String, String> properties,
           Map<String, Double> measurements) {
-        Envelope envelope = null;
+        Data<ITelemetryData> data = null;
         if (isConfigured()) {
             PageViewData telemetry = new PageViewData();
             telemetry.setName(ensureNotNull(pageName));
@@ -268,9 +283,9 @@ class EnvelopeFactory {
             telemetry.setProperties(properties);
             telemetry.setMeasurements(measurements);
 
-            envelope = createEnvelope(telemetry);
+            data = createData(telemetry);
         }
-        return envelope;
+        return data;
     }
 
     /**
@@ -279,15 +294,15 @@ class EnvelopeFactory {
      *
      * @return an Envelope object, which contains a session
      */
-    protected Envelope createNewSessionEnvelope() {
-        Envelope envelope = null;
+    protected Data<ITelemetryData> createNewSessionData() {
+        Data<ITelemetryData> data = null;
         if (isConfigured()) {
             SessionStateData telemetry = new SessionStateData();
             telemetry.setState(SessionState.Start);
 
-            envelope = createEnvelope(telemetry);
+            data = createData(telemetry);
         }
-        return envelope;
+        return data;
     }
 
     /**

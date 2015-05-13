@@ -1,12 +1,13 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.contracts.Envelope;
+import com.microsoft.applicationinsights.contracts.Data;
+import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 public class MockTelemetryClient extends TelemetryClient {
-    public ArrayList<Envelope> messages;
+    public ArrayList<Data<ITelemetryData>> messages;
     public boolean mockTrackMethod;
 
     /**
@@ -74,7 +75,7 @@ public class MockTelemetryClient extends TelemetryClient {
             Map<String, String> properties,
             Map<String, Double> measurements) {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createEventEnvelope(eventName, properties, measurements));
+            messages.add(EnvelopeFactory.getInstance().createEventData(eventName, properties, measurements));
         }else{
             super.trackEvent(eventName, properties, measurements);
         }
@@ -83,7 +84,7 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackTrace(String message, Map<String, String> properties) {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createTraceEnvelope(message, properties));
+            messages.add(EnvelopeFactory.getInstance().createTraceData(message, properties));
         }else{
             super.trackTrace(message, properties);
         }
@@ -92,7 +93,7 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackMetric(String name, double value) {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createMetricEnvelope(name, value));
+            messages.add(EnvelopeFactory.getInstance().createMetricData(name, value));
         }else{
             super.trackMetric(name, value);
         }
@@ -101,7 +102,7 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createExceptionEnvelope(handledException, properties));
+            messages.add(EnvelopeFactory.getInstance().createExceptionData(handledException, properties));
         }else{
             super.trackHandledException(handledException, properties);
         }
@@ -113,7 +114,7 @@ public class MockTelemetryClient extends TelemetryClient {
             Map<String, String> properties,
             Map<String, Double> measurements) {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createPageViewEnvelope(pageName, properties, measurements));
+            messages.add(EnvelopeFactory.getInstance().createPageViewData(pageName, properties, measurements));
         }else{
             super.trackPageView(pageName, properties, measurements);
         }
@@ -122,13 +123,13 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackNewSession() {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createNewSessionEnvelope());
+            messages.add(EnvelopeFactory.getInstance().createNewSessionData());
         }else{
             super.trackNewSession();
         }
     }
 
-    public ArrayList<Envelope> getMessages()
+    public ArrayList<Data<ITelemetryData>> getMessages()
     {
         return messages;
     }
