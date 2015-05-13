@@ -37,16 +37,5 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
         ApplicationInsights.setDeveloperMode(false);
         ExceptionTracking.registerExceptionHandler();
         Assert.assertTrue("no exception for multiple registration without debug mode", true);
-
-        // double register with debug mode and verify runtime exception
-        ApplicationInsights.setDeveloperMode(true);
-        RuntimeException exception = null;
-        try {
-            ExceptionTracking.registerExceptionHandler();
-        } catch (RuntimeException e) {
-            exception = e;
-        }
-
-        Assert.assertNotNull("developer Exception was thrown", exception);
     }
 }

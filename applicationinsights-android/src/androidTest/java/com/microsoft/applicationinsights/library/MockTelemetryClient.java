@@ -61,8 +61,9 @@ public class MockTelemetryClient extends TelemetryClient {
 //        }
 //
 //        return MockTelemetryClient.instance;
-
-        return (MockTelemetryClient)TelemetryClient.getInstance();
+        MockTelemetryClient mClient = new MockTelemetryClient(true);
+        mClient.messages = new ArrayList<Data<ITelemetryData>>();
+        return mClient;
     }
 
 

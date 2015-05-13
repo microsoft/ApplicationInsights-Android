@@ -11,14 +11,10 @@ public class MockLifeCycleTracking extends LifeCycleTracking {
     public final MockTelemetryClient tc;
     public long currentTime;
 
-    public static MockLifeCycleTracking getInstance() {
-        return (MockLifeCycleTracking)LifeCycleTracking.getInstance();
-    }
-
     protected MockLifeCycleTracking(ISessionConfig config, TelemetryContext telemetryContext) {
         super(config, telemetryContext);
         currentTime = 0;
-        this.tc = new MockTelemetryClient(true);
+        this.tc = MockTelemetryClient.getInstance();
     }
 
     //@Override

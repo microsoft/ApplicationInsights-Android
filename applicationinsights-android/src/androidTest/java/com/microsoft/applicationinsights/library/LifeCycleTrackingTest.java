@@ -8,12 +8,14 @@ import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.test.ActivityUnitTestCase;
+import android.test.UiThreadTest;
 
 import com.microsoft.applicationinsights.contracts.Data;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
+import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
 import junit.framework.Assert;
 
@@ -25,19 +27,20 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
     private MockTelemetryClient telemetryClient;
     private MockApplication mockApplication;
     private MockLifeCycleTracking mockLifeCycleTracking;
+    private MockActivity activity;
 
     public LifeCycleTrackingTest() {
         super(MockActivity.class);
     }
 
-    //TODO fix Mock object if easily possible
-
-
     public void setUp() throws Exception {
         super.setUp();
 
-        Context context = this.getInstrumentation().getContext();
-        this.mockLifeCycleTracking = MockLifeCycleTracking.getInstance();
+        final Context context = this.getInstrumentation().getContext();
+        ApplicationInsightsConfig config = new ApplicationInsightsConfig();
+        TelemetryContext tContext = new TelemetryContext(context, "ikey", "userid");
+
+        this.mockLifeCycleTracking = new MockLifeCycleTracking(config, tContext);
         this.mockLifeCycleTracking.reset();
         this.telemetryClient = this.mockLifeCycleTracking.tc;
 
@@ -54,9 +57,10 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         this.mockApplication.unregister();
     }
 
+    @UiThreadTest
     public void testPageViewEvent() throws Exception {
         // setup
-        MockActivity activity = this.startActivity(this.intent, null, null);
+        //MockActivity activity = this.startActivity(this.intent, null, null);
 
         // test
         getInstrumentation().callActivityOnResume(activity);

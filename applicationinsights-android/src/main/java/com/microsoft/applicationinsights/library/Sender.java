@@ -283,7 +283,7 @@ class Sender {
      * @param connection the connection which will read the response
      * @param builder    a string builder for storing the response
      */
-    private void readResponse(HttpURLConnection connection, StringBuilder builder) {
+    protected void readResponse(HttpURLConnection connection, StringBuilder builder) {
         BufferedReader reader = null;
         try {
             InputStream inputStream = connection.getErrorStream();
@@ -343,5 +343,15 @@ class Sender {
      */
     protected void setPersistence(Persistence persistence) {
         this.persistence = persistence;
+    }
+
+
+    /**
+     * Set the instance, used for tests
+     *
+     * @param instance the test instance to use here
+     */
+    protected void setInstance(Sender instance) {
+        Sender.instance = instance;
     }
 }
