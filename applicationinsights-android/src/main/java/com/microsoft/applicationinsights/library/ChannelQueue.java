@@ -68,7 +68,7 @@ class ChannelQueue {
     /**
      * Adds an item to the sender queue
      *
-     * @param item a telemetry item to enqueue
+     * @param item a telemetry item to log
      * @return true if the item was successfully added to the queue
      */
     protected boolean enqueue(IJsonSerializable item) {

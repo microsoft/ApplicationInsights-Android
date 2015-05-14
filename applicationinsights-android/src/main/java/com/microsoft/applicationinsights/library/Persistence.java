@@ -274,6 +274,7 @@ class Persistence {
                 if (!deletedFile) {
                     InternalLogging.warn(TAG, "Error deleting telemetry file " + file.toString());
                 } else {
+                    InternalLogging.info(TAG, "Successfully deleted telemetry file ", file.toString());
                     servedFiles.remove(file);
                 }
             }

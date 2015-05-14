@@ -1,7 +1,8 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.contracts.Envelope;
+import com.microsoft.applicationinsights.contracts.Data;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 
 import java.util.Map;
 
@@ -61,30 +62,30 @@ class TrackDataOperation implements Runnable {
 
     @Override
     public void run() {
-        Envelope envelope = null;
+        Data<ITelemetryData> telemetry = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
-            envelope = EnvelopeFactory.getInstance().createExceptionEnvelope(this.exception, this.properties);
+            telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties);
         } else if (Persistence.getInstance().isFreeSpaceAvailable(false)) {
             switch (this.type) {
                 case NONE:
                     if (this.telemetry != null) {
-                        envelope = EnvelopeFactory.getInstance().createEnvelope(this.telemetry);
+                        telemetry = EnvelopeFactory.getInstance().createData(this.telemetry);
                     }
                     break;
                 case EVENT:
-                    envelope = EnvelopeFactory.getInstance().createEventEnvelope(this.name, this.properties, this.measurements);
+                    telemetry = EnvelopeFactory.getInstance().createEventData(this.name, this.properties, this.measurements);
                     break;
                 case PAGE_VIEW:
-                    envelope = EnvelopeFactory.getInstance().createPageViewEnvelope(this.name, this.properties, this.measurements);
+                    telemetry = EnvelopeFactory.getInstance().createPageViewData(this.name, this.properties, this.measurements);
                     break;
                 case TRACE:
-                    envelope = EnvelopeFactory.getInstance().createTraceEnvelope(this.name, this.properties);
+                    telemetry = EnvelopeFactory.getInstance().createTraceData(this.name, this.properties);
                     break;
                 case METRIC:
-                    envelope = EnvelopeFactory.getInstance().createMetricEnvelope(this.name, this.metric);
+                    telemetry = EnvelopeFactory.getInstance().createMetricData(this.name, this.metric);
                     break;
                 case NEW_SESSION:
-                    envelope = EnvelopeFactory.getInstance().createNewSessionEnvelope();
+                    telemetry = EnvelopeFactory.getInstance().createNewSessionData();
                     break;
                 case HANDLED_EXCEPTION:
                 case UNHANDLED_EXCEPTION:
@@ -94,12 +95,12 @@ class TrackDataOperation implements Runnable {
             }
         }
 
-        if (envelope != null) {
+        if (telemetry != null) {
             Channel channel = Channel.getInstance();
             if (type == DataType.UNHANDLED_EXCEPTION) {
-                channel.processUnhandledException(envelope);
+                channel.processUnhandledException(telemetry);
             } else {
-                channel.enqueue(envelope);
+                channel.log(telemetry);
             }
         }
     }

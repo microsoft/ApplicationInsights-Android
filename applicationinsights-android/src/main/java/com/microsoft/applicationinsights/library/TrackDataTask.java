@@ -2,7 +2,6 @@ package com.microsoft.applicationinsights.library;
 
 import android.os.AsyncTask;
 
-import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 
 import java.util.Map;
@@ -158,62 +157,62 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
 
-        trackEnvelope();
+        //trackEnvelope();
 
         return null;
     }
 
-    protected void trackEnvelope(){
-        Envelope envelope = null;
-        switch (this.type){
-            case NONE:
-                if(this.telemetry != null){
-                    envelope = EnvelopeFactory.getInstance().createEnvelope(this.telemetry);
-                }
-                break;
-            case EVENT:
-                if(this.name != null){
-                    envelope = this.envelopeFactory.createEventEnvelope(this.name, this.properties, this.measurements);
-                }
-                break;
-            case PAGE_VIEW:
-                if(this.name != null){
-                    envelope = this.envelopeFactory.createPageViewEnvelope(this.name, this.properties, this.measurements);
-                }
-                break;
-            case TRACE:
-                if(this.name != null){
-                    envelope = this.envelopeFactory.createTraceEnvelope(this.name, this.properties);
-                }
-                break;
-            case METRIC:
-                if(this.name != null){
-                    envelope = this.envelopeFactory.createMetricEnvelope(this.name, this.metric);
-                }
-                break;
-            case NEW_SESSION:
-                envelope = this.envelopeFactory.createNewSessionEnvelope();
-                break;
-            case HANDLED_EXCEPTION:
-            case UNHANDLED_EXCEPTION:
-                //TODO: Unhandled exceptions should not be processed asynchronously
-                if(exception != null){
-                    envelope = this.envelopeFactory.createExceptionEnvelope(this.exception, this.properties);
-                }
-                break;
-            default:
-                break;
-        }
-        if(envelope != null){
-            forwardEnvelope(envelope);
-        }
-    }
-
-    protected void forwardEnvelope(Envelope envelope){
-        if(type == DataType.UNHANDLED_EXCEPTION){
-            this.channel.processUnhandledException(envelope);
-        }else{
-            this.channel.enqueue(envelope);
-        }
-    }
+//    protected void trackEnvelope(){
+//        Envelope envelope = null;
+//        switch (this.type){
+//            case NONE:
+//                if(this.telemetry != null){
+//                    envelope = EnvelopeFactory.getInstance().createEnvelope(this.telemetry);
+//                }
+//                break;
+//            case EVENT:
+//                if(this.name != null){
+//                    envelope = this.envelopeFactory.createEventEnvelope(this.name, this.properties, this.measurements);
+//                }
+//                break;
+//            case PAGE_VIEW:
+//                if(this.name != null){
+//                    envelope = this.envelopeFactory.createPageViewEnvelope(this.name, this.properties, this.measurements);
+//                }
+//                break;
+//            case TRACE:
+//                if(this.name != null){
+//                    envelope = this.envelopeFactory.createTraceEnvelope(this.name, this.properties);
+//                }
+//                break;
+//            case METRIC:
+//                if(this.name != null){
+//                    envelope = this.envelopeFactory.createMetricEnvelope(this.name, this.metric);
+//                }
+//                break;
+//            case NEW_SESSION:
+//                envelope = this.envelopeFactory.createNewSessionEnvelope();
+//                break;
+//            case HANDLED_EXCEPTION:
+//            case UNHANDLED_EXCEPTION:
+//                //TODO: Unhandled exceptions should not be processed asynchronously
+//                if(exception != null){
+//                    envelope = this.envelopeFactory.createExceptionEnvelope(this.exception, this.properties);
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//        if(envelope != null){
+//            forwardEnvelope(envelope);
+//        }
+//    }
+//
+//    protected void forwardEnvelope(Envelope envelope){
+//        if(type == DataType.UNHANDLED_EXCEPTION){
+//            this.channel.processUnhandledException(envelope);
+//        }else{
+//            this.channel.log(envelope);
+//        }
+//    }
 }
