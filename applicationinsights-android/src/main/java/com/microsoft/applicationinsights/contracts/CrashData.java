@@ -1,4 +1,4 @@
-package AI;
+package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class CrashData extends Domain implements
     /**
      * Backing field for property Headers.
      */
-    private CrashDataHeaders headers;
+    private com.microsoft.applicationinsights.contracts.Client.Contracts.CrashDataHeaders headers;
     
     /**
      * Backing field for property Threads.
@@ -66,14 +66,14 @@ public class CrashData extends Domain implements
     /**
      * Gets the Headers property.
      */
-    public CrashDataHeaders getHeaders() {
+    public com.microsoft.applicationinsights.contracts.Client.Contracts.CrashDataHeaders getHeaders() {
         return this.headers;
     }
     
     /**
      * Sets the Headers property.
      */
-    public void setHeaders(CrashDataHeaders value) {
+    public void setHeaders(com.microsoft.applicationinsights.contracts.Client.Contracts.CrashDataHeaders value) {
         this.headers = value;
     }
     
@@ -139,7 +139,7 @@ public class CrashData extends Domain implements
         prefix = ",";
         
         writer.write(prefix + "\"headers\":");
-        JsonHelper.writeJsonSerializable(writer, this.headers);
+        writer.write(JsonHelper.convert(this.headers));
         prefix = ",";
         
         if (!(this.threads == null))
@@ -170,6 +170,6 @@ public class CrashData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.CrashData";
+        QualifiedName = "com.microsoft.applicationinsights.contracts.CrashData";
     }
 }

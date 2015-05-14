@@ -1,4 +1,4 @@
-package AI;
+package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -155,6 +155,6 @@ public class PageViewData extends EventData implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.PageViewData";
+        QualifiedName = "com.microsoft.applicationinsights.contracts.PageViewData";
     }
 }

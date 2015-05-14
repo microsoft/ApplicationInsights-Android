@@ -1,4 +1,4 @@
-package AI;
+package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -325,6 +325,6 @@ public class RequestData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.RequestData";
+        QualifiedName = "com.microsoft.applicationinsights.contracts.RequestData";
     }
 }

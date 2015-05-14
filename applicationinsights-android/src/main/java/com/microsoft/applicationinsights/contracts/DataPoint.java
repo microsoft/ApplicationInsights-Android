@@ -1,4 +1,4 @@
-package AI;
+package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class DataPoint implements
     /**
      * Backing field for property Kind.
      */
-    private int kind = DataPointType.Measurement;
+    private com.microsoft.applicationinsights.contracts.Client.Contracts.DataPointType kind = DataPointType.Measurement;
     
     /**
      * Backing field for property Value.
@@ -80,14 +80,14 @@ public class DataPoint implements
     /**
      * Gets the Kind property.
      */
-    public int getKind() {
+    public com.microsoft.applicationinsights.contracts.Client.Contracts.DataPointType getKind() {
         return this.kind;
     }
     
     /**
      * Sets the Kind property.
      */
-    public void setKind(int value) {
+    public void setKind(com.microsoft.applicationinsights.contracts.Client.Contracts.DataPointType value) {
         this.kind = value;
     }
     

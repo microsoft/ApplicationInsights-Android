@@ -1,4 +1,4 @@
-package AI;
+package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public class ExceptionData extends Domain implements
     /**
      * Backing field for property SeverityLevel.
      */
-    private int severityLevel;
+    private com.microsoft.applicationinsights.contracts.Client.Contracts.SeverityLevel severityLevel;
     
     /**
      * Backing field for property ProblemId.
@@ -117,14 +117,14 @@ public class ExceptionData extends Domain implements
     /**
      * Gets the SeverityLevel property.
      */
-    public int getSeverityLevel() {
+    public com.microsoft.applicationinsights.contracts.Client.Contracts.SeverityLevel getSeverityLevel() {
         return this.severityLevel;
     }
     
     /**
      * Sets the SeverityLevel property.
      */
-    public void setSeverityLevel(int value) {
+    public void setSeverityLevel(com.microsoft.applicationinsights.contracts.Client.Contracts.SeverityLevel value) {
         this.severityLevel = value;
     }
     
@@ -259,6 +259,6 @@ public class ExceptionData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.ExceptionData";
+        QualifiedName = "com.microsoft.applicationinsights.contracts.ExceptionData";
     }
 }
