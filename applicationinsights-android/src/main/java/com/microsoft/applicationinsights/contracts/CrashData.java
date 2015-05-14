@@ -1,16 +1,18 @@
-/*
- * Generated from CrashData.bond (https://github.com/Microsoft/bond)
-*/
-package com.microsoft.applicationinsights.contracts;
-
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
-
+package AI;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.microsoft.telemetry.ITelemetry;
+import com.microsoft.telemetry.ITelemetryData;
+import com.microsoft.telemetry.IContext;
+import com.microsoft.telemetry.IJsonSerializable;
+import com.microsoft.telemetry.Base;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.Extension;
+import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class CrashData.
@@ -31,33 +33,20 @@ public class CrashData extends Domain implements
     /**
      * Backing field for property Threads.
      */
-    private List<CrashDataThread> threads;
+    private ArrayList<CrashDataThread> threads;
     
     /**
      * Backing field for property Binaries.
      */
-    private List<CrashDataBinary> binaries;
+    private ArrayList<CrashDataBinary> binaries;
     
     /**
-     * Initializes a new instance of the CrashData class.
+     * Initializes a new instance of the <see cref="CrashData"/> class.
      */
     public CrashData()
     {
         this.InitializeFields();
-    }
-    
-    /**
-     * Envelope Name for this telemetry.
-     */
-    public String getEnvelopeName() {
-        return "Microsoft.ApplicationInsights.Crash";
-    }
-    
-    /**
-     * Base Type for this telemetry.
-     */
-    public String getBaseType() {
-        return "Microsoft.ApplicationInsights.CrashData";
+        this.SetupAttributes();
     }
     
     /**
@@ -91,7 +80,7 @@ public class CrashData extends Domain implements
     /**
      * Gets the Threads property.
      */
-    public List<CrashDataThread> getThreads() {
+    public ArrayList<CrashDataThread> getThreads() {
         if (this.threads == null) {
             this.threads = new ArrayList<CrashDataThread>();
         }
@@ -101,14 +90,14 @@ public class CrashData extends Domain implements
     /**
      * Sets the Threads property.
      */
-    public void setThreads(List<CrashDataThread> value) {
+    public void setThreads(ArrayList<CrashDataThread> value) {
         this.threads = value;
     }
     
     /**
      * Gets the Binaries property.
      */
-    public List<CrashDataBinary> getBinaries() {
+    public ArrayList<CrashDataBinary> getBinaries() {
         if (this.binaries == null) {
             this.binaries = new ArrayList<CrashDataBinary>();
         }
@@ -118,7 +107,7 @@ public class CrashData extends Domain implements
     /**
      * Sets the Binaries property.
      */
-    public void setBinaries(List<CrashDataBinary> value) {
+    public void setBinaries(ArrayList<CrashDataBinary> value) {
         this.binaries = value;
     }
     
@@ -126,7 +115,7 @@ public class CrashData extends Domain implements
     /**
     * Gets the Properties property.
     */
-    public Map<String, String> getProperties() {
+    public LinkedHashMap<String, String> getProperties() {
         //Do nothing - does not currently take properties
         return null;
     }
@@ -134,7 +123,7 @@ public class CrashData extends Domain implements
     /**
     * Sets the Properties property.
     */
-    public void setProperties(Map<String, String> value) {
+    public void setProperties(LinkedHashMap<String, String> value) {
         //Do nothing - does not currently take properties
     }
 
@@ -171,9 +160,16 @@ public class CrashData extends Domain implements
     }
     
     /**
+     * Sets up the events attributes
+     */
+    public void SetupAttributes()
+    {
+    }
+    
+    /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        // method stub to initialize fields for the current context
+        QualifiedName = "AI.CrashData";
     }
 }

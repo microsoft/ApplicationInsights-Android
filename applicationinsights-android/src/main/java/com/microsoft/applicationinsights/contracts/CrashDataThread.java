@@ -1,15 +1,18 @@
-/*
- * Generated from CrashDataThread.bond (https://github.com/Microsoft/bond)
-*/
-package com.microsoft.applicationinsights.contracts;
-
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
-
+package AI;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.List;
+import com.microsoft.telemetry.ITelemetry;
+import com.microsoft.telemetry.ITelemetryData;
+import com.microsoft.telemetry.IContext;
+import com.microsoft.telemetry.IJsonSerializable;
+import com.microsoft.telemetry.Base;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.Extension;
+import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class CrashDataThread.
@@ -25,10 +28,10 @@ public class CrashDataThread implements
     /**
      * Backing field for property Frames.
      */
-    private List<CrashDataThreadFrame> frames;
+    private ArrayList<CrashDataThreadFrame> frames;
     
     /**
-     * Initializes a new instance of the CrashDataThread class.
+     * Initializes a new instance of the <see cref="CrashDataThread"/> class.
      */
     public CrashDataThread()
     {
@@ -52,7 +55,7 @@ public class CrashDataThread implements
     /**
      * Gets the Frames property.
      */
-    public List<CrashDataThreadFrame> getFrames() {
+    public ArrayList<CrashDataThreadFrame> getFrames() {
         if (this.frames == null) {
             this.frames = new ArrayList<CrashDataThreadFrame>();
         }
@@ -62,7 +65,7 @@ public class CrashDataThread implements
     /**
      * Sets the Frames property.
      */
-    public void setFrames(List<CrashDataThreadFrame> value) {
+    public void setFrames(ArrayList<CrashDataThreadFrame> value) {
         this.frames = value;
     }
     
@@ -109,6 +112,6 @@ public class CrashDataThread implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        // method stub to initialize fields for the current context
+        
     }
 }

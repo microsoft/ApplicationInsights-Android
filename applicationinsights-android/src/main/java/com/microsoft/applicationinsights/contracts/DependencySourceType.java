@@ -1,18 +1,10 @@
-/*
- * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
-*/
-package com.microsoft.applicationinsights.contracts;
+package AI;
 /**
  * Enum DependencySourceType.
  */
 public class DependencySourceType
 {
-    public static final int Undefined = 0;
-    public static final int Aic = 1;
-    public static final int Apmc = 2;
-    
-    private DependencySourceType() {
-        // hide default constructor
-    }
-    
+    public static int Undefined = 0;
+    public static int Aic = 1;
+    public static int Apmc = 2;
 }

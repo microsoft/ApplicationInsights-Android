@@ -1,17 +1,9 @@
-/*
- * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
-*/
-package com.microsoft.applicationinsights.contracts;
+package AI;
 /**
  * Enum DataPointType.
  */
 public class DataPointType
 {
-    public static final int Measurement = 0;
-    public static final int Aggregation = 1;
-    
-    private DataPointType() {
-        // hide default constructor
-    }
-    
+    public static int Measurement = 0;
+    public static int Aggregation = 1;
 }

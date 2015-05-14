@@ -1,14 +1,18 @@
-/*
- * Generated from ContextTagKeys.bond (https://github.com/Microsoft/bond)
-*/
-package com.microsoft.applicationinsights.contracts;
-
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
-
+package AI;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import com.microsoft.telemetry.ITelemetry;
+import com.microsoft.telemetry.ITelemetryData;
+import com.microsoft.telemetry.IContext;
+import com.microsoft.telemetry.IJsonSerializable;
+import com.microsoft.telemetry.Base;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.Extension;
+import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class User.
@@ -42,7 +46,7 @@ public class User implements
     private String storeRegion;
     
     /**
-     * Initializes a new instance of the User class.
+     * Initializes a new instance of the <see cref="User"/> class.
      */
     public User()
     {
@@ -124,7 +128,7 @@ public class User implements
      * Adds all members of this class to a hashmap
      * @param map to which the members of this class will be added.
      */
-    public void addToHashMap(Map<String, String> map)
+    public void addToHashMap(LinkedHashMap<String, String> map)
     {
         if (!(this.accountAcquisitionDate == null)) {
             map.put("ai.user.accountAcquisitionDate", this.accountAcquisitionDate);
@@ -210,6 +214,6 @@ public class User implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        // method stub to initialize fields for the current context
+        
     }
 }

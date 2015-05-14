@@ -1,17 +1,18 @@
-/*
- * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
-*/
-package com.microsoft.applicationinsights.contracts;
-
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
-
+package AI;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.ArrayList;
+import com.microsoft.telemetry.ITelemetry;
+import com.microsoft.telemetry.ITelemetryData;
+import com.microsoft.telemetry.IContext;
+import com.microsoft.telemetry.IJsonSerializable;
+import com.microsoft.telemetry.Base;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.Extension;
+import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class ExceptionData.
@@ -32,7 +33,7 @@ public class ExceptionData extends Domain implements
     /**
      * Backing field for property Exceptions.
      */
-    private List<ExceptionDetails> exceptions;
+    private ArrayList<ExceptionDetails> exceptions;
     
     /**
      * Backing field for property SeverityLevel.
@@ -52,33 +53,20 @@ public class ExceptionData extends Domain implements
     /**
      * Backing field for property Properties.
      */
-    private Map<String, String> properties;
+    private LinkedHashMap<String, String> properties;
     
     /**
      * Backing field for property Measurements.
      */
-    private Map<String, Double> measurements;
+    private LinkedHashMap<String, Double> measurements;
     
     /**
-     * Initializes a new instance of the ExceptionData class.
+     * Initializes a new instance of the <see cref="ExceptionData"/> class.
      */
     public ExceptionData()
     {
         this.InitializeFields();
-    }
-    
-    /**
-     * Envelope Name for this telemetry.
-     */
-    public String getEnvelopeName() {
-        return "Microsoft.ApplicationInsights.Exception";
-    }
-    
-    /**
-     * Base Type for this telemetry.
-     */
-    public String getBaseType() {
-        return "Microsoft.ApplicationInsights.ExceptionData";
+        this.SetupAttributes();
     }
     
     /**
@@ -112,7 +100,7 @@ public class ExceptionData extends Domain implements
     /**
      * Gets the Exceptions property.
      */
-    public List<ExceptionDetails> getExceptions() {
+    public ArrayList<ExceptionDetails> getExceptions() {
         if (this.exceptions == null) {
             this.exceptions = new ArrayList<ExceptionDetails>();
         }
@@ -122,7 +110,7 @@ public class ExceptionData extends Domain implements
     /**
      * Sets the Exceptions property.
      */
-    public void setExceptions(List<ExceptionDetails> value) {
+    public void setExceptions(ArrayList<ExceptionDetails> value) {
         this.exceptions = value;
     }
     
@@ -171,7 +159,7 @@ public class ExceptionData extends Domain implements
     /**
      * Gets the Properties property.
      */
-    public Map<String, String> getProperties() {
+    public LinkedHashMap<String, String> getProperties() {
         if (this.properties == null) {
             this.properties = new LinkedHashMap<String, String>();
         }
@@ -181,14 +169,14 @@ public class ExceptionData extends Domain implements
     /**
      * Sets the Properties property.
      */
-    public void setProperties(Map<String, String> value) {
+    public void setProperties(LinkedHashMap<String, String> value) {
         this.properties = value;
     }
     
     /**
      * Gets the Measurements property.
      */
-    public Map<String, Double> getMeasurements() {
+    public LinkedHashMap<String, Double> getMeasurements() {
         if (this.measurements == null) {
             this.measurements = new LinkedHashMap<String, Double>();
         }
@@ -198,7 +186,7 @@ public class ExceptionData extends Domain implements
     /**
      * Sets the Measurements property.
      */
-    public void setMeasurements(Map<String, Double> value) {
+    public void setMeasurements(LinkedHashMap<String, Double> value) {
         this.measurements = value;
     }
     
@@ -261,9 +249,16 @@ public class ExceptionData extends Domain implements
     }
     
     /**
+     * Sets up the events attributes
+     */
+    public void SetupAttributes()
+    {
+    }
+    
+    /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        // method stub to initialize fields for the current context
+        QualifiedName = "AI.ExceptionData";
     }
 }

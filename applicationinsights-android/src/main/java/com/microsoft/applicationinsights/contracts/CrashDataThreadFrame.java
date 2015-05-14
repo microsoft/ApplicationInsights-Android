@@ -1,15 +1,18 @@
-/*
- * Generated from CrashDataThreadFrame.bond (https://github.com/Microsoft/bond)
-*/
-package com.microsoft.applicationinsights.contracts;
-
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
-
+package AI;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import com.microsoft.telemetry.ITelemetry;
+import com.microsoft.telemetry.ITelemetryData;
+import com.microsoft.telemetry.IContext;
+import com.microsoft.telemetry.IJsonSerializable;
+import com.microsoft.telemetry.Base;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.Extension;
+import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class CrashDataThreadFrame.
@@ -30,10 +33,10 @@ public class CrashDataThreadFrame implements
     /**
      * Backing field for property Registers.
      */
-    private Map<String, String> registers;
+    private LinkedHashMap<String, String> registers;
     
     /**
-     * Initializes a new instance of the CrashDataThreadFrame class.
+     * Initializes a new instance of the <see cref="CrashDataThreadFrame"/> class.
      */
     public CrashDataThreadFrame()
     {
@@ -71,7 +74,7 @@ public class CrashDataThreadFrame implements
     /**
      * Gets the Registers property.
      */
-    public Map<String, String> getRegisters() {
+    public LinkedHashMap<String, String> getRegisters() {
         if (this.registers == null) {
             this.registers = new LinkedHashMap<String, String>();
         }
@@ -81,7 +84,7 @@ public class CrashDataThreadFrame implements
     /**
      * Sets the Registers property.
      */
-    public void setRegisters(Map<String, String> value) {
+    public void setRegisters(LinkedHashMap<String, String> value) {
         this.registers = value;
     }
     
@@ -135,6 +138,6 @@ public class CrashDataThreadFrame implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        // method stub to initialize fields for the current context
+        
     }
 }
