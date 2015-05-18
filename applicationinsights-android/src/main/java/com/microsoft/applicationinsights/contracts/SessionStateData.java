@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.contracts;
+package AI;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class SessionStateData extends Domain implements
     /**
      * Backing field for property State.
      */
-    private com.microsoft.applicationinsights.contracts.Client.Contracts.SessionState state = SessionState.Start;
+    private int state = SessionState.Start;
     
     /**
      * Initializes a new instance of the <see cref="SessionStateData"/> class.
@@ -56,14 +56,14 @@ public class SessionStateData extends Domain implements
     /**
      * Gets the State property.
      */
-    public com.microsoft.applicationinsights.contracts.Client.Contracts.SessionState getState() {
+    public int getState() {
         return this.state;
     }
     
     /**
      * Sets the State property.
      */
-    public void setState(com.microsoft.applicationinsights.contracts.Client.Contracts.SessionState value) {
+    public void setState(int value) {
         this.state = value;
     }
     
@@ -112,6 +112,6 @@ public class SessionStateData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "com.microsoft.applicationinsights.contracts.SessionStateData";
+        QualifiedName = "AI.SessionStateData";
     }
 }

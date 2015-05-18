@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.contracts;
+package AI;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class MessageData extends Domain implements
     /**
      * Backing field for property SeverityLevel.
      */
-    private com.microsoft.applicationinsights.contracts.Client.Contracts.SeverityLevel severityLevel;
+    private int severityLevel;
     
     /**
      * Backing field for property Properties.
@@ -80,14 +80,14 @@ public class MessageData extends Domain implements
     /**
      * Gets the SeverityLevel property.
      */
-    public com.microsoft.applicationinsights.contracts.Client.Contracts.SeverityLevel getSeverityLevel() {
+    public int getSeverityLevel() {
         return this.severityLevel;
     }
     
     /**
      * Sets the SeverityLevel property.
      */
-    public void setSeverityLevel(com.microsoft.applicationinsights.contracts.Client.Contracts.SeverityLevel value) {
+    public void setSeverityLevel(int value) {
         this.severityLevel = value;
     }
     
@@ -152,6 +152,6 @@ public class MessageData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "com.microsoft.applicationinsights.contracts.MessageData";
+        QualifiedName = "AI.MessageData";
     }
 }

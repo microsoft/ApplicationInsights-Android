@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.contracts;
+package AI;
 /**
  * Enum DependencyKind.
  */

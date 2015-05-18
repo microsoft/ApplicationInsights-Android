@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.contracts;
+package AI;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class RemoteDependencyData extends Domain implements
     /**
      * Backing field for property Kind.
      */
-    private com.microsoft.applicationinsights.contracts.Client.Contracts.DataPointType kind = DataPointType.Measurement;
+    private int kind = DataPointType.Measurement;
     
     /**
      * Backing field for property Value.
@@ -63,7 +63,7 @@ public class RemoteDependencyData extends Domain implements
     /**
      * Backing field for property DependencyKind.
      */
-    private com.microsoft.applicationinsights.contracts.Client.Contracts.DependencyKind dependencyKind = DependencyKind.Other;
+    private int dependencyKind = DependencyKind.Other;
     
     /**
      * Backing field for property Success.
@@ -78,7 +78,7 @@ public class RemoteDependencyData extends Domain implements
     /**
      * Backing field for property DependencySource.
      */
-    private com.microsoft.applicationinsights.contracts.Client.Contracts.DependencySourceType dependencySource = DependencySourceType.Undefined;
+    private int dependencySource = DependencySourceType.Undefined;
     
     /**
      * Backing field for property CommandName.
@@ -135,14 +135,14 @@ public class RemoteDependencyData extends Domain implements
     /**
      * Gets the Kind property.
      */
-    public com.microsoft.applicationinsights.contracts.Client.Contracts.DataPointType getKind() {
+    public int getKind() {
         return this.kind;
     }
     
     /**
      * Sets the Kind property.
      */
-    public void setKind(com.microsoft.applicationinsights.contracts.Client.Contracts.DataPointType value) {
+    public void setKind(int value) {
         this.kind = value;
     }
     
@@ -219,14 +219,14 @@ public class RemoteDependencyData extends Domain implements
     /**
      * Gets the DependencyKind property.
      */
-    public com.microsoft.applicationinsights.contracts.Client.Contracts.DependencyKind getDependencyKind() {
+    public int getDependencyKind() {
         return this.dependencyKind;
     }
     
     /**
      * Sets the DependencyKind property.
      */
-    public void setDependencyKind(com.microsoft.applicationinsights.contracts.Client.Contracts.DependencyKind value) {
+    public void setDependencyKind(int value) {
         this.dependencyKind = value;
     }
     
@@ -261,14 +261,14 @@ public class RemoteDependencyData extends Domain implements
     /**
      * Gets the DependencySource property.
      */
-    public com.microsoft.applicationinsights.contracts.Client.Contracts.DependencySourceType getDependencySource() {
+    public int getDependencySource() {
         return this.dependencySource;
     }
     
     /**
      * Sets the DependencySource property.
      */
-    public void setDependencySource(com.microsoft.applicationinsights.contracts.Client.Contracts.DependencySourceType value) {
+    public void setDependencySource(int value) {
         this.dependencySource = value;
     }
     
@@ -432,6 +432,6 @@ public class RemoteDependencyData extends Domain implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "com.microsoft.applicationinsights.contracts.RemoteDependencyData";
+        QualifiedName = "AI.RemoteDependencyData";
     }
 }

@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.contracts;
+package AI;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;

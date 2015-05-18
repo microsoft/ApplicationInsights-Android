@@ -1,4 +1,4 @@
-package com.microsoft.applicationinsights.contracts;
+package AI;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -181,6 +181,6 @@ public class PageViewPerfData extends PageViewData implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "com.microsoft.applicationinsights.contracts.PageViewPerfData";
+        QualifiedName = "AI.PageViewPerfData";
     }
 }
