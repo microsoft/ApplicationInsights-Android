@@ -1,18 +1,15 @@
-package AI;
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
+package com.microsoft.applicationinsights.contracts;
+
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
-import com.microsoft.telemetry.JsonHelper;
+import java.util.Map;
 
 /**
  * Data contract class MessageData.
@@ -38,15 +35,28 @@ public class MessageData extends Domain implements
     /**
      * Backing field for property Properties.
      */
-    private LinkedHashMap<String, String> properties;
+    private Map<String, String> properties;
     
     /**
-     * Initializes a new instance of the <see cref="MessageData"/> class.
+     * Initializes a new instance of the MessageData class.
      */
     public MessageData()
     {
         this.InitializeFields();
-        this.SetupAttributes();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Message";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.MessageData";
     }
     
     /**
@@ -94,7 +104,7 @@ public class MessageData extends Domain implements
     /**
      * Gets the Properties property.
      */
-    public LinkedHashMap<String, String> getProperties() {
+    public Map<String, String> getProperties() {
         if (this.properties == null) {
             this.properties = new LinkedHashMap<String, String>();
         }
@@ -104,7 +114,7 @@ public class MessageData extends Domain implements
     /**
      * Sets the Properties property.
      */
-    public void setProperties(LinkedHashMap<String, String> value) {
+    public void setProperties(Map<String, String> value) {
         this.properties = value;
     }
     
@@ -142,16 +152,9 @@ public class MessageData extends Domain implements
     }
     
     /**
-     * Sets up the events attributes
-     */
-    public void SetupAttributes()
-    {
-    }
-    
-    /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.MessageData";
+        // method stub to initialize fields for the current context
     }
 }

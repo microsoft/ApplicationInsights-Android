@@ -1,18 +1,14 @@
-package AI;
+/*
+ * Generated from SessionStateData.bond (https://github.com/Microsoft/bond)
+*/
+package com.microsoft.applicationinsights.contracts;
+
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
-import com.microsoft.telemetry.JsonHelper;
+import java.util.Map;
 
 /**
  * Data contract class SessionStateData.
@@ -31,12 +27,25 @@ public class SessionStateData extends Domain implements
     private int state = SessionState.Start;
     
     /**
-     * Initializes a new instance of the <see cref="SessionStateData"/> class.
+     * Initializes a new instance of the SessionStateData class.
      */
     public SessionStateData()
     {
         this.InitializeFields();
-        this.SetupAttributes();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.SessionState";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.SessionStateData";
     }
     
     /**
@@ -71,7 +80,7 @@ public class SessionStateData extends Domain implements
     /**
     * Gets the Properties property.
     */
-    public LinkedHashMap<String, String> getProperties() {
+    public Map<String, String> getProperties() {
         //Do nothing - does not currently take properties
         return null;
     }
@@ -79,7 +88,7 @@ public class SessionStateData extends Domain implements
     /**
     * Sets the Properties property.
     */
-    public void setProperties(LinkedHashMap<String, String> value) {
+    public void setProperties(Map<String, String> value) {
         //Do nothing - does not currently take properties
     }
 
@@ -102,16 +111,9 @@ public class SessionStateData extends Domain implements
     }
     
     /**
-     * Sets up the events attributes
-     */
-    public void SetupAttributes()
-    {
-    }
-    
-    /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.SessionStateData";
+        // method stub to initialize fields for the current context
     }
 }

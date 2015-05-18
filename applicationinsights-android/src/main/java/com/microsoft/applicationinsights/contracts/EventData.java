@@ -1,18 +1,15 @@
-package AI;
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
+package com.microsoft.applicationinsights.contracts;
+
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
-import com.microsoft.telemetry.JsonHelper;
+import java.util.Map;
 
 /**
  * Data contract class EventData.
@@ -33,20 +30,33 @@ public class EventData extends Domain implements
     /**
      * Backing field for property Properties.
      */
-    private LinkedHashMap<String, String> properties;
+    private Map<String, String> properties;
     
     /**
      * Backing field for property Measurements.
      */
-    private LinkedHashMap<String, Double> measurements;
+    private Map<String, Double> measurements;
     
     /**
-     * Initializes a new instance of the <see cref="EventData"/> class.
+     * Initializes a new instance of the EventData class.
      */
     public EventData()
     {
         this.InitializeFields();
-        this.SetupAttributes();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Event";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.EventData";
     }
     
     /**
@@ -80,7 +90,7 @@ public class EventData extends Domain implements
     /**
      * Gets the Properties property.
      */
-    public LinkedHashMap<String, String> getProperties() {
+    public Map<String, String> getProperties() {
         if (this.properties == null) {
             this.properties = new LinkedHashMap<String, String>();
         }
@@ -90,14 +100,14 @@ public class EventData extends Domain implements
     /**
      * Sets the Properties property.
      */
-    public void setProperties(LinkedHashMap<String, String> value) {
+    public void setProperties(Map<String, String> value) {
         this.properties = value;
     }
     
     /**
      * Gets the Measurements property.
      */
-    public LinkedHashMap<String, Double> getMeasurements() {
+    public Map<String, Double> getMeasurements() {
         if (this.measurements == null) {
             this.measurements = new LinkedHashMap<String, Double>();
         }
@@ -107,7 +117,7 @@ public class EventData extends Domain implements
     /**
      * Sets the Measurements property.
      */
-    public void setMeasurements(LinkedHashMap<String, Double> value) {
+    public void setMeasurements(Map<String, Double> value) {
         this.measurements = value;
     }
     
@@ -145,16 +155,9 @@ public class EventData extends Domain implements
     }
     
     /**
-     * Sets up the events attributes
-     */
-    public void SetupAttributes()
-    {
-    }
-    
-    /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.EventData";
+        // method stub to initialize fields for the current context
     }
 }

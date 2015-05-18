@@ -1,18 +1,13 @@
-package AI;
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
+package com.microsoft.applicationinsights.contracts;
+
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
-import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class PageViewPerfData.
@@ -46,12 +41,25 @@ public class PageViewPerfData extends PageViewData implements
     private String domProcessing;
     
     /**
-     * Initializes a new instance of the <see cref="PageViewPerfData"/> class.
+     * Initializes a new instance of the PageViewPerfData class.
      */
     public PageViewPerfData()
     {
         this.InitializeFields();
-        this.SetupAttributes();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.PageViewPerf";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.PageViewPerfData";
     }
     
     /**
@@ -171,16 +179,9 @@ public class PageViewPerfData extends PageViewData implements
     }
     
     /**
-     * Sets up the events attributes
-     */
-    public void SetupAttributes()
-    {
-    }
-    
-    /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.PageViewPerfData";
+        // method stub to initialize fields for the current context
     }
 }

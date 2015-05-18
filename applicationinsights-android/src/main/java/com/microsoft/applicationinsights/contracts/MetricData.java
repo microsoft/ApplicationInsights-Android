@@ -1,18 +1,17 @@
-package AI;
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
+package com.microsoft.applicationinsights.contracts;
+
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
-import com.microsoft.telemetry.JsonHelper;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data contract class MetricData.
@@ -28,20 +27,33 @@ public class MetricData extends Domain implements
     /**
      * Backing field for property Metrics.
      */
-    private ArrayList<DataPoint> metrics;
+    private List<DataPoint> metrics;
     
     /**
      * Backing field for property Properties.
      */
-    private LinkedHashMap<String, String> properties;
+    private Map<String, String> properties;
     
     /**
-     * Initializes a new instance of the <see cref="MetricData"/> class.
+     * Initializes a new instance of the MetricData class.
      */
     public MetricData()
     {
         this.InitializeFields();
-        this.SetupAttributes();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.Metric";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.MetricData";
     }
     
     /**
@@ -61,7 +73,7 @@ public class MetricData extends Domain implements
     /**
      * Gets the Metrics property.
      */
-    public ArrayList<DataPoint> getMetrics() {
+    public List<DataPoint> getMetrics() {
         if (this.metrics == null) {
             this.metrics = new ArrayList<DataPoint>();
         }
@@ -71,14 +83,14 @@ public class MetricData extends Domain implements
     /**
      * Sets the Metrics property.
      */
-    public void setMetrics(ArrayList<DataPoint> value) {
+    public void setMetrics(List<DataPoint> value) {
         this.metrics = value;
     }
     
     /**
      * Gets the Properties property.
      */
-    public LinkedHashMap<String, String> getProperties() {
+    public Map<String, String> getProperties() {
         if (this.properties == null) {
             this.properties = new LinkedHashMap<String, String>();
         }
@@ -88,7 +100,7 @@ public class MetricData extends Domain implements
     /**
      * Sets the Properties property.
      */
-    public void setProperties(LinkedHashMap<String, String> value) {
+    public void setProperties(Map<String, String> value) {
         this.properties = value;
     }
     
@@ -119,16 +131,9 @@ public class MetricData extends Domain implements
     }
     
     /**
-     * Sets up the events attributes
-     */
-    public void SetupAttributes()
-    {
-    }
-    
-    /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.MetricData";
+        // method stub to initialize fields for the current context
     }
 }

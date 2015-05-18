@@ -1,18 +1,13 @@
-package AI;
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
+package com.microsoft.applicationinsights.contracts;
+
+import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
-import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class PageViewData.
@@ -31,22 +26,25 @@ public class PageViewData extends EventData implements
     private String duration;
     
     /**
-     * Backing field for property Referrer.
-     */
-    private String referrer;
-    
-    /**
-     * Backing field for property ReferrerData.
-     */
-    private String referrerData;
-    
-    /**
-     * Initializes a new instance of the <see cref="PageViewData"/> class.
+     * Initializes a new instance of the PageViewData class.
      */
     public PageViewData()
     {
         this.InitializeFields();
-        this.SetupAttributes();
+    }
+    
+    /**
+     * Envelope Name for this telemetry.
+     */
+    public String getEnvelopeName() {
+        return "Microsoft.ApplicationInsights.PageView";
+    }
+    
+    /**
+     * Base Type for this telemetry.
+     */
+    public String getBaseType() {
+        return "Microsoft.ApplicationInsights.PageViewData";
     }
     
     /**
@@ -77,34 +75,6 @@ public class PageViewData extends EventData implements
         this.duration = value;
     }
     
-    /**
-     * Gets the Referrer property.
-     */
-    public String getReferrer() {
-        return this.referrer;
-    }
-    
-    /**
-     * Sets the Referrer property.
-     */
-    public void setReferrer(String value) {
-        this.referrer = value;
-    }
-    
-    /**
-     * Gets the ReferrerData property.
-     */
-    public String getReferrerData() {
-        return this.referrerData;
-    }
-    
-    /**
-     * Sets the ReferrerData property.
-     */
-    public void setReferrerData(String value) {
-        this.referrerData = value;
-    }
-    
 
     /**
      * Serializes the beginning of this object to the passed in writer.
@@ -127,34 +97,13 @@ public class PageViewData extends EventData implements
             prefix = ",";
         }
         
-        if (!(this.referrer == null))
-        {
-            writer.write(prefix + "\"referrer\":");
-            writer.write(JsonHelper.convert(this.referrer));
-            prefix = ",";
-        }
-        
-        if (!(this.referrerData == null))
-        {
-            writer.write(prefix + "\"referrerData\":");
-            writer.write(JsonHelper.convert(this.referrerData));
-            prefix = ",";
-        }
-        
         return prefix;
-    }
-    
-    /**
-     * Sets up the events attributes
-     */
-    public void SetupAttributes()
-    {
     }
     
     /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        QualifiedName = "AI.PageViewData";
+        // method stub to initialize fields for the current context
     }
 }

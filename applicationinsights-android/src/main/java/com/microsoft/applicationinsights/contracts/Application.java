@@ -1,18 +1,14 @@
-package AI;
+/*
+ * Generated from ContextTagKeys.bond (https://github.com/Microsoft/bond)
+*/
+package com.microsoft.applicationinsights.contracts;
+
+import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
-import com.microsoft.telemetry.JsonHelper;
+import java.util.Map;
 
 /**
  * Data contract class Application.
@@ -31,7 +27,7 @@ public class Application implements
     private String build;
     
     /**
-     * Initializes a new instance of the <see cref="Application"/> class.
+     * Initializes a new instance of the Application class.
      */
     public Application()
     {
@@ -71,7 +67,7 @@ public class Application implements
      * Adds all members of this class to a hashmap
      * @param map to which the members of this class will be added.
      */
-    public void addToHashMap(LinkedHashMap<String, String> map)
+    public void addToHashMap(Map<String, String> map)
     {
         if (!(this.ver == null)) {
             map.put("ai.application.ver", this.ver);
@@ -127,6 +123,6 @@ public class Application implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }

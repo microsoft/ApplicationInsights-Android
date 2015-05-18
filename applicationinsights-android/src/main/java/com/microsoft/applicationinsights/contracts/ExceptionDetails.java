@@ -1,18 +1,15 @@
-package AI;
+/*
+ * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
+*/
+package com.microsoft.applicationinsights.contracts;
+
+import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
-import com.microsoft.telemetry.JsonHelper;
+import java.util.List;
 
 /**
  * Data contract class ExceptionDetails.
@@ -53,10 +50,10 @@ public class ExceptionDetails implements
     /**
      * Backing field for property ParsedStack.
      */
-    private ArrayList<StackFrame> parsedStack;
+    private List<StackFrame> parsedStack;
     
     /**
-     * Initializes a new instance of the <see cref="ExceptionDetails"/> class.
+     * Initializes a new instance of the ExceptionDetails class.
      */
     public ExceptionDetails()
     {
@@ -150,7 +147,7 @@ public class ExceptionDetails implements
     /**
      * Gets the ParsedStack property.
      */
-    public ArrayList<StackFrame> getParsedStack() {
+    public List<StackFrame> getParsedStack() {
         if (this.parsedStack == null) {
             this.parsedStack = new ArrayList<StackFrame>();
         }
@@ -160,7 +157,7 @@ public class ExceptionDetails implements
     /**
      * Sets the ParsedStack property.
      */
-    public void setParsedStack(ArrayList<StackFrame> value) {
+    public void setParsedStack(List<StackFrame> value) {
         this.parsedStack = value;
     }
     
@@ -211,7 +208,7 @@ public class ExceptionDetails implements
         writer.write(JsonHelper.convert(this.message));
         prefix = ",";
         
-        if (!(this.hasFullStack == false))
+        if (this.hasFullStack)
         {
             writer.write(prefix + "\"hasFullStack\":");
             writer.write(JsonHelper.convert(this.hasFullStack));
@@ -239,6 +236,6 @@ public class ExceptionDetails implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+        // method stub to initialize fields for the current context
     }
 }
