@@ -165,7 +165,6 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     public static void registerForPersistingWhenInBackground(Application application) {
         if(application != null){
-            application.unregisterComponentCallbacks(LifeCycleTracking.getInstance());
             application.registerComponentCallbacks(LifeCycleTracking.getInstance());
             InternalLogging.warn(TAG, "Registered component callbacks");
         }
