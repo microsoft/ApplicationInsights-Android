@@ -149,7 +149,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerPageViewCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
             synchronized (LifeCycleTracking.LOCK) {
                 registerActivityLifecycleCallbacks(application);
                 autoPageViewsEnabled = true;
@@ -176,7 +176,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void unregisterPageViewCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
             synchronized (LifeCycleTracking.LOCK) {
                 unregisterActivityLifecycleCallbacks(application);
                 autoPageViewsEnabled = false;
@@ -191,7 +191,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerSessionManagementCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
             synchronized (LifeCycleTracking.LOCK) {
                 registerActivityLifecycleCallbacks(application);
                 autoSessionManagementEnabled = true;
@@ -206,7 +206,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void unregisterSessionManagementCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)) {
             synchronized (LifeCycleTracking.LOCK) {
                 unregisterActivityLifecycleCallbacks(application);
                 autoSessionManagementEnabled = false;
