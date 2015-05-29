@@ -10,9 +10,7 @@ RSpec.configure do |config|
     options = {
       caps: {
         platformName: 'Android',
-       #appActivity: 'ItemListActivity',
-        app:'app-sample/build/outputs/apk/app-sample-debug.apk',
-        #appPackage: 'com.microsoft.applicationinsights.appsample',
+        app:'../app-sample/build/outputs/apk/app-sample-debug.apk',
         deviceName: 'appinsights-appium'
       },
       launchTimeout: 5000
