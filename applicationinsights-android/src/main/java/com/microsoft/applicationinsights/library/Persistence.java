@@ -322,7 +322,7 @@ class Persistence {
         String filesDirPath = getContext().getFilesDir().getPath();
         //create high prio directory
         File dir = new File(filesDirPath + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY);
-        String successMessage = "Successfully created regular directory";
+        String successMessage = "Successfully created directory";
         String errorMessage = "Error creating directory";
         if (!dir.exists()) {
             if (dir.mkdirs()) {
