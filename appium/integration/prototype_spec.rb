@@ -22,7 +22,11 @@ describe 'When we open our sample app' do
     list_el = text('Trigger Synchronize')
     list_el.click 
     back
+    sleep(5)
+    list_el.click
+    back
   end
+
 
 it 'should crash the app' do
   list_el = text('Crash the App!')

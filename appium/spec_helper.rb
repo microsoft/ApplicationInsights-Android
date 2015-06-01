@@ -11,7 +11,7 @@ RSpec.configure do |config|
       caps: {
         platformName: 'Android',
         app:'../app-sample/build/outputs/apk/app-sample-debug.apk',
-        deviceName: 'appinsights-appium'
+        deviceName: 'appinsights-appium' #required but doesn't have to match for genymotion  or android emu
       },
       launchTimeout: 5000
     }
