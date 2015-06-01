@@ -251,7 +251,9 @@ public enum ApplicationInsights {
             return;
         }
         if (!INSTANCE.telemetryDisabled) {
-            LifeCycleTracking.registerActivityLifecycleCallbacks(application);
+            if(application != null){
+                LifeCycleTracking.registerActivityLifecycleCallbacks(application);
+            }
         }
     }
 
