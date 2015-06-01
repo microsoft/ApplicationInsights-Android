@@ -15,8 +15,18 @@ describe 'When we open our sample app' do
     list_el.click
     back
     list_el.click
+    back
   end
 
+  it 'should trigger a sync' do
+    list_el = text('Trigger Synchronize')
+    list_el.click 
+    back
+  end
 
+it 'should crash the app' do
+  list_el = text('Crash the App!')
+  list_el.click
+end
 
 end
