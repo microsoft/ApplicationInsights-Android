@@ -53,6 +53,8 @@ class ExceptionTracking implements UncaughtExceptionHandler {
                       ignoreDefaultHandler);
 
                 Thread.setDefaultUncaughtExceptionHandler(handler);
+                InternalLogging.info(TAG,
+                      "ExceptionHandler was registered successfully", "");
             }
         }
     }

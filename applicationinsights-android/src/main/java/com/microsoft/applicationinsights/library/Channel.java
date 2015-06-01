@@ -94,6 +94,7 @@ class Channel {
         data[0] = envelope;
 
         if (this.persistence != null) {
+            InternalLogging.info(TAG, "persisting crash", envelope.toString());
             this.persistence.persist(data, true);
         }
         else {
