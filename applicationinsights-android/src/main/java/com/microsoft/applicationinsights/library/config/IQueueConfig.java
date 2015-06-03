@@ -10,13 +10,13 @@ public interface IQueueConfig {
 
     /**
      * Sets the maximum size of a batch in bytes
-     * @param maxBatchCount the batchsize of data that will be queued until we send/persist it
+     * @param maxBatchCount the batchsize of data that will be queued until we send/writeToDisk it
      */
     public void setMaxBatchCount(int maxBatchCount);
 
     /**
      * Gets the maximum interval allowed between calls to batchInvoke
-     * @return the interval until we send/persist queued up data
+     * @return the interval until we send/writeToDisk queued up data
      */
     public int getMaxBatchIntervalMs();
 

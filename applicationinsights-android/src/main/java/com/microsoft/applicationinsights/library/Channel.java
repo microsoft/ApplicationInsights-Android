@@ -1,9 +1,12 @@
 package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.contracts.Envelope;
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
+import com.microsoft.applicationinsights.contracts.Internal;
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
+
+import java.io.IOException;
+import java.io.StringWriter;
 
 /**
  * This class records telemetry for application insights.
@@ -80,24 +83,40 @@ class Channel {
      * @param envelope the envelope object to record
      */
     protected void enqueue(Envelope envelope) {
+        String serializedData = this.serializeEnvelope(envelope);
+
         // enqueue to queue
-        queue.enqueue(envelope);
+        queue.enqueue(serializedData);
 
         InternalLogging.info(TAG, "enqueued telemetry", envelope.getName());
+    }
+
+    protected String serializeEnvelope(Envelope envelope) {
+        try {
+            if (envelope != null) {
+                StringWriter stringWriter = new StringWriter();
+                envelope.serialize(stringWriter);
+                return stringWriter.toString();
+            }
+            InternalLogging.warn(TAG, "Envelop wasn't empty but failed to serialize anything, returning null");
+            return null;
+        } catch (IOException e) {
+            InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
+            return null;
+        }
     }
 
     protected void processUnhandledException(Envelope envelope) {
         queue.isCrashing = true;
         queue.flush();
 
-        IJsonSerializable[] data = new IJsonSerializable[1];
-        data[0] = envelope;
+        String[] data = new String[1];
+        data[0] = serializeEnvelope(envelope);
 
         if (this.persistence != null) {
             InternalLogging.info(TAG, "persisting crash", envelope.toString());
             this.persistence.persist(data, true);
-        }
-        else {
+        } else {
             InternalLogging.info(TAG, "error persisting crash", envelope.toString());
         }
 
