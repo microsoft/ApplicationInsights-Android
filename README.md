@@ -178,6 +178,14 @@ client.trackTrace("sample trace");
 
 //track a metric
 client.trackMetric("sample metric", 3);
+
+//track handled exceptions
+ArrayList<Object> myList = new ArrayList<Object>();
+try{
+	Object test = myList.get(2);
+}catch(Exception e){
+	TelemetryClient.getInstance().trackHandledException(e);
+}
 ```
 
 Some data types allow for custom properties.
