@@ -52,7 +52,7 @@ public class TelemetryContextTest extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testUserContextInitialization() {
-        TelemetryContext tc = new PublicTelemetryContext(this.getActivity(), "iKey", "1234");
+        TelemetryContext tc = new PublicTelemetryContext(this.getActivity(), "iKey", null);
 
         String id = tc.getContextTags().get(userIdKey);
         try {
