@@ -255,7 +255,7 @@ public enum ApplicationInsights {
             return;
         }
         if (!INSTANCE.telemetryDisabled) {
-            if(application != null){
+            if(application != null && Util.isLifecycleTrackingAvailable()){
                 LifeCycleTracking.registerActivityLifecycleCallbacks(application);
             }
         }
@@ -273,8 +273,11 @@ public enum ApplicationInsights {
             return;
         } else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not set page view tracking, because " +
-                  "ApplicationInsights has not been setup with an application.");
+                    "ApplicationInsights has not been setup with an application.");
             return;
+        } else if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "Could not set page view tracking, because " +
+                    "it is not supported on this OS version.");
         } else {
             LifeCycleTracking.registerPageViewCallbacks(INSTANCE.getApplication());
         }
@@ -294,6 +297,9 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
+        } else if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                    "it is not supported on this OS version.");
         } else {
             LifeCycleTracking.unregisterPageViewCallbacks(INSTANCE.getApplication());
         }
@@ -313,6 +319,9 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not set session management, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
+        } else if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "Could not set session management, because " +
+                    "it is not supported on this OS version.");
         } else {
             LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.getApplication());
         }
@@ -332,6 +341,9 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not unset session management, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
+        } else if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "Could not unset session management, because " +
+                    "it is not supported on this OS version.");
         } else {
             LifeCycleTracking.unregisterSessionManagementCallbacks(INSTANCE.getApplication());
         }
