@@ -3,9 +3,9 @@ package com.microsoft.applicationinsights.library;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
@@ -200,15 +200,19 @@ public enum ApplicationInsights {
 
             // Initialize Telemetry
             TelemetryClient.initialize(!telemetryDisabled);
-            LifeCycleTracking.initialize(telemetryContext, this.config);
             Application application = INSTANCE.getApplication();
-            LifeCycleTracking.registerForPersistingWhenInBackground(application);
-            if (INSTANCE.getApplication() != null && !this.autoCollectionDisabled) {
+
+            if (INSTANCE.getApplication() != null &&
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH &&
+                    !this.autoCollectionDisabled) {
+                LifeCycleTracking.initialize(telemetryContext, this.config);
+                LifeCycleTracking.registerForPersistingWhenInBackground(application);
                 LifeCycleTracking.registerPageViewCallbacks(application);
                 LifeCycleTracking.registerSessionManagementCallbacks(application);
             } else {
                 InternalLogging.warn(TAG, "Auto collection of page views could not be " +
-                      "started, since the given application was null");
+                      "started. Either the given application was null, the device API level " +
+                        "is lower than 14, or the user actively disabled the feature.");
             }
 
             // Start crash reporting
