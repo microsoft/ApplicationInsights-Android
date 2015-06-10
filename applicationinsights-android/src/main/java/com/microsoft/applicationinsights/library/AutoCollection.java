@@ -311,11 +311,6 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
             InternalLogging.info(TAG, "UI of the app is hidden");
             InternalLogging.info(TAG, "Setting background time");
             this.lastBackground.set(this.getTime());
-            InternalLogging.info(TAG, "Syncing data");
-            Channel.getInstance().synchronize();
-        } else if (level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_LOW) {
-            InternalLogging.info(TAG, "Memory running low, syncing data");
-            Channel.getInstance().synchronize();
         }
     }
 
@@ -327,9 +322,6 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
     @Override
     public void onLowMemory() {
         // unused but required to implement ComponentCallbacks
-        InternalLogging.warn(TAG, "Received onLowMemory()-Callback, persisting data");
-        Channel.getInstance().synchronize();
-
     }
 
     /**

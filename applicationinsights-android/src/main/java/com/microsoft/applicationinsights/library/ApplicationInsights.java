@@ -168,33 +168,54 @@ public enum ApplicationInsights {
             }
 
             this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, userId);
-            EnvelopeFactory.initialize(telemetryContext, this.commonProperties);
 
-            Persistence.initialize(context);
-            Sender.initialize(this.config);
-            Channel.initialize(this.config);
-
-            // Initialize Telemetry
-            TelemetryClient.initialize(!telemetryDisabled);
-
-            if (INSTANCE.getApplication() != null && !this.autoLifecycleCollectionDisabled) {
-                AutoCollection.initialize(telemetryContext, this.config);
-                enableAutoCollection();
-            } else {
-                InternalLogging.warn(TAG, "Auto collection of page views could not be " +
-                      "started. Either the given application was null, the device's API level " +
-                      "is lower than 14, or the user actively disabled the feature.");
-            }
-
-            // Start crash reporting
-            if (!this.exceptionTrackingDisabled) {
-                ExceptionTracking.registerExceptionHandler();
-            }
+            initializePipeline(context);
+            startSyncWhenBackgrounding();
+            setupAndStartAutocollection();
+            startCrashReporting();
 
             isRunning = true;
             Sender.getInstance().sendDataOnAppStart();
             InternalLogging.info(TAG, "ApplicationInsights has been started.", "");
         }
+    }
+
+    private void startCrashReporting() {
+        // Start crash reporting
+        if (!this.exceptionTrackingDisabled) {
+            ExceptionTracking.registerExceptionHandler();
+        }
+    }
+
+    private void setupAndStartAutocollection() {
+        if ((INSTANCE.getApplication() != null) && !this.autoLifecycleCollectionDisabled) {
+            AutoCollection.initialize(telemetryContext, this.config);
+            enableAutoCollection();
+        } else {
+            InternalLogging.warn(TAG, "Auto collection of page views could not be " +
+                  "started. Either the given application was null, the device's API level " +
+                  "is lower than 14, or the user actively disabled the feature.");
+        }
+    }
+
+    private void startSyncWhenBackgrounding() {
+        if (INSTANCE.getApplication() != null) {
+            SyncUtil.getInstance().start(INSTANCE.getApplication());
+        } else {
+            InternalLogging.warn(TAG, "Couldn't turn on SyncUtil becuase given application " +
+                  "was null");
+        }
+    }
+
+    private void initializePipeline(Context context) {
+        EnvelopeFactory.initialize(telemetryContext, this.commonProperties);
+
+        Persistence.initialize(context);
+        Sender.initialize(this.config);
+        Channel.initialize(this.config);
+
+        // Initialize Telemetry
+        TelemetryClient.initialize(!telemetryDisabled);
     }
 
     /**
@@ -212,7 +233,7 @@ public enum ApplicationInsights {
         Channel.getInstance().synchronize();
     }
 
-     /**
+    /**
      * enables all auto-collection features
      *
      * @warning requires ApplicationInsights to be setup with an Application object
