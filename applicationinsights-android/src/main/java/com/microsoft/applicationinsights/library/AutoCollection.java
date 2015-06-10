@@ -124,8 +124,9 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private static void registerActivityLifecycleCallbacks(Application application) {
         if (!autoPageViewsEnabled && !autoSessionManagementEnabled && !autoAppearanceTrackingEnabled) {
-            if (Util.isLifecycleTrackingAvailable()) {
+            if ((application != null ) && Util.isLifecycleTrackingAvailable()) {
                 application.registerActivityLifecycleCallbacks(AutoCollection.getInstance());
+                InternalLogging.info(TAG, "Registered activity lifecycle callbacks");
             }
         }
     }
@@ -137,9 +138,11 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      * @param application the application object
      */
     private static void registerForComponentCallbacks(Application application) {
-        if (application != null && Util.isLifecycleTrackingAvailable()) {
-            application.registerComponentCallbacks(AutoCollection.getInstance());
-            InternalLogging.info(TAG, "Registered component callbacks");
+        if (!autoPageViewsEnabled && !autoSessionManagementEnabled && !autoAppearanceTrackingEnabled) {
+            if ((application != null ) && Util.isLifecycleTrackingAvailable()) {
+                application.registerComponentCallbacks(AutoCollection.getInstance());
+                InternalLogging.info(TAG, "Registered component callbacks");
+            }
         }
     }
 
@@ -238,6 +241,7 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
         synchronized (AutoCollection.LOCK) {
             if (count == 0) {
                 if (autoSessionManagementEnabled) {
+                    InternalLogging.info(TAG, "Starting & tracking session");
                     TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
                     new Thread(sessionOp).start();
                 }
@@ -266,18 +270,18 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
         // check if the session should be renewed
         long now = this.getTime();
         long then = this.lastBackground.getAndSet(this.getTime());
-        boolean shouldRenew = (now - then) >= this.config.getSessionIntervalMs();
-
-        //TODO check what happens when an app is in foreground for more than the session interval (videoplay) and we then start a new activity
-
+        boolean shouldRenew = ((now - then) >= this.config.getSessionIntervalMs());
+        
         synchronized (AutoCollection.LOCK) {
             if (autoSessionManagementEnabled && shouldRenew) {
+                InternalLogging.info(TAG, "Renewing session");
                 this.telemetryContext.renewSessionId();
                 TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
                 new Thread(sessionOp).start();
             }
 
             if (autoPageViewsEnabled) {
+                InternalLogging.info(TAG, "New Pageview");
                 TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName(), null, null);
                 new Thread(pageViewOp).start();
             }
