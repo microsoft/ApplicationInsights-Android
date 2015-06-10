@@ -317,7 +317,7 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
     }
 
     @Override
-    public void onTrimMemory(int level) {//TODO Move syncing to seperate class
+    public void onTrimMemory(int level) {
         if (level == TRIM_MEMORY_UI_HIDDEN) {
             InternalLogging.info(TAG, "UI of the app is hidden");
             InternalLogging.info(TAG, "Setting background time");
@@ -327,7 +327,19 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        // unused but required to implement ComponentCallbacks
+        switch (newConfig.orientation) {
+            case Configuration.ORIENTATION_PORTRAIT:
+                InternalLogging.info(TAG, "Device Orientation is portrait");
+                break;
+            case Configuration.ORIENTATION_LANDSCAPE:
+                InternalLogging.info(TAG, "Device Orientation is landscape");
+                break;
+            case Configuration.ORIENTATION_UNDEFINED:
+                InternalLogging.info(TAG, "Device Orientation is undefinded");
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
