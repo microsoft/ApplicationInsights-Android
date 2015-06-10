@@ -73,6 +73,9 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      */
     private static boolean autoAppearanceTrackingEnabled;
 
+    private static boolean hasRegisteredComponentCallbacks;
+
+    private static boolean hasRegisteredLifecycleCallbacks;
 
     /**
      * Create a new INSTANCE of the autocollection event tracking
@@ -99,6 +102,8 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
             synchronized (AutoCollection.LOCK) {
                 if (!AutoCollection.isLoaded) {
                     AutoCollection.isLoaded = true;
+                    AutoCollection.hasRegisteredComponentCallbacks = false;
+                    AutoCollection.hasRegisteredLifecycleCallbacks = false;
                     AutoCollection.instance = new AutoCollection(config, telemetryContext);
                 }
             }
@@ -123,9 +128,10 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private static void registerActivityLifecycleCallbacks(Application application) {
-        if (!autoPageViewsEnabled && !autoSessionManagementEnabled && !autoAppearanceTrackingEnabled) {
+        if (!hasRegisteredLifecycleCallbacks) {
             if ((application != null ) && Util.isLifecycleTrackingAvailable()) {
                 application.registerActivityLifecycleCallbacks(AutoCollection.getInstance());
+                hasRegisteredLifecycleCallbacks = true;
                 InternalLogging.info(TAG, "Registered activity lifecycle callbacks");
             }
         }
@@ -138,9 +144,10 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      * @param application the application object
      */
     private static void registerForComponentCallbacks(Application application) {
-        if (!autoPageViewsEnabled && !autoSessionManagementEnabled && !autoAppearanceTrackingEnabled) {
+        if (!hasRegisteredComponentCallbacks) {
             if ((application != null ) && Util.isLifecycleTrackingAvailable()) {
                 application.registerComponentCallbacks(AutoCollection.getInstance());
+                hasRegisteredComponentCallbacks = true;
                 InternalLogging.info(TAG, "Registered component callbacks");
             }
         }
@@ -271,7 +278,7 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
         long now = this.getTime();
         long then = this.lastBackground.getAndSet(this.getTime());
         boolean shouldRenew = ((now - then) >= this.config.getSessionIntervalMs());
-        
+
         synchronized (AutoCollection.LOCK) {
             if (autoSessionManagementEnabled && shouldRenew) {
                 InternalLogging.info(TAG, "Renewing session");

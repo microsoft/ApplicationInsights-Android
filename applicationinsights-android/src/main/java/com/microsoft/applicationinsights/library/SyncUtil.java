@@ -1,16 +1,18 @@
 package com.microsoft.applicationinsights.library;
 
 import android.annotation.TargetApi;
-import android.content.ComponentCallbacks;
+import android.app.Application;
 import android.content.ComponentCallbacks2;
 import android.content.res.Configuration;
-import android.app.Application;
 import android.os.Build;
 
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
+/**
+ * Class that triggers a sync call to the pipeline by using ComponentCallbacks2
+ */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class SyncUtil implements ComponentCallbacks, ComponentCallbacks2 {
+class SyncUtil implements ComponentCallbacks2 {
 
     /**
      * The singleton INSTANCE of this class
@@ -38,21 +40,22 @@ public class SyncUtil implements ComponentCallbacks, ComponentCallbacks2 {
     }
 
     protected void start(Application application) {
-        if(application != null) {
+        if (application != null) {
             application.registerComponentCallbacks(SyncUtil.instance);
             InternalLogging.info(TAG, "Started listening to componentcallbacks to trigger sync");
         }
     }
 
-    @Override
     public void onTrimMemory(int level) {
-        if (level == TRIM_MEMORY_UI_HIDDEN) {
-            InternalLogging.info(TAG, "UI of the app is hidden");
-            InternalLogging.info(TAG, "Syncing data");
-            Channel.getInstance().synchronize();
-        } else if (level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_LOW) {
-            InternalLogging.info(TAG, "Memory running low, syncing data");
-            Channel.getInstance().synchronize();
+        if (Util.isLifecycleTrackingAvailable()) {
+            if (level == TRIM_MEMORY_UI_HIDDEN) {
+                InternalLogging.info(TAG, "UI of the app is hidden");
+                InternalLogging.info(TAG, "Syncing data");
+                Channel.getInstance().synchronize();
+            } else if (level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_LOW) {
+                InternalLogging.info(TAG, "Memory running low, syncing data");
+                Channel.getInstance().synchronize();
+            }
         }
     }
 

@@ -194,7 +194,7 @@ public enum ApplicationInsights {
     }
 
     private void setupAndStartAutocollection() {
-        if ((INSTANCE.getApplication() != null) && !this.autoLifecycleCollectionDisabled) {
+        if (Util.isLifecycleTrackingAvailable() && (INSTANCE.getApplication() != null) && !this.autoLifecycleCollectionDisabled) {
             AutoCollection.initialize(telemetryContext, this.config);
             enableAutoCollection();
         } else {
@@ -205,10 +205,14 @@ public enum ApplicationInsights {
     }
 
     private void startSyncWhenBackgrounding() {
+        if(!Util.isLifecycleTrackingAvailable()) {
+            return;
+        }
+
         if (INSTANCE.getApplication() != null) {
             SyncUtil.getInstance().start(INSTANCE.getApplication());
         } else {
-            InternalLogging.warn(TAG, "Couldn't turn on SyncUtil becuase given application " +
+            InternalLogging.warn(TAG, "Couldn't turn on SyncUtil because given application " +
                   "was null");
         }
     }
