@@ -40,7 +40,7 @@ public class SyncUtil implements ComponentCallbacks, ComponentCallbacks2 {
     protected void start(Application application) {
         if(application != null) {
             application.registerComponentCallbacks(SyncUtil.instance);
-            InternalLogging.info(TAG, "Started listenng to componentcallbacks to trigger sync");
+            InternalLogging.info(TAG, "Started listening to componentcallbacks to trigger sync");
         }
     }
 

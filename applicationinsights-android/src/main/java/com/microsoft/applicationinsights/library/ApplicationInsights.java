@@ -79,8 +79,15 @@ public enum ApplicationInsights {
      */
     private Map<String, String> commonProperties;
 
-    private static boolean isRunning;
-    private static boolean isSetup;
+    /**
+     * Flag that indicates that the user has called a setup-method before
+     */
+    private static boolean isConfigured;
+
+    /**
+     * Flag that indicates that the pipeline (Channel, Persistence, etc.) have been setup
+     */
+    private static boolean isSetupAndRunning;
 
     /**
      * Create ApplicationInsights instance
@@ -122,12 +129,12 @@ public enum ApplicationInsights {
      * @param instrumentationKey the instrumentation key associated with the app
      */
     public void setupInstance(Context context, Application application, String instrumentationKey) {
-        if (!isSetup) {
+        if (!isConfigured) {
             if (context != null) {
                 this.weakContext = new WeakReference<Context>(context);
                 this.instrumentationKey = instrumentationKey;
                 this.weakApplication = new WeakReference<Application>(application);
-                isSetup = true;
+                isConfigured = true;
                 InternalLogging.info(TAG, "ApplicationInsights has been setup correctly.", null);
             } else {
                 InternalLogging.warn(TAG, "ApplicationInsights could not be setup correctly " +
@@ -139,7 +146,7 @@ public enum ApplicationInsights {
 
     /**
      * Start ApplicationInsights
-     * Note: This should be called after {@link #isSetup}
+     * Note: This should be called after {@link #isConfigured}
      */
     public static void start() {
         INSTANCE.startInstance();
@@ -147,15 +154,15 @@ public enum ApplicationInsights {
 
     /**
      * Start ApplicationInsights
-     * Note: This should be called after {@link #isSetup}
+     * Note: This should be called after {@link #isConfigured}
      */
     public void startInstance() {
-        if (!isSetup) {
+        if (!isConfigured) {
             InternalLogging.warn(TAG, "Could not start Application Insights since it has not been " +
                   "setup correctly.");
             return;
         }
-        if (!isRunning) {
+        if (!isSetupAndRunning) {
             Context context = INSTANCE.getContext();
 
             if (context == null) {
@@ -174,7 +181,6 @@ public enum ApplicationInsights {
             setupAndStartAutocollection();
             startCrashReporting();
 
-            isRunning = true;
             Sender.getInstance().sendDataOnAppStart();
             InternalLogging.info(TAG, "ApplicationInsights has been started.", "");
         }
@@ -216,6 +222,8 @@ public enum ApplicationInsights {
 
         // Initialize Telemetry
         TelemetryClient.initialize(!telemetryDisabled);
+
+        isSetupAndRunning = true;
     }
 
     /**
@@ -225,7 +233,7 @@ public enum ApplicationInsights {
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
-        if (!isRunning) {
+        if (!isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not set send pending data, because " +
                   "ApplicationInsights has not been started, yet.");
             return;
@@ -264,14 +272,14 @@ public enum ApplicationInsights {
      */
     public static void enableAutoPageViewTracking() {
         if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+            InternalLogging.warn(TAG, "Could not enable page view tracking, because " +
                   "it is not supported on this OS version.");
-        } else if (!isRunning) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+        } else if (!isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Could not enable page view tracking, because " +
                   "ApplicationInsights has not been started yet.");
             return;
         } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+            InternalLogging.warn(TAG, "Could not enable page view tracking, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
         } else {
@@ -286,14 +294,14 @@ public enum ApplicationInsights {
      */
     public static void disableAutoPageViewTracking() {
         if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
                   "it is not supported on this OS version.");
-        } else if (!isRunning) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+        } else if (!isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
                   "ApplicationInsights has not been started yet.");
             return;
         } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
         } else {
@@ -308,14 +316,14 @@ public enum ApplicationInsights {
      */
     public static void enableAutoSessionManagement() {
         if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+            InternalLogging.warn(TAG, "Could not enable auto session management, because " +
                   "it is not supported on this OS version.");
-        } else if (!isRunning) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+        } else if (!isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Could not enable auto session management, because " +
                   "ApplicationInsights has not been started yet.");
             return;
         } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+            InternalLogging.warn(TAG, "Could not enable auto session management, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
         } else {
@@ -330,14 +338,14 @@ public enum ApplicationInsights {
      */
     public static void disableAutoSessionManagement() {
         if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
                   "it is not supported on this OS version.");
-        } else if (!isRunning) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+        } else if (!isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
                   "ApplicationInsights has not been started yet.");
             return;
         } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
         } else {
@@ -351,12 +359,12 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoAppearanceTracking() {
-        if (!isRunning) {
-            InternalLogging.warn(TAG, "Could not set session management, because " +
+        if (!isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Could not enable auto appearance tracking, because " +
                   "ApplicationInsights has not been started yet.");
             return;
         } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not set session management, because " +
+            InternalLogging.warn(TAG, "Could not enable auto appearance tracking, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
         } else {
@@ -370,12 +378,12 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoAppearanceTracking() {
-        if (!isRunning) {
-            InternalLogging.warn(TAG, "Could not unset session management, because " +
+        if (!isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Could not disable auto appearance tracking, because " +
                   "ApplicationInsights has not been started yet.");
             return;
         } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not unset session management, because " +
+            InternalLogging.warn(TAG, "Could not disable auto appearance tracking, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
         } else {
@@ -389,12 +397,12 @@ public enum ApplicationInsights {
      * @param disabled if set to true, crash reporting will be disabled
      */
     public static void setExceptionTrackingDisabled(boolean disabled) {
-        if (!isSetup) {
+        if (!isConfigured) {
             InternalLogging.warn(TAG, "Could not enable/disable exception tracking, because " +
                   "ApplicationInsights has not been setup correctly.");
             return;
         }
-        if (isRunning) {
+        if (isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not enable/disable exception tracking, because " +
                   "ApplicationInsights has already been started.");
             return;
@@ -408,12 +416,12 @@ public enum ApplicationInsights {
      * @param disabled if set to true, the telemetry feature will be disabled
      */
     public static void setTelemetryDisabled(boolean disabled) {
-        if (!isSetup) {
+        if (!isConfigured) {
             InternalLogging.warn(TAG, "Could not enable/disable telemetry, because " +
                   "ApplicationInsights has not been setup correctly.");
             return;
         }
-        if (isRunning) {
+        if (isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not enable/disable telemetry, because " +
                   "ApplicationInsights has already been started.");
             return;
@@ -432,12 +440,12 @@ public enum ApplicationInsights {
      * {@link ApplicationInsights#disableAutoPageViewTracking()}
      */
     public static void setAutoCollectionDisabled(boolean disabled) {
-        if (!isSetup) {
+        if (!isConfigured) {
             InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
                   "ApplicationInsights has not been setup correctly.");
             return;
         }
-        if (isRunning) {
+        if (isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
                   "ApplicationInsights has already been started.");
             return;
@@ -460,12 +468,12 @@ public enum ApplicationInsights {
      * @param commonProperties a dictionary of properties to enqueue with all telemetry.
      */
     public static void setCommonProperties(Map<String, String> commonProperties) {
-        if (!isSetup) {
+        if (!isConfigured) {
             InternalLogging.warn(TAG, "Could not set common properties, because " +
                   "ApplicationInsights has not been setup correctly.");
             return;
         }
-        if (isRunning) {
+        if (isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not set common properties, because " +
                   "ApplicationInsights has already been started.");
             return;
@@ -562,12 +570,12 @@ public enum ApplicationInsights {
      * Sets the session configuration for the instance
      */
     public void setConfig(ApplicationInsightsConfig config) {
-        if (!isSetup) {
+        if (!isConfigured) {
             InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
                   "ApplicationInsights has not been setup correctly.");
             return;
         }
-        if (isRunning) {
+        if (isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
                   "ApplicationInsights has already been started.");
             return;
@@ -593,7 +601,7 @@ public enum ApplicationInsights {
      * @param userId a user ID associated with the telemetry data
      */
     public static void setUserId(String userId) {
-        if (isRunning) {
+        if (isSetupAndRunning) {
             INSTANCE.telemetryContext.configUserContext(userId);
         } else {
             INSTANCE.userId = userId;
