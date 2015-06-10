@@ -3,9 +3,9 @@ package com.microsoft.applicationinsights.library;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
@@ -34,8 +34,10 @@ public enum ApplicationInsights {
     /**
      * A flag, which determines if auto collection of sessions and page views should be disabled.
      * Default is false.
+     *
+     * @deprecated 1.0-beta.5 will have a feature to turn of autocollection at runtime
      */
-    private boolean autoCollectionDisabled;
+    private boolean autoLifecycleCollectionDisabled;
 
     /**
      * A flag, which determines if sending telemetry data should be disabled. Default is false.
@@ -86,7 +88,7 @@ public enum ApplicationInsights {
     ApplicationInsights() {
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
-        this.autoCollectionDisabled = false;
+        this.autoLifecycleCollectionDisabled = false;
         this.config = new ApplicationInsightsConfig();
     }
 
@@ -200,19 +202,14 @@ public enum ApplicationInsights {
 
             // Initialize Telemetry
             TelemetryClient.initialize(!telemetryDisabled);
-            Application application = INSTANCE.getApplication();
 
-            if (INSTANCE.getApplication() != null &&
-                    Util.isLifecycleTrackingAvailable() &&
-                    !this.autoCollectionDisabled) {
-                LifeCycleTracking.initialize(telemetryContext, this.config);
-                LifeCycleTracking.registerForPersistingWhenInBackground(application);
-                LifeCycleTracking.registerPageViewCallbacks(application);
-                LifeCycleTracking.registerSessionManagementCallbacks(application);
+            if (INSTANCE.getApplication() != null && !this.autoLifecycleCollectionDisabled) {
+                AutoCollection.initialize(telemetryContext, this.config);
+                enableAutoCollection();
             } else {
                 InternalLogging.warn(TAG, "Auto collection of page views could not be " +
-                      "started. Either the given application was null, the device API level " +
-                        "is lower than 14, or the user actively disabled the feature.");
+                      "started. Either the given application was null, the device's API level " +
+                      "is lower than 14, or the user actively disabled the feature.");
             }
 
             // Start crash reporting
@@ -241,23 +238,27 @@ public enum ApplicationInsights {
         Channel.getInstance().synchronize();
     }
 
-    /**
-     * Enable auto page view tracking as well as auto session tracking. This will only work, if
-     * {@link ApplicationInsights#telemetryDisabled} is set to false.
+     /**
+     * enables all auto-collection features
      *
-     * @param application the application used to register the life cycle callbacks
-     * @deprecated This method is deprecated: Use setAutoCollectionDisabled instead.
+     * @warning requires ApplicationInsights to be setup with an Application object
      */
-    public static void enableActivityTracking(Application application) {
-        if (!isRunning) { //TODO fix log warning
-            InternalLogging.warn(TAG, "Could not set activity tracking, because " +
-                  "ApplicationInsights has not been started, yet.");
-            return;
+    public static void enableAutoCollection() {
+        enableAutoAppearanceTracking();
+        if (Util.isLifecycleTrackingAvailable()) {
+            enableAutoPageViewTracking();
+            enableAutoSessionManagement();
         }
-        if (!INSTANCE.telemetryDisabled) {
-            if(application != null && Util.isLifecycleTrackingAvailable()){
-                LifeCycleTracking.registerActivityLifecycleCallbacks(application);
-            }
+    }
+
+    /**
+     * disables all auto-collection features
+     */
+    public static void disableAutoCollection() {
+        disableAutoAppearanceTracking();
+        if (Util.isLifecycleTrackingAvailable()) {
+            disableAutoPageViewTracking();
+            disableAutoSessionManagement();
         }
     }
 
@@ -267,19 +268,19 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoPageViewTracking() {
-        if (!isRunning) {
-            InternalLogging.warn(TAG, "Could not set page view tracking, because " +
+        if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                  "it is not supported on this OS version.");
+        } else if (!isRunning) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
                   "ApplicationInsights has not been started yet.");
             return;
         } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not set page view tracking, because " +
-                    "ApplicationInsights has not been setup with an application.");
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                  "ApplicationInsights has not been setup with an application.");
             return;
-        } else if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not set page view tracking, because " +
-                    "it is not supported on this OS version.");
         } else {
-            LifeCycleTracking.registerPageViewCallbacks(INSTANCE.getApplication());
+            AutoCollection.enableAutoPageViews(INSTANCE.getApplication());
         }
     }
 
@@ -289,7 +290,10 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoPageViewTracking() {
-        if (!isRunning) {
+        if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                  "it is not supported on this OS version.");
+        } else if (!isRunning) {
             InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
                   "ApplicationInsights has not been started yet.");
             return;
@@ -297,11 +301,8 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
-        } else if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
-                    "it is not supported on this OS version.");
         } else {
-            LifeCycleTracking.unregisterPageViewCallbacks(INSTANCE.getApplication());
+            AutoCollection.disableAutoPageViews();
         }
     }
 
@@ -311,19 +312,19 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoSessionManagement() {
-        if (!isRunning) {
-            InternalLogging.warn(TAG, "Could not set session management, because " +
+        if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                  "it is not supported on this OS version.");
+        } else if (!isRunning) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
                   "ApplicationInsights has not been started yet.");
             return;
         } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not set session management, because " +
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
-        } else if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not set session management, because " +
-                    "it is not supported on this OS version.");
         } else {
-            LifeCycleTracking.registerSessionManagementCallbacks(INSTANCE.getApplication());
+            AutoCollection.enableAutoSessionManagement(INSTANCE.getApplication());
         }
     }
 
@@ -333,6 +334,47 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoSessionManagement() {
+        if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                  "it is not supported on this OS version.");
+        } else if (!isRunning) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                  "ApplicationInsights has not been started yet.");
+            return;
+        } else if (INSTANCE.getApplication() == null) {
+            InternalLogging.warn(TAG, "Could not unset page view tracking, because " +
+                  "ApplicationInsights has not been setup with an application.");
+            return;
+        } else {
+            AutoCollection.disableAutoSessionManagement();
+        }
+    }
+
+    /**
+     * Enable auto appearance tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void enableAutoAppearanceTracking() {
+        if (!isRunning) {
+            InternalLogging.warn(TAG, "Could not set session management, because " +
+                  "ApplicationInsights has not been started yet.");
+            return;
+        } else if (INSTANCE.getApplication() == null) {
+            InternalLogging.warn(TAG, "Could not set session management, because " +
+                  "ApplicationInsights has not been setup with an application.");
+            return;
+        } else {
+            AutoCollection.enableAutoAppearanceTracking(INSTANCE.getApplication());
+        }
+    }
+
+    /**
+     * Disable auto appearance tracking. This will only work, if ApplicationInsights has been setup
+     * with an application. This method should only be called after
+     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     */
+    public static void disableAutoAppearanceTracking() {
         if (!isRunning) {
             InternalLogging.warn(TAG, "Could not unset session management, because " +
                   "ApplicationInsights has not been started yet.");
@@ -341,11 +383,8 @@ public enum ApplicationInsights {
             InternalLogging.warn(TAG, "Could not unset session management, because " +
                   "ApplicationInsights has not been setup with an application.");
             return;
-        } else if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not unset session management, because " +
-                    "it is not supported on this OS version.");
         } else {
-            LifeCycleTracking.unregisterSessionManagementCallbacks(INSTANCE.getApplication());
+            AutoCollection.disableAutoAppearanceTracking();
         }
     }
 
@@ -391,6 +430,11 @@ public enum ApplicationInsights {
      * Enable / disable auto collection of telemetry data.
      *
      * @param disabled if set to true, the auto collection feature will be disabled
+     * @deprecated with 1.0-beta.5
+     * Use {@link ApplicationInsights#disableAutoCollection()} or the more specific
+     * {@link ApplicationInsights#disableAutoSessionManagement()},
+     * {@link ApplicationInsights#disableAutoAppearanceTracking()} and
+     * {@link ApplicationInsights#disableAutoPageViewTracking()}
      */
     public static void setAutoCollectionDisabled(boolean disabled) {
         if (!isSetup) {
@@ -403,7 +447,7 @@ public enum ApplicationInsights {
                   "ApplicationInsights has already been started.");
             return;
         }
-        INSTANCE.autoCollectionDisabled = disabled;
+        INSTANCE.autoLifecycleCollectionDisabled = disabled;
     }
 
     /**

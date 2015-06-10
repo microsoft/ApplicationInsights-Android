@@ -15,15 +15,8 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * The public API for auto collecting application insights telemetry.
- * @warning Deprecated with 1.0-beta.5, please use
- * {@link com.microsoft.applicationinsights.library.AutoCollection} instead
- */
-@Deprecated
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, ComponentCallbacks2 {
-
+class AutoCollection implements Application.ActivityLifecycleCallbacks, ComponentCallbacks2 {
     /**
      * The activity counter
      */
@@ -57,12 +50,12 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
     /**
      * The singleton INSTANCE of this class
      */
-    private static LifeCycleTracking instance;
+    private static AutoCollection instance;
 
     /**
      * The tag for logging
      */
-    private static final String TAG = "LifeCycleTracking";
+    private static final String TAG = "AutoCollection";
 
     /**
      * A flag which determines whether auto page view tracking has been enabled or not.
@@ -76,12 +69,18 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
     ;
 
     /**
-     * Create a new INSTANCE of the lifecycle event tracking
+     * A flag that deterines whether we want to auto-track events for foregrounding backgrounding
+     */
+    private static boolean autoAppearanceTrackingEnabled;
+
+
+    /**
+     * Create a new INSTANCE of the autocollection event tracking
      *
      * @param config           the session configuration for session tracking
      * @param telemetryContext the context, which is needed to renew sessions
      */
-    protected LifeCycleTracking(ISessionConfig config, TelemetryContext telemetryContext) {
+    protected AutoCollection(ISessionConfig config, TelemetryContext telemetryContext) {
         this.activityCount = new AtomicInteger(0);
         this.lastBackground = new AtomicLong(this.getTime());
         this.config = config;
@@ -89,32 +88,32 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
     }
 
     /**
-     * Initialize the INSTANCE of lifecycle event tracking.
+     * Initialize the INSTANCE of Autocollection event tracking.
      *
      * @param telemetryContext the context, which is needed to renew sessions
      * @param config           the session configuration for session tracking
      */
     protected static void initialize(TelemetryContext telemetryContext, ISessionConfig config) {
-        // note: isPersistenceLoaded must be volatile for the double-checked LOCK to work
-        if (!LifeCycleTracking.isLoaded) {
-            synchronized (LifeCycleTracking.LOCK) {
-                if (!LifeCycleTracking.isLoaded) {
-                    LifeCycleTracking.isLoaded = true;
-                    LifeCycleTracking.instance = new LifeCycleTracking(config, telemetryContext);
+        // note: isLoaded must be volatile for the double-checked LOCK to work
+        if (!AutoCollection.isLoaded) {
+            synchronized (AutoCollection.LOCK) {
+                if (!AutoCollection.isLoaded) {
+                    AutoCollection.isLoaded = true;
+                    AutoCollection.instance = new AutoCollection(config, telemetryContext);
                 }
             }
         }
     }
 
     /**
-     * @return the INSTANCE of lifecycle event tracking or null if not yet initialized
+     * @return the INSTANCE of autocollection event tracking or null if not yet initialized
      */
-    protected static LifeCycleTracking getInstance() {
-        if (LifeCycleTracking.instance == null) {
+    protected static AutoCollection getInstance() {
+        if (AutoCollection.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }
 
-        return LifeCycleTracking.instance;
+        return AutoCollection.instance;
     }
 
     /**
@@ -123,39 +122,10 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      * @param application the application object
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public static void registerActivityLifecycleCallbacks(Application application) {
-        if (!autoPageViewsEnabled && !autoSessionManagementEnabled) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                application.registerActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
-            }
-        }
-    }
-
-    /**
-     * Enables lifecycle event tracking for the provided application
-     *
-     * @param application the application object
-     */
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    private static void unregisterActivityLifecycleCallbacks(Application application) {
-        if (autoPageViewsEnabled ^ autoSessionManagementEnabled) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                application.unregisterActivityLifecycleCallbacks(LifeCycleTracking.getInstance());
-            }
-        }
-    }
-
-    /**
-     * Enables page view event tracking for the provided application
-     *
-     * @param application the application object
-     */
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public static void registerPageViewCallbacks(Application application) {
-        if (application != null && Util.isLifecycleTrackingAvailable()) {
-            synchronized (LifeCycleTracking.LOCK) {
-                registerActivityLifecycleCallbacks(application);
-                autoPageViewsEnabled = true;
+    private static void registerActivityLifecycleCallbacks(Application application) {
+        if (!autoPageViewsEnabled && !autoSessionManagementEnabled && !autoAppearanceTrackingEnabled) {
+            if (Util.isLifecycleTrackingAvailable()) {
+                application.registerActivityLifecycleCallbacks(AutoCollection.getInstance());
             }
         }
     }
@@ -166,23 +136,35 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      *
      * @param application the application object
      */
-    public static void registerForPersistingWhenInBackground(Application application) {
-        if(application != null){
-            application.registerComponentCallbacks(LifeCycleTracking.getInstance());
-            InternalLogging.warn(TAG, "Registered component callbacks");
+    private static void registerForComponentCallbacks(Application application) {
+        if (application != null && Util.isLifecycleTrackingAvailable()) {
+            application.registerComponentCallbacks(AutoCollection.getInstance());
+            InternalLogging.info(TAG, "Registered component callbacks");
         }
     }
 
     /**
-     * Disables page view event tracking for the provided application
+     * Enables page view event tracking for the provided application
      *
      * @param application the application object
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public static void unregisterPageViewCallbacks(Application application) {
+    protected static void enableAutoPageViews(Application application) {
         if (application != null && Util.isLifecycleTrackingAvailable()) {
-            synchronized (LifeCycleTracking.LOCK) {
-                unregisterActivityLifecycleCallbacks(application);
+            synchronized (AutoCollection.LOCK) {
+                registerActivityLifecycleCallbacks(application);
+                autoPageViewsEnabled = true;
+            }
+        }
+    }
+
+    /**
+     * Disables page view event tracking for the provided application*
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    protected static void disableAutoPageViews() {
+        if (Util.isLifecycleTrackingAvailable()) {
+            synchronized (AutoCollection.LOCK) {
                 autoPageViewsEnabled = false;
             }
         }
@@ -194,9 +176,10 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      * @param application the application object
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public static void registerSessionManagementCallbacks(Application application) {
+    protected static void enableAutoSessionManagement(Application application) {
         if (application != null && Util.isLifecycleTrackingAvailable()) {
-            synchronized (LifeCycleTracking.LOCK) {
+            synchronized (AutoCollection.LOCK) {
+                registerForComponentCallbacks(application);
                 registerActivityLifecycleCallbacks(application);
                 autoSessionManagementEnabled = true;
             }
@@ -205,15 +188,41 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
 
     /**
      * Disables session event tracking for the provided application
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    protected static void disableAutoSessionManagement() {
+        if (Util.isLifecycleTrackingAvailable()) {
+            synchronized (AutoCollection.LOCK) {
+                autoSessionManagementEnabled = false;
+            }
+        }
+    }
+
+    /**
+     * Enables auto appearance event tracking for the provided application
      *
      * @param application the application object
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    public static void unregisterSessionManagementCallbacks(Application application) {
+    protected static void enableAutoAppearanceTracking(Application application) {
         if (application != null && Util.isLifecycleTrackingAvailable()) {
-            synchronized (LifeCycleTracking.LOCK) {
-                unregisterActivityLifecycleCallbacks(application);
-                autoSessionManagementEnabled = false;
+            synchronized (AutoCollection.LOCK) {
+                registerForComponentCallbacks(application);
+                registerActivityLifecycleCallbacks(application);
+                autoAppearanceTrackingEnabled = true;
+            }
+        }
+    }
+
+
+    /**
+     * Disables auto appearance event tracking for the provided application
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    protected static void disableAutoAppearanceTracking() {
+        if (Util.isLifecycleTrackingAvailable()) {
+            synchronized (AutoCollection.LOCK) {
+                autoAppearanceTrackingEnabled = false;
             }
         }
     }
@@ -226,10 +235,15 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         int count = this.activityCount.getAndIncrement();
-        synchronized (LifeCycleTracking.LOCK) {
-            if (count == 0 && autoSessionManagementEnabled) {
-                TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
-                new Thread(sessionOp).start();
+        synchronized (AutoCollection.LOCK) {
+            if (count == 0) {
+                if (autoSessionManagementEnabled) {
+                    TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
+                    new Thread(sessionOp).start();
+                }
+                if(autoAppearanceTrackingEnabled) {
+                    //TODO track cold start as soon as it's available in new Schema.
+                }
             }
         }
     }
@@ -244,7 +258,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
     }
 
     /**
-     * This is called each time an activity leaves the foreground
+     * This is called each time an activity has been started or was resumed after pause
      *
      * @param activity the activity which left the foreground
      */
@@ -254,7 +268,9 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
         long then = this.lastBackground.getAndSet(this.getTime());
         boolean shouldRenew = (now - then) >= this.config.getSessionIntervalMs();
 
-        synchronized (LifeCycleTracking.LOCK) {
+        //TODO check what happens when an app is in foreground for more than the session interval (videoplay) and we then start a new activity
+
+        synchronized (AutoCollection.LOCK) {
             if (autoSessionManagementEnabled && shouldRenew) {
                 this.telemetryContext.renewSessionId();
                 TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
@@ -274,7 +290,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      * @param activity the activity which was paused
      */
     public void onActivityPaused(Activity activity) {
-        this.lastBackground.set(this.getTime());
+        //set backgrounding in onTrimMemory
     }
 
     public void onActivityStopped(Activity activity) {
@@ -290,12 +306,15 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
     }
 
     @Override
-    public void onTrimMemory(int level) {
+    public void onTrimMemory(int level) {//TODO Move syncing to seperate class
         if (level == TRIM_MEMORY_UI_HIDDEN) {
-            InternalLogging.warn(TAG, "UI of the app is hidden, persisting data");
+            InternalLogging.info(TAG, "UI of the app is hidden");
+            InternalLogging.info(TAG, "Setting background time");
+            this.lastBackground.set(this.getTime());
+            InternalLogging.info(TAG, "Syncing data");
             Channel.getInstance().synchronize();
         } else if (level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_LOW) {
-            InternalLogging.warn(TAG, "Memory running low, persisting data");
+            InternalLogging.info(TAG, "Memory running low, syncing data");
             Channel.getInstance().synchronize();
         }
     }
@@ -313,7 +332,6 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
 
     }
 
-
     /**
      * Test hook to get the current time
      *
@@ -322,5 +340,4 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
     protected long getTime() {
         return new Date().getTime();
     }
-
 }
