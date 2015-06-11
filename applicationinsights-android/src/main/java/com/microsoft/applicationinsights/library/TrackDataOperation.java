@@ -121,7 +121,7 @@ class TrackDataOperation implements Runnable {
                     envelope = EnvelopeFactory.getInstance().createNewSessionEnvelope();
                     break;
                 case HANDLED_EXCEPTION:
-                case UNHANDLED_EXCEPTION:
+                    envelope = EnvelopeFactory.getInstance().createExceptionEnvelope(this.exception, this.properties);
                     break;
                 default:
                     break;
