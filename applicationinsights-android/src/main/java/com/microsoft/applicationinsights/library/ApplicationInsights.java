@@ -90,20 +90,7 @@ public enum ApplicationInsights {
         this.config = new ApplicationInsightsConfig();
     }
 
-    /**
-     * Configure Application Insights
-     * Note: This should be called before start
-     *
-     * @param context the context associated with Application Insights
-     * @param context the application context associated with Application Insights
-     * @warning auto-collection of lifecycle-events is disabled when using this method
-     * @deprecated This method is deprecated: Use setup(Context context, Application application) instead.
-     */
-    public static void setup(Context context) {
-        ApplicationInsights.INSTANCE.setupInstance(context, null, null);
-    }
-
-    /**
+      /**
      * Configure Application Insights
      * Note: This should be called before start
      *
@@ -111,19 +98,6 @@ public enum ApplicationInsights {
      */
     public static void setup(Context context, Application application) {
         ApplicationInsights.INSTANCE.setupInstance(context, application, null);
-    }
-
-    /**
-     * Configure Application Insights
-     * Note: This should be called before start
-     *
-     * @param context            the application context associated with Application Insights
-     * @param instrumentationKey the instrumentation key associated with the app
-     * @warning auto-collection of lifecycle-events is disabled when using this method
-     * @deprecated This method is deprecated: Use setup(Context context, Application application) instead.
-     */
-    public static void setup(Context context, String instrumentationKey) {
-        ApplicationInsights.INSTANCE.setupInstance(context, null, instrumentationKey);
     }
 
     /**
@@ -239,26 +213,6 @@ public enum ApplicationInsights {
             return;
         }
         Channel.getInstance().synchronize();
-    }
-
-    /**
-     * Enable auto page view tracking as well as auto session tracking. This will only work, if
-     * {@link ApplicationInsights#telemetryDisabled} is set to false.
-     *
-     * @param application the application used to register the life cycle callbacks
-     * @deprecated This method is deprecated: Use setAutoCollectionDisabled instead.
-     */
-    public static void enableActivityTracking(Application application) {
-        if (!isRunning) { //TODO fix log warning
-            InternalLogging.warn(TAG, "Could not set activity tracking, because " +
-                  "ApplicationInsights has not been started, yet.");
-            return;
-        }
-        if (!INSTANCE.telemetryDisabled) {
-            if(application != null && Util.isLifecycleTrackingAvailable()){
-                LifeCycleTracking.registerActivityLifecycleCallbacks(application);
-            }
-        }
     }
 
     /**
