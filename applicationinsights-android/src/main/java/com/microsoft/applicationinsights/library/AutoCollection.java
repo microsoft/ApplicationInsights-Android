@@ -69,12 +69,18 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
     ;
 
     /**
-     * A flag that deterines whether we want to auto-track events for foregrounding backgrounding
+     * A flag that determines whether we want to auto-track events for foregrounding backgrounding
      */
     private static boolean autoAppearanceTrackingEnabled;
 
+    /**
+     * A flag that indicates if componentcallbacks have been registered
+     */
     private static boolean hasRegisteredComponentCallbacks;
 
+    /**
+     * A flag that indicates if lifecyclecallbacks have been already registered
+     */
     private static boolean hasRegisteredLifecycleCallbacks;
 
     /**

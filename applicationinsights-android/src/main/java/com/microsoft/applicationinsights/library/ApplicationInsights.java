@@ -99,7 +99,7 @@ public enum ApplicationInsights {
         this.config = new ApplicationInsightsConfig();
     }
 
-    /**
+      /**
      * Configure Application Insights
      * Note: This should be called before start
      *

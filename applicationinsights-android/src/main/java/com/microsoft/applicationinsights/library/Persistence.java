@@ -2,16 +2,13 @@ package com.microsoft.applicationinsights.library;
 
 import android.content.Context;
 
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -95,11 +92,11 @@ class Persistence {
     /**
      * Serializes a IJsonSerializable[] and calls:
      *
-     * @param data         the data to serialize and save to disk
+     * @param data         the data to save to disk
      * @param highPriority the priority to save the data with
-     * @see Persistence#persist(String, Boolean)
+     * @see Persistence#writeToDisk(String, Boolean)
      */
-    protected void persist(IJsonSerializable[] data, Boolean highPriority) {
+    protected void persist(String[] data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
             Sender.getInstance().sendNextFile();
@@ -108,28 +105,22 @@ class Persistence {
 
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess;
-        try {
-            buffer.append('[');
-            for (int i = 0; i < data.length; i++) {
-                if (i > 0) {
-                    buffer.append(',');
-                }
-                StringWriter stringWriter = new StringWriter();
-                data[i].serialize(stringWriter);
-                buffer.append(stringWriter.toString());
+        buffer.append('[');
+        for (int i = 0; i < data.length; i++) {
+            if (i > 0) {
+                buffer.append(',');
             }
+            buffer.append(data[i]);
+        }
 
-            buffer.append(']');
-            String serializedData = buffer.toString();
-            isSuccess = this.persist(serializedData, highPriority);
-            if (isSuccess) {
-                Sender sender = Sender.getInstance();
-                if (sender != null) {
-                    sender.sendNextFile();
-                }
+        buffer.append(']');
+        String serializedData = buffer.toString();
+        isSuccess = this.writeToDisk(serializedData, highPriority);
+        if (isSuccess) {
+            Sender sender = Sender.getInstance();
+            if (sender != null) {
+                sender.sendNextFile();
             }
-        } catch (IOException e) {
-            InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
         }
     }
 
@@ -140,7 +131,7 @@ class Persistence {
      * @param highPriority the priority we want to use for persisting the data
      * @return true if the operation was successful, false otherwise
      */
-    protected boolean persist(String data, Boolean highPriority) {
+    protected boolean writeToDisk(String data, Boolean highPriority) {
         String uuid = UUID.randomUUID().toString();
         Boolean isSuccess = false;
         Context context = this.getContext();

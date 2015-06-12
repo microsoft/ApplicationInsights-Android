@@ -34,13 +34,17 @@ public class ChannelTest extends InstrumentationTestCase {
     public void testEnqueuedItemIsAddedToQueue(){
         // Test
         Envelope testItem1 = new Envelope();
+        testItem1.setDeviceId("Test");
+        String serialized1 = sut.serializeEnvelope(testItem1);
         sut.enqueue(testItem1);
         Envelope testItem2 = new Envelope();
+        testItem2.setDeviceId("Test1");
+        String serialized2 = sut.serializeEnvelope(testItem2);
         sut.enqueue(testItem2);
 
         // Verify
-        verify(mockQueue, times(1)).enqueue(testItem1);
-        verify(mockQueue, times(1)).enqueue(testItem2);
+        verify(mockQueue, times(1)).enqueue(serialized1);
+        verify(mockQueue, times(1)).enqueue(serialized2);
     }
 
     public void testProcessUnhandledExceptionIsPersistedDirectly(){
@@ -49,19 +53,20 @@ public class ChannelTest extends InstrumentationTestCase {
         sut.processUnhandledException(testItem1);
 
         // Verify
-        verify(mockQueue, times(0)).enqueue(testItem1);
-        verify(mockPersistence, times(1)).persist(any(IJsonSerializable[].class), eq(true));
+        verify(mockQueue, times(0)).enqueue(new String());
+        verify(mockPersistence, times(1)).persist(any(String[].class), eq(true));
     }
 
     public void testQueueFlushesWhenProcessingCrash(){
         // Setup
         Envelope testItem1 = new Envelope();
+        String serializedString = sut.serializeEnvelope(testItem1);
 
         // Test
         sut.processUnhandledException(testItem1);
 
         // Verify
-        verify(mockQueue, times(0)).enqueue(testItem1);
+        verify(mockQueue, times(0)).enqueue(serializedString);
         verify(mockQueue, times(1)).flush();
     }
 }
