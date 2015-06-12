@@ -17,7 +17,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The public API for auto collecting application insights telemetry.
+ * @warning Deprecated with 1.0-beta.5, please use
+ * {@link com.microsoft.applicationinsights.library.AutoCollection} instead
  */
+@Deprecated
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, ComponentCallbacks2 {
 

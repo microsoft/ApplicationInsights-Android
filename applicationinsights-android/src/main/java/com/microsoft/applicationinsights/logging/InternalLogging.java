@@ -13,7 +13,7 @@ public class InternalLogging {
 
     /**
      * Inform SDK users about SDK activities. This has 3 parameters to avoid the string
-     * concatenation then verbose mode is disabled.
+     * concatenation when verbose mode is disabled.
      *
      * @param tag     the log context
      * @param message the log message
@@ -26,11 +26,24 @@ public class InternalLogging {
     }
 
     /**
-     * Warn SDK users about non-critical SDK misuse
+     * Inform SDK users about SDK activities.
      *
      * @param tag     the log context
      * @param message the log message
      */
+    public static void info(String tag, String message) {
+        if (ApplicationInsights.isDeveloperMode()) {
+            Log.i(PREFIX + " " + tag, message);
+        }
+    }
+
+
+        /**
+         * Warn SDK users about non-critical SDK misuse
+         *
+         * @param tag     the log context
+         * @param message the log message
+         */
     public static void warn(String tag, String message) {
         if (ApplicationInsights.isDeveloperMode()) {
             Log.w(PREFIX + " " + tag, message);

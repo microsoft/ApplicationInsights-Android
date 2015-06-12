@@ -134,7 +134,6 @@ public class TelemetryClient {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.EVENT,
                     eventName, properties, measurements));
         }
-
     }
 
     /**
