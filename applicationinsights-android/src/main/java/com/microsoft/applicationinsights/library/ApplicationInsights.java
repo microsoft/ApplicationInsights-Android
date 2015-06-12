@@ -194,13 +194,9 @@ public enum ApplicationInsights {
     }
 
     private void setupAndStartAutocollection() {
-        if (Util.isLifecycleTrackingAvailable() && (INSTANCE.getApplication() != null) && !this.autoLifecycleCollectionDisabled) {
+        if (autoCollectionPossible("Initialization of AutoCollection at app start")) {
             AutoCollection.initialize(telemetryContext, this.config);
             enableAutoCollection();
-        } else {
-            InternalLogging.warn(TAG, "Auto collection of page views could not be " +
-                  "started. Either the given application was null, the device's API level " +
-                  "is lower than 14, or the user actively disabled the feature.");
         }
     }
 
@@ -252,21 +248,17 @@ public enum ApplicationInsights {
      */
     public static void enableAutoCollection() {
         enableAutoAppearanceTracking();
-        if (Util.isLifecycleTrackingAvailable()) {
-            enableAutoPageViewTracking();
-            enableAutoSessionManagement();
-        }
+        enableAutoPageViewTracking();
+        enableAutoSessionManagement();
     }
 
     /**
      * disables all auto-collection features
      */
     public static void disableAutoCollection() {
-        disableAutoAppearanceTracking();
-        if (Util.isLifecycleTrackingAvailable()) {
+            disableAutoAppearanceTracking();
             disableAutoPageViewTracking();
             disableAutoSessionManagement();
-        }
     }
 
     /**
@@ -275,18 +267,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoPageViewTracking() {
-        if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not enable page view tracking, because " +
-                  "it is not supported on this OS version.");
-        } else if (!isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not enable page view tracking, because " +
-                  "ApplicationInsights has not been started yet.");
-            return;
-        } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not enable page view tracking, because " +
-                  "ApplicationInsights has not been setup with an application.");
-            return;
-        } else {
+        if(autoCollectionPossible("Auto PageView Tracking")) {
             AutoCollection.enableAutoPageViews(INSTANCE.getApplication());
         }
     }
@@ -297,18 +278,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoPageViewTracking() {
-        if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
-                  "it is not supported on this OS version.");
-        } else if (!isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
-                  "ApplicationInsights has not been started yet.");
-            return;
-        } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
-                  "ApplicationInsights has not been setup with an application.");
-            return;
-        } else {
+        if(autoCollectionPossible("Auto PageView Tracking")) {
             AutoCollection.disableAutoPageViews();
         }
     }
@@ -319,18 +289,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoSessionManagement() {
-        if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not enable auto session management, because " +
-                  "it is not supported on this OS version.");
-        } else if (!isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not enable auto session management, because " +
-                  "ApplicationInsights has not been started yet.");
-            return;
-        } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not enable auto session management, because " +
-                  "ApplicationInsights has not been setup with an application.");
-            return;
-        } else {
+        if(autoCollectionPossible("Auto Session Management")) {
             AutoCollection.enableAutoSessionManagement(INSTANCE.getApplication());
         }
     }
@@ -341,18 +300,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoSessionManagement() {
-        if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
-                  "it is not supported on this OS version.");
-        } else if (!isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
-                  "ApplicationInsights has not been started yet.");
-            return;
-        } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not disable page view tracking, because " +
-                  "ApplicationInsights has not been setup with an application.");
-            return;
-        } else {
+        if(autoCollectionPossible("Auto Session Management")) {
             AutoCollection.disableAutoSessionManagement();
         }
     }
@@ -363,15 +311,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoAppearanceTracking() {
-        if (!isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not enable auto appearance tracking, because " +
-                  "ApplicationInsights has not been started yet.");
-            return;
-        } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not enable auto appearance tracking, because " +
-                  "ApplicationInsights has not been setup with an application.");
-            return;
-        } else {
+        if(autoCollectionPossible("Auto Appearance")) {
             AutoCollection.enableAutoAppearanceTracking(INSTANCE.getApplication());
         }
     }
@@ -382,16 +322,29 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoAppearanceTracking() {
-        if (!isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not disable auto appearance tracking, because " +
-                  "ApplicationInsights has not been started yet.");
-            return;
-        } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "Could not disable auto appearance tracking, because " +
-                  "ApplicationInsights has not been setup with an application.");
-            return;
-        } else {
+        if(autoCollectionPossible("Auto Appearance")) {
             AutoCollection.disableAutoAppearanceTracking();
+        }
+    }
+
+    private static boolean autoCollectionPossible(String featureName) {
+        if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
+                  " can't be enabled/disabled, because " +
+                  "it is not supported on this OS version.");
+            return false;
+        } else if (!isSetupAndRunning) {
+            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
+                  " can't be enabled/disabled, because " +
+                  "ApplicationInsights has not been started yet.");
+            return false;
+        } else if (INSTANCE.getApplication() == null) {
+            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
+                  " can't be enabled/disabled, because " +
+                  "ApplicationInsights has not been setup with an application.");
+            return false;
+        } else {
+            return true;
         }
     }
 
