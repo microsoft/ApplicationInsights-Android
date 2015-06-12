@@ -25,7 +25,6 @@ public class AutoCollectionTests extends ActivityUnitTestCase<MockActivity> {
     private MockTelemetryClient telemetryClient;
     private Application mockApplication;
     private MockActivity mockActivity;
-    private PublicAutoCollection sut;
     private TelemetryContext mockTelemetryContext;
     private ApplicationInsightsConfig mockConfig;
 
@@ -56,9 +55,7 @@ public class AutoCollectionTests extends ActivityUnitTestCase<MockActivity> {
         intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
 
 
-        PublicAutoCollection.initialize(mockTelemetryContext, mockConfig);
-
-        //mockActivity = startActivity(intent, null, null);
+        AutoCollection.initialize(mockTelemetryContext, mockConfig);
     }
 
     public void tearDown() throws Exception {
@@ -66,26 +63,35 @@ public class AutoCollectionTests extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testInitialisationWorks() {
-        Assert.assertNotNull(PublicAutoCollection.getInstance());
+        Assert.assertNotNull(AutoCollection.getInstance());
     }
 
 
     public void testReturnsSameAutoCollection() {
-        AutoCollection autoCollection1 = PublicAutoCollection.getInstance();
-        AutoCollection autoCollection2 = PublicAutoCollection.getInstance();
+        AutoCollection autoCollection1 = AutoCollection.getInstance();
+        AutoCollection autoCollection2 = AutoCollection.getInstance();
 
         Assert.assertSame(autoCollection1, autoCollection2);
     }
 
     public void testEnablingCallbacksCanBeEnabled() {
-        PublicAutoCollection.getInstance().enableAutoPageViews(mockApplication);
-        Assert.assertTrue(PublicAutoCollection.getInstance().isAutoPageViewsEnabled());
+        AutoCollection.getInstance().enableAutoPageViews(mockApplication);
+        Assert.assertTrue(AutoCollection.getInstance().isAutoPageViewsEnabled());
 
-        PublicAutoCollection.getInstance().enableAutoSessionManagement(mockApplication);
-        Assert.assertTrue(PublicAutoCollection.getInstance().isAutoSessionManagementEnabled());
+        AutoCollection.getInstance().enableAutoSessionManagement(mockApplication);
+        Assert.assertTrue(AutoCollection.getInstance().isAutoSessionManagementEnabled());
 
-        PublicAutoCollection.getInstance().enableAutoAppearanceTracking(mockApplication);
-        Assert.assertTrue(PublicAutoCollection.getInstance().isAutoAppearanceTrackingEnabled());
+        AutoCollection.getInstance().enableAutoAppearanceTracking(mockApplication);
+        Assert.assertTrue(AutoCollection.getInstance().isAutoAppearanceTrackingEnabled());
+    }
+
+    //TODO throws a NPE and I haven't managed to solve it
+    public void testPageViewEvent() throws Exception {
+        // setup
+        MockActivity activity = this.startActivity(this.intent, null, null);
+
+        // test
+        getInstrumentation().callActivityOnCreate(activity, null);
     }
 
 //
