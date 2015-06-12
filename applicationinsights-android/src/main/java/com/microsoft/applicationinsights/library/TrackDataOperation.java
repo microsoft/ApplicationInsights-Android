@@ -1,8 +1,9 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.contracts.Data;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.IChannel;
+import com.microsoft.telemetry.ITelemetry;
 
 import java.util.Map;
 
@@ -62,7 +63,7 @@ class TrackDataOperation implements Runnable {
 
     @Override
     public void run() {
-        Data<ITelemetryData> telemetry = null;
+        Data<Domain> telemetry = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties);
         } else if (Persistence.getInstance().isFreeSpaceAvailable(false)) {
@@ -96,11 +97,13 @@ class TrackDataOperation implements Runnable {
         }
 
         if (telemetry != null) {
-            Channel channel = Channel.getInstance();
+            IChannel channel = ChannelManager.getInstance().getChannel();
             if (type == DataType.UNHANDLED_EXCEPTION) {
-                channel.processUnhandledException(telemetry);
+                ((Channel)Channel.getInstance()).processUnhandledException(telemetry);
             } else {
-                channel.log(telemetry);
+                telemetry.getBaseData().QualifiedName = telemetry.getBaseType();
+                Map<String,String> tags = EnvelopeFactory.getInstance().getContext().getContextTags();
+                channel.log(telemetry, tags);
             }
         }
     }

@@ -4,19 +4,19 @@ import com.microsoft.applicationinsights.contracts.CrashData;
 import com.microsoft.applicationinsights.contracts.CrashDataHeaders;
 import com.microsoft.applicationinsights.contracts.CrashDataThread;
 import com.microsoft.applicationinsights.contracts.CrashDataThreadFrame;
-import com.microsoft.applicationinsights.contracts.Data;
 import com.microsoft.applicationinsights.contracts.DataPoint;
 import com.microsoft.applicationinsights.contracts.DataPointType;
-import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.EventData;
 import com.microsoft.applicationinsights.contracts.MessageData;
 import com.microsoft.applicationinsights.contracts.MetricData;
 import com.microsoft.applicationinsights.contracts.PageViewData;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.logging.InternalLogging;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.Envelope;
+import com.microsoft.telemetry.ITelemetry;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -120,8 +120,8 @@ class EnvelopeFactory {
         envelope.setAppVer(this.context.getApplication().getVer());
         envelope.setTime(Util.dateToISO8601(new Date()));
         envelope.setIKey(this.context.getInstrumentationKey());
-        envelope.setUserId(this.context.getUser().getId());
-        envelope.setDeviceId(this.context.getDevice().getId());
+        //envelope.setUserId(this.context.getUser().getId());
+        //envelope.setDeviceId(this.context.getDevice().getId());
         envelope.setOsVer(this.context.getDevice().getOsVersion());
         envelope.setOs(this.context.getDevice().getOs());
 
@@ -138,11 +138,11 @@ class EnvelopeFactory {
      * @param data The telemetry we want to wrap inside an Enevelope and send to the server
      * @return the envelope that includes the telemetry data
      */
-    protected Envelope createEnvelope(Data<ITelemetryData> data) {
+    protected Envelope createEnvelope(Data<Domain> data) {
 
         Envelope envelope = createEnvelope();
         envelope.setData(data);
-        ITelemetryData baseData = data.getBaseData();
+        Domain baseData = data.getBaseData();
         if(baseData instanceof ITelemetry) {
             String envelopeName = ((ITelemetry) baseData).getEnvelopeName();
             envelope.setName(envelopeName);
@@ -161,12 +161,13 @@ class EnvelopeFactory {
      * @param telemetryData The telemetry we want to wrap inside an Enevelope and send to the server
      * @return the envelope that includes the telemetry data
      */
-    protected Data<ITelemetryData> createData(ITelemetry telemetryData) {
+    protected Data<Domain> createData(ITelemetry telemetryData) {
         addCommonProperties(telemetryData);
 
-        Data<ITelemetryData> data = new Data<ITelemetryData>();
+        Data<Domain> data = new Data<Domain>();
         data.setBaseData(telemetryData);
         data.setBaseType(telemetryData.getBaseType());
+        data.QualifiedName = telemetryData.getEnvelopeName();
 
         return data;
     }
@@ -180,10 +181,10 @@ class EnvelopeFactory {
      * @param measurements Custom measurements associated with the event
      * @return an Envelope object, which contains an event
      */
-    protected Data<ITelemetryData> createEventData(String eventName,
+    protected Data<Domain> createEventData(String eventName,
                                            Map<String, String> properties,
                                            Map<String, Double> measurements) {
-        Data<ITelemetryData> data = null;
+        Data<Domain> data = null;
         if (isConfigured()) {
             EventData telemetry = new EventData();
             telemetry.setName(ensureNotNull(eventName));
@@ -203,8 +204,8 @@ class EnvelopeFactory {
      * @param properties Custom properties associated with the event
      * @return an Envelope object, which contains a trace
      */
-    protected Data<ITelemetryData> createTraceData(String message, Map<String, String> properties) {
-        Data<ITelemetryData> data = null;
+    protected Data<Domain> createTraceData(String message, Map<String, String> properties) {
+        Data<Domain> data = null;
         if (isConfigured()) {
             MessageData telemetry = new MessageData();
             telemetry.setMessage(this.ensureNotNull(message));
@@ -223,8 +224,8 @@ class EnvelopeFactory {
      * @param value The value of the metric
      * @return an Envelope object, which contains a metric
      */
-    protected Data<ITelemetryData> createMetricData(String name, double value) {
-        Data<ITelemetryData> data = null;
+    protected Data<Domain> createMetricData(String name, double value) {
+        Data<Domain> data = null;
         if (isConfigured()) {
             MetricData telemetry = new MetricData();
             DataPoint dataPoint = new DataPoint();
@@ -252,8 +253,8 @@ class EnvelopeFactory {
      * @param properties Custom properties associated with the event
      * @return an Envelope object, which contains a handled or unhandled exception
      */
-    protected Data<ITelemetryData> createExceptionData(Throwable exception, Map<String, String> properties) {
-        Data<ITelemetryData> data = null;
+    protected Data<Domain> createExceptionData(Throwable exception, Map<String, String> properties) {
+        Data<Domain> data = null;
         if (isConfigured()) {
             CrashData telemetry = this.getCrashData(exception, properties);
 
@@ -271,11 +272,11 @@ class EnvelopeFactory {
      * @param measurements Custom measurements associated with the event
      * @return an Envelope object, which contains a page view
      */
-    protected Data<ITelemetryData> createPageViewData(
+    protected Data<Domain> createPageViewData(
           String pageName,
           Map<String, String> properties,
           Map<String, Double> measurements) {
-        Data<ITelemetryData> data = null;
+        Data<Domain> data = null;
         if (isConfigured()) {
             PageViewData telemetry = new PageViewData();
             telemetry.setName(ensureNotNull(pageName));
@@ -294,8 +295,8 @@ class EnvelopeFactory {
      *
      * @return an Envelope object, which contains a session
      */
-    protected Data<ITelemetryData> createNewSessionData() {
-        Data<ITelemetryData> data = null;
+    protected Data<Domain> createNewSessionData() {
+        Data<Domain> data = null;
         if (isConfigured()) {
             SessionStateData telemetry = new SessionStateData();
             telemetry.setState(SessionState.Start);
@@ -393,5 +394,13 @@ class EnvelopeFactory {
             InternalLogging.warn(TAG, "Could not create telemetry data. You have to setup & start ApplicationInsights first.");
         }
         return configured;
+    }
+
+    /**
+     * Get Context
+     * @return The telemetry context associated with this envelope factory
+     */
+    protected TelemetryContext getContext() {
+        return this.context;
     }
 }

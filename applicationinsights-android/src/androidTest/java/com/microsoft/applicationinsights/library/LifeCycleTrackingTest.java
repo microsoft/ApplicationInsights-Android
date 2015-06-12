@@ -10,11 +10,11 @@ import android.os.IBinder;
 import android.test.ActivityUnitTestCase;
 import android.test.UiThreadTest;
 
-import com.microsoft.applicationinsights.contracts.Data;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
 
 import junit.framework.Assert;
 
@@ -65,10 +65,10 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity);
 
         // validation
-        ArrayList<Data<ITelemetryData>> messages = this.mockLifeCycleTracking.tc.getMessages();
+        ArrayList<Data<Domain>> messages = this.mockLifeCycleTracking.tc.getMessages();
 
         Assert.assertEquals("Received 2 messages", 2, messages.size());
-        SessionStateData sessionData = (SessionStateData) ((Data<ITelemetryData>) messages.get(0)).getBaseData();
+        SessionStateData sessionData = (SessionStateData) ((Data<Domain>) messages.get(0)).getBaseData();
         Assert.assertEquals("Received Session State data", "Microsoft.ApplicationInsights.SessionStateData", sessionData.getBaseType());
         Assert.assertEquals("Got the start session", SessionState.Start, sessionData.getState());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(1).getBaseType());
@@ -91,11 +91,11 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
 
         // validation
-        ArrayList<Data<ITelemetryData>> messages = this.mockLifeCycleTracking.tc.getMessages();
+        ArrayList<Data<Domain>> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 6 messages", 6, messages.size());
         Assert.assertEquals("Received Session State data", "Microsoft.ApplicationInsights.SessionStateData", messages.get(0).getBaseType());
 
-        SessionStateData sessionData = (SessionStateData) ((Data<ITelemetryData>) messages.get(0)).getBaseData();
+        SessionStateData sessionData = (SessionStateData) ((Data<Domain>) messages.get(0)).getBaseData();
         Assert.assertEquals("Got the start session", SessionState.Start, sessionData.getState());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(1).getBaseType());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(2).getBaseType());
@@ -112,11 +112,11 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity);
 
         // validation
-        ArrayList<Data<ITelemetryData>> messages = this.mockLifeCycleTracking.tc.getMessages();
+        ArrayList<Data<Domain>> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 2 messages", 2, messages.size());
         Assert.assertEquals("Received Session State data", "Microsoft.ApplicationInsights.SessionStateData", messages.get(0).getBaseType());
 
-        SessionStateData sessionData = (SessionStateData) ((Data<ITelemetryData>) messages.get(0)).getBaseData();
+        SessionStateData sessionData = (SessionStateData) ((Data<Domain>) messages.get(0)).getBaseData();
         Assert.assertEquals("Got the start session", SessionState.Start, sessionData.getState());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(1).getBaseType());
 
@@ -146,11 +146,11 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity1);
 
         // validation
-        ArrayList<Data<ITelemetryData>> messages = this.mockLifeCycleTracking.tc.getMessages();
+        ArrayList<Data<Domain>> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 5 messages", 5, messages.size());
         Assert.assertEquals("Received Session State data", "Microsoft.ApplicationInsights.SessionStateData", messages.get(0).getBaseType());
 
-        SessionStateData sessionData = (SessionStateData) ((Data<ITelemetryData>) messages.get(0)).getBaseData();
+        SessionStateData sessionData = (SessionStateData) ((Data<Domain>) messages.get(0)).getBaseData();
         Assert.assertEquals("Got the start session", SessionState.Start, sessionData.getState());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(1).getBaseType());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(2).getBaseType());
@@ -175,17 +175,17 @@ public class LifeCycleTrackingTest extends ActivityUnitTestCase<MockActivity> {
         getInstrumentation().callActivityOnResume(activity2);
 
         // validation
-        ArrayList<Data<ITelemetryData>> messages = this.mockLifeCycleTracking.tc.getMessages();
+        ArrayList<Data<Domain>> messages = this.mockLifeCycleTracking.tc.getMessages();
         Assert.assertEquals("Received 6 messages", 6, messages.size());
         Assert.assertEquals("Received Session State data", "Microsoft.ApplicationInsights.SessionStateData", messages.get(0).getBaseType());
 
-        SessionStateData sessionData = (SessionStateData) ((Data<ITelemetryData>) messages.get(0)).getBaseData();
+        SessionStateData sessionData = (SessionStateData) ((Data<Domain>) messages.get(0)).getBaseData();
         Assert.assertEquals("Got the start session", SessionState.Start, sessionData.getState());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(1).getBaseType());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(2).getBaseType());
         Assert.assertEquals("Received Session State data", "Microsoft.ApplicationInsights.SessionStateData", messages.get(3).getBaseType());
 
-        sessionData = (SessionStateData) ((Data<ITelemetryData>) messages.get(3)).getBaseData();
+        sessionData = (SessionStateData) ((Data<Domain>) messages.get(3)).getBaseData();
         Assert.assertEquals("Got the start session", SessionState.Start, sessionData.getState());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(4).getBaseType());
         Assert.assertEquals("Received page view", "Microsoft.ApplicationInsights.PageViewData", messages.get(5).getBaseType());

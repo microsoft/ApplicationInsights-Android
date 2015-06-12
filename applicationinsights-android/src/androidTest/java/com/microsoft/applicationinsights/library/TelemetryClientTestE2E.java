@@ -88,7 +88,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             exception = e;
         }
 
-        Channel.getInstance().queue.config.setMaxBatchCount(10);
+        ((Channel)Channel.getInstance()).queue.config.setMaxBatchCount(10);
         for (int i = 0; i < batchCount; i++) {
             TelemetryClient.getInstance().trackEvent("android event");
             TelemetryClient.getInstance().trackTrace("android trace");

@@ -1,13 +1,13 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.contracts.Data;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 public class MockTelemetryClient extends TelemetryClient {
-    public ArrayList<Data<ITelemetryData>> messages;
+    public ArrayList<Data<Domain>> messages;
     public boolean mockTrackMethod;
 
     /**
@@ -63,7 +63,7 @@ public class MockTelemetryClient extends TelemetryClient {
 //
 //        return MockTelemetryClient.instance;
         MockTelemetryClient mClient = new MockTelemetryClient(true);
-        mClient.messages = new ArrayList<Data<ITelemetryData>>();
+        mClient.messages = new ArrayList<Data<Domain>>();
         return mClient;
     }
 
@@ -130,7 +130,7 @@ public class MockTelemetryClient extends TelemetryClient {
         }
     }
 
-    public ArrayList<Data<ITelemetryData>> getMessages()
+    public ArrayList<Data<Domain>> getMessages()
     {
         return messages;
     }

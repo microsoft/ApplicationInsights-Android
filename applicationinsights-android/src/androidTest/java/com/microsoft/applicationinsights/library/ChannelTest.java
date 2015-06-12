@@ -2,9 +2,10 @@ package com.microsoft.applicationinsights.library;
 
 import android.test.InstrumentationTestCase;
 
-import com.microsoft.applicationinsights.contracts.Data;
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.IJsonSerializable;
+import com.microsoft.telemetry.ITelemetry;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
@@ -38,10 +39,10 @@ public class ChannelTest extends InstrumentationTestCase {
 
     public void testEnqueuedItemIsAddedToQueue(){
         // Test
-        Data<ITelemetryData> testItem1 = new Data<ITelemetryData>();
-        sut.log(testItem1);
-        Data<ITelemetryData> testItem2 = new Data<ITelemetryData>();
-        sut.log(testItem2);
+        Data<Domain> testItem1 = new Data<Domain>();
+        sut.log(testItem1, null);
+        Data<ITelemetry> testItem2 = new Data<ITelemetry>();
+        sut.log(testItem2, null);
 
         // Verify
         verify(mockQueue, times(1)).enqueue(testItem1);
@@ -50,7 +51,7 @@ public class ChannelTest extends InstrumentationTestCase {
 
     public void testProcessUnhandledExceptionIsPersistedDirectly(){
         // Test
-        Data<ITelemetryData> testItem1 = new Data<ITelemetryData>();
+        Data<Domain> testItem1 = new Data<Domain>();
         sut.processUnhandledException(testItem1);
 
         // Verify
@@ -60,7 +61,7 @@ public class ChannelTest extends InstrumentationTestCase {
 
     public void testQueueFlushesWhenProcessingCrash(){
         // Setup
-        Data<ITelemetryData> testItem1 = new Data<ITelemetryData>();
+        Data<Domain> testItem1 = new Data<Domain>();
 
         // Test
         sut.processUnhandledException(testItem1);

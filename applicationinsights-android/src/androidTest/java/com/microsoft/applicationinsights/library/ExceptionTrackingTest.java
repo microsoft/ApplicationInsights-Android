@@ -22,7 +22,7 @@ public class ExceptionTrackingTest extends ActivityUnitTestCase<MockActivity> {
     public void tearDown() throws Exception {
         super.tearDown();
         Thread.setDefaultUncaughtExceptionHandler(originalHandler);
-        Channel.getInstance().queue.setIsCrashing(false);
+        ((Channel)Channel.getInstance()).queue.setIsCrashing(false);
         ApplicationInsights.setDeveloperMode(false);
     }
 

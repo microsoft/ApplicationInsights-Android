@@ -1,12 +1,15 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.contracts.Base;
-import com.microsoft.applicationinsights.contracts.Data;
-import com.microsoft.applicationinsights.contracts.Envelope;
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
+import com.microsoft.telemetry.Base;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.Envelope;
+import com.microsoft.telemetry.IChannel;
+import com.microsoft.telemetry.IJsonSerializable;
+
+import java.util.Map;
 
 /**
  * This class records telemetry for application insights.
@@ -40,7 +43,7 @@ class Channel implements IChannel {
     private Persistence persistence;
 
     /**
-     * Instantiates a new INSTANCE of Sender
+     * Instantiates a new INSTANCE of Channel
      */
     protected Channel() {
         this.persistence = Persistence.getInstance();
@@ -62,7 +65,7 @@ class Channel implements IChannel {
     /**
      * @return the INSTANCE of Channel or null if not yet initialized
      */
-    protected static Channel getInstance() {
+    protected static IChannel getInstance() {
         if (Channel.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }
@@ -73,7 +76,7 @@ class Channel implements IChannel {
     /**
      * Persist all pending items.
      */
-    protected void synchronize() {
+    public void synchronize() {
         this.queue.flush();
     }
 
@@ -82,7 +85,7 @@ class Channel implements IChannel {
      *
      * @param data the base object to record
      */
-    public void log(Base data) {
+    public void log(Base data, Map<String, String> tags) {
         if(data instanceof Data) {
             Envelope envelope = EnvelopeFactory.getInstance().createEnvelope((Data) data);
 
@@ -94,7 +97,7 @@ class Channel implements IChannel {
         }
     }
 
-    protected void processUnhandledException(Data<ITelemetryData> data) {
+    protected void processUnhandledException(Data<Domain> data) {
         Envelope envelope = EnvelopeFactory.getInstance().createEnvelope(data);
 
         queue.isCrashing = true;

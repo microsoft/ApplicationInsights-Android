@@ -2,9 +2,8 @@
  * Generated from ContextTagKeys.bond (https://github.com/Microsoft/bond)
 */
 package com.microsoft.applicationinsights.contracts;
-
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+import com.microsoft.telemetry.IJsonSerializable;
+import com.microsoft.telemetry.JsonHelper;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -13,8 +12,8 @@ import java.util.Map;
 /**
  * Data contract class Application.
  */
-public class Application implements
-    IJsonSerializable
+public class Application
+     implements IJsonSerializable
 {
     /**
      * Backing field for property Ver.
@@ -123,6 +122,6 @@ public class Application implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        // method stub to initialize fields for the current context
+        
     }
 }

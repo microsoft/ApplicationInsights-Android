@@ -2,9 +2,9 @@ package com.microsoft.applicationinsights.library;
 
 import android.test.InstrumentationTestCase;
 
-import com.microsoft.applicationinsights.contracts.Envelope;
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
+import com.microsoft.telemetry.Envelope;
+import com.microsoft.telemetry.IJsonSerializable;
 
 import junit.framework.Assert;
 

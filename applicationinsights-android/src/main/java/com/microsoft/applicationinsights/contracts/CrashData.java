@@ -2,9 +2,8 @@
  * Generated from CrashData.bond (https://github.com/Microsoft/bond)
 */
 package com.microsoft.applicationinsights.contracts;
-
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
-import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
+import com.microsoft.telemetry.ITelemetry;
+import com.microsoft.telemetry.JsonHelper;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -15,8 +14,7 @@ import java.util.Map;
 /**
  * Data contract class CrashData.
  */
-public class CrashData extends Domain implements
-    ITelemetry
+public class CrashData extends ITelemetry
 {
     /**
      * Backing field for property Ver.
@@ -44,6 +42,7 @@ public class CrashData extends Domain implements
     public CrashData()
     {
         this.InitializeFields();
+        this.SetupAttributes();
     }
     
     /**
@@ -171,9 +170,16 @@ public class CrashData extends Domain implements
     }
     
     /**
+     * Sets up the events attributes
+     */
+    public void SetupAttributes()
+    {
+    }
+    
+    /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        // method stub to initialize fields for the current context
+        QualifiedName = "com.microsoft.applicationinsights.contracts.CrashData";
     }
 }

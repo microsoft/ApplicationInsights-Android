@@ -2,8 +2,8 @@ package com.microsoft.applicationinsights.library;
 
 import android.content.Context;
 
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.logging.InternalLogging;
+import com.microsoft.telemetry.IJsonSerializable;
 
 import java.io.BufferedReader;
 import java.io.File;

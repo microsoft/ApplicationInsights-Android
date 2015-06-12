@@ -2,7 +2,8 @@ package com.microsoft.applicationinsights.library;
 
 import android.os.AsyncTask;
 
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.telemetry.IChannel;
+import com.microsoft.telemetry.ITelemetry;
 
 import java.util.Map;
 
@@ -65,7 +66,7 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
     /**
      * The channel to use for processing a telemetry item.
      */
-    protected Channel channel;
+    protected IChannel channel;
 
     /**
      * Create a TrackDataTask.
@@ -75,7 +76,7 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
     protected TrackDataTask(DataType type){
         this.type = type;
         this.envelopeFactory = EnvelopeFactory.getInstance();
-        this.channel = Channel.getInstance();
+        this.channel = ChannelManager.getInstance().getChannel();
     }
 
     /**
@@ -150,7 +151,7 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
      *
      * @param channel the channel to use for processing a telemetry item
      */
-    protected void setChannel(Channel channel) {
+    protected void setChannel(IChannel channel) {
         this.channel = channel;
     }
 

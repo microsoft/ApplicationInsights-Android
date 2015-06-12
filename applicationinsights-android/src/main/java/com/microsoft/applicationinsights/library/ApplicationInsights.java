@@ -77,6 +77,11 @@ public enum ApplicationInsights {
      */
     private Map<String, String> commonProperties;
 
+    /**
+     * The type of channel to use for logging
+     */
+    private ChannelType channelType;
+
     private static boolean isRunning;
     private static boolean isSetup;
 
@@ -87,6 +92,7 @@ public enum ApplicationInsights {
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
         this.autoCollectionDisabled = false;
+        this.channelType = ChannelType.Default;
         this.config = new ApplicationInsightsConfig();
     }
 
@@ -193,10 +199,9 @@ public enum ApplicationInsights {
 
             this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, userId);
             EnvelopeFactory.initialize(telemetryContext, this.commonProperties);
-
             Persistence.initialize(context);
             Sender.initialize(this.config);
-            Channel.initialize(this.config);
+            ChannelManager.initialize(channelType);
 
             // Initialize Telemetry
             TelemetryClient.initialize(!telemetryDisabled);
@@ -231,10 +236,10 @@ public enum ApplicationInsights {
     public static void sendPendingData() {
         if (!isRunning) {
             InternalLogging.warn(TAG, "Could not set send pending data, because " +
-                  "ApplicationInsights has not been started, yet.");
+                    "ApplicationInsights has not been started, yet.");
             return;
         }
-        Channel.getInstance().synchronize();
+        ChannelManager.getInstance().getChannel().synchronize();
     }
 
     /**
@@ -263,7 +268,7 @@ public enum ApplicationInsights {
     public static void enableAutoPageViewTracking() {
         if (!isRunning) {
             InternalLogging.warn(TAG, "Could not set page view tracking, because " +
-                  "ApplicationInsights has not been started yet.");
+                    "ApplicationInsights has not been started yet.");
             return;
         } else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "Could not set page view tracking, because " +
@@ -512,7 +517,7 @@ public enum ApplicationInsights {
         }
         if (isRunning) {
             InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
-                  "ApplicationInsights has already been started.");
+                    "ApplicationInsights has already been started.");
             return;
         }
         INSTANCE.config = config;
@@ -541,6 +546,28 @@ public enum ApplicationInsights {
         } else {
             INSTANCE.userId = userId;
         }
+    }
+
+    /**
+     * Sets the channel type to be used for logging
+     * @param channelType The channel type to use
+     */
+    public static void setChannelType(ChannelType channelType) {
+        if(isRunning) {
+            InternalLogging.warn(TAG, "Cannot set channel type, because " +
+                    "ApplicationInsights has already been started.");
+            return;
+        }
+
+        INSTANCE.channelType = channelType;
+    }
+
+    /**
+     * Gets the currently used channel type
+     * @return The current channel type.
+     */
+    public static ChannelType getChannelType() {
+        return INSTANCE.channelType;
     }
 
     /**

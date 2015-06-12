@@ -2,20 +2,28 @@
  * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
 */
 package com.microsoft.applicationinsights.contracts;
-
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
-import com.microsoft.applicationinsights.contracts.shared.JsonHelper;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
+import java.util.Map;
 import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import com.microsoft.telemetry.ITelemetry;
+import com.microsoft.telemetry.ITelemetryData;
+import com.microsoft.telemetry.IContext;
+import com.microsoft.telemetry.IJsonSerializable;
+import com.microsoft.telemetry.Base;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.Extension;
+import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class ExceptionDetails.
  */
-public class ExceptionDetails implements
-    IJsonSerializable
+public class ExceptionDetails
+     implements IJsonSerializable
 {
     /**
      * Backing field for property Id.
@@ -208,7 +216,7 @@ public class ExceptionDetails implements
         writer.write(JsonHelper.convert(this.message));
         prefix = ",";
         
-        if (this.hasFullStack)
+        if (!(this.hasFullStack == false))
         {
             writer.write(prefix + "\"hasFullStack\":");
             writer.write(JsonHelper.convert(this.hasFullStack));
@@ -236,6 +244,6 @@ public class ExceptionDetails implements
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        // method stub to initialize fields for the current context
+        
     }
 }
