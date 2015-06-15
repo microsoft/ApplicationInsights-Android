@@ -75,3 +75,6 @@ DEPENDENCIES
   sauce_whisk (~> 0.0.14)
   spec (~> 5.3.4)
   test-unit (~> 2.5.5)
+
+BUNDLED WITH
+   1.10.3
