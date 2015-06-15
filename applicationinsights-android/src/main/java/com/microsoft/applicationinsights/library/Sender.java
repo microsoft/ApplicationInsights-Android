@@ -129,9 +129,7 @@ class Sender {
     protected void send(File fileToSend) {
         String persistedData = this.persistence.load(fileToSend);
         if (!persistedData.isEmpty()) {
-            InternalLogging.info(TAG, "sending persisted data", persistedData);
             try {
-                InternalLogging.info(TAG, "sending persisted data", persistedData);
                 this.operationsCount.getAndIncrement();
                 this.sendRequestWithPayload(persistedData, fileToSend);
             } catch (IOException e) {
@@ -161,7 +159,7 @@ class Sender {
         connection.setUseCaches(false);
 
         try {
-            InternalLogging.info(TAG, "writing payload", payload);
+            InternalLogging.info(TAG, "Logging payload", payload);
             writer = getWriter(connection);
             writer.write(payload);
             writer.flush();

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class MockTelemetryClient extends TelemetryClient {
-    public ArrayList<Envelope> messages;
+    public ArrayList<Envelope> messages = new ArrayList<Envelope>();
     public boolean mockTrackMethod;
 
     /**
