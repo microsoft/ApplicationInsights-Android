@@ -321,7 +321,7 @@ ApplicationInsights.renewSession("New session ID");
 
 ### 9.5 Other
 
-For all available configarion options, see our [Javadoc](http://microsoft.github.io/ApplicationInsights-Android/) for ```ApplicationInisghtsConfig```
+For all available configarion options, see our [Javadoc](http://microsoft.github.io/ApplicationInsights-Android/) for ```ApplicationInsightsConfig```
 
 ##<a name="10"></a> 10. Documentation
 
