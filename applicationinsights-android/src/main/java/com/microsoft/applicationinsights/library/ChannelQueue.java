@@ -37,7 +37,7 @@ class ChannelQueue {
     /**
      * The linked list for this queue
      */
-    protected final List<IJsonSerializable> list;
+    protected final List<String> list;
 
     /**
      * If true the app is crashing and data should be persisted instead of sent
@@ -58,7 +58,7 @@ class ChannelQueue {
      * Prevent external instantiation
      */
     protected ChannelQueue(IQueueConfig config) {
-        this.list = new LinkedList<IJsonSerializable>();
+        this.list = new LinkedList<String>();
         this.timer = new Timer("Application Insights Sender Queue", true);
         this.config = config;
         this.isCrashing = false;
@@ -68,19 +68,19 @@ class ChannelQueue {
     /**
      * Adds an item to the sender queue
      *
-     * @param item a telemetry item to log
+     * @param serializedItem a serialized telemetry item to enqueue
      * @return true if the item was successfully added to the queue
      */
-    protected boolean enqueue(IJsonSerializable item) {
+    protected boolean enqueue(String serializedItem) {
         // prevent invalid argument exception
-        if (item == null) {
+        if (serializedItem == null) {
             return false;
         }
 
         boolean success;
         synchronized (this.LOCK) {
             // attempt to add the item to the queue
-            success = this.list.add(item);
+            success = this.list.add(serializedItem);
 
             if (success) {
                 if ((this.list.size() >= this.config.getMaxBatchCount()) || isCrashing) {
@@ -106,10 +106,10 @@ class ChannelQueue {
             this.scheduledPersistenceTask.cancel();
         }
 
-        IJsonSerializable[] data;
+        String[] data;
         synchronized (this.LOCK) {
             if (!list.isEmpty()) {
-                data = new IJsonSerializable[list.size()];
+                data = new String[list.size()];
                 list.toArray(data);
                 list.clear();
 
@@ -132,7 +132,7 @@ class ChannelQueue {
     /**
      * Initiates persisting the content queue.
      */
-    protected void executePersistenceTask(IJsonSerializable[] data){
+    protected void executePersistenceTask(String[] data){
         if (data != null) {
             if (persistence != null) {
                 persistence.persist(data, false);

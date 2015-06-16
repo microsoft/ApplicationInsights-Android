@@ -9,9 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -95,11 +93,11 @@ class Persistence {
     /**
      * Serializes a IJsonSerializable[] and calls:
      *
-     * @param data         the data to serialize and save to disk
+     * @param data         the data to save to disk
      * @param highPriority the priority to save the data with
-     * @see Persistence#persist(String, Boolean)
+     * @see Persistence#writeToDisk(String, Boolean)
      */
-    protected void persist(IJsonSerializable[] data, Boolean highPriority) {
+    protected void persist(String[] data, Boolean highPriority) {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
             Sender.getInstance().sendNextFile();
@@ -108,28 +106,22 @@ class Persistence {
 
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess;
-        try {
-            buffer.append('[');
-            for (int i = 0; i < data.length; i++) {
-                if (i > 0) {
-                    buffer.append(',');
-                }
-                StringWriter stringWriter = new StringWriter();
-                data[i].serialize(stringWriter);
-                buffer.append(stringWriter.toString());
+        buffer.append('[');
+        for (int i = 0; i < data.length; i++) {
+            if (i > 0) {
+                buffer.append(',');
             }
+            buffer.append(data[i]);
+        }
 
-            buffer.append(']');
-            String serializedData = buffer.toString();
-            isSuccess = this.persist(serializedData, highPriority);
-            if (isSuccess) {
-                Sender sender = Sender.getInstance();
-                if (sender != null) {
-                    sender.sendNextFile();
-                }
+        buffer.append(']');
+        String serializedData = buffer.toString();
+        isSuccess = this.writeToDisk(serializedData, highPriority);
+        if (isSuccess) {
+            Sender sender = Sender.getInstance();
+            if (sender != null && !highPriority) {
+                sender.sendNextFile();
             }
-        } catch (IOException e) {
-            InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
         }
     }
 
@@ -140,7 +132,7 @@ class Persistence {
      * @param highPriority the priority we want to use for persisting the data
      * @return true if the operation was successful, false otherwise
      */
-    protected boolean persist(String data, Boolean highPriority) {
+    protected boolean writeToDisk(String data, Boolean highPriority) {
         String uuid = UUID.randomUUID().toString();
         Boolean isSuccess = false;
         Context context = this.getContext();
@@ -151,13 +143,17 @@ class Persistence {
                 if (highPriority) {
                     filesDir = new File(filesDir + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY + uuid);
                     outputStream = new FileOutputStream(filesDir, true);
+                    InternalLogging.warn(TAG, "Saving data" + "HIGH PRIO");
                 } else {
                     filesDir = new File(filesDir + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY + uuid);
                     outputStream = new FileOutputStream(filesDir, true);
+                    InternalLogging.warn(TAG, "Saving data" + "REGULAR PRIO");
                 }
                 outputStream.write(data.getBytes());
                 outputStream.close();
                 isSuccess = true;
+                InternalLogging.warn(TAG, "Saved data");
+
             } catch (Exception e) {
                 //Do nothing
                 InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
@@ -202,12 +198,16 @@ class Persistence {
      * @return the next available file.
      */
     protected File nextAvailableFile() {
-        File file = this.nextHighPrioFile();
-        if (file != null) {
-            return file;
-        } else {
-            return this.nextRegularPrioFile();
+        synchronized (Persistence.LOCK) {
+            File file = this.nextHighPrioFile();
+            if (file != null) {
+                return file;
+            } else {
+                InternalLogging.info(TAG, "High prio file was empty", "(That's the default if no crashes present");
+                return this.nextRegularPrioFile();
+            }
         }
+
     }
 
 
@@ -216,6 +216,8 @@ class Persistence {
         if (context != null) {
             String path = context.getFilesDir() + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY;
             File directory = new File(path);
+            InternalLogging.info(TAG, "Returning High Prio File: ", path);
+
             return this.nextAvailableFileInDirectory(directory);
         }
 
@@ -229,6 +231,7 @@ class Persistence {
         if (context != null) {
             String path = context.getFilesDir() + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY;
             File directory = new File(path);
+            InternalLogging.info(TAG, "Returning Regular Prio File: " + path);
             return this.nextAvailableFileInDirectory(directory);
         }
 
@@ -245,18 +248,29 @@ class Persistence {
             if (directory != null) {
                 File[] files = directory.listFiles();
                 File file;
+
                 if ((files != null) && (files.length > 0)) {
-                    for (int i = 0; i < files.length - 1; i++) {
+                    for (int i = 0; i <= files.length - 1; i++) {
+                        InternalLogging.info(TAG, "The directory " + directory.toString(), " ITERATING over " + files.length + " files" );
+
                         file = files[i];
+                        InternalLogging.info(TAG, "The directory " +file.toString(), " FOUND" );
+
                         if (!this.servedFiles.contains(file)) {
+                            InternalLogging.info(TAG, "The directory " + file.toString(), " ADDING TO SERVED AND RETURN" );
+
                             this.servedFiles.add(file);
                             return file;//we haven't served the file, return it
                         }
+                        else {
+                            InternalLogging.info(TAG, "The directory " + file.toString(), " WAS ALREADY SERVED" );
+                        }
                     }
-
                 }
-            }
+                InternalLogging.info(TAG, "The directory " + directory.toString(), " NO FILES" );
 
+            }
+            InternalLogging.info(TAG, "The directory " + directory.toString(), "Did not contain any unserved files" );
             return null; //no files in directory or no directory
         }
     }
@@ -322,7 +336,7 @@ class Persistence {
         String filesDirPath = getContext().getFilesDir().getPath();
         //create high prio directory
         File dir = new File(filesDirPath + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY);
-        String successMessage = "Successfully created regular directory";
+        String successMessage = "Successfully created directory";
         String errorMessage = "Error creating directory";
         if (!dir.exists()) {
             if (dir.mkdirs()) {
