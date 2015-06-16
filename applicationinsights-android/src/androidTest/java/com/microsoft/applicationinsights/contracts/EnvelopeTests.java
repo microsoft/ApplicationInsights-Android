@@ -18,7 +18,6 @@ public class EnvelopeTests extends TestCase
 {
     public void testVerPropertyWorksAsExpected()
     {
-        // TODO: Envelope has a version number of type String. This test should be re-written with that in mind
         int expected = 42;
         Envelope item = new Envelope();
         item.setVer(expected);
@@ -59,7 +58,6 @@ public class EnvelopeTests extends TestCase
         Assert.assertEquals(expected, actual);
     }
 
-    // TODO: Common Schema 2.1 has changed these fields and these tests are no longer valid
     public void testSample_ratePropertyWorksAsExpected()
     {
         double expected = 1.5;
