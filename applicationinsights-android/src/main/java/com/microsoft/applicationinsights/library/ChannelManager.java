@@ -77,22 +77,59 @@ public class ChannelManager {
      * @param channelType The new channel to use
      */
     protected void setChannel(ChannelType channelType) {
+        if(channelType == null) {
+            InternalLogging.warn(TAG, "ChannelType is null, setting up using default channel type");
+            this.channel = createDefaultChannel();
+            return;
+        }
+
         switch (channelType) {
             case Default:
-                IChannel newChannel = Channel.getInstance();
-                if(newChannel == null) {
-                    Channel.initialize(ApplicationInsights.getConfig());
-                    newChannel = Channel.getInstance();
-                }
-
-                this.channel = newChannel;
+                this.channel = createDefaultChannel();
                 break;
             case TelemetryClientForAndroid:
-                String iKey = ApplicationInsights.getInstrumentationKey() == null ? "" : ApplicationInsights.getInstrumentationKey();
-                AndroidCll cll = (AndroidCll)AndroidCll.initialize(iKey, ApplicationInsights.INSTANCE.getContext(), ApplicationInsights.getConfig().getEndpointUrl());
-                cll.useLagacyCS(true);
-                this.channel = cll;
+                this.channel = createTelemetryClientChannel();
                 break;
         }
+    }
+
+    /**
+     * Resets this instance of the channel manager
+     */
+    protected void reset() {
+        if(channel != null) {
+            channel = null;
+        }
+
+        if(instance != null) {
+            instance = null;
+        }
+
+        isInitialized = false;
+    }
+
+    /**
+     * Creates a channel of default type
+     * @return The new default channel
+     */
+    private IChannel createDefaultChannel() {
+        IChannel defaultChannel = Channel.getInstance();
+        if(defaultChannel == null) {
+            Channel.initialize(ApplicationInsights.getConfig());
+            defaultChannel = Channel.getInstance();
+        }
+
+        return defaultChannel;
+    }
+
+    /**
+     * Creates a channel of the Telemetry Client type
+     * @return The new Telemetry Client channel
+     */
+    private IChannel createTelemetryClientChannel() {
+        String iKey = ApplicationInsights.getInstrumentationKey() == null ? "" : ApplicationInsights.getInstrumentationKey();
+        AndroidCll cll = (AndroidCll)AndroidCll.initialize(iKey, ApplicationInsights.INSTANCE.getContext(), ApplicationInsights.getConfig().getEndpointUrl());
+        cll.useLagacyCS(true);
+        return cll;
     }
 }
