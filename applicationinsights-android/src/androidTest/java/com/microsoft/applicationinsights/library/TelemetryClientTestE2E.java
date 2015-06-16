@@ -1,7 +1,6 @@
 package com.microsoft.applicationinsights.library;
 
-import android.content.Intent;
-import android.test.ActivityUnitTestCase;
+import android.test.ApplicationTestCase;
 import android.util.Log;
 
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
@@ -11,10 +10,10 @@ import junit.framework.Assert;
 import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
+public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication> {
 
     public TelemetryClientTestE2E() {
-        super(MockActivity.class);
+        super(MockApplication.class);
     }
 
     private LinkedHashMap<String, String> properties;
@@ -24,10 +23,7 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
     public void setUp() throws Exception {
         super.setUp();
 
-        Intent intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
-        this.setActivity(this.startActivity(intent, null, null));
-
-        ApplicationInsights.setup(this.getActivity(), "a7963eac-b272-41ca-b184-0d75cd2301c0");
+        ApplicationInsights.setup(this.getContext(), this.getApplication());
         ApplicationInsights.setDeveloperMode(true);
 
         ApplicationInsightsConfig config = ApplicationInsights.getConfig();

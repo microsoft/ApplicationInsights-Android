@@ -72,8 +72,6 @@ public class ItemListFragment extends ListFragment {
     public ItemListFragment() {
     }
 
-    @SuppressLint("InlinedApi")
-    @TargetApi(11)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +79,7 @@ public class ItemListFragment extends ListFragment {
         // TODO: replace with a real list adapter.
         setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
               getActivity(),
-              android.R.layout.simple_list_item_activated_1,
+              android.R.layout.simple_list_item_1,
               android.R.id.text1,
               DummyContent.ITEMS));
     }
