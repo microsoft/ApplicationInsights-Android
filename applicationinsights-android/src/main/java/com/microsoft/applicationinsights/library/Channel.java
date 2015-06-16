@@ -75,7 +75,9 @@ class Channel {
      */
     protected void synchronize() {
         this.queue.flush();
-        Sender.getInstance().sendNextFile();
+        if(Sender.getInstance() != null) {
+            Sender.getInstance().sendNextFile();
+        }
     }
 
     /**
