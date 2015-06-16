@@ -15,7 +15,7 @@ import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Envelope;
+import com.microsoft.telemetry.cs2.Envelope;
 import com.microsoft.telemetry.ITelemetry;
 
 import java.util.ArrayList;

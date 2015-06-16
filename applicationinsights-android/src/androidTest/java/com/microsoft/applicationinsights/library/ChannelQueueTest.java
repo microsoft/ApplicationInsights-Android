@@ -3,7 +3,7 @@ package com.microsoft.applicationinsights.library;
 import android.test.InstrumentationTestCase;
 
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
-import com.microsoft.telemetry.Envelope;
+import com.microsoft.telemetry.cs2.Envelope;
 import com.microsoft.telemetry.IJsonSerializable;
 
 import junit.framework.Assert;

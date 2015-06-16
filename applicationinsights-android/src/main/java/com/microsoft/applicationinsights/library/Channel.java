@@ -5,7 +5,7 @@ import com.microsoft.applicationinsights.logging.InternalLogging;
 import com.microsoft.telemetry.Base;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Envelope;
+import com.microsoft.telemetry.cs2.Envelope;
 import com.microsoft.telemetry.IChannel;
 import com.microsoft.telemetry.IJsonSerializable;
 

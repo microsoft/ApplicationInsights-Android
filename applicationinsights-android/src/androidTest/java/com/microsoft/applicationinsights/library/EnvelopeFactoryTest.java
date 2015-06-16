@@ -14,7 +14,7 @@ import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Envelope;
+import com.microsoft.telemetry.cs2.Envelope;
 
 import junit.framework.Assert;
 
@@ -189,8 +189,8 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         Assert.assertEquals(MOCK_APP_VER, envelope.getAppVer());
         Assert.assertNotNull(envelope.getTime());
         Assert.assertEquals(MOCK_IKEY, envelope.getIKey());
-        //Assert.assertEquals(MOCK_USER_ID, envelope.getUserId());
-        //Assert.assertEquals(MOCK_DEVICE_ID, envelope.getDeviceId());
+        Assert.assertEquals(MOCK_USER_ID, envelope.getUserId());
+        Assert.assertEquals(MOCK_DEVICE_ID, envelope.getDeviceId());
         Assert.assertEquals(MOCK_OS_VER, envelope.getOsVer());
         Assert.assertEquals(MOCK_OS, envelope.getOs());
         Assert.assertNotNull(envelope.getTags());

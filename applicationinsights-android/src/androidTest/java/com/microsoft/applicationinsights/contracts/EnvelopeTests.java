@@ -1,7 +1,7 @@
 package com.microsoft.applicationinsights.contracts;
 
 import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Envelope;
+import com.microsoft.telemetry.cs2.Envelope;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
