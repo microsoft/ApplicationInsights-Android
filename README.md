@@ -21,6 +21,7 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 9. [Additional configuration](#9)
 10. [Documentation](#10)
 11. [Contributing](#11) 
+12. [Contact](#12)
 
 ## <a name="1"></a> 1. Release Notes
 
@@ -336,8 +337,7 @@ Our Javadoc can be found at [http://microsoft.github.io/ApplicationInsights-Andr
 * [Get an instrumentation key](/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key) and set it in the manifest
 * Run tests from Android Studio
 
-<a id="contact"></a>
-## 12. Contact
+##<a name="12"></a> 12. Contact
 
 If you have further questions or are running into trouble that cannot be resolved by any of the steps here, feel free to contact us at [AppInsights-Android@microsoft.com](mailto:AppInsights-Android@microsoft.com)
 
