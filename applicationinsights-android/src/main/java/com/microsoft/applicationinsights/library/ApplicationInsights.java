@@ -248,7 +248,7 @@ public enum ApplicationInsights {
                   "ApplicationInsights has not been started, yet.");
             return;
         }
-        Channel.getInstance().synchronize();
+        ChannelManager.getInstance().getChannel().synchronize();
     }
 
     /**
