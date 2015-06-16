@@ -117,4 +117,13 @@ class Util {
     protected static boolean isDebuggerAttached() {
         return Debug.isDebuggerConnected();
     }
+
+    /**
+     * Determines if Lifecycle Tracking is available for the current user or not.
+     *
+     * @return YES if app runs on at least OS 4.0
+     */
+    protected static boolean isLifecycleTrackingAvailable() {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH);
+    }
 }

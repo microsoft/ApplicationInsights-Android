@@ -17,7 +17,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The public API for auto collecting application insights telemetry.
+ * @warning Deprecated with 1.0-beta.5, please use
+ * {@link com.microsoft.applicationinsights.library.AutoCollection} instead
  */
+@Deprecated
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, ComponentCallbacks2 {
 
@@ -149,7 +152,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerPageViewCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && Util.isLifecycleTrackingAvailable()) {
             synchronized (LifeCycleTracking.LOCK) {
                 registerActivityLifecycleCallbacks(application);
                 autoPageViewsEnabled = true;
@@ -164,9 +167,10 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      * @param application the application object
      */
     public static void registerForPersistingWhenInBackground(Application application) {
-        application.unregisterComponentCallbacks(LifeCycleTracking.getInstance());
-        application.registerComponentCallbacks(LifeCycleTracking.getInstance());
-        InternalLogging.warn(TAG, "Registered component callbacks");
+        if(application != null){
+            application.registerComponentCallbacks(LifeCycleTracking.getInstance());
+            InternalLogging.warn(TAG, "Registered component callbacks");
+        }
     }
 
     /**
@@ -176,7 +180,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void unregisterPageViewCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && Util.isLifecycleTrackingAvailable()) {
             synchronized (LifeCycleTracking.LOCK) {
                 unregisterActivityLifecycleCallbacks(application);
                 autoPageViewsEnabled = false;
@@ -191,7 +195,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerSessionManagementCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && Util.isLifecycleTrackingAvailable()) {
             synchronized (LifeCycleTracking.LOCK) {
                 registerActivityLifecycleCallbacks(application);
                 autoSessionManagementEnabled = true;
@@ -206,7 +210,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void unregisterSessionManagementCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && Util.isLifecycleTrackingAvailable()) {
             synchronized (LifeCycleTracking.LOCK) {
                 unregisterActivityLifecycleCallbacks(application);
                 autoSessionManagementEnabled = false;
