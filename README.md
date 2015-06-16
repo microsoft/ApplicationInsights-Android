@@ -1,6 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-beta.4)
+# Application Insights for Android (1.0-beta.5)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
@@ -11,7 +11,7 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 ## Content
 
 1. [Release Notes](#1)
-2. [Breaking Changes](#2)
+2. [Breaking Changes & Deprecations](#2)
 3. [Setup](#3)
 4. [Advanced Setup](#4)
 5. [Developer Mode](#5)
@@ -24,29 +24,43 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 ## <a name="1"></a> 1. Release Notes
 
-* Improvements regarding threat safety
-* Improved unit tests (now using Mockito)
-* Simplified threading model (still deferring work to background tasks)
-* Bugfix for sending logic (number of running operations wasn't decremented when we don't have a connection)
-* Fix for potential memory leaks
-* Updated code in sample app
-* Data is now persisted when the user sends the app into the background (requires API level 14)
-* Data is now persisted when the device is low on memory
+* The SDK is now built using the Android Tools Gradle plugin 1.2.3
+* * Fix a null pointer exception in ```LifecycleTracking```[#43]("https://github.com/Microsoft/ApplicationInsights-Android/pull/43")
+* Refactored Autocollection – ```LifecycleTracking```has been deprecated [#51]("https://github.com/Microsoft/ApplicationInsights-Android/pull/51")
+* Fix for null pointer exceptions when trying to serialize ```null``` [#45]("https://github.com/Microsoft/ApplicationInsights-Android/pull/45")
+* Fix for ```Concurrent Modification Exception``` in case the same Telemetry-Object was after it was modified [#44]("https://github.com/Microsoft/ApplicationInsights-Android/pull/44")
+* **Fix for ```ClassNotFoundException``` when running the SDK on an Android 2.3 device** [#48]("https://github.com/Microsoft/ApplicationInsights-Android/pull/48")
+* **Fix a bug that was introduced in 1.0-beta.4 that caused crashes not to be sent under some circumstances** [#52]("https://github.com/Microsoft/ApplicationInsights-Android/pull/52") & [Commit]("https://github.com/Microsoft/ApplicationInsights-Android/commit/e3b51e7927f238cc123c50b654fbeab448ba6df6")
 
-##<a name="2"></a> 2. Breaking Changes
 
-Starting with the first 1.0 stable release, we will start deprecating API instead of breaking old ones.
+##<a name="2"></a> 2. Breaking Changes & deprecations
 
-* **[1.0-beta.4]** **No breaking API changes**.
+Starting with 1.0-beta.5, breaking changes will be announced 1 release in advance. Once a method has been deprecated, the next release of the SDK will remove the API.
+
+**[1.0-beta.5]**
+
+* Two previously deprecated setup-methods for ```ApplicationInsights```have been removed.
+* ```LifecycleTracking```has been deprecated, use ```AutoCollection```instead. 
+
+**[1.0-beta.4]**
+
 * Two setup-methods for ```ApplicationInsights```have been deprecated and will be removed in the next beta
 
-* **[1.0-beta.3]** Configuration of the Application Insights SDK is now done using ```ApplicationInsightsConfig```. The previous config-classes have been removed
+**[1.0-beta.3]**
 
-* **[1.0-beta.2]** To enable automatic lifecycle-tracking, Application Insights has to be set up with an instance of Application (see [Life-cycle tracking] (#2)), otherwise, lifecycle-tracking is disabled.
+Configuration of the Application Insights SDK is now done using ```ApplicationInsightsConfig```. The previous config-classes have been removed
 
-* **[1.0-beta.1]** Setup and start of the Application Insights SDK are now done using the new umbrella class `ApplicationInsights` instead of `AppInsights `
+**[1.0-beta.2]**
 
-* **[1.0-Alpha.5]** Setup and start of the Application Insights SDK are now done using the new umbrella class `AppInsights` instead of `TelemetryClient`
+To enable automatic lifecycle-tracking, Application Insights has to be set up with an instance of Application (see [Life-cycle tracking] (#2)), otherwise, lifecycle-tracking is disabled.
+
+**[1.0-beta.1]**
+
+Setup and start of the Application Insights SDK are now done using the new umbrella class `ApplicationInsights` instead of `AppInsights `
+
+**[1.0-Alpha.5]**
+
+Setup and start of the Application Insights SDK are now done using the new umbrella class `AppInsights` instead of `TelemetryClient`
 
 ##<a name="3"></a> 3. Setup
 
@@ -60,7 +74,7 @@ In your module's ```build.gradle```add a dependency for Application Insights
 
 ```groovy
 dependencies {
-    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.3'
+    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.5'
 }
 ```
 
@@ -110,7 +124,7 @@ ApplicationInsights.start();
 
 in the activity's `onCreate`-callback.
 
-**Congratulation, now you're all set to use Application Insights! See [Usage](#6) how to use Application Insights.**
+**Congratulation, now you're all set to use Application Insights! See [Usage](#6) on how to use Application Insights.**
 
 ##<a name="4"></a> 4. Advanced Setup
 
@@ -146,7 +160,7 @@ ApplicationInsights.start();
 
 ## <a name="5"></a> 5. Developer Mode
 
-The **developer mode** is enabled automatically in case the debugger is attached or if the app is running in the emulator. This will enable the console logging and decrease the number of telemetry items sent in a batch (5 items) as well as the interval items will be sent (3 seconds). If you don't want this behavior, disable the **developer mode**.
+The **developer mode** is enabled automatically in case the debugger is attached or if the app is running in the emulator. This will enable the console logging and decrease the number of telemetry items per batch (5 items) as well as the sending interval (3 seconds). If you don't want this behavior, disable the **developer mode**.
 
 You can explicitly enable/disable the developer mode like this:
 
@@ -206,7 +220,7 @@ client.trackEvent("sample event", properties);
 
 ## <a name="7"></a>7. Automatic collection of life-cycle events (Sessions & Page Views)
 
-This only works in Android SDK version 15 and up (Ice Cream Sandwich+) and is **enabled by default**. Don't forget to provide an Application instance when setting up Application Insights (otherwise auto collection will be disabled):
+This only works in Android SDK version 14 and up (Ice Cream Sandwich+) and is **enabled by default**. Don't forget to provide an Application instance when setting up Application Insights (otherwise auto collection will be disabled):
 
 ```java
 ApplicationInsights.setup(this.getApplicationContext(), this.getApplication());
@@ -220,7 +234,7 @@ ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collecti
 ApplicationInsights.start();
 ```
 
-After `ApplicationInsights.start()` was called, you can enable or disable those features at any point:
+After `ApplicationInsights.start()` was called, you can enable or disable those features at any point, even if you have disabled it between setup and start of the Application Insights SDK:
 
 ```java
 // Disable automatic session renewal & tracking
