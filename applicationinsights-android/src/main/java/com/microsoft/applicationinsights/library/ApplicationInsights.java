@@ -247,7 +247,7 @@ public enum ApplicationInsights {
     /**
      * enables all auto-collection features
      *
-     * @warning requires ApplicationInsights to be setup with an Application object
+     * Requires ApplicationInsights to be setup with an Application object
      */
     public static void enableAutoCollection() {
         enableAutoAppearanceTracking();
@@ -419,7 +419,7 @@ public enum ApplicationInsights {
      *
      * @param disabled if set to true, the auto collection feature will be disabled at app start
      * To enable/disable auto collection features at runtime, use
-     * {@link ApplicationInsights#disableAutoCollection() or the more specific
+     * {@link ApplicationInsights#disableAutoCollection()} or the more specific
      * {@link ApplicationInsights#disableAutoSessionManagement()},
      * {@link ApplicationInsights#disableAutoAppearanceTracking()} and
      * {@link ApplicationInsights#disableAutoPageViewTracking()}
