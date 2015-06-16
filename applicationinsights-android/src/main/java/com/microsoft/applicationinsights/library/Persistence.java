@@ -118,7 +118,7 @@ class Persistence {
         isSuccess = this.writeToDisk(serializedData, highPriority);
         if (isSuccess) {
             Sender sender = Sender.getInstance();
-            if (sender != null) {
+            if (sender != null && !highPriority) {
                 sender.sendNextFile();
             }
         }
@@ -142,13 +142,17 @@ class Persistence {
                 if (highPriority) {
                     filesDir = new File(filesDir + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY + uuid);
                     outputStream = new FileOutputStream(filesDir, true);
+                    InternalLogging.warn(TAG, "Saving data" + "HIGH PRIO");
                 } else {
                     filesDir = new File(filesDir + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY + uuid);
                     outputStream = new FileOutputStream(filesDir, true);
+                    InternalLogging.warn(TAG, "Saving data" + "REGULAR PRIO");
                 }
                 outputStream.write(data.getBytes());
                 outputStream.close();
                 isSuccess = true;
+                InternalLogging.warn(TAG, "Saved data");
+
             } catch (Exception e) {
                 //Do nothing
                 InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
@@ -193,12 +197,16 @@ class Persistence {
      * @return the next available file.
      */
     protected File nextAvailableFile() {
-        File file = this.nextHighPrioFile();
-        if (file != null) {
-            return file;
-        } else {
-            return this.nextRegularPrioFile();
+        synchronized (Persistence.LOCK) {
+            File file = this.nextHighPrioFile();
+            if (file != null) {
+                return file;
+            } else {
+                InternalLogging.info(TAG, "High prio file was empty", "(That's the default if no crashes present");
+                return this.nextRegularPrioFile();
+            }
         }
+
     }
 
 
@@ -207,6 +215,8 @@ class Persistence {
         if (context != null) {
             String path = context.getFilesDir() + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY;
             File directory = new File(path);
+            InternalLogging.info(TAG, "Returning High Prio File: ", path);
+
             return this.nextAvailableFileInDirectory(directory);
         }
 
@@ -220,6 +230,7 @@ class Persistence {
         if (context != null) {
             String path = context.getFilesDir() + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY;
             File directory = new File(path);
+            InternalLogging.info(TAG, "Returning Regular Prio File: " + path);
             return this.nextAvailableFileInDirectory(directory);
         }
 
@@ -236,18 +247,29 @@ class Persistence {
             if (directory != null) {
                 File[] files = directory.listFiles();
                 File file;
+
                 if ((files != null) && (files.length > 0)) {
-                    for (int i = 0; i < files.length - 1; i++) {
+                    for (int i = 0; i <= files.length - 1; i++) {
+                        InternalLogging.info(TAG, "The directory " + directory.toString(), " ITERATING over " + files.length + " files" );
+
                         file = files[i];
+                        InternalLogging.info(TAG, "The directory " +file.toString(), " FOUND" );
+
                         if (!this.servedFiles.contains(file)) {
+                            InternalLogging.info(TAG, "The directory " + file.toString(), " ADDING TO SERVED AND RETURN" );
+
                             this.servedFiles.add(file);
                             return file;//we haven't served the file, return it
                         }
+                        else {
+                            InternalLogging.info(TAG, "The directory " + file.toString(), " WAS ALREADY SERVED" );
+                        }
                     }
-
                 }
-            }
+                InternalLogging.info(TAG, "The directory " + directory.toString(), " NO FILES" );
 
+            }
+            InternalLogging.info(TAG, "The directory " + directory.toString(), "Did not contain any unserved files" );
             return null; //no files in directory or no directory
         }
     }
