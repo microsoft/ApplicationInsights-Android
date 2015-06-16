@@ -32,10 +32,9 @@ public enum ApplicationInsights {
     private ApplicationInsightsConfig config;
 
     /**
-     * A flag, which determines if auto collection of sessions and page views should be disabled.
+     * A flag, which determines if auto collection of sessions and page views should be disabled from the start.
      * Default is false.
-     *
-     * @deprecated 1.0-beta.5 will have a feature to turn of autocollection at runtime
+     * The features can be enabled/disabled at runtime later
      */
     private boolean autoLifecycleCollectionDisabled;
 
@@ -194,7 +193,11 @@ public enum ApplicationInsights {
     }
 
     private void setupAndStartAutocollection() {
-        if (autoCollectionPossible("Initialization of AutoCollection at app start")) {
+        if(INSTANCE.autoLifecycleCollectionDisabled) {
+            InternalLogging.info(TAG, "Auto collection has been disabled at app start, it can" +
+            " be enabled using the various enableAuto...-Methods.");
+        }
+        else if (autoCollectionPossible("Initialization of AutoCollection at app start")) {
             AutoCollection.initialize(telemetryContext, this.config);
             enableAutoCollection();
         }
@@ -391,12 +394,38 @@ public enum ApplicationInsights {
      *
      * @param disabled if set to true, the auto collection feature will be disabled
      * @deprecated with 1.0-beta.5
-     * Use {@link ApplicationInsights#disableAutoCollection()} or the more specific
+     * To enable/disable at runtime, use {@link ApplicationInsights#disableAutoCollection()} or the more specific
      * {@link ApplicationInsights#disableAutoSessionManagement()},
      * {@link ApplicationInsights#disableAutoAppearanceTracking()} and
      * {@link ApplicationInsights#disableAutoPageViewTracking()}
+     *
      */
     public static void setAutoCollectionDisabled(boolean disabled) {
+        if (!isConfigured) {
+            InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
+                  "ApplicationInsights has not been setup correctly.");
+            return;
+        }
+        if (isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
+                  "ApplicationInsights has already been started.");
+            return;
+        }
+        INSTANCE.autoLifecycleCollectionDisabled = disabled;
+    }
+
+    /**
+     * Enable / disable auto collection of telemetry data at startup.
+     *
+     * @param disabled if set to true, the auto collection feature will be disabled at app start
+     * To enable/disable auto collection features at runtime, use
+     * {@link ApplicationInsights#disableAutoCollection() or the more specific
+     * {@link ApplicationInsights#disableAutoSessionManagement()},
+     * {@link ApplicationInsights#disableAutoAppearanceTracking()} and
+     * {@link ApplicationInsights#disableAutoPageViewTracking()}
+     *
+     */
+    public static void setAutoCollectionDisabledAtStartup(boolean disabled) {
         if (!isConfigured) {
             InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
                   "ApplicationInsights has not been setup correctly.");
