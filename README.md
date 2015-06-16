@@ -25,12 +25,12 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 ## <a name="1"></a> 1. Release Notes
 
 * The SDK is now built using the Android Tools Gradle plugin 1.2.3
-* * Fix a null pointer exception in ```LifecycleTracking```[#43]("https://github.com/Microsoft/ApplicationInsights-Android/pull/43")
-* Refactored Autocollection – ```LifecycleTracking```has been deprecated [#51]("https://github.com/Microsoft/ApplicationInsights-Android/pull/51")
-* Fix for null pointer exceptions when trying to serialize ```null``` [#45]("https://github.com/Microsoft/ApplicationInsights-Android/pull/45")
-* Fix for ```Concurrent Modification Exception``` in case the same Telemetry-Object was after it was modified [#44]("https://github.com/Microsoft/ApplicationInsights-Android/pull/44")
-* **Fix for ```ClassNotFoundException``` when running the SDK on an Android 2.3 device** [#48]("https://github.com/Microsoft/ApplicationInsights-Android/pull/48")
-* **Fix a bug that was introduced in 1.0-beta.4 that caused crashes not to be sent under some circumstances** [#52]("https://github.com/Microsoft/ApplicationInsights-Android/pull/52") & [Commit]("https://github.com/Microsoft/ApplicationInsights-Android/commit/e3b51e7927f238cc123c50b654fbeab448ba6df6")
+* Fix a null pointer exception in ```LifecycleTracking```[#43](https://github.com/Microsoft/ApplicationInsights-Android/pull/43)
+* Refactored Autocollection – ```LifecycleTracking```has been deprecated [#51](https://github.com/Microsoft/ApplicationInsights-Android/pull/51)
+* Fix for null pointer exceptions when trying to serialize ```null``` [#45](https://github.com/Microsoft/ApplicationInsights-Android/pull/45)
+* Fix for ```Concurrent Modification Exception``` in case the same Telemetry-Object was after it was modified [#44](https://github.com/Microsoft/ApplicationInsights-Android/pull/44)
+* **Fix for ```ClassNotFoundException``` when running the SDK on an Android 2.3 device** [#48](https://github.com/Microsoft/ApplicationInsights-Android/pull/48)
+* **Fix a bug that was introduced in 1.0-beta.4 that caused crashes not to be sent under some circumstances** [#52](https://github.com/Microsoft/ApplicationInsights-Android/pull/52) & [e3b51e7927f238cc123c50b654fbeab448ba6df6](https://github.com/Microsoft/ApplicationInsights-Android/commit/e3b51e7927f238cc123c50b654fbeab448ba6df6)
 
 
 ##<a name="2"></a> 2. Breaking Changes & deprecations
