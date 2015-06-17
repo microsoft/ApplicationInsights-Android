@@ -2,10 +2,8 @@ require 'rubygems'
 require 'rspec'
 require 'rspec/expectations'
 require 'appium_lib'
-require 'byebug'
 
 RSpec.configure do |config|
-  config.color_enabled = true
   config.before(:all) do
     options = {
       caps: {
