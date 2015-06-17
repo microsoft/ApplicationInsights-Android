@@ -89,12 +89,18 @@ public enum ApplicationInsights {
     private static boolean isSetupAndRunning;
 
     /**
+     * The type of channel to use for logging
+     */
+    private ChannelType channelType;
+
+    /**
      * Create ApplicationInsights instance
      */
     ApplicationInsights() {
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
         this.autoLifecycleCollectionDisabled = false;
+        this.channelType = ChannelType.Default;
         this.config = new ApplicationInsightsConfig();
     }
 
@@ -212,7 +218,7 @@ public enum ApplicationInsights {
             SyncUtil.getInstance().start(INSTANCE.getApplication());
         } else {
             InternalLogging.warn(TAG, "Couldn't turn on SyncUtil because given application " +
-                  "was null");
+                    "was null");
         }
     }
 
@@ -221,7 +227,8 @@ public enum ApplicationInsights {
 
         Persistence.initialize(context);
         Sender.initialize(this.config);
-        Channel.initialize(this.config);
+        ChannelManager.initialize(channelType);
+        //Channel.initialize(this.config);
 
         // Initialize Telemetry
         TelemetryClient.initialize(!telemetryDisabled);
@@ -241,7 +248,7 @@ public enum ApplicationInsights {
                   "ApplicationInsights has not been started, yet.");
             return;
         }
-        Channel.getInstance().synchronize();
+        ChannelManager.getInstance().getChannel().synchronize();
     }
 
     /**
@@ -364,7 +371,7 @@ public enum ApplicationInsights {
         }
         if (isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not enable/disable exception tracking, because " +
-                  "ApplicationInsights has already been started.");
+                    "ApplicationInsights has already been started.");
             return;
         }
         INSTANCE.exceptionTrackingDisabled = disabled;
@@ -451,7 +458,7 @@ public enum ApplicationInsights {
     /**
      * Sets properties which are common to all telemetry sent form this client.
      *
-     * @param commonProperties a dictionary of properties to enqueue with all telemetry.
+     * @param commonProperties a dictionary of properties to log with all telemetry.
      */
     public static void setCommonProperties(Map<String, String> commonProperties) {
         if (!isConfigured) {
@@ -593,6 +600,29 @@ public enum ApplicationInsights {
             INSTANCE.userId = userId;
         }
     }
+
+    /**
+     * Sets the channel type to be used for logging
+     * @param channelType The channel type to use
+     */
+    public static void setChannelType(ChannelType channelType) {
+        if(isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Cannot set channel type, because " +
+                    "ApplicationInsights has already been started.");
+            return;
+        }
+
+        INSTANCE.channelType = channelType;
+    }
+
+    /**
+     * Gets the currently used channel type
+     * @return The current channel type.
+     */
+    public static ChannelType getChannelType() {
+        return INSTANCE.channelType;
+    }
+
 
     /**
      * Get the instrumentation key associated with this app.

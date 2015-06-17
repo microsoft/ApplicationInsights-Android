@@ -2,8 +2,12 @@ package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.library.config.ISenderConfig;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class MockSender extends Sender {
@@ -11,42 +15,49 @@ public class MockSender extends Sender {
     public int responseCode;
     public CountDownLatch sendSignal;
     public CountDownLatch responseSignal;
-    private String lastResponse;
+    public List<String> payloads;
+    public List<String> responses;
+    public List<Integer> responseCodes;
 
-    public MockSender(CountDownLatch sendSignal,
-                      CountDownLatch responseSignal,
+    public MockSender(int count,
                       ISenderConfig config) {
         super(config);
         this.responseCode = 0;
-        this.sendSignal = sendSignal;
-        this.responseSignal = responseSignal;
-        this.lastResponse = null;
+        this.sendSignal = new CountDownLatch(count);
+        this.responseSignal = new CountDownLatch(count);
+        this.payloads = new ArrayList<String>();
+        this.responses = new ArrayList<String>();
+        this.responseCodes = new ArrayList<Integer>();
+        this.setInstance(this);
     }
 
-    public String getLastResponse() {
-        if (this.lastResponse == null) {
-            return "";
-        } else {
-            return this.lastResponse;
+    // make singleton getter here
+
+    public void flush(int count) {
+        for(int i = 0; i < count; i++) {
+            super.sendNextFile();
         }
     }
 
-//    @Override
-//    protected void send(IJsonSerializable[] data) {
-//        this.sendSignal.countDown();
-//        super.send(data);
-//    }
+    @Override
+    protected void sendRequestWithPayload(String payload, File fileToSend) throws IOException {
+        super.sendRequestWithPayload(payload, fileToSend);
+        this.payloads.add(prettyPrintJSON(payload));
+        this.sendSignal.countDown();
+    }
 
-    //TODO fix unit tests
+    @Override
+    protected void onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
+        super.onResponse(connection, responseCode, payload, fileToSend);
+        this.responseCodes.add(responseCode);
+        this.responseSignal.countDown();
+    }
 
-//    @Override
-//    protected String onResponse(HttpURLConnection connection, int responseCode, String payload) {
-//        String response = super.onResponse(connection, responseCode, payload);
-//        this.lastResponse = prettyPrintJSON(response);
-//        this.responseCode = responseCode;
-//        this.responseSignal.countDown();
-//        return response;
-//    }
+    @Override
+    protected void readResponse(HttpURLConnection connection, StringBuilder builder) {
+        super.readResponse(connection, builder);
+        this.responses.add(prettyPrintJSON(builder.toString()));
+    }
 
     private String prettyPrintJSON(String payload) {
         if (payload == null)

@@ -374,41 +374,43 @@ class TelemetryContext {
         int width;
         int height;
 
-        WindowManager wm = (WindowManager) context.getSystemService(
-              Context.WINDOW_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            Point size = new Point();
-            wm.getDefaultDisplay().getRealSize(size);
-            width = size.x;
-            height = size.y;
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            try {
-                //We have to use undocumented API here. Android 4.0 introduced soft buttons for
-                //back, home and menu, but there's no API present to get the real display size
-                //all available methods only return the size of the contentview.
-                Method mGetRawW = Display.class.getMethod("getRawWidth");
-                Method mGetRawH = Display.class.getMethod("getRawHeight");
-                Display display = wm.getDefaultDisplay();
-                width = (Integer) mGetRawW.invoke(display);
-                height = (Integer) mGetRawH.invoke(display);
-            } catch (Exception ex) {
+        if(context != null) {
+            WindowManager wm = (WindowManager) context.getSystemService(
+                    Context.WINDOW_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 Point size = new Point();
-                wm.getDefaultDisplay().getSize(size);
+                wm.getDefaultDisplay().getRealSize(size);
                 width = size.x;
                 height = size.y;
-                InternalLogging.warn(TAG, "Couldn't determine screen resolution: " + ex.toString());
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+                try {
+                    //We have to use undocumented API here. Android 4.0 introduced soft buttons for
+                    //back, home and menu, but there's no API present to get the real display size
+                    //all available methods only return the size of the contentview.
+                    Method mGetRawW = Display.class.getMethod("getRawWidth");
+                    Method mGetRawH = Display.class.getMethod("getRawHeight");
+                    Display display = wm.getDefaultDisplay();
+                    width = (Integer) mGetRawW.invoke(display);
+                    height = (Integer) mGetRawH.invoke(display);
+                } catch (Exception ex) {
+                    Point size = new Point();
+                    wm.getDefaultDisplay().getSize(size);
+                    width = size.x;
+                    height = size.y;
+                    InternalLogging.warn(TAG, "Couldn't determine screen resolution: " + ex.toString());
+                }
+
+            } else {
+                //Use old, and now deprecated API to get width and height of the display
+                Display d = wm.getDefaultDisplay();
+                width = d.getWidth();
+                height = d.getHeight();
             }
 
-        } else {
-            //Use old, and now deprecated API to get width and height of the display
-            Display d = wm.getDefaultDisplay();
-            width = d.getWidth();
-            height = d.getHeight();
+            resolutionString = String.valueOf(height) + "x" + String.valueOf(width);
+
+            this.device.setScreenResolution(resolutionString);
         }
-
-        resolutionString = String.valueOf(height) + "x" + String.valueOf(width);
-
-        this.device.setScreenResolution(resolutionString);
     }
 
     /**
