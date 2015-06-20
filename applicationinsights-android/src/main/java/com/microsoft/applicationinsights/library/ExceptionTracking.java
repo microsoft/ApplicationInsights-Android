@@ -13,6 +13,7 @@ class ExceptionTracking implements UncaughtExceptionHandler {
     protected UncaughtExceptionHandler preexistingExceptionHandler;
 
     private boolean ignoreDefaultHandler;
+    private static boolean ignoreExceptions;
 
     /**
      * Constructs a new instance of the ExceptionTracking class
@@ -70,19 +71,25 @@ class ExceptionTracking implements UncaughtExceptionHandler {
      */
     @Override
     public void uncaughtException(Thread thread, Throwable exception) {
-        Map<String, String> properties = null;
-        if (thread != null) {
-            properties = new LinkedHashMap<String, String>();
-            properties.put("threadName", thread.getName());
-            properties.put("threadId", Long.toString(thread.getId()));
-            properties.put("threadPriority", Integer.toString(thread.getPriority()));
-        }
 
-        // track the crash
-        Thread executor = new Thread(new TrackDataOperation(TrackDataOperation.DataType.UNHANDLED_EXCEPTION,
-                exception, properties));
-        executor.setDaemon(false);
-        executor.start();
+        if(!ignoreExceptions){
+            Map<String, String> properties = null;
+            if (thread != null) {
+                properties = new LinkedHashMap<String, String>();
+                properties.put("threadName", thread.getName());
+                properties.put("threadId", Long.toString(thread.getId()));
+                properties.put("threadPriority", Integer.toString(thread.getPriority()));
+            }
+
+            // track the crash
+            Thread executor = new Thread(new TrackDataOperation(TrackDataOperation.DataType.UNHANDLED_EXCEPTION,
+                    exception, properties));
+
+            executor.start();
+        }else{
+            InternalLogging.info(TAG,
+                    "Exception ignored.", "");
+        }
 
         // invoke the existing handler if requested and if it exists
         if (!this.ignoreDefaultHandler && this.preexistingExceptionHandler != null) {
@@ -99,4 +106,9 @@ class ExceptionTracking implements UncaughtExceptionHandler {
         android.os.Process.killProcess(android.os.Process.myPid());
         System.exit(10);
     }
+
+    public static void setIgnoreExceptions(boolean ignoreExceptions) {
+        ExceptionTracking.ignoreExceptions = ignoreExceptions;
+    }
+
 }
