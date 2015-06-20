@@ -16,6 +16,7 @@ import com.microsoft.applicationinsights.contracts.MetricData;
 import com.microsoft.applicationinsights.contracts.PageViewData;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
+import com.microsoft.applicationinsights.contracts.StackFrame;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
 import com.microsoft.applicationinsights.logging.InternalLogging;
@@ -404,10 +405,18 @@ class EnvelopeFactory {
     private ExceptionData getExceptionData(String type, String message, String stacktrace) {
 
         ExceptionDetails details = new ExceptionDetails();
-        details.setHasFullStack((stacktrace != null) ? true : false);
         details.setMessage(message);
-        details.setStack(stacktrace);
         details.setTypeName(type);
+
+        if(stacktrace != null){
+            details.setStack(stacktrace);
+            List<StackFrame> stackFrames = getStackframes(stacktrace);
+            if(stacktrace.length() >=1){
+                details.setParsedStack(getStackframes(stacktrace));
+                details.setHasFullStack(true);
+            }
+        }
+
 
         ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
         exceptions.add(details);
@@ -417,6 +426,52 @@ class EnvelopeFactory {
         data.setExceptions(exceptions);
 
         return data;
+    }
+
+    private List<StackFrame> getStackframes(String stacktrace){
+
+        List<StackFrame> frameList = null;
+
+        if(stacktrace != null){
+            frameList = new ArrayList<StackFrame>();
+            String[] lines = stacktrace.split("[\r\n]+");
+            for (String frameInfo : lines) {
+                frameList.add(getStackframe(frameInfo));
+            }
+        }
+        return frameList;
+    }
+
+    private StackFrame getStackframe(String line){
+
+        StackFrame frame = null;
+        if(line != null){
+            String[] frameComponents = line.split("\\s+");
+            if(frameComponents.length > 3){
+                frame = new StackFrame();
+                frame.setMethod(frameComponents[1] + frameComponents[2]);
+
+                int lastIndex = frameComponents.length-1;
+                String[] fileAndLine = frameComponents[lastIndex].split(":");
+
+                if(fileAndLine.length == 2 && parseInt(fileAndLine[1]) > 0){
+                    frame.setLine(parseInt(fileAndLine[1]));
+                    frame.setFileName(fileAndLine[0]);
+                }
+            }
+        }
+        return frame;
+    }
+
+    private int parseInt(String text){
+
+        int number = 0;
+
+        try {
+            number = Integer.parseInt(text);
+        } catch(NumberFormatException nfe) {}
+
+        return number;
     }
 
     protected boolean isConfigured() {
