@@ -9,6 +9,8 @@ import com.microsoft.applicationinsights.contracts.DataPoint;
 import com.microsoft.applicationinsights.contracts.DataPointType;
 import com.microsoft.applicationinsights.contracts.Envelope;
 import com.microsoft.applicationinsights.contracts.EventData;
+import com.microsoft.applicationinsights.contracts.ExceptionData;
+import com.microsoft.applicationinsights.contracts.ExceptionDetails;
 import com.microsoft.applicationinsights.contracts.MessageData;
 import com.microsoft.applicationinsights.contracts.MetricData;
 import com.microsoft.applicationinsights.contracts.PageViewData;
@@ -248,6 +250,24 @@ class EnvelopeFactory {
     }
 
     /**
+     * Creates information about an handled or unhandled exception to Application Insights.
+     *
+     *  @param type the exception type
+     *  @param message the exception message
+     *  @param stacktrace the stacktrace for the exception
+     * @return an Envelope object, which contains a handled or unhandled exception
+     */
+    protected Envelope createExceptionEnvelope(String type, String message, String stacktrace) {
+        Envelope envelope = null;
+        if (isConfigured()) {
+            ExceptionData telemetry = this.getExceptionData(type, message, stacktrace);
+
+            envelope = createEnvelope(telemetry);
+        }
+        return envelope;
+    }
+
+    /**
      * Creates information about a page view for Application Insights. This method gets called by a
      * CreateTelemetryDataTask in order to create and forward data on a background thread.
      *
@@ -371,6 +391,32 @@ class EnvelopeFactory {
         crashData.setProperties(properties);
 
         return crashData;
+    }
+
+    /**
+     * Create the ExceptionData object.
+     *
+     * @param type  The name of the exception type
+     * @param message The exception message
+     * @param stacktrace The stacktrace for the exception
+     * @return a ExceptionData object that contains the stacktrace and context info
+     */
+    private ExceptionData getExceptionData(String type, String message, String stacktrace) {
+
+        ExceptionDetails details = new ExceptionDetails();
+        details.setHasFullStack((stacktrace != null) ? true : false);
+        details.setMessage(message);
+        details.setStack(stacktrace);
+        details.setTypeName(type);
+
+        ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
+        exceptions.add(details);
+
+        ExceptionData data = new ExceptionData();
+        data.setHandledAt("");
+        data.setExceptions(exceptions);
+
+        return data;
     }
 
     protected boolean isConfigured() {

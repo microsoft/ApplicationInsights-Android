@@ -21,10 +21,13 @@ class TrackDataOperation implements Runnable {
         PAGE_VIEW,
         HANDLED_EXCEPTION,
         UNHANDLED_EXCEPTION,
+        MANAGED_EXCEPTION,
         NEW_SESSION
     }
 
     private String name;
+    private String exceptionMessage;
+    private String exceptionStacktrace;
     private Map<String, String> properties;
     private Map<String, Double> measurements;
     private final DataType type;
@@ -36,6 +39,16 @@ class TrackDataOperation implements Runnable {
         this.type = DataType.NONE;
         try {
             this.telemetry = (ITelemetry)deepCopy(telemetry);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected TrackDataOperation(DataType type, String name) {
+        this.type = type;
+        try {
+            this.name = (String)deepCopy(name);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -90,7 +103,21 @@ class TrackDataOperation implements Runnable {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    protected TrackDataOperation(DataType type,
+                                 String name,
+                                 String message,
+                                 String stacktrace) {
+        this.type = type; // no need to copy as enum is pass by value
+        try {
+            this.name = (String) deepCopy(name);
+            this.exceptionMessage = (String) deepCopy(message);
+            this.exceptionStacktrace = (String) deepCopy(stacktrace);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -98,6 +125,8 @@ class TrackDataOperation implements Runnable {
         Envelope envelope = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
             envelope = EnvelopeFactory.getInstance().createExceptionEnvelope(this.exception, this.properties);
+        }else if ((this.type == DataType.MANAGED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
+            envelope = EnvelopeFactory.getInstance().createExceptionEnvelope(this.name, this.exceptionMessage, this.exceptionStacktrace);
         } else if (Persistence.getInstance().isFreeSpaceAvailable(false)) {
             switch (this.type) {
                 case NONE:
@@ -130,7 +159,7 @@ class TrackDataOperation implements Runnable {
 
         if (envelope != null) {
             Channel channel = Channel.getInstance();
-            if (type == DataType.UNHANDLED_EXCEPTION) {
+            if (type == DataType.UNHANDLED_EXCEPTION || type == DataType.MANAGED_EXCEPTION) {
                 channel.processUnhandledException(envelope);
             } else {
                 channel.enqueue(envelope);
