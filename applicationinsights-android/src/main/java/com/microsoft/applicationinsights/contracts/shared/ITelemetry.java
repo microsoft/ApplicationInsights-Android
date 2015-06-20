@@ -18,6 +18,7 @@ public interface ITelemetry extends ITelemetryData {
      */
     void setVer(int ver);
 
+    int getVer();
     /**
      * Gets the envelope name for this telemetry object.
      */
