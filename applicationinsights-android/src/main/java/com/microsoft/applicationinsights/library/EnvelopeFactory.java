@@ -412,7 +412,7 @@ class EnvelopeFactory {
             details.setStack(stacktrace);
             List<StackFrame> stackFrames = getStackframes(stacktrace);
             if(stacktrace.length() >=1){
-                details.setParsedStack(getStackframes(stacktrace));
+                details.setParsedStack(stackFrames);
                 details.setHasFullStack(true);
             }
         }
@@ -436,7 +436,13 @@ class EnvelopeFactory {
             frameList = new ArrayList<StackFrame>();
             String[] lines = stacktrace.split("[\r\n]+");
             for (String frameInfo : lines) {
-                frameList.add(getStackframe(frameInfo));
+                StackFrame frame = getStackframe(frameInfo);
+                if(frame != null){
+                    frameList.add(frame);
+                }else{
+                    return null;
+                }
+
             }
         }
         return frameList;
