@@ -117,7 +117,7 @@ dependencies {
     compile 'com.github.microsoft.telemetry-client-for-android:AndroidCore:1.0'
     compile 'com.github.microsoft.telemetry-client-for-android:AndroidCll:1.0'
 
-    androidTestCompile 'org.mockito:mockito-core:2.+'
+    androidTestCompile 'org.mockito:mockito-core:2.0.17-beta'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
 
