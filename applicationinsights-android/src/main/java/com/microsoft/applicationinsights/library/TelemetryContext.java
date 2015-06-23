@@ -26,7 +26,6 @@ import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.reflect.Method;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -40,6 +39,7 @@ class TelemetryContext {
     protected static final String SHARED_PREFERENCES_KEY = "APP_INSIGHTS_CONTEXT";
     protected static final String USER_ID_KEY = "USER_ID";
     protected static final String USER_ACQ_KEY = "USER_ACQ";
+    protected static final String USER_ACCOUNT_ID_KEY = "USER_ACCOUNT_ID";
     private static final String TAG = "TelemetryContext";
 
     /**
@@ -100,10 +100,11 @@ class TelemetryContext {
     /**
      * Constructs a new INSTANCE of the Telemetry telemetryContext tag keys
      *
-     * @param context the context for this telemetryContext
+     * @param context            the context for this telemetryContext
+     * @param instrumentationKey the instrumentationkey for this application
+     * @param user               a custom user object that will be assiciated with the telemetry data
      */
-    public TelemetryContext(Context context, String instrumentationKey, String userId) {
-
+    protected TelemetryContext(Context context, String instrumentationKey, User user) {
         // get an INSTANCE of the shared preferences manager for persistent context fields
         this.settings = context.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         this.operation = new Operation();
@@ -112,7 +113,7 @@ class TelemetryContext {
         this.session = new Session();
         configSessionContext();
         this.user = new User();
-        configUserContext(userId);
+        configUserContext(user);
         this.internal = new Internal();
         configInternalContext(context);
         this.application = new Application();
@@ -272,30 +273,48 @@ class TelemetryContext {
     }
 
     /**
-     * Sets the user context
+     * Sets the user Id. This method has been made private to make sure it's not accessed from outside the SDK
+     * To customize the user context, use {@Link ApplicationInsights#setCustomUserContext}
+     *
+     * @param userId custom user id
      */
-    public void configUserContext(String userId) {
-        String userAcq;
-
+    protected void configUserContext(String userId) {
         if (userId == null) {
             // No custom user Id is given, so get this info from settings
             userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
-            userAcq = this.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
-
-            if (userId == null || userAcq == null) {
+            if (userId == null) {
                 // No settings available, generate new user info
                 userId = UUID.randomUUID().toString();
-                userAcq = Util.dateToISO8601(new Date());
-                saveUserInfo(userId, userAcq);
+                saveUserInfo(userId, null, null);
             }
         } else {
-            // UserId provided by the User, generate date
-            userAcq = Util.dateToISO8601(new Date());
-            saveUserInfo(userId, userAcq);
+            // UserId provided by the User
+            saveUserInfo(userId, null, null);
         }
 
         this.user.setId(userId);
-        this.user.setAccountAcquisitionDate(userAcq);
+    }
+
+    /**
+     * set the user for the user context associated with telemetry data.
+     *
+     * @param user The user object
+     *             In case the user object that is passed is null, a new user object will be generated.
+     *             If the user is missing a property, they will be generated, too.
+     */
+    public void configUserContext(User user) {
+        if (user == null) {
+            user = new User();
+        }
+
+        if (user.getId() == null) {
+            user.setId(UUID.randomUUID().toString());
+        }
+
+        this.saveUserInfo(user.getId(), user.getAccountAcquisitionDate(), user.getAccountId());
+        this.user.setAccountId(user.getAccountId());
+        this.user.setAccountAcquisitionDate((user.getAccountAcquisitionDate()));
+        this.user.setId(user.getId());
     }
 
     /**
@@ -303,11 +322,13 @@ class TelemetryContext {
      *
      * @param userId        the user ID
      * @param acqDateString the date of the acquisition as string
+     * @param accountId     the accountId
      */
-    private void saveUserInfo(String userId, String acqDateString) {
+    private void saveUserInfo(String userId, String acqDateString, String accountId) {
         SharedPreferences.Editor editor = this.settings.edit();
         editor.putString(TelemetryContext.USER_ID_KEY, userId);
         editor.putString(TelemetryContext.USER_ACQ_KEY, acqDateString);
+        editor.putString(TelemetryContext.USER_ACCOUNT_ID_KEY, accountId);
         editor.apply();
     }
 
@@ -374,9 +395,9 @@ class TelemetryContext {
         int width;
         int height;
 
-        if(context != null) {
+        if (context != null) {
             WindowManager wm = (WindowManager) context.getSystemService(
-                    Context.WINDOW_SERVICE);
+                  Context.WINDOW_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 Point size = new Point();
                 wm.getDefaultDisplay().getRealSize(size);
