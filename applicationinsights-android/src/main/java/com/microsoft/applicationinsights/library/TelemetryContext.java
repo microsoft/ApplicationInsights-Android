@@ -102,34 +102,6 @@ class TelemetryContext {
      *
      * @param context            the context for this telemetryContext
      * @param instrumentationKey the instrumentationkey for this application
-     * @param userId             custom userId that will be associated with telemetry data
-     * @deprecated use {@link TelemetryContext#TelemetryContext(Context, String, User)} instead
-     */
-    protected TelemetryContext(Context context, String instrumentationKey, String userId) {
-        // get an INSTANCE of the shared preferences manager for persistent context fields
-        this.settings = context.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-        this.operation = new Operation();
-        this.device = new Device();
-        configDeviceContext(context);
-        this.session = new Session();
-        configSessionContext();
-        this.user = new User();
-        configUserContext(userId);
-        this.internal = new Internal();
-        configInternalContext(context);
-        this.application = new Application();
-        configAppContext(context);
-
-        this.lastSessionId = null;
-        this.instrumentationKey = instrumentationKey;
-        this.cachedTags = getCachedTags();
-    }
-
-    /**
-     * Constructs a new INSTANCE of the Telemetry telemetryContext tag keys
-     *
-     * @param context            the context for this telemetryContext
-     * @param instrumentationKey the instrumentationkey for this application
      * @param user               a custom user object that will be assiciated with the telemetry data
      */
     protected TelemetryContext(Context context, String instrumentationKey, User user) {
