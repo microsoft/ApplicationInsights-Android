@@ -261,7 +261,6 @@ public enum ApplicationInsights {
 
     /**
      * enables all auto-collection features
-     * <p/>
      * Requires ApplicationInsights to be setup with an Application object
      */
     public static void enableAutoCollection() {
