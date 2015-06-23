@@ -270,9 +270,9 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      * @param savedInstanceState the bundle
      */
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        int count = this.activityCount.getAndIncrement();
         synchronized (AutoCollection.LOCK) {
-            if (count == 0) {
+            int count = this.activityCount.getAndIncrement();
+            if (count == 1) {
                 if (autoSessionManagementEnabled) {
                     InternalLogging.info(TAG, "Starting & tracking session");
                     TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
