@@ -26,7 +26,6 @@ import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.reflect.Method;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -308,39 +307,26 @@ class TelemetryContext {
      * @param userId custom user id
      */
     protected void configUserContext(String userId) {
-        String userAcq;
-        String accountId;
-
         if (userId == null) {
             // No custom user Id is given, so get this info from settings
             userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
-            userAcq = this.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
-            accountId = this.settings.getString(TelemetryContext.USER_ACCOUNT_ID_KEY, null);
-            if (userId == null || userAcq == null || accountId == null) {
+            if (userId == null) {
                 // No settings available, generate new user info
                 userId = UUID.randomUUID().toString();
-                userAcq = Util.dateToISO8601(new Date());
-                accountId = UUID.randomUUID().toString();
-
-                saveUserInfo(userId, userAcq, accountId);
+                saveUserInfo(userId, null, null);
             }
         } else {
-            // UserId provided by the User, generate date & account ID
-            userAcq = Util.dateToISO8601(new Date());
-            accountId = UUID.randomUUID().toString();
-            saveUserInfo(userId, userAcq, accountId);
+            // UserId provided by the User
+            saveUserInfo(userId, null, null);
         }
 
         this.user.setId(userId);
-        this.user.setAccountAcquisitionDate(userAcq);
-        this.user.setAccountId(accountId);
     }
 
     /**
      * set the user for the user context associated with telemetry data.
      *
      * @param user The user object
-     *             <p/>
      *             In case the user object that is passed is null, a new user object will be generated.
      *             If the user is missing a property, they will be generated, too.
      */
@@ -352,12 +338,7 @@ class TelemetryContext {
         if (user.getId() == null) {
             user.setId(UUID.randomUUID().toString());
         }
-        if (user.getAccountAcquisitionDate() == null) {
-            user.setAccountAcquisitionDate(Util.dateToISO8601(new Date()));
-        }
-        if (user.getAccountId() == null) {
-            user.setAccountId(UUID.randomUUID().toString());
-        }
+
         this.saveUserInfo(user.getId(), user.getAccountAcquisitionDate(), user.getAccountId());
         this.user.setAccountId(user.getAccountId());
         this.user.setAccountAcquisitionDate((user.getAccountAcquisitionDate()));
