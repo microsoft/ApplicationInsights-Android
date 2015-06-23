@@ -188,7 +188,20 @@ public enum ApplicationInsights {
                 this.instrumentationKey = readInstrumentationKey(context);
             }
 
-            this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
+            if(this.user != null) {
+                //the dev has use setCustomUserContext to configure the user object
+                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
+            }
+            else if(this.userId != null) {
+                //in case the dev uses deprecated method to set the user's ID
+                this.user = new User();
+                this.user.setId(this.userId);
+                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
+            }
+            else {
+                //in case the dev doesn't use a custom user object
+                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, new User());
+            }
 
             initializePipeline(context);
             startSyncWhenBackgrounding();
