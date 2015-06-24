@@ -112,7 +112,11 @@ if (!this.hasProperty('bintray_user') ||
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile 'org.mockito:mockito-core:2.+'
+
+    compile('com.github.microsoft.telemetry-client-for-android:SharedTelemetryContracts:1.0')
+    compile 'com.github.microsoft.telemetry-client-for-android:AndroidCll:1.0'
+
+    androidTestCompile 'org.mockito:mockito-core:2.0.17-beta'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
 

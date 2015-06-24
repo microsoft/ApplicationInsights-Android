@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
@@ -60,8 +61,16 @@ public enum ApplicationInsights {
 
     /**
      * A custom user ID used for sending telemetry data.
+     *
+     * @deprecated use user-property instead
      */
     private String userId;
+
+    /**
+     * A custom user object for sending telemetry data. Replaces
+     * userId as we allow more configuration of the user object
+     */
+    private User user;
 
     /**
      * The weakContext associated with Application Insights.
@@ -89,16 +98,22 @@ public enum ApplicationInsights {
     private static boolean isSetupAndRunning;
 
     /**
+     * The type of channel to use for logging
+     */
+    private ChannelType channelType;
+
+    /**
      * Create ApplicationInsights instance
      */
     ApplicationInsights() {
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
         this.autoLifecycleCollectionDisabled = false;
+        this.channelType = ChannelType.Default;
         this.config = new ApplicationInsightsConfig();
     }
 
-      /**
+    /**
      * Configure Application Insights
      * Note: This should be called before start
      *
@@ -173,7 +188,20 @@ public enum ApplicationInsights {
                 this.instrumentationKey = readInstrumentationKey(context);
             }
 
-            this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, userId);
+            if(this.user != null) {
+                //the dev has use setCustomUserContext to configure the user object
+                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
+            }
+            else if(this.userId != null) {
+                //in case the dev uses deprecated method to set the user's ID
+                this.user = new User();
+                this.user.setId(this.userId);
+                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
+            }
+            else {
+                //in case the dev doesn't use a custom user object
+                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, new User());
+            }
 
             initializePipeline(context);
             startSyncWhenBackgrounding();
@@ -193,18 +221,17 @@ public enum ApplicationInsights {
     }
 
     private void setupAndStartAutocollection() {
-        if(INSTANCE.autoLifecycleCollectionDisabled) {
+        if (INSTANCE.autoLifecycleCollectionDisabled) {
             InternalLogging.info(TAG, "Auto collection has been disabled at app start, it can" +
-            " be enabled using the various enableAuto...-Methods.");
-        }
-        else if (autoCollectionPossible("Initialization of AutoCollection at app start")) {
+                  " be enabled using the various enableAuto...-Methods.");
+        } else if (autoCollectionPossible("Initialization of AutoCollection at app start")) {
             AutoCollection.initialize(telemetryContext, this.config);
             enableAutoCollection();
         }
     }
 
     private void startSyncWhenBackgrounding() {
-        if(!Util.isLifecycleTrackingAvailable()) {
+        if (!Util.isLifecycleTrackingAvailable()) {
             return;
         }
 
@@ -221,7 +248,8 @@ public enum ApplicationInsights {
 
         Persistence.initialize(context);
         Sender.initialize(this.config);
-        Channel.initialize(this.config);
+        ChannelManager.initialize(channelType);
+        //Channel.initialize(this.config);
 
         // Initialize Telemetry
         TelemetryClient.initialize(!telemetryDisabled);
@@ -241,12 +269,11 @@ public enum ApplicationInsights {
                   "ApplicationInsights has not been started, yet.");
             return;
         }
-        Channel.getInstance().synchronize();
+        ChannelManager.getInstance().getChannel().synchronize();
     }
 
     /**
      * enables all auto-collection features
-     *
      * Requires ApplicationInsights to be setup with an Application object
      */
     public static void enableAutoCollection() {
@@ -259,9 +286,9 @@ public enum ApplicationInsights {
      * disables all auto-collection features
      */
     public static void disableAutoCollection() {
-            disableAutoAppearanceTracking();
-            disableAutoPageViewTracking();
-            disableAutoSessionManagement();
+        disableAutoAppearanceTracking();
+        disableAutoPageViewTracking();
+        disableAutoSessionManagement();
     }
 
     /**
@@ -270,7 +297,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoPageViewTracking() {
-        if(autoCollectionPossible("Auto PageView Tracking")) {
+        if (autoCollectionPossible("Auto PageView Tracking")) {
             AutoCollection.enableAutoPageViews(INSTANCE.getApplication());
         }
     }
@@ -281,7 +308,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoPageViewTracking() {
-        if(autoCollectionPossible("Auto PageView Tracking")) {
+        if (autoCollectionPossible("Auto PageView Tracking")) {
             AutoCollection.disableAutoPageViews();
         }
     }
@@ -292,7 +319,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoSessionManagement() {
-        if(autoCollectionPossible("Auto Session Management")) {
+        if (autoCollectionPossible("Auto Session Management")) {
             AutoCollection.enableAutoSessionManagement(INSTANCE.getApplication());
         }
     }
@@ -303,7 +330,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoSessionManagement() {
-        if(autoCollectionPossible("Auto Session Management")) {
+        if (autoCollectionPossible("Auto Session Management")) {
             AutoCollection.disableAutoSessionManagement();
         }
     }
@@ -314,7 +341,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void enableAutoAppearanceTracking() {
-        if(autoCollectionPossible("Auto Appearance")) {
+        if (autoCollectionPossible("Auto Appearance")) {
             AutoCollection.enableAutoAppearanceTracking(INSTANCE.getApplication());
         }
     }
@@ -325,7 +352,7 @@ public enum ApplicationInsights {
      * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
      */
     public static void disableAutoAppearanceTracking() {
-        if(autoCollectionPossible("Auto Appearance")) {
+        if (autoCollectionPossible("Auto Appearance")) {
             AutoCollection.disableAutoAppearanceTracking();
         }
     }
@@ -398,7 +425,6 @@ public enum ApplicationInsights {
      * {@link ApplicationInsights#disableAutoSessionManagement()},
      * {@link ApplicationInsights#disableAutoAppearanceTracking()} and
      * {@link ApplicationInsights#disableAutoPageViewTracking()}
-     *
      */
     public static void setAutoCollectionDisabled(boolean disabled) {
         if (!isConfigured) {
@@ -418,12 +444,11 @@ public enum ApplicationInsights {
      * Enable / disable auto collection of telemetry data at startup.
      *
      * @param disabled if set to true, the auto collection feature will be disabled at app start
-     * To enable/disable auto collection features at runtime, use
-     * {@link ApplicationInsights#disableAutoCollection()} or the more specific
-     * {@link ApplicationInsights#disableAutoSessionManagement()},
-     * {@link ApplicationInsights#disableAutoAppearanceTracking()} and
-     * {@link ApplicationInsights#disableAutoPageViewTracking()}
-     *
+     *                 To enable/disable auto collection features at runtime, use
+     *                 {@link ApplicationInsights#disableAutoCollection()} or the more specific
+     *                 {@link ApplicationInsights#disableAutoSessionManagement()},
+     *                 {@link ApplicationInsights#disableAutoAppearanceTracking()} and
+     *                 {@link ApplicationInsights#disableAutoPageViewTracking()}
      */
     public static void setAutoCollectionDisabledAtStartup(boolean disabled) {
         if (!isConfigured) {
@@ -451,7 +476,7 @@ public enum ApplicationInsights {
     /**
      * Sets properties which are common to all telemetry sent form this client.
      *
-     * @param commonProperties a dictionary of properties to enqueue with all telemetry.
+     * @param commonProperties a dictionary of properties to log with all telemetry.
      */
     public static void setCommonProperties(Map<String, String> commonProperties) {
         if (!isConfigured) {
@@ -568,6 +593,7 @@ public enum ApplicationInsights {
      * will generate a random ID.
      *
      * @param userId a user ID associated with the telemetry data
+     * @deprecated use {@link ApplicationInsights#setCustomUserContext(User)} instead
      */
     public static void setUserId(String userId) {
         if (isSetupAndRunning) {
@@ -576,6 +602,45 @@ public enum ApplicationInsights {
             INSTANCE.userId = userId;
         }
     }
+
+    /**
+     * Set a custom user to be associated with the telemetry data.
+     *
+     * @param user a custom user object. If the param is null or one of the supported properties is null,
+     *            the missing property will be generated by the SDK
+     */
+    public static void setCustomUserContext(User user) {
+        if (isSetupAndRunning) {
+            INSTANCE.telemetryContext.configUserContext(user);
+        } else {
+            INSTANCE.user = user;
+        }
+    }
+
+    /**
+     * Sets the channel type to be used for logging
+     *
+     * @param channelType The channel type to use
+     */
+    public static void setChannelType(ChannelType channelType) {
+        if (isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Cannot set channel type, because " +
+                  "ApplicationInsights has already been started.");
+            return;
+        }
+
+        INSTANCE.channelType = channelType;
+    }
+
+    /**
+     * Gets the currently used channel type
+     *
+     * @return The current channel type.
+     */
+    public static ChannelType getChannelType() {
+        return INSTANCE.channelType;
+    }
+
 
     /**
      * Get the instrumentation key associated with this app.

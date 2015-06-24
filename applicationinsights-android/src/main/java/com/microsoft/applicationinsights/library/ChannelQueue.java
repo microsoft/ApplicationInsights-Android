@@ -2,6 +2,7 @@ package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
+import com.microsoft.telemetry.IJsonSerializable;
 
 import java.util.LinkedList;
 import java.util.List;

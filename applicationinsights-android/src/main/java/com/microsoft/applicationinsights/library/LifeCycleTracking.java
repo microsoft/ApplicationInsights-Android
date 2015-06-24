@@ -293,10 +293,10 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
     public void onTrimMemory(int level) {
         if (level == TRIM_MEMORY_UI_HIDDEN) {
             InternalLogging.warn(TAG, "UI of the app is hidden, persisting data");
-            Channel.getInstance().synchronize();
+            ChannelManager.getInstance().getChannel().synchronize();
         } else if (level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_LOW) {
             InternalLogging.warn(TAG, "Memory running low, persisting data");
-            Channel.getInstance().synchronize();
+            ChannelManager.getInstance().getChannel().synchronize();
         }
     }
 
@@ -309,7 +309,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
     public void onLowMemory() {
         // unused but required to implement ComponentCallbacks
         InternalLogging.warn(TAG, "Received onLowMemory()-Callback, persisting data");
-        Channel.getInstance().synchronize();
+        ChannelManager.getInstance().getChannel().synchronize();
 
     }
 
