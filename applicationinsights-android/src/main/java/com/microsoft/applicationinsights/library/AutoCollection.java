@@ -294,40 +294,45 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      */
     public void onActivityResumed(Activity activity) {
         synchronized (AutoCollection.LOCK) {
-            //Session Management
-            int count = this.activityCount.getAndIncrement();
-            if (count == 0) {
-                if (autoSessionManagementEnabled) {
-                    InternalLogging.info(TAG, "Starting & tracking session");
-                    TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
-                    new Thread(sessionOp).start();
-                } else {
-                    InternalLogging.info(TAG, "Session management disabled by the developer");
-                }
-                if (autoAppearanceTrackingEnabled) {
-                    //TODO track cold start as soon as it's available in new Schema.
-                }
+            sessionManagement();
+            sendPagewView(activity);
+        }
+    }
+
+    private void sendPagewView(Activity activity) {
+        if (autoPageViewsEnabled) {
+            InternalLogging.info(TAG, "New Pageview");
+            TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName(), null, null);
+            new Thread(pageViewOp).start();
+        }
+    }
+
+    private void sessionManagement() {
+        int count = this.activityCount.getAndIncrement();
+        if (count == 0) {
+            if (autoSessionManagementEnabled) {
+                InternalLogging.info(TAG, "Starting & tracking session");
+                TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
+                new Thread(sessionOp).start();
             } else {
-                //we should already have a session now
-                //check if the session should be renewed
-                long now = this.getTime();
-                long then = this.lastBackground.getAndSet(this.getTime());
-                boolean shouldRenew = ((now - then) >= this.config.getSessionIntervalMs());
-                InternalLogging.info(TAG, "Checking if we have to renew a session, time difference is: " + (now-then));
-
-                if (autoSessionManagementEnabled && shouldRenew) {
-                    InternalLogging.info(TAG, "Renewing session");
-                    this.telemetryContext.renewSessionId();
-                    TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
-                    new Thread(sessionOp).start();
-                }
+                InternalLogging.info(TAG, "Session management disabled by the developer");
             }
+            if (autoAppearanceTrackingEnabled) {
+                //TODO track cold start as soon as it's available in new Schema.
+            }
+        } else {
+            //we should already have a session now
+            //check if the session should be renewed
+            long now = this.getTime();
+            long then = this.lastBackground.getAndSet(this.getTime());
+            boolean shouldRenew = ((now - then) >= this.config.getSessionIntervalMs());
+            InternalLogging.info(TAG, "Checking if we have to renew a session, time difference is: " + (now-then));
 
-            //PageView Logic
-            if (autoPageViewsEnabled) {
-                InternalLogging.info(TAG, "New Pageview");
-                TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName(), null, null);
-                new Thread(pageViewOp).start();
+            if (autoSessionManagementEnabled && shouldRenew) {
+                InternalLogging.info(TAG, "Renewing session");
+                this.telemetryContext.renewSessionId();
+                TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
+                new Thread(sessionOp).start();
             }
         }
     }
