@@ -33,11 +33,22 @@ public enum ApplicationInsights {
     private ApplicationInsightsConfig config;
 
     /**
-     * A flag, which determines if auto collection of sessions and page views should be disabled from the start.
+     * A flag, which determines if auto page views should be disabled from the start.
      * Default is false.
-     * The features can be enabled/disabled at runtime later
      */
-    private boolean autoLifecycleCollectionDisabled;
+    private boolean autoPageViewsDisabled;
+
+    /**
+     * A flag, which determines if auto session management should be disabled from the start.
+     * Default is false.
+     */
+    private boolean autoSessionManagementDisabled;
+
+    /**
+     * A flag, which determines if auto appearance should be disabled from the start.
+     * Default is false.
+     */
+    private boolean autoAppearanceDisabled;
 
     /**
      * A flag, which determines if sending telemetry data should be disabled. Default is false.
@@ -108,7 +119,9 @@ public enum ApplicationInsights {
     ApplicationInsights() {
         this.telemetryDisabled = false;
         this.exceptionTrackingDisabled = false;
-        this.autoLifecycleCollectionDisabled = false;
+        this.autoAppearanceDisabled = false;
+        this.autoPageViewsDisabled = false;
+        this.autoSessionManagementDisabled = false;
         this.channelType = ChannelType.Default;
         this.config = new ApplicationInsightsConfig();
     }
@@ -188,24 +201,22 @@ public enum ApplicationInsights {
                 this.instrumentationKey = readInstrumentationKey(context);
             }
 
-            if(this.user != null) {
+            if (this.user != null) {
                 //the dev has use setCustomUserContext to configure the user object
                 this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
-            }
-            else if(this.userId != null) {
+            } else if (this.userId != null) {
                 //in case the dev uses deprecated method to set the user's ID
                 this.user = new User();
                 this.user.setId(this.userId);
                 this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
-            }
-            else {
+            } else {
                 //in case the dev doesn't use a custom user object
                 this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, new User());
             }
 
             initializePipeline(context);
             startSyncWhenBackgrounding();
-            setupAndStartAutocollection();
+            startAutoCollection();
             startCrashReporting();
 
             Sender.getInstance().sendDataOnAppStart();
@@ -220,13 +231,28 @@ public enum ApplicationInsights {
         }
     }
 
-    private void setupAndStartAutocollection() {
-        if (INSTANCE.autoLifecycleCollectionDisabled) {
-            InternalLogging.info(TAG, "Auto collection has been disabled at app start, it can" +
-                  " be enabled using the various enableAuto...-Methods.");
-        } else if (autoCollectionPossible("Initialization of AutoCollection at app start")) {
-            AutoCollection.initialize(telemetryContext, this.config);
-            enableAutoCollection();
+    /**
+     * Start/Stop AutoCollection features depending on user's settings.
+     * Will be called during start of the SDK and when enabling/disabling ALL autocollection features
+     */
+    private void startAutoCollection() {
+        if (autoCollectionPossible("Start of AutoCollection at app start.")) {
+            //if the SDK has already been started, activate/deactivate features
+            if (INSTANCE.autoAppearanceDisabled) {
+                disableAutoAppearanceTracking();
+            } else {
+                enableAutoAppearanceTracking();
+            }
+            if (INSTANCE.autoPageViewsDisabled) {
+                disableAutoPageViewTracking();
+            } else {
+                enableAutoPageViewTracking();
+            }
+            if (INSTANCE.autoSessionManagementDisabled) {
+                disableAutoSessionManagement();
+            } else {
+                enableAutoSessionManagement();
+            }
         }
     }
 
@@ -243,18 +269,27 @@ public enum ApplicationInsights {
         }
     }
 
+    /**
+     * Makes sure Persistence, Sender, ChannelManager, TelemetryClient and AutoCollection are initialized
+     * Call this before starting AutoCollection
+     *
+     * @param context application context
+     */
     private void initializePipeline(Context context) {
         EnvelopeFactory.initialize(telemetryContext, this.commonProperties);
 
         Persistence.initialize(context);
         Sender.initialize(this.config);
         ChannelManager.initialize(channelType);
-        //Channel.initialize(this.config);
 
         // Initialize Telemetry
         TelemetryClient.initialize(!telemetryDisabled);
 
         isSetupAndRunning = true;
+
+        if (autoCollectionPossible("Initialise AutoCollection")) {
+            AutoCollection.initialize(telemetryContext, this.config);
+        }
     }
 
     /**
@@ -273,10 +308,36 @@ public enum ApplicationInsights {
     }
 
     /**
-     * enables all auto-collection features
+     * Enable / disable ALL auto collection of telemetry data at startup.Call this before calling
+     * {@link ApplicationInsights#start()}
+     *
+     * @param disabled if set to true, the auto collection features will be disabled at app start
+     * @deprecated with 1.0-beta.6 use {@link ApplicationInsights#disableAutoCollection()} or
+     * the more specific
+     * {@link ApplicationInsights#disableAutoSessionManagement()},
+     * {@link ApplicationInsights#disableAutoAppearanceTracking()} and
+     * {@link ApplicationInsights#disableAutoPageViewTracking()} instead
+     */
+    public static void setAutoCollectionDisabledAtStartup(boolean disabled) {
+        INSTANCE.autoAppearanceDisabled = disabled;
+        INSTANCE.autoPageViewsDisabled = disabled;
+        INSTANCE.autoSessionManagementDisabled = disabled;
+        //don't call startAutoCollection() because setAutoCollectionDisabledAtStartup(disabled)
+        //was intended to be called
+        //before the developer calls start()
+    }
+
+    /**
+     * Enables all auto-collection features. Call this before
+     * {@link ApplicationInsights#start()} or when ApplicationInsights is already running to change
+     * AutoCollection settings at runtime.
+     * <p/>
      * Requires ApplicationInsights to be setup with an Application object
      */
     public static void enableAutoCollection() {
+        INSTANCE.autoAppearanceDisabled = false;
+        INSTANCE.autoPageViewsDisabled = false;
+        INSTANCE.autoSessionManagementDisabled = false;
         enableAutoAppearanceTracking();
         enableAutoPageViewTracking();
         enableAutoSessionManagement();
@@ -286,77 +347,93 @@ public enum ApplicationInsights {
      * disables all auto-collection features
      */
     public static void disableAutoCollection() {
+        INSTANCE.autoAppearanceDisabled = true;
+        INSTANCE.autoPageViewsDisabled = true;
+        INSTANCE.autoSessionManagementDisabled = true;
         disableAutoAppearanceTracking();
         disableAutoPageViewTracking();
         disableAutoSessionManagement();
     }
 
     /**
-     * Enable auto page view tracking. This will only work, if ApplicationInsights has been setup
-     * with an application. This method should only be called after
-     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     * Enable auto page view tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This featuee only works if ApplicationInsights has been setup
+     * with an application.
      */
     public static void enableAutoPageViewTracking() {
+        INSTANCE.autoPageViewsDisabled = false;
         if (autoCollectionPossible("Auto PageView Tracking")) {
             AutoCollection.enableAutoPageViews(INSTANCE.getApplication());
         }
     }
 
     /**
-     * Disable auto page view tracking. This will only work, if ApplicationInsights has been setup
-     * with an application. This method should only be called after
-     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     * Disable auto page view tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
      */
     public static void disableAutoPageViewTracking() {
+        INSTANCE.autoPageViewsDisabled = true;
         if (autoCollectionPossible("Auto PageView Tracking")) {
             AutoCollection.disableAutoPageViews();
         }
     }
 
     /**
-     * Enable auto session tracking. This will only work, if ApplicationInsights has been setup
-     * with an application. This method should only be called after
-     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     * Enable auto session management tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
      */
     public static void enableAutoSessionManagement() {
+        INSTANCE.autoSessionManagementDisabled = false;
         if (autoCollectionPossible("Auto Session Management")) {
             AutoCollection.enableAutoSessionManagement(INSTANCE.getApplication());
         }
     }
 
     /**
-     * Disable auto session tracking. This will only work, if ApplicationInsights has been setup
-     * with an application. This method should only be called after
-     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     * Disable auto session management tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
      */
     public static void disableAutoSessionManagement() {
+        INSTANCE.autoSessionManagementDisabled = true;
         if (autoCollectionPossible("Auto Session Management")) {
             AutoCollection.disableAutoSessionManagement();
         }
     }
 
     /**
-     * Enable auto appearance tracking. This will only work, if ApplicationInsights has been setup
-     * with an application. This method should only be called after
-     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     * Enable auto appearance management tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
      */
     public static void enableAutoAppearanceTracking() {
+        INSTANCE.autoAppearanceDisabled = false;
         if (autoCollectionPossible("Auto Appearance")) {
             AutoCollection.enableAutoAppearanceTracking(INSTANCE.getApplication());
         }
     }
 
     /**
-     * Disable auto appearance tracking. This will only work, if ApplicationInsights has been setup
-     * with an application. This method should only be called after
-     * {@link com.microsoft.applicationinsights.library.ApplicationInsights#start()}.
+     * Disable auto appearance management tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
      */
     public static void disableAutoAppearanceTracking() {
+        INSTANCE.autoAppearanceDisabled = true;
         if (autoCollectionPossible("Auto Appearance")) {
             AutoCollection.disableAutoAppearanceTracking();
         }
     }
 
+    /**
+     * Will check if autocollection is possible
+     *
+     * @param featureName The name of the feature which will be logged in case autocollection is not
+     *                    possible
+     * @return a flag indicating if autocollection features can be activated
+     */
     private static boolean autoCollectionPossible(String featureName) {
         if (!Util.isLifecycleTrackingAvailable()) {
             InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
@@ -365,8 +442,7 @@ public enum ApplicationInsights {
             return false;
         } else if (!isSetupAndRunning) {
             InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
-                  " can't be enabled/disabled, because " +
-                  "ApplicationInsights has not been started yet.");
+                  " has been set and will be activated when calling start().");
             return false;
         } else if (INSTANCE.getApplication() == null) {
             InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
@@ -417,54 +493,6 @@ public enum ApplicationInsights {
     }
 
     /**
-     * Enable / disable auto collection of telemetry data.
-     *
-     * @param disabled if set to true, the auto collection feature will be disabled
-     * @deprecated with 1.0-beta.5
-     * To enable/disable at runtime, use {@link ApplicationInsights#disableAutoCollection()} or the more specific
-     * {@link ApplicationInsights#disableAutoSessionManagement()},
-     * {@link ApplicationInsights#disableAutoAppearanceTracking()} and
-     * {@link ApplicationInsights#disableAutoPageViewTracking()}
-     */
-    public static void setAutoCollectionDisabled(boolean disabled) {
-        if (!isConfigured) {
-            InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
-                  "ApplicationInsights has not been setup correctly.");
-            return;
-        }
-        if (isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
-                  "ApplicationInsights has already been started.");
-            return;
-        }
-        INSTANCE.autoLifecycleCollectionDisabled = disabled;
-    }
-
-    /**
-     * Enable / disable auto collection of telemetry data at startup.
-     *
-     * @param disabled if set to true, the auto collection feature will be disabled at app start
-     *                 To enable/disable auto collection features at runtime, use
-     *                 {@link ApplicationInsights#disableAutoCollection()} or the more specific
-     *                 {@link ApplicationInsights#disableAutoSessionManagement()},
-     *                 {@link ApplicationInsights#disableAutoAppearanceTracking()} and
-     *                 {@link ApplicationInsights#disableAutoPageViewTracking()}
-     */
-    public static void setAutoCollectionDisabledAtStartup(boolean disabled) {
-        if (!isConfigured) {
-            InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
-                  "ApplicationInsights has not been setup correctly.");
-            return;
-        }
-        if (isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not enable/disable auto collection, because " +
-                  "ApplicationInsights has already been started.");
-            return;
-        }
-        INSTANCE.autoLifecycleCollectionDisabled = disabled;
-    }
-
-    /**
      * Gets the properties which are common to all telemetry sent from this client.
      *
      * @return common properties for this telemetry client
@@ -492,10 +520,19 @@ public enum ApplicationInsights {
         INSTANCE.commonProperties = commonProperties;
     }
 
+    /**
+     * Activates the developer mode which. It enables extensive logging as well as use different
+     * settings for batching. Batch Size in debug mode is 5 and sending interval is 3s.
+     * @param developerMode if true, developer mode will be activated
+     */
     public static void setDeveloperMode(boolean developerMode) {
         DEVELOPER_MODE.set(developerMode);
     }
 
+    /**
+     * Check if developerMode is activated
+     * @return flag indicating activated developer mode
+     */
     public static boolean isDeveloperMode() {
         return DEVELOPER_MODE.get();
     }
@@ -624,7 +661,7 @@ public enum ApplicationInsights {
      * Set a custom user to be associated with the telemetry data.
      *
      * @param user a custom user object. If the param is null or one of the supported properties is null,
-     *            the missing property will be generated by the SDK
+     *             the missing property will be generated by the SDK
      */
     public static void setCustomUserContext(User user) {
         if (isSetupAndRunning) {
