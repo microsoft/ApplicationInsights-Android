@@ -52,17 +52,16 @@ end
     back
   end
 
-it 'should crash the app' do
-  list_el = text('Crash the App!')
-  list_el.click
-end
-  
+ 
 end
 
 describe 'Run default tests' do
   defaultTestRun
+  it 'should crash the app' do
+  list_el = text('Crash the App!')
+  list_el.click
 end
-
+end
 
 describe 'Run with disabled session management' do
   it 'Can disable session management' do
@@ -71,6 +70,10 @@ describe 'Run with disabled session management' do
   back
 end
   defaultTestRun
+  it 'should crash the app' do
+  list_el = text('Crash the App!')
+  list_el.click
+end
 end
 
 describe 'Run with re-enabled session management' do
@@ -80,6 +83,10 @@ describe 'Run with re-enabled session management' do
   back
 end
   defaultTestRun
+  it 'should crash the app' do
+  list_el = text('Crash the App!')
+  list_el.click
+end
 end
 
 describe 'Run with disabled pageviews' do
@@ -89,6 +96,10 @@ describe 'Run with disabled pageviews' do
   back
 end
   defaultTestRun
+  it 'should crash the app' do
+  list_el = text('Crash the App!')
+  list_el.click
+end
 end
 
 describe 'Run with re-enabled pageviews' do
@@ -98,6 +109,10 @@ describe 'Run with re-enabled pageviews' do
   back
 end
   defaultTestRun
+  it 'should crash the app' do
+  list_el = text('Crash the App!')
+  list_el.click
+end
 end
 
 describe 'Run with disabled pageviews and session management' do
@@ -111,6 +126,6 @@ end
   list_el.click
   back
 end
-  defaultTestRun
+defaultTestRun 
 end
 

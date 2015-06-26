@@ -1,5 +1,8 @@
 package com.microsoft.applicationinsights.contracts;
 
+import com.microsoft.telemetry.Base;
+import com.microsoft.telemetry.cs2.Envelope;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -20,7 +23,7 @@ public class EnvelopeTests extends TestCase
         item.setVer(expected);
         int actual = item.getVer();
         Assert.assertEquals(expected, actual);
-        
+
         expected = 13;
         item.setVer(expected);
         actual = item.getVer();
@@ -54,7 +57,7 @@ public class EnvelopeTests extends TestCase
         actual = item.getTime();
         Assert.assertEquals(expected, actual);
     }
-    
+
     public void testSample_ratePropertyWorksAsExpected()
     {
         double expected = 1.5;
@@ -62,13 +65,13 @@ public class EnvelopeTests extends TestCase
         item.setSampleRate(expected);
         double actual = item.getSampleRate();
         Assert.assertEquals(expected, actual);
-        
+
         expected = 4.8;
         item.setSampleRate(expected);
         actual = item.getSampleRate();
         Assert.assertEquals(expected, actual);
     }
-    
+
     public void testSeqPropertyWorksAsExpected()
     {
         String expected = "Test string";
@@ -76,7 +79,7 @@ public class EnvelopeTests extends TestCase
         item.setSeq(expected);
         String actual = item.getSeq();
         Assert.assertEquals(expected, actual);
-        
+
         expected = "Other string";
         item.setSeq(expected);
         actual = item.getSeq();
@@ -118,7 +121,7 @@ public class EnvelopeTests extends TestCase
         item.setDeviceId(expected);
         String actual = item.getDeviceId();
         Assert.assertEquals(expected, actual);
-        
+
         expected = "Other string";
         item.setDeviceId(expected);
         actual = item.getDeviceId();
@@ -188,7 +191,7 @@ public class EnvelopeTests extends TestCase
         item.setUserId(expected);
         String actual = item.getUserId();
         Assert.assertEquals(expected, actual);
-        
+
         expected = "Other string";
         item.setUserId(expected);
         actual = item.getUserId();

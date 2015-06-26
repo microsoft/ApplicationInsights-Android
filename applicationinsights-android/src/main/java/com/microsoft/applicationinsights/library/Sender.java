@@ -153,7 +153,7 @@ class Sender {
         connection.setReadTimeout(config.getSenderReadTimeout());
         connection.setConnectTimeout(config.getSenderConnectTimeout());
         connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Content-Type", "application/x-json-stream");
         connection.setDoOutput(true);
         connection.setDoInput(true);
         connection.setUseCaches(false);
@@ -281,7 +281,7 @@ class Sender {
      * @param connection the connection which will read the response
      * @param builder    a string builder for storing the response
      */
-    private void readResponse(HttpURLConnection connection, StringBuilder builder) {
+    protected void readResponse(HttpURLConnection connection, StringBuilder builder) {
         BufferedReader reader = null;
         try {
             InputStream inputStream = connection.getErrorStream();
@@ -325,7 +325,7 @@ class Sender {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // GZIP if we are running SDK 19 or higher
             connection.addRequestProperty("Content-Encoding", "gzip");
-            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Content-Type", "application/x-json-stream");
             GZIPOutputStream gzip = new GZIPOutputStream(connection.getOutputStream(), true);
             return new OutputStreamWriter(gzip);
         } else {
@@ -341,5 +341,15 @@ class Sender {
      */
     protected void setPersistence(Persistence persistence) {
         this.persistence = persistence;
+    }
+
+
+    /**
+     * Set the instance, used for tests
+     *
+     * @param instance the test instance to use here
+     */
+    protected void setInstance(Sender instance) {
+        Sender.instance = instance;
     }
 }

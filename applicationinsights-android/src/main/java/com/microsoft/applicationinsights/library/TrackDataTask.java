@@ -2,8 +2,8 @@ package com.microsoft.applicationinsights.library;
 
 import android.os.AsyncTask;
 
-import com.microsoft.applicationinsights.contracts.Envelope;
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
+import com.microsoft.telemetry.IChannel;
+import com.microsoft.telemetry.ITelemetry;
 
 import java.util.Map;
 
@@ -66,7 +66,7 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
     /**
      * The channel to use for processing a telemetry item.
      */
-    protected Channel channel;
+    protected IChannel channel;
 
     /**
      * Create a TrackDataTask.
@@ -76,7 +76,7 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
     protected TrackDataTask(DataType type){
         this.type = type;
         this.envelopeFactory = EnvelopeFactory.getInstance();
-        this.channel = Channel.getInstance();
+        this.channel = ChannelManager.getInstance().getChannel();
     }
 
     /**
@@ -151,69 +151,69 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
      *
      * @param channel the channel to use for processing a telemetry item
      */
-    protected void setChannel(Channel channel) {
+    protected void setChannel(IChannel channel) {
         this.channel = channel;
     }
 
     @Override
     protected Void doInBackground(Void... params) {
 
-        trackEnvelope();
+        //trackEnvelope();
 
         return null;
     }
 
-    protected void trackEnvelope(){
-        Envelope envelope = null;
-        switch (this.type){
-            case NONE:
-                if(this.telemetry != null){
-                    envelope = EnvelopeFactory.getInstance().createEnvelope(this.telemetry);
-                }
-                break;
-            case EVENT:
-                if(this.name != null){
-                    envelope = this.envelopeFactory.createEventEnvelope(this.name, this.properties, this.measurements);
-                }
-                break;
-            case PAGE_VIEW:
-                if(this.name != null){
-                    envelope = this.envelopeFactory.createPageViewEnvelope(this.name, this.properties, this.measurements);
-                }
-                break;
-            case TRACE:
-                if(this.name != null){
-                    envelope = this.envelopeFactory.createTraceEnvelope(this.name, this.properties);
-                }
-                break;
-            case METRIC:
-                if(this.name != null){
-                    envelope = this.envelopeFactory.createMetricEnvelope(this.name, this.metric);
-                }
-                break;
-            case NEW_SESSION:
-                envelope = this.envelopeFactory.createNewSessionEnvelope();
-                break;
-            case HANDLED_EXCEPTION:
-            case UNHANDLED_EXCEPTION:
-                //TODO: Unhandled exceptions should not be processed asynchronously
-                if(exception != null){
-                    envelope = this.envelopeFactory.createExceptionEnvelope(this.exception, this.properties);
-                }
-                break;
-            default:
-                break;
-        }
-        if(envelope != null){
-            forwardEnvelope(envelope);
-        }
-    }
-
-    protected void forwardEnvelope(Envelope envelope){
-        if(type == DataType.UNHANDLED_EXCEPTION){
-            this.channel.processUnhandledException(envelope);
-        }else{
-            this.channel.enqueue(envelope);
-        }
-    }
+//    protected void trackEnvelope(){
+//        Envelope envelope = null;
+//        switch (this.type){
+//            case NONE:
+//                if(this.telemetry != null){
+//                    envelope = EnvelopeFactory.getInstance().createEnvelope(this.telemetry);
+//                }
+//                break;
+//            case EVENT:
+//                if(this.name != null){
+//                    envelope = this.envelopeFactory.createEventEnvelope(this.name, this.properties, this.measurements);
+//                }
+//                break;
+//            case PAGE_VIEW:
+//                if(this.name != null){
+//                    envelope = this.envelopeFactory.createPageViewEnvelope(this.name, this.properties, this.measurements);
+//                }
+//                break;
+//            case TRACE:
+//                if(this.name != null){
+//                    envelope = this.envelopeFactory.createTraceEnvelope(this.name, this.properties);
+//                }
+//                break;
+//            case METRIC:
+//                if(this.name != null){
+//                    envelope = this.envelopeFactory.createMetricEnvelope(this.name, this.metric);
+//                }
+//                break;
+//            case NEW_SESSION:
+//                envelope = this.envelopeFactory.createNewSessionEnvelope();
+//                break;
+//            case HANDLED_EXCEPTION:
+//            case UNHANDLED_EXCEPTION:
+//                //TODO: Unhandled exceptions should not be processed asynchronously
+//                if(exception != null){
+//                    envelope = this.envelopeFactory.createExceptionEnvelope(this.exception, this.properties);
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//        if(envelope != null){
+//            forwardEnvelope(envelope);
+//        }
+//    }
+//
+//    protected void forwardEnvelope(Envelope envelope){
+//        if(type == DataType.UNHANDLED_EXCEPTION){
+//            this.channel.processUnhandledException(envelope);
+//        }else{
+//            this.channel.log(envelope);
+//        }
+//    }
 }
