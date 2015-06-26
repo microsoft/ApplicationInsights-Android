@@ -1,14 +1,21 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.contracts.Envelope;
-import com.microsoft.applicationinsights.contracts.shared.IJsonSerializable;
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
+import com.microsoft.telemetry.Base;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.IChannel;
+import com.microsoft.telemetry.cs2.Envelope;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
 
 /**
  * This class records telemetry for application insights.
  */
-class Channel {
+class Channel implements IChannel {
     private static final String TAG = "Channel";
 
     /**
@@ -37,7 +44,7 @@ class Channel {
     private Persistence persistence;
 
     /**
-     * Instantiates a new INSTANCE of Sender
+     * Instantiates a new INSTANCE of Channel
      */
     protected Channel() {
         this.persistence = Persistence.getInstance();
@@ -59,7 +66,7 @@ class Channel {
     /**
      * @return the INSTANCE of Channel or null if not yet initialized
      */
-    protected static Channel getInstance() {
+    protected static IChannel getInstance() {
         if (Channel.instance == null) {
             InternalLogging.error(TAG, "getInstance was called before initialization");
         }
@@ -70,33 +77,59 @@ class Channel {
     /**
      * Persist all pending items.
      */
-    protected void synchronize() {
+    public void synchronize() {
         this.queue.flush();
+        if(Sender.getInstance() != null) {
+            Sender.getInstance().sendNextFile();
+        }
     }
 
     /**
      * Records the passed in data.
      *
-     * @param envelope the envelope object to record
+     * @param data the base object to record
      */
-    protected void enqueue(Envelope envelope) {
-        // enqueue to queue
-        queue.enqueue(envelope);
+    public void log(Base data, Map<String, String> tags) {
+        if(data instanceof Data) {
+            Envelope envelope = EnvelopeFactory.getInstance().createEnvelope((Data) data);
 
-        InternalLogging.info(TAG, "enqueued telemetry", envelope.getName());
+            // log to queue
+            String serializedEnvelope = serializeEnvelope(envelope);
+            queue.enqueue(serializedEnvelope);
+            InternalLogging.info(TAG, "enqueued telemetry", envelope.getName());
+        } else {
+            InternalLogging.warn(TAG, "telemetry not enqueued, must be of type ITelemetry");
+        }
     }
 
-    protected void processUnhandledException(Envelope envelope) {
+    protected String serializeEnvelope(Envelope envelope) {
+        try {
+            if (envelope != null) {
+                StringWriter stringWriter = new StringWriter();
+                envelope.serialize(stringWriter);
+                return stringWriter.toString();
+            }
+            InternalLogging.warn(TAG, "Envelop wasn't empty but failed to serialize anything, returning null");
+            return null;
+        } catch (IOException e) {
+            InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
+            return null;
+        }
+    }
+
+    protected void processUnhandledException(Data<Domain> data) {
+        Envelope envelope = EnvelopeFactory.getInstance().createEnvelope(data);
+
         queue.isCrashing = true;
         queue.flush();
 
-        IJsonSerializable[] data = new IJsonSerializable[1];
-        data[0] = envelope;
+        String serializedEnvelope = serializeEnvelope(envelope);
+        String[] serializedEvelopeArray = new String[]{serializedEnvelope};
 
         if (this.persistence != null) {
-            this.persistence.persist(data, true);
-        }
-        else {
+            InternalLogging.info(TAG, "persisting crash", envelope.toString());
+            this.persistence.persist(serializedEvelopeArray, true);
+        } else {
             InternalLogging.info(TAG, "error persisting crash", envelope.toString());
         }
 

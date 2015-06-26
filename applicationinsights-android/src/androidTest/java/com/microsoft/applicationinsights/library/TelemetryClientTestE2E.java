@@ -1,35 +1,38 @@
 package com.microsoft.applicationinsights.library;
 
-import android.content.Intent;
-import android.test.ActivityUnitTestCase;
+import android.test.ApplicationTestCase;
+import android.util.Log;
 
 import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 
-import java.io.InvalidObjectException;
-import java.util.LinkedHashMap;
+import junit.framework.Assert;
 
-public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
+import java.util.LinkedHashMap;
+import java.util.concurrent.TimeUnit;
+
+public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication> {
 
     public TelemetryClientTestE2E() {
-        super(MockActivity.class);
+        super(MockApplication.class);
     }
 
-    private MockTelemetryClient client;
     private LinkedHashMap<String, String> properties;
     private LinkedHashMap<String, Double> measurements;
+    private static int batchCount = 10;
 
     public void setUp() throws Exception {
         super.setUp();
 
-        Intent intent = new Intent(getInstrumentation().getTargetContext(), MockActivity.class);
-        this.setActivity(this.startActivity(intent, null, null));
+        ApplicationInsights.setup(this.getContext(), this.getApplication());
+        ApplicationInsights.setDeveloperMode(true);
 
-        MockTelemetryClient.getInstance().mockTrackMethod = false;
-        ApplicationInsightsConfig config = new ApplicationInsightsConfig();
-        Channel.initialize(config);
-        Channel.getInstance().queue.config.setMaxBatchIntervalMs(20);
+        ApplicationInsightsConfig config = ApplicationInsights.getConfig();
+        config.setEndpointUrl(config.getEndpointUrl().replace("https", "http"));
+        config.setMaxBatchIntervalMs(10);
+        config.setMaxBatchCount(batchCount);
+        ApplicationInsights.INSTANCE.setConfig(config);
 
-        Sender.initialize(config);
+        ApplicationInsights.start();
 
         this.properties = new LinkedHashMap<String, String>();
         this.properties.put("core property", "core value");
@@ -38,48 +41,39 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
     }
 
     public void testTrackEvent() throws Exception {
-        this.client.trackEvent(null);
-        this.client.trackEvent("event1");
-        this.client.trackEvent("event2", properties);
-        this.client.trackEvent("event3", properties, measurements);
-        this.validate();
+        TelemetryClient.getInstance().trackEvent(null);
+        TelemetryClient.getInstance().trackEvent("event1");
+        TelemetryClient.getInstance().trackEvent("event2", properties);
+        TelemetryClient.getInstance().trackEvent("event3", properties, measurements);
+        Thread.sleep(50);
+        this.validate(1);
     }
 
     public void testTrackTrace() throws Exception {
-        this.client.trackTrace(null);
-        this.client.trackTrace("trace1");
-        this.client.trackTrace("trace2", properties);
-        this.validate();
+        TelemetryClient.getInstance().trackTrace(null);
+        TelemetryClient.getInstance().trackTrace("trace1");
+        TelemetryClient.getInstance().trackTrace("trace2", properties);
+        Thread.sleep(50);
+        this.validate(1);
     }
 
     public void testTrackMetric() throws Exception {
-        this.client.trackMetric(null, 0);
-        this.client.trackMetric("metric1", 1.1);
-        this.client.trackMetric("metric2", 3);
-        this.client.trackMetric("metric3", 3.3);
-        this.client.trackMetric("metric3", 4);
-        this.validate();
-    }
-
-    public void testTrackException() throws Exception {
-        this.client.trackHandledException(null);
-        this.client.trackHandledException(new Exception());
-        try {
-            throw new InvalidObjectException("this is expected");
-        } catch (InvalidObjectException exception) {
-            this.client.trackHandledException(exception);
-            this.client.trackHandledException(exception, properties);
-        }
-
-        this.validate();
+        TelemetryClient.getInstance().trackMetric(null, 0);
+        TelemetryClient.getInstance().trackMetric("metric1", 1.1);
+        TelemetryClient.getInstance().trackMetric("metric2", 3);
+        TelemetryClient.getInstance().trackMetric("metric3", 3.3);
+        TelemetryClient.getInstance().trackMetric("metric3", 4);
+        Thread.sleep(50);
+        this.validate(1);
     }
 
     public void testTrackPageView() throws Exception {
-        this.client.trackPageView("android page");
-        this.client.trackPageView("android page");
-        this.client.trackPageView("android page", properties);
-        this.client.trackPageView("android page", properties, measurements);
-        this.validate();
+        TelemetryClient.getInstance().trackPageView("android page");
+        TelemetryClient.getInstance().trackPageView("android page");
+        TelemetryClient.getInstance().trackPageView("android page", properties);
+        TelemetryClient.getInstance().trackPageView("android page", properties, measurements);
+        Thread.sleep(50);
+        this.validate(1);
     }
 
     public void testTrackAllRequests() throws Exception {
@@ -90,44 +84,44 @@ public class TelemetryClientTestE2E extends ActivityUnitTestCase<MockActivity> {
             exception = e;
         }
 
-        Channel.getInstance().queue.config.setMaxBatchCount(10);
-        for (int i = 0; i < 10; i++) {
-            this.client.trackEvent("android event");
-            this.client.trackTrace("android trace");
-            this.client.trackMetric("android metric", 0.0);
-            this.client.trackHandledException(exception);
-            this.client.trackPageView("android page");
+        ((Channel)Channel.getInstance()).queue.config.setMaxBatchCount(10);
+        for (int i = 0; i < batchCount; i++) {
+            TelemetryClient.getInstance().trackEvent("android event");
+            TelemetryClient.getInstance().trackTrace("android trace");
+            TelemetryClient.getInstance().trackMetric("android metric", 0.0);
+            TelemetryClient.getInstance().trackHandledException(exception);
+            TelemetryClient.getInstance().trackPageView("android page");
             Thread.sleep(10);
         }
 
-        ApplicationInsights.sendPendingData();
-        Thread.sleep(10);
-        this.validate();
+        Thread.sleep(50);
+        this.validate(1);
     }
 
-    public void validate() throws Exception {
-//        try {
-//            MockQueue queue = MockChannel.getInstance().getQueue();
-//            CountDownLatch rspSignal = queue.sender.responseSignal;
-//            CountDownLatch sendSignal = queue.sender.sendSignal;
-//            rspSignal.await(30, TimeUnit.SECONDS);
-//
-//            Log.i("RESPONSE", queue.sender.getLastResponse());
-//
-//            if (rspSignal.getCount() < sendSignal.getCount()) {
-//                Log.w("BACKEND_ERROR", "response count is lower than enqueue count");
-//            } else if (queue.sender.responseCode == 206) {
-//                Log.w("BACKEND_ERROR", "response is 206, some telemetry was rejected");
-//            }
-//
-//            if (queue.sender.responseCode != 200) {
-//                Assert.fail("response rejected with: " + queue.sender.getLastResponse());
-//            }
-//
-//            Assert.assertEquals("response was received", 0, rspSignal.getCount());
-//            Assert.assertEquals("queue is empty", 0, queue.getQueueSize());
-//        } catch (InterruptedException e) {
-//            Assert.fail(e.toString());
-//        }
+    public void validate(int count) throws Exception {
+        try {
+            ApplicationInsightsConfig config = new ApplicationInsightsConfig();
+            MockSender sender = new MockSender(count, config);
+
+            sender.flush(count);
+
+            // wait 30 seconds for all responses
+            sender.responseSignal.await(5, TimeUnit.SECONDS);
+
+            if (sender.responseSignal.getCount() != 0) {
+                Log.w("BACKEND_ERROR", "response count is lower than enqueue count");
+            }
+
+            for(int i = 0; i < count; i++) {
+                if(i < sender.responseCodes.size()) {
+                    Assert.assertTrue("response is 206, some telemetry was rejected",
+                            sender.responseCodes.get(i) == 200);
+                }
+            }
+
+            Assert.assertEquals("response was received", 0, sender.responseSignal.getCount());
+        } catch (InterruptedException e) {
+            Assert.fail(e.toString());
+        }
    }
 }

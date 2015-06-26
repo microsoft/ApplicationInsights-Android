@@ -3,6 +3,8 @@ package com.microsoft.applicationinsights.library;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
+import android.content.ComponentCallbacks2;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -15,9 +17,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The public API for auto collecting application insights telemetry.
+ * @warning Deprecated with 1.0-beta.5, please use
+ * {@link com.microsoft.applicationinsights.library.AutoCollection} instead
  */
+@Deprecated
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
+class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, ComponentCallbacks2 {
 
     /**
      * The activity counter
@@ -147,11 +152,24 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerPageViewCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && Util.isLifecycleTrackingAvailable()) {
             synchronized (LifeCycleTracking.LOCK) {
                 registerActivityLifecycleCallbacks(application);
                 autoPageViewsEnabled = true;
             }
+        }
+    }
+
+    /**
+     * Register for component callbacks to enable persisting when backgrounding on devices with API-level 14+
+     * and persisting when receiving onMemoryLow() on devices with API-level 1+
+     *
+     * @param application the application object
+     */
+    public static void registerForPersistingWhenInBackground(Application application) {
+        if(application != null){
+            application.registerComponentCallbacks(LifeCycleTracking.getInstance());
+            InternalLogging.warn(TAG, "Registered component callbacks");
         }
     }
 
@@ -162,7 +180,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void unregisterPageViewCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && Util.isLifecycleTrackingAvailable()) {
             synchronized (LifeCycleTracking.LOCK) {
                 unregisterActivityLifecycleCallbacks(application);
                 autoPageViewsEnabled = false;
@@ -177,7 +195,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void registerSessionManagementCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && Util.isLifecycleTrackingAvailable()) {
             synchronized (LifeCycleTracking.LOCK) {
                 registerActivityLifecycleCallbacks(application);
                 autoSessionManagementEnabled = true;
@@ -192,7 +210,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
      */
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void unregisterSessionManagementCallbacks(Application application) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        if (application != null && Util.isLifecycleTrackingAvailable()) {
             synchronized (LifeCycleTracking.LOCK) {
                 unregisterActivityLifecycleCallbacks(application);
                 autoSessionManagementEnabled = false;
@@ -234,7 +252,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
         // check if the session should be renewed
         long now = this.getTime();
         long then = this.lastBackground.getAndSet(this.getTime());
-        boolean shouldRenew = now - then >= this.config.getSessionIntervalMs();
+        boolean shouldRenew = (now - then) >= this.config.getSessionIntervalMs();
 
         synchronized (LifeCycleTracking.LOCK) {
             if (autoSessionManagementEnabled && shouldRenew) {
@@ -271,6 +289,31 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
         // unused but required to implement ActivityLifecycleCallbacks
     }
 
+    @Override
+    public void onTrimMemory(int level) {
+        if (level == TRIM_MEMORY_UI_HIDDEN) {
+            InternalLogging.warn(TAG, "UI of the app is hidden, persisting data");
+            ChannelManager.getInstance().getChannel().synchronize();
+        } else if (level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_LOW) {
+            InternalLogging.warn(TAG, "Memory running low, persisting data");
+            ChannelManager.getInstance().getChannel().synchronize();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        // unused but required to implement ComponentCallbacks
+    }
+
+    @Override
+    public void onLowMemory() {
+        // unused but required to implement ComponentCallbacks
+        InternalLogging.warn(TAG, "Received onLowMemory()-Callback, persisting data");
+        ChannelManager.getInstance().getChannel().synchronize();
+
+    }
+
+
     /**
      * Test hook to get the current time
      *
@@ -279,4 +322,5 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks {
     protected long getTime() {
         return new Date().getTime();
     }
+
 }

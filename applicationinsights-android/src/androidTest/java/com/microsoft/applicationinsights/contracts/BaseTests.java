@@ -1,5 +1,7 @@
 package com.microsoft.applicationinsights.contracts;
 
+import com.microsoft.telemetry.Base;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
