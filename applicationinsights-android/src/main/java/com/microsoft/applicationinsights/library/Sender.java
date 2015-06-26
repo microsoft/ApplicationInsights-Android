@@ -325,6 +325,7 @@ class Sender {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // GZIP if we are running SDK 19 or higher
             connection.addRequestProperty("Content-Encoding", "gzip");
+            connection.setRequestProperty("Content-Type", "application/x-json-stream");
             GZIPOutputStream gzip = new GZIPOutputStream(connection.getOutputStream(), true);
             return new OutputStreamWriter(gzip);
         } else {

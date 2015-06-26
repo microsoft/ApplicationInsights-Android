@@ -106,15 +106,11 @@ class Persistence {
 
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess;
-        buffer.append('[');
         for (int i = 0; i < data.length; i++) {
-            if (i > 0) {
-                buffer.append(',');
-            }
+            buffer.append('\n');
             buffer.append(data[i]);
         }
 
-        buffer.append(']');
         String serializedData = buffer.toString();
         isSuccess = this.writeToDisk(serializedData, highPriority);
         if (isSuccess) {
