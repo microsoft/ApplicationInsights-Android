@@ -11,6 +11,7 @@ import com.microsoft.applicationinsights.contracts.MetricData;
 import com.microsoft.applicationinsights.contracts.PageViewData;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
+import com.microsoft.applicationinsights.contracts.StackFrame;
 import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
@@ -150,6 +151,50 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     public void testExceptionEnvelope() {
         // TODO: Add test
+    }
+
+
+    public void testParseSingleStackframeFromStringWorks(){
+        // Setup
+        String testString1 = "  at My.Method/Name (My.Parameter Type) in My/Filename:123 ";
+        // Test
+        StackFrame frame1 = sut.getStackframe(testString1);
+        // Verify
+        Assert.assertEquals("My.Method/Name (My.Parameter Type)", frame1.getMethod());
+        Assert.assertEquals("My/Filename", frame1.getFileName());
+        Assert.assertEquals(123, frame1.getLine());
+
+        // Setup
+        String testString2 = "at  My.Method/Name(My.ParameterType) in My/Filename:noNumber ";
+        // Test
+        StackFrame frame2 = sut.getStackframe(testString2);
+        // Verify
+        Assert.assertEquals("My.Method/Name(My.ParameterType)", frame2.getMethod());
+        Assert.assertNull(frame2.getFileName());
+        Assert.assertEquals(0, frame2.getLine());
+
+        // Setup
+        String testString3 = "at  () My.Method/Name(My.ParameterType) in My/Filename:noNumber";
+        // Test
+        StackFrame frame3 = sut.getStackframe(testString3);
+        // Verify
+        Assert.assertEquals("() My.Method/Name(My.ParameterType)", frame3.getMethod());
+        Assert.assertNull(frame3.getFileName());
+        Assert.assertEquals(0, frame3.getLine());
+
+        String testString4 = "at  () My.Method/Name(My.ParameterType) out My/Filename:123    ";
+        // Test
+        StackFrame frame4 = sut.getStackframe(testString4);
+        // Verify
+        Assert.assertEquals("() My.Method/Name(My.ParameterType)", frame4.getMethod());
+        Assert.assertNull(frame4.getFileName());
+        Assert.assertEquals(0, frame4.getLine());
+
+        String testString5 = "My.Method/Name(My.ParameterType) in My/Filename:123    ";
+        // Test
+        StackFrame frame5 = sut.getStackframe(testString5);
+        // Verify
+        Assert.assertNull(frame5);
     }
 
     // TestHelper
