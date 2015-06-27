@@ -274,10 +274,10 @@ class EnvelopeFactory {
      *  @param stacktrace the stacktrace for the exception
      * @return an Envelope object, which contains a handled or unhandled exception
      */
-    protected Data<Domain> createExceptionData(String type, String message, String stacktrace) {
+    protected Data<Domain> createExceptionData(String type, String message, String stacktrace, boolean handled) {
         Data<Domain> data = null;
         if (isConfigured()) {
-            ExceptionData telemetry = this.getExceptionData(type, message, stacktrace);
+            ExceptionData telemetry = this.getExceptionData(type, message, stacktrace, handled);
 
             data = createData(telemetry);
         }
@@ -418,7 +418,7 @@ class EnvelopeFactory {
      * @param stacktrace The stacktrace for the exception
      * @return a ExceptionData object that contains the stacktrace and context info
      */
-    private ExceptionData getExceptionData(String type, String message, String stacktrace) {
+    protected ExceptionData getExceptionData(String type, String message, String stacktrace, boolean handled) {
 
         ExceptionDetails details = new ExceptionDetails();
         details.setMessage(message);
@@ -438,7 +438,7 @@ class EnvelopeFactory {
         exceptions.add(details);
 
         ExceptionData data = new ExceptionData();
-        data.setHandledAt("");
+        data.setHandledAt(handled ? "HANDLED" : "UNHANDLED");
         data.setExceptions(exceptions);
 
         return data;

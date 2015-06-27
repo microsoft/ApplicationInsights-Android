@@ -26,14 +26,24 @@ class TrackDataOperation implements Runnable {
         NEW_SESSION
     }
 
+    // common
+    private final DataType type;
     private String name;
-    private String exceptionMessage;
-    private String exceptionStacktrace;
     private Map<String, String> properties;
     private Map<String, Double> measurements;
-    private final DataType type;
+
+    // managed exceptions
+    private String exceptionMessage;
+    private String exceptionStacktrace;
+    private boolean handled;
+
+    // metric
     private double metric;
+
+    // unmanaged exceptions
     private Throwable exception;
+
+    // custom
     private ITelemetry telemetry;
 
     protected TrackDataOperation(ITelemetry telemetry) {
@@ -109,7 +119,8 @@ class TrackDataOperation implements Runnable {
     protected TrackDataOperation(DataType type,
                                  String name,
                                  String message,
-                                 String stacktrace) {
+                                 String stacktrace,
+                                 boolean handled) {
         this.type = type; // no need to copy as enum is pass by value
         try {
             this.name = (String) deepCopy(name);
@@ -127,7 +138,7 @@ class TrackDataOperation implements Runnable {
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties);
         }else if ((this.type == DataType.MANAGED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
-            telemetry = EnvelopeFactory.getInstance().createExceptionData(this.name, this.exceptionMessage, this.exceptionStacktrace);
+            telemetry = EnvelopeFactory.getInstance().createExceptionData(this.name, this.exceptionMessage, this.exceptionStacktrace, this.handled);
 
         } else if (Persistence.getInstance().isFreeSpaceAvailable(false)) {
             switch (this.type) {
