@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class EnvelopeFactory {
 
@@ -444,48 +446,48 @@ class EnvelopeFactory {
         return data;
     }
 
-    private List<StackFrame> getStackframes(String stacktrace){
+    protected List<StackFrame> getStackframes(String stacktrace){
 
         List<StackFrame> frameList = null;
 
         if(stacktrace != null){
             frameList = new ArrayList<StackFrame>();
-            String[] lines = stacktrace.split("[\r\n]+");
+            String[] lines = stacktrace.split("\\n");
             for (String frameInfo : lines) {
                 StackFrame frame = getStackframe(frameInfo);
                 if(frame != null){
                     frameList.add(frame);
-                }else{
-                    return null;
                 }
-
             }
         }
         return frameList;
     }
 
-    private StackFrame getStackframe(String line){
+    protected StackFrame getStackframe(String line){
 
         StackFrame frame = null;
         if(line != null){
-            String[] frameComponents = line.split("\\s+");
-            if(frameComponents.length > 3){
+            Pattern methodPattern = Pattern.compile("^\\s*at\\s*(.*\\(.*\\)).*");
+            Matcher methodMatcher = methodPattern.matcher(line);
+
+            if(methodMatcher.find() && methodMatcher.groupCount() > 0){
                 frame = new StackFrame();
-                frame.setMethod(frameComponents[1] + frameComponents[2]);
+                frame.setMethod(methodMatcher.group(1));
 
-                int lastIndex = frameComponents.length-1;
-                String[] fileAndLine = frameComponents[lastIndex].split(":");
+                Pattern filePattern = Pattern.compile("in\\s(.*):([0-9s]+)\\s*");
+                Matcher fileMatcher = filePattern.matcher(line);
 
-                if(fileAndLine.length == 2 && parseInt(fileAndLine[1]) > 0){
-                    frame.setLine(parseInt(fileAndLine[1]));
-                    frame.setFileName(fileAndLine[0]);
+                if(fileMatcher.find() && fileMatcher.groupCount() > 1){
+                    frame.setFileName(fileMatcher.group(1));
+                    int lineNumber = parseInt(fileMatcher.group(2));
+                    frame.setLine(lineNumber);
                 }
             }
         }
         return frame;
     }
 
-    private int parseInt(String text){
+    protected int parseInt(String text){
 
         int number = 0;
 
