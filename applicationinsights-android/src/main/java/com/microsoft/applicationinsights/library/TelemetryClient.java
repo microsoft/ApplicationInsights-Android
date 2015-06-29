@@ -207,8 +207,9 @@ public class TelemetryClient {
      *  @param handled a flag which determines if the exception was handled or not
      */
     public void trackManagedException(String type, String message, String stacktrace, boolean handled) {
-        new TrackDataOperation(TrackDataOperation.DataType.MANAGED_EXCEPTION, type, message, stacktrace, handled).run();
         ExceptionTracking.setIgnoreExceptions(!handled);
+        new TrackDataOperation(TrackDataOperation.DataType.MANAGED_EXCEPTION, type, message, stacktrace, handled).run();
+
     }
 
     /**

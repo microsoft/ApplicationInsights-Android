@@ -154,11 +154,11 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     }
 
 
-    public void testParseSingleStackframeFromStringWorks(){
+    public void testParseSingleManagedStackframeFromStringWorks(){
         // Setup
         String testString1 = "  at My.Method/Name (My.Parameter Type) in My/Filename:123 ";
         // Test
-        StackFrame frame1 = sut.getStackframe(testString1);
+        StackFrame frame1 = sut.getStackframe(testString1, true);
         // Verify
         Assert.assertEquals("My.Method/Name (My.Parameter Type)", frame1.getMethod());
         Assert.assertEquals("My/Filename", frame1.getFileName());
@@ -167,7 +167,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         // Setup
         String testString2 = "at  My.Method/Name(My.ParameterType) in My/Filename:noNumber ";
         // Test
-        StackFrame frame2 = sut.getStackframe(testString2);
+        StackFrame frame2 = sut.getStackframe(testString2, true);
         // Verify
         Assert.assertEquals("My.Method/Name(My.ParameterType)", frame2.getMethod());
         Assert.assertNull(frame2.getFileName());
@@ -176,7 +176,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         // Setup
         String testString3 = "at  () My.Method/Name(My.ParameterType) in My/Filename:noNumber";
         // Test
-        StackFrame frame3 = sut.getStackframe(testString3);
+        StackFrame frame3 = sut.getStackframe(testString3, true);
         // Verify
         Assert.assertEquals("() My.Method/Name(My.ParameterType)", frame3.getMethod());
         Assert.assertNull(frame3.getFileName());
@@ -184,7 +184,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
         String testString4 = "at  () My.Method/Name(My.ParameterType) out My/Filename:123    ";
         // Test
-        StackFrame frame4 = sut.getStackframe(testString4);
+        StackFrame frame4 = sut.getStackframe(testString4, true);
         // Verify
         Assert.assertEquals("() My.Method/Name(My.ParameterType)", frame4.getMethod());
         Assert.assertNull(frame4.getFileName());
@@ -192,7 +192,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
         String testString5 = "My.Method/Name(My.ParameterType) in My/Filename:123    ";
         // Test
-        StackFrame frame5 = sut.getStackframe(testString5);
+        StackFrame frame5 = sut.getStackframe(testString5, true);
         // Verify
         Assert.assertNull(frame5);
     }

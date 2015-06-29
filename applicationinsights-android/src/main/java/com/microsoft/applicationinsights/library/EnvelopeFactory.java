@@ -422,22 +422,34 @@ class EnvelopeFactory {
      */
     protected ExceptionData getExceptionData(String type, String message, String stacktrace, boolean handled) {
 
-        ExceptionDetails details = new ExceptionDetails();
-        details.setMessage(message);
-        details.setTypeName(type);
+        ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
 
         if(stacktrace != null){
-            details.setStack(stacktrace);
-            List<StackFrame> stackFrames = getStackframes(stacktrace);
-            if(stacktrace.length() >=1){
-                details.setParsedStack(stackFrames);
-                details.setHasFullStack(true);
+
+            // Split raw stacktrace in case it contains managed and unmanaged exception info
+            String[] subStackTraces = stacktrace.split("\\n\\s*--- End of managed exception stack trace ---\\s*\\n");
+            for (int i = 0; i < subStackTraces.length; i++) {
+
+                ExceptionDetails details = new ExceptionDetails();
+
+                // Exception info
+                String exceptionSource = "";
+                boolean managed = (i==0);
+                exceptionSource = (managed) ? "Managed exception: " : "Unmanaged exception: ";
+
+                details.setMessage(exceptionSource + message);
+                details.setTypeName(type);
+                details.setStack(subStackTraces[i]);
+
+                // Parse stacktrace
+                List<StackFrame> stackFrames = getStackframes(subStackTraces[i], managed);
+                if(stackFrames.size() > 0){
+                    details.setParsedStack(stackFrames);
+                    details.setHasFullStack(true);
+                }
+                exceptions.add(details);
             }
         }
-
-
-        ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
-        exceptions.add(details);
 
         ExceptionData data = new ExceptionData();
         data.setHandledAt(handled ? "HANDLED" : "UNHANDLED");
@@ -446,7 +458,7 @@ class EnvelopeFactory {
         return data;
     }
 
-    protected List<StackFrame> getStackframes(String stacktrace){
+    protected List<StackFrame> getStackframes(String stacktrace, boolean managed){
 
         List<StackFrame> frameList = null;
 
@@ -454,7 +466,7 @@ class EnvelopeFactory {
             frameList = new ArrayList<StackFrame>();
             String[] lines = stacktrace.split("\\n");
             for (String frameInfo : lines) {
-                StackFrame frame = getStackframe(frameInfo);
+                StackFrame frame = getStackframe(frameInfo, managed);
                 if(frame != null){
                     frameList.add(frame);
                 }
@@ -463,18 +475,18 @@ class EnvelopeFactory {
         return frameList;
     }
 
-    protected StackFrame getStackframe(String line){
+    protected StackFrame getStackframe(String line, boolean managed){
 
         StackFrame frame = null;
         if(line != null){
-            Pattern methodPattern = Pattern.compile("^\\s*at\\s*(.*\\(.*\\)).*");
+            Pattern methodPattern = managed ? Pattern.compile("^\\s*at\\s*(.*\\(.*\\)).*") : Pattern.compile("^[\\s\\t]*at\\s*(.*)\\(");
             Matcher methodMatcher = methodPattern.matcher(line);
 
             if(methodMatcher.find() && methodMatcher.groupCount() > 0){
                 frame = new StackFrame();
                 frame.setMethod(methodMatcher.group(1));
 
-                Pattern filePattern = Pattern.compile("in\\s(.*):([0-9s]+)\\s*");
+                Pattern filePattern = (managed) ? Pattern.compile("in\\s(.*):([0-9s]+)\\s*") : Pattern.compile("\\((.*):([0-9]+)\\)");
                 Matcher fileMatcher = filePattern.matcher(line);
 
                 if(fileMatcher.find() && fileMatcher.groupCount() > 1){
