@@ -435,7 +435,14 @@ class EnvelopeFactory {
                 // Exception info
                 String exceptionSource = "";
                 boolean managed = (i==0);
-                exceptionSource = (managed) ? "Managed exception: " : "Unmanaged exception: ";
+
+                if(managed){
+                    exceptionSource = "Managed exception: ";
+                    details.setId(1);
+                }else{
+                    exceptionSource = "Unmanaged exception: ";
+                    details.setOuterId(1);
+                }
 
                 details.setMessage(exceptionSource + message);
                 details.setTypeName(type);
