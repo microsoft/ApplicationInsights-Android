@@ -492,14 +492,14 @@ class EnvelopeFactory {
 
         StackFrame frame = null;
         if(line != null){
-            Pattern methodPattern = managed ? Pattern.compile("^\\s*at\\s*(.*\\(.*\\)).*") : Pattern.compile("^[\\s\\t]*at\\s*(.*)\\(");
+            Pattern methodPattern = managed ? Pattern.compile("^\\s*at\\s*(.*\\(.*\\)).*") : Pattern.compile("^[\\s\\t]*at\\s*(.*)\\(.*");
             Matcher methodMatcher = methodPattern.matcher(line);
 
             if(methodMatcher.find() && methodMatcher.groupCount() > 0){
                 frame = new StackFrame();
                 frame.setMethod(methodMatcher.group(1));
 
-                Pattern filePattern = (managed) ? Pattern.compile("in\\s(.*):([0-9s]+)\\s*") : Pattern.compile("\\((.*):([0-9]+)\\)");
+                Pattern filePattern = (managed) ? Pattern.compile("in\\s(.*):([0-9]+)\\s*") : Pattern.compile(".*\\((.*):([0-9]+)\\)\\s*");
                 Matcher fileMatcher = filePattern.matcher(line);
 
                 if(fileMatcher.find() && fileMatcher.groupCount() > 1){
