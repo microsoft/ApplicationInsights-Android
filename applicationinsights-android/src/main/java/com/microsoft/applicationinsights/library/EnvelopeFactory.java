@@ -478,6 +478,12 @@ class EnvelopeFactory {
                     frameList.add(frame);
                 }
             }
+
+            int level = frameList.size()-1;
+            for (StackFrame frame : frameList) {
+                frame.setLevel(level);
+                level--;
+            }
         }
         return frameList;
     }
