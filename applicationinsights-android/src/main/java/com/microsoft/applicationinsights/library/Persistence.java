@@ -3,7 +3,6 @@ package com.microsoft.applicationinsights.library;
 import android.content.Context;
 
 import com.microsoft.applicationinsights.logging.InternalLogging;
-import com.microsoft.telemetry.IJsonSerializable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -106,15 +105,11 @@ class Persistence {
 
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess;
-        buffer.append('[');
         for (int i = 0; i < data.length; i++) {
-            if (i > 0) {
-                buffer.append(',');
-            }
+            buffer.append('\n');
             buffer.append(data[i]);
         }
 
-        buffer.append(']');
         String serializedData = buffer.toString();
         isSuccess = this.writeToDisk(serializedData, highPriority);
         if (isSuccess) {
@@ -176,12 +171,14 @@ class Persistence {
                 FileInputStream inputStream = new FileInputStream(file);
                 InputStreamReader streamReader = new InputStreamReader(inputStream);
                 BufferedReader reader = new BufferedReader(streamReader);
-                String str;
 
-                while ((str = reader.readLine()) != null) {
-                    buffer.append(str);
+                //comment: we can't use BufferedReader's readline() as this removes linebreaks that
+                //are required for JSON stream
+                int c;
+                while ((c = reader.read()) != -1) {
+                    //Cast c to char. As it's not -1, we won't get a problem
+                    buffer.append((char) c);
                 }
-
                 reader.close();
             } catch (Exception e) {
                 InternalLogging.warn(TAG, "Error reading telemetry data from file with exception message "
@@ -251,26 +248,25 @@ class Persistence {
 
                 if ((files != null) && (files.length > 0)) {
                     for (int i = 0; i <= files.length - 1; i++) {
-                        InternalLogging.info(TAG, "The directory " + directory.toString(), " ITERATING over " + files.length + " files" );
+                        InternalLogging.info(TAG, "The directory " + directory.toString(), " ITERATING over " + files.length + " files");
 
                         file = files[i];
-                        InternalLogging.info(TAG, "The directory " +file.toString(), " FOUND" );
+                        InternalLogging.info(TAG, "The directory " + file.toString(), " FOUND");
 
                         if (!this.servedFiles.contains(file)) {
-                            InternalLogging.info(TAG, "The directory " + file.toString(), " ADDING TO SERVED AND RETURN" );
+                            InternalLogging.info(TAG, "The directory " + file.toString(), " ADDING TO SERVED AND RETURN");
 
                             this.servedFiles.add(file);
                             return file;//we haven't served the file, return it
-                        }
-                        else {
-                            InternalLogging.info(TAG, "The directory " + file.toString(), " WAS ALREADY SERVED" );
+                        } else {
+                            InternalLogging.info(TAG, "The directory " + file.toString(), " WAS ALREADY SERVED");
                         }
                     }
                 }
-                InternalLogging.info(TAG, "The directory " + directory.toString(), " NO FILES" );
+                InternalLogging.info(TAG, "The directory " + directory.toString(), " NO FILES");
 
             }
-            InternalLogging.info(TAG, "The directory " + directory.toString(), "Did not contain any unserved files" );
+            InternalLogging.info(TAG, "The directory " + directory.toString(), "Did not contain any unserved files");
             return null; //no files in directory or no directory
         }
     }
