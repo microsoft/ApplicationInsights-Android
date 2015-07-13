@@ -262,7 +262,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
             }
 
             if (autoPageViewsEnabled) {
-                TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName(), null, null);
+                TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName());
                 new Thread(pageViewOp).start();
             }
         }

@@ -30,7 +30,6 @@ public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication>
         config.setEndpointUrl(config.getEndpointUrl().replace("https", "http"));
         config.setMaxBatchIntervalMs(10);
         config.setMaxBatchCount(batchCount);
-        ApplicationInsights.INSTANCE.setConfig(config);
 
         ApplicationInsights.start();
 

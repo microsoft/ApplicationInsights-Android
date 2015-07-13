@@ -190,7 +190,7 @@ public enum ApplicationInsights {
             return;
         }
         if (!isSetupAndRunning) {
-            Context context = INSTANCE.getContext();
+            Context context = this.weakContext.get();
 
             if (context == null) {
                 InternalLogging.warn(TAG, "Could not start Application Insights as context is null");
@@ -572,8 +572,8 @@ public enum ApplicationInsights {
      */
     protected Context getContext() {
         Context context = null;
-        if (weakContext != null) {
-            context = weakContext.get();
+        if (this.weakContext != null) {
+            context = this.weakContext.get();
         }
 
         return context;
@@ -612,23 +612,6 @@ public enum ApplicationInsights {
      */
     public static ApplicationInsightsConfig getConfig() {
         return INSTANCE.config;
-    }
-
-    /**
-     * Sets the session configuration for the instance
-     */
-    public void setConfig(ApplicationInsightsConfig config) {
-        if (!isConfigured) {
-            InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
-                  "ApplicationInsights has not been setup correctly.");
-            return;
-        }
-        if (isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not set telemetry configuration, because " +
-                  "ApplicationInsights has already been started.");
-            return;
-        }
-        INSTANCE.config = config;
     }
 
     /**

@@ -302,7 +302,7 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
     private void sendPagewView(Activity activity) {
         if (autoPageViewsEnabled) {
             InternalLogging.info(TAG, "New Pageview");
-            TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName(), null, null);
+            TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName());
             new Thread(pageViewOp).start();
         }
     }

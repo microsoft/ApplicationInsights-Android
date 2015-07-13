@@ -22,21 +22,44 @@ class TrackDataOperation implements Runnable {
         PAGE_VIEW,
         HANDLED_EXCEPTION,
         UNHANDLED_EXCEPTION,
+        MANAGED_EXCEPTION,
         NEW_SESSION
     }
 
+    // common
+    private final DataType type;
     private String name;
     private Map<String, String> properties;
     private Map<String, Double> measurements;
-    private final DataType type;
+
+    // managed exceptions
+    private String exceptionMessage;
+    private String exceptionStacktrace;
+    private boolean handled;
+
+    // metric
     private double metric;
+
+    // unmanaged exceptions
     private Throwable exception;
+
+    // custom
     private ITelemetry telemetry;
 
     protected TrackDataOperation(ITelemetry telemetry) {
         this.type = DataType.NONE;
         try {
             this.telemetry = (ITelemetry)deepCopy(telemetry);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected TrackDataOperation(DataType type, String name) {
+        this.type = type;
+        try {
+            this.name = (String)deepCopy(name);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -91,7 +114,22 @@ class TrackDataOperation implements Runnable {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    protected TrackDataOperation(DataType type,
+                                 String name,
+                                 String message,
+                                 String stacktrace,
+                                 boolean handled) {
+        this.type = type; // no need to copy as enum is pass by value
+        try {
+            this.name = (String) deepCopy(name);
+            this.exceptionMessage = (String) deepCopy(message);
+            this.exceptionStacktrace = (String) deepCopy(stacktrace);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -99,6 +137,9 @@ class TrackDataOperation implements Runnable {
         Data<Domain> telemetry = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties);
+        }else if ((this.type == DataType.MANAGED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
+            telemetry = EnvelopeFactory.getInstance().createExceptionData(this.name, this.exceptionMessage, this.exceptionStacktrace, this.handled);
+
         } else if (Persistence.getInstance().isFreeSpaceAvailable(false)) {
             switch (this.type) {
                 case NONE:
@@ -131,7 +172,7 @@ class TrackDataOperation implements Runnable {
 
         if (telemetry != null) {
             IChannel channel = ChannelManager.getInstance().getChannel();
-            if (type == DataType.UNHANDLED_EXCEPTION) {
+            if (type == DataType.UNHANDLED_EXCEPTION || type == DataType.MANAGED_EXCEPTION) {
                 ((Channel)Channel.getInstance()).processUnhandledException(telemetry);
             } else {
                 telemetry.getBaseData().QualifiedName = telemetry.getBaseType();

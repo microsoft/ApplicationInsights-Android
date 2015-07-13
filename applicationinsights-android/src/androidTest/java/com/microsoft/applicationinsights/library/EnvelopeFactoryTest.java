@@ -11,6 +11,7 @@ import com.microsoft.applicationinsights.contracts.MetricData;
 import com.microsoft.applicationinsights.contracts.PageViewData;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
+import com.microsoft.applicationinsights.contracts.StackFrame;
 import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
@@ -150,6 +151,79 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     public void testExceptionEnvelope() {
         // TODO: Add test
+    }
+
+
+    public void testParseSingleManagedStackframeFromStringWorks() {
+        // Setup
+        String testString1 = "  at My.Method/Name (My.Parameter Type) in My/Filename:123 ";
+        // Test
+        StackFrame frame1 = sut.getStackframe(testString1, true);
+        // Verify
+        Assert.assertEquals("My.Method/Name (My.Parameter Type)", frame1.getMethod());
+        Assert.assertEquals("My/Filename", frame1.getFileName());
+        Assert.assertEquals(123, frame1.getLine());
+
+        // Setup
+        String testString2 = "at  My.Method/Name(My.ParameterType) in My/Filename:noNumber ";
+        // Test
+        StackFrame frame2 = sut.getStackframe(testString2, true);
+        // Verify
+        Assert.assertEquals("My.Method/Name(My.ParameterType)", frame2.getMethod());
+        Assert.assertNull(frame2.getFileName());
+        Assert.assertEquals(0, frame2.getLine());
+
+        // Setup
+        String testString3 = "at  () My.Method/Name(My.ParameterType) in My/Filename:noNumber";
+        // Test
+        StackFrame frame3 = sut.getStackframe(testString3, true);
+        // Verify
+        Assert.assertEquals("() My.Method/Name(My.ParameterType)", frame3.getMethod());
+        Assert.assertNull(frame3.getFileName());
+        Assert.assertEquals(0, frame3.getLine());
+
+        String testString4 = "at  () My.Method/Name(My.ParameterType) out My/Filename:123    ";
+        // Test
+        StackFrame frame4 = sut.getStackframe(testString4, true);
+        // Verify
+        Assert.assertEquals("() My.Method/Name(My.ParameterType)", frame4.getMethod());
+        Assert.assertNull(frame4.getFileName());
+        Assert.assertEquals(0, frame4.getLine());
+
+        String testString5 = "My.Method/Name(My.ParameterType) in My/Filename:123    ";
+        // Test
+        StackFrame frame5 = sut.getStackframe(testString5, true);
+        // Verify
+        Assert.assertNull(frame5);
+    }
+
+    public void testParseSingleUnmanagedStackframeFromStringWorks() {
+        // Setup
+        String testString1 = "  at com.microsoft.ai.xamarinexample.ExampleClass$1.run(ExampleClass.java:17)  ";
+        // Test
+        StackFrame frame1 = sut.getStackframe(testString1, false);
+        // Verify
+        Assert.assertEquals("com.microsoft.ai.xamarinexample.ExampleClass$1.run", frame1.getMethod());
+        Assert.assertEquals("ExampleClass.java", frame1.getFileName());
+        Assert.assertEquals(17, frame1.getLine());
+
+        // Setup
+        String testString2 = "at dalvik.system.NativeStart.main(Native Method)";
+        // Test
+        StackFrame frame2 = sut.getStackframe(testString2, false);
+        // Verify
+        Assert.assertEquals("dalvik.system.NativeStart.main", frame2.getMethod());
+        Assert.assertNull(frame2.getFileName());
+        Assert.assertEquals(0, frame2.getLine());
+
+        // Setup
+        String testString3 = "at () md5d4dd78677dce656d5db26c85a3743ef3.TableViewModelRenderer.onItemClick(TableViewModelRenderer.java:99)";
+        // Test
+        StackFrame frame3 = sut.getStackframe(testString3, false);
+        // Verify
+        Assert.assertEquals("() md5d4dd78677dce656d5db26c85a3743ef3.TableViewModelRenderer.onItemClick", frame3.getMethod());
+        Assert.assertEquals("TableViewModelRenderer.java", frame3.getFileName());
+        Assert.assertEquals(99, frame3.getLine());
     }
 
     // TestHelper

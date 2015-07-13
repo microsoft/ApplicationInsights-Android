@@ -197,6 +197,22 @@ public class TelemetryClient {
     }
 
     /**
+     * Sends unhandled Exception to Application Insights. This method should be called from your
+     * Xamarin code to send the C# stacktrace to ApplicationInsights and ignore the report created
+     * by {@link ExceptionTracking}.
+     *
+     *  @param type the exception type
+     *  @param message the exception message
+     *  @param stacktrace the stacktrace for the exception
+     *  @param handled a flag which determines if the exception was handled or not
+     */
+    public void trackManagedException(String type, String message, String stacktrace, boolean handled) {
+        ExceptionTracking.setIgnoreExceptions(!handled);
+        new TrackDataOperation(TrackDataOperation.DataType.MANAGED_EXCEPTION, type, message, stacktrace, handled).run();
+
+    }
+
+    /**
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *

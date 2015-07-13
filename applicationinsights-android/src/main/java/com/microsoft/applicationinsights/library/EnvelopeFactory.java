@@ -7,11 +7,14 @@ import com.microsoft.applicationinsights.contracts.CrashDataThreadFrame;
 import com.microsoft.applicationinsights.contracts.DataPoint;
 import com.microsoft.applicationinsights.contracts.DataPointType;
 import com.microsoft.applicationinsights.contracts.EventData;
+import com.microsoft.applicationinsights.contracts.ExceptionData;
+import com.microsoft.applicationinsights.contracts.ExceptionDetails;
 import com.microsoft.applicationinsights.contracts.MessageData;
 import com.microsoft.applicationinsights.contracts.MetricData;
 import com.microsoft.applicationinsights.contracts.PageViewData;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
+import com.microsoft.applicationinsights.contracts.StackFrame;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
@@ -23,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class EnvelopeFactory {
 
@@ -264,6 +269,24 @@ class EnvelopeFactory {
     }
 
     /**
+     * Creates information about an handled or unhandled exception to Application Insights.
+     *
+     *  @param type the exception type
+     *  @param message the exception message
+     *  @param stacktrace the stacktrace for the exception
+     * @return an Envelope object, which contains a handled or unhandled exception
+     */
+    protected Data<Domain> createExceptionData(String type, String message, String stacktrace, boolean handled) {
+        Data<Domain> data = null;
+        if (isConfigured()) {
+            ExceptionData telemetry = this.getExceptionData(type, message, stacktrace, handled);
+
+            data = createData(telemetry);
+        }
+        return data;
+    }
+
+    /**
      * Creates information about a page view for Application Insights. This method gets called by a
      * CreateTelemetryDataTask in order to create and forward data on a background thread.
      *
@@ -387,6 +410,117 @@ class EnvelopeFactory {
         crashData.setProperties(properties);
 
         return crashData;
+    }
+
+    /**
+     * Create the ExceptionData object.
+     *
+     * @param type  The name of the exception type
+     * @param message The exception message
+     * @param stacktrace The stacktrace for the exception
+     * @return a ExceptionData object that contains the stacktrace and context info
+     */
+    protected ExceptionData getExceptionData(String type, String message, String stacktrace, boolean handled) {
+
+        ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
+
+        if(stacktrace != null){
+
+            // Split raw stacktrace in case it contains managed and unmanaged exception info
+            String[] subStackTraces = stacktrace.split("\\n\\s*--- End of managed exception stack trace ---\\s*\\n");
+            for (int i = 0; i < subStackTraces.length; i++) {
+
+                ExceptionDetails details = new ExceptionDetails();
+
+                // Exception info
+                String exceptionSource = "";
+                boolean managed = (i==0);
+
+                if(managed){
+                    exceptionSource = "Managed exception: ";
+                    details.setId(1);
+                }else{
+                    exceptionSource = "Unmanaged exception: ";
+                    details.setOuterId(1);
+                }
+
+                details.setMessage(exceptionSource + message);
+                details.setTypeName(type);
+                details.setStack(subStackTraces[i]);
+
+                // Parse stacktrace
+                List<StackFrame> stackFrames = getStackframes(subStackTraces[i], managed);
+                if(stackFrames.size() > 0){
+                    details.setParsedStack(stackFrames);
+                    details.setHasFullStack(true);
+                }
+                exceptions.add(details);
+            }
+        }
+
+        ExceptionData data = new ExceptionData();
+        data.setHandledAt(handled ? "HANDLED" : "UNHANDLED");
+        data.setExceptions(exceptions);
+
+        return data;
+    }
+
+    protected List<StackFrame> getStackframes(String stacktrace, boolean managed){
+
+        List<StackFrame> frameList = null;
+
+        if(stacktrace != null){
+            frameList = new ArrayList<StackFrame>();
+            String[] lines = stacktrace.split("\\n");
+            for (String frameInfo : lines) {
+                StackFrame frame = getStackframe(frameInfo, managed);
+                if(frame != null){
+                    frameList.add(frame);
+                }
+            }
+
+            int level = frameList.size()-1;
+            for (StackFrame frame : frameList) {
+                frame.setLevel(level);
+                level--;
+            }
+        }
+        return frameList;
+    }
+
+    protected StackFrame getStackframe(String line, boolean managed){
+
+        StackFrame frame = null;
+        if(line != null){
+            Pattern methodPattern = managed ? Pattern.compile("^\\s*at\\s*(.*\\(.*\\)).*") : Pattern.compile("^[\\s\\t]*at\\s*(.*)\\(.*");
+            Matcher methodMatcher = methodPattern.matcher(line);
+
+            if(methodMatcher.find() && methodMatcher.groupCount() > 0){
+                frame = new StackFrame();
+                frame.setMethod(methodMatcher.group(1));
+
+                Pattern filePattern = (managed) ? Pattern.compile("in\\s(.*):([0-9]+)\\s*") : Pattern.compile(".*\\((.*):([0-9]+)\\)\\s*");
+                Matcher fileMatcher = filePattern.matcher(line);
+
+                if(fileMatcher.find() && fileMatcher.groupCount() > 1){
+                    frame.setFileName(fileMatcher.group(1));
+                    int lineNumber = parseInt(fileMatcher.group(2));
+                    frame.setLine(lineNumber);
+                }
+            }
+        }
+        return frame;
+    }
+
+    protected int parseInt(String text){
+
+        int number = 0;
+
+        try {
+            number = Integer.parseInt(text);
+        } catch(NumberFormatException nfe) {}
+
+        return number;
     }
 
     protected boolean isConfigured() {
