@@ -223,6 +223,8 @@ class TelemetryContext {
     protected void renewSessionId() {
         String newId = UUID.randomUUID().toString();
         this.session.setId(newId);
+        //TODO investigate why we don't set isNew to true here because comments says so (iOS doesn't do it either)
+        //also: the comment doesn't really match!
     }
 
     /**
@@ -339,7 +341,7 @@ class TelemetryContext {
      */
     protected void configDeviceContext(Context appContext) {
         this.device.setOsVersion(Build.VERSION.RELEASE);
-        this.device.setOs("Android");
+        this.device.setOs("Android"); //used by the AI extension in Azure Portal to build stack traces
         this.device.setModel(Build.MODEL);
         this.device.setOemName(Build.MANUFACTURER);
         this.device.setLocale(Locale.getDefault().toString());
