@@ -105,9 +105,9 @@ class Persistence {
 
         StringBuilder buffer = new StringBuilder();
         Boolean isSuccess;
-        for (int i = 0; i < data.length; i++) {
+        for (String aData : data) {
             buffer.append('\n');
-            buffer.append(data[i]);
+            buffer.append(aData);
         }
 
         String serializedData = buffer.toString();
@@ -266,7 +266,9 @@ class Persistence {
                 InternalLogging.info(TAG, "The directory " + directory.toString(), " NO FILES");
 
             }
-            InternalLogging.info(TAG, "The directory " + directory.toString(), "Did not contain any unserved files");
+            if(directory != null) {
+                InternalLogging.info(TAG, "The directory " + directory.toString(), "Did not contain any unserved files");
+            }
             return null; //no files in directory or no directory
         }
     }

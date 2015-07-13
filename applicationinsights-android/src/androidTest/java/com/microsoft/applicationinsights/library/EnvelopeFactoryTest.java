@@ -230,7 +230,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     private void validateEnvelopeProperties(Envelope envelope){
         Map<String,String> actualProperties = null;
-        Domain baseData = (Domain)((Data<Domain>)envelope.getData()).getBaseData();
+        Domain baseData = ((Data<Domain>)envelope.getData()).getBaseData();
 
         if(baseData instanceof EventData){
             actualProperties = ((EventData)baseData).getProperties();
@@ -245,7 +245,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     private void validateEnvelopeMeasurements(Envelope envelope){
         Map<String,Double> actualMeasurements = null;
-        Domain baseData = (Domain)((Data<Domain>)envelope.getData()).getBaseData();
+        Domain baseData = ((Data<Domain>)envelope.getData()).getBaseData();
 
         if(baseData instanceof EventData){
             actualMeasurements = ((EventData)baseData).getMeasurements();
@@ -328,7 +328,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     }
 
     private static final String MOCK_MEASUREMENTS_KEY = "measurementsKey";
-    private static final Double MOCK_MEASUREMENTS_VALUE = new Double(11);
+    private static final Double MOCK_MEASUREMENTS_VALUE = (double) 11;
 
     private static HashMap<String,Double> getMeasurements(){
         HashMap<String,Double> measurements = new HashMap<String,Double>();

@@ -6,7 +6,7 @@ import com.microsoft.applicationinsights.library.ApplicationInsights;
 
 public class ApplicationInsightsConfigTest extends AndroidTestCase {
 
-    ApplicationInsightsConfig sut;
+    private ApplicationInsightsConfig sut;
     public void setUp() throws Exception {
         super.setUp();
         sut = new ApplicationInsightsConfig();

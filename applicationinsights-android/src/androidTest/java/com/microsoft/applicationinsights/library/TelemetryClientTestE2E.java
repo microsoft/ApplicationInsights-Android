@@ -97,7 +97,7 @@ public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication>
         this.validate(1);
     }
 
-    public void validate(int count) throws Exception {
+    public void validate(int count) {
         try {
             ApplicationInsightsConfig config = new ApplicationInsightsConfig();
             MockSender sender = new MockSender(count, config);

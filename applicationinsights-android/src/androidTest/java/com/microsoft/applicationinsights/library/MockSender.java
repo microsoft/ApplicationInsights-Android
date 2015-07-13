@@ -75,15 +75,15 @@ public class MockSender extends Sender {
                 case '[':
                 case '{':
                     tabs += "\t";
-                    sb.append(" " + c + logCatNewLine + tabs);
+                    sb.append(" ").append(c).append(logCatNewLine).append(tabs);
                     break;
                 case ']':
                 case '}':
                     tabs = tabs.substring(0, tabs.length() - 1);
-                    sb.append(logCatNewLine + tabs + c);
+                    sb.append(logCatNewLine).append(tabs).append(c);
                     break;
                 case ',':
-                    sb.append(c + logCatNewLine + tabs);
+                    sb.append(c).append(logCatNewLine).append(tabs);
                     break;
                 default:
                     sb.append(c);
