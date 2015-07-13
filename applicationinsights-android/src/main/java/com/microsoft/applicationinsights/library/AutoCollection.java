@@ -66,7 +66,6 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      * A flag which determines whether session management has been enabled or not.
      */
     private static boolean autoSessionManagementEnabled;
-    ;
 
     protected static boolean isAutoAppearanceTrackingEnabled() {
         return autoAppearanceTrackingEnabled;

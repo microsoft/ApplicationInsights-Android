@@ -73,7 +73,6 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      * A flag which determines whether session management has been enabled or not.
      */
     private static boolean autoSessionManagementEnabled;
-    ;
 
     /**
      * Create a new INSTANCE of the lifecycle event tracking
