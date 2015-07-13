@@ -15,7 +15,6 @@ public class SenderTest extends TestCase {
         super.setUp();
         ApplicationInsightsConfig config = new ApplicationInsightsConfig();
         this.sut = new Sender(config);
-        PublicPersistence mockPersistence = mock(PublicPersistence.class);
     }
 
     public void testInitialisationWorks(){

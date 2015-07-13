@@ -91,7 +91,7 @@ class Channel implements IChannel {
      */
     public void log(Base data, Map<String, String> tags) {
         if(data instanceof Data) {
-            Envelope envelope = EnvelopeFactory.getInstance().createEnvelope((Data) data);
+            Envelope envelope = EnvelopeFactory.getInstance().createEnvelope((Data<Domain>) data);
 
             // log to queue
             String serializedEnvelope = serializeEnvelope(envelope);

@@ -433,7 +433,7 @@ class EnvelopeFactory {
                 ExceptionDetails details = new ExceptionDetails();
 
                 // Exception info
-                String exceptionSource = "";
+                String exceptionSource;
                 boolean managed = (i==0);
 
                 if(managed){
@@ -513,12 +513,13 @@ class EnvelopeFactory {
     }
 
     protected int parseInt(String text){
-
         int number = 0;
 
         try {
             number = Integer.parseInt(text);
-        } catch(NumberFormatException nfe) {}
+        } catch(NumberFormatException nfe) {
+            InternalLogging.warn(TAG, "Couldn't parse the line number for crash report");
+        }
 
         return number;
     }

@@ -276,7 +276,7 @@ class TelemetryContext {
 
     /**
      * Sets the user Id. This method has been made private to make sure it's not accessed from outside the SDK
-     * To customize the user context, use {@Link ApplicationInsights#setCustomUserContext}
+     * To customize the user context, use {@link ApplicationInsights#setCustomUserContext}
      *
      * @param userId custom user id
      */

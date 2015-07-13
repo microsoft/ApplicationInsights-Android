@@ -3,9 +3,6 @@ package com.microsoft.applicationinsights.library;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-/**
- * Created by jmorman on 6/15/2015.
- */
 public class ChannelManagerTest extends TestCase {
 
     public void testGetSetDefaultChannelManager() {

@@ -155,7 +155,7 @@ public enum ApplicationInsights {
      * @param context            the application context associated with Application Insights
      * @param instrumentationKey the instrumentation key associated with the app
      */
-    public void setupInstance(Context context, Application application, String instrumentationKey) {
+    private void setupInstance(Context context, Application application, String instrumentationKey) {
         if (!isConfigured) {
             if (context != null) {
                 this.weakContext = new WeakReference<Context>(context);
@@ -183,7 +183,7 @@ public enum ApplicationInsights {
      * Start ApplicationInsights
      * Note: This should be called after {@link #isConfigured}
      */
-    public void startInstance() {
+    private void startInstance() {
         if (!isConfigured) {
             InternalLogging.warn(TAG, "Could not start Application Insights since it has not been " +
                   "setup correctly.");
@@ -570,7 +570,7 @@ public enum ApplicationInsights {
      *
      * @return the Context that's used by the Application Insights SDK
      */
-    protected Context getContext() {
+    Context getContext() {
         Context context = null;
         if (this.weakContext != null) {
             context = this.weakContext.get();
@@ -584,7 +584,7 @@ public enum ApplicationInsights {
      *
      * @return the reference to the application that was used during initialization of the SDK
      */
-    protected Application getApplication() {
+    private Application getApplication() {
         Application application = null;
         if (weakApplication != null) {
             application = weakApplication.get();

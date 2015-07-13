@@ -2,7 +2,6 @@ package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
-import com.microsoft.telemetry.IJsonSerializable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -123,7 +122,7 @@ class ChannelQueue {
      *
      * @see com.microsoft.applicationinsights.library.ChannelQueue.TriggerPersistTask
      */
-    protected void schedulePersitenceTask(){
+    protected void schedulePersitenceTask() {
         // schedule a FlushTask if this is the first item in the queue
         this.scheduledPersistenceTask = new TriggerPersistTask();
         this.timer.schedule(this.scheduledPersistenceTask, this.config.getMaxBatchIntervalMs());
@@ -132,7 +131,7 @@ class ChannelQueue {
     /**
      * Initiates persisting the content queue.
      */
-    protected void executePersistenceTask(String[] data){
+    protected void executePersistenceTask(String[] data) {
         if (data != null) {
             if (persistence != null) {
                 persistence.persist(data, false);
@@ -163,7 +162,7 @@ class ChannelQueue {
      *
      * @param config a config which contains information about how this queue should behave.
      */
-    protected void setQueueConfig(IQueueConfig config){
+    protected void setQueueConfig(IQueueConfig config) {
         this.config = config;
     }
 
@@ -173,9 +172,9 @@ class ChannelQueue {
     private class TriggerPersistTask extends TimerTask {
         /**
          * The sender INSTANCE is provided to the constructor as a test hook
-         *
          */
-        public TriggerPersistTask() {}
+        public TriggerPersistTask() {
+        }
 
         @Override
         public void run() {

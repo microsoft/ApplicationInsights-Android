@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The public API for auto collecting application insights telemetry.
- * @warning Deprecated with 1.0-beta.5, please use
+ * Deprecated with 1.0-beta.5, please use
  * {@link com.microsoft.applicationinsights.library.AutoCollection} instead
  */
 @Deprecated
@@ -73,7 +73,6 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
      * A flag which determines whether session management has been enabled or not.
      */
     private static boolean autoSessionManagementEnabled;
-    ;
 
     /**
      * Create a new INSTANCE of the lifecycle event tracking
@@ -294,7 +293,7 @@ class LifeCycleTracking implements Application.ActivityLifecycleCallbacks, Compo
         if (level == TRIM_MEMORY_UI_HIDDEN) {
             InternalLogging.warn(TAG, "UI of the app is hidden, persisting data");
             ChannelManager.getInstance().getChannel().synchronize();
-        } else if (level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_LOW) {
+        } else if (level == TRIM_MEMORY_RUNNING_LOW) {
             InternalLogging.warn(TAG, "Memory running low, persisting data");
             ChannelManager.getInstance().getChannel().synchronize();
         }

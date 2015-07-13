@@ -52,7 +52,7 @@ class SyncUtil implements ComponentCallbacks2 {
                 InternalLogging.info(TAG, "UI of the app is hidden");
                 InternalLogging.info(TAG, "Syncing data");
                 Channel.getInstance().synchronize();
-            } else if (level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_LOW) {
+            } else if (level == TRIM_MEMORY_RUNNING_LOW) {
                 InternalLogging.info(TAG, "Memory running low, syncing data");
                 Channel.getInstance().synchronize();
             }

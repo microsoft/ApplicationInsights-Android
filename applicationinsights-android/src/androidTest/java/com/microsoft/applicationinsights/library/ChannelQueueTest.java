@@ -3,8 +3,6 @@ package com.microsoft.applicationinsights.library;
 import android.test.InstrumentationTestCase;
 
 import com.microsoft.applicationinsights.library.config.IQueueConfig;
-import com.microsoft.telemetry.cs2.Envelope;
-import com.microsoft.telemetry.IJsonSerializable;
 
 import junit.framework.Assert;
 
@@ -25,7 +23,7 @@ public class ChannelQueueTest extends InstrumentationTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        System.setProperty("dexmaker.dexcache",getInstrumentation().getTargetContext().getCacheDir().getPath());
+        System.setProperty("dexmaker.dexcache", getInstrumentation().getTargetContext().getCacheDir().getPath());
         mockConfig = mock(IQueueConfig.class);
         sut = new PublicChannelQueue(mockConfig);
         mockPersistence = mock(PublicPersistence.class);
@@ -40,14 +38,14 @@ public class ChannelQueueTest extends InstrumentationTestCase {
         Assert.assertFalse(sut.isCrashing);
     }
 
-    public void testItemGetsEnqueued(){
+    public void testItemGetsEnqueued() {
         // Setup
         when(mockConfig.getMaxBatchIntervalMs()).thenReturn(10000);
         when(mockConfig.getMaxBatchCount()).thenReturn(3);
 
         // Test
-        sut.enqueue(new String());
-        sut.enqueue(new String());
+        sut.enqueue("");
+        sut.enqueue("");
 
         // Verify
         Assert.assertEquals(2, sut.list.size());
@@ -59,17 +57,17 @@ public class ChannelQueueTest extends InstrumentationTestCase {
         when(mockConfig.getMaxBatchCount()).thenReturn(3);
 
         // Test
-        sut.enqueue(new String());
-        sut.enqueue(new String());
+        sut.enqueue("");
+        sut.enqueue("");
 
         // Verify
         Assert.assertEquals(2, sut.list.size());
-        verify(mockPersistence,never()).persist(any(String[].class), anyBoolean());
+        verify(mockPersistence, never()).persist(any(String[].class), anyBoolean());
 
-        sut.enqueue(new String());
+        sut.enqueue("");
 
         Assert.assertEquals(0, sut.list.size());
-        verify(mockPersistence,times(1)).persist(any(String[].class), anyBoolean());
+        verify(mockPersistence, times(1)).persist(any(String[].class), anyBoolean());
     }
 
     public void testQueueFlushedAfterBatchIntervalReached() {
@@ -78,12 +76,12 @@ public class ChannelQueueTest extends InstrumentationTestCase {
         when(mockConfig.getMaxBatchCount()).thenReturn(3);
 
         // Test
-        sut.enqueue(new String());
+        sut.enqueue("");
 
         // Verify
         Assert.assertEquals(1, sut.list.size());
-        verify(mockPersistence,never()).persist(any(String[].class), anyBoolean());
-        verify(mockPersistence,after(250).times(1)).persist(any(String[].class), anyBoolean());
+        verify(mockPersistence, never()).persist(any(String[].class), anyBoolean());
+        verify(mockPersistence, after(250).times(1)).persist(any(String[].class), anyBoolean());
         Assert.assertEquals(0, sut.list.size());
     }
 
@@ -92,16 +90,16 @@ public class ChannelQueueTest extends InstrumentationTestCase {
         when(mockConfig.getMaxBatchIntervalMs()).thenReturn(200);
         when(mockConfig.getMaxBatchCount()).thenReturn(3);
 
-        sut.enqueue(new String());
+        sut.enqueue("");
         Assert.assertEquals(1, sut.list.size());
-        verify(mockPersistence,never()).persist(any(String[].class), anyBoolean());
+        verify(mockPersistence, never()).persist(any(String[].class), anyBoolean());
 
         // Test
         sut.flush();
 
         // Verify
         Assert.assertEquals(0, sut.list.size());
-        verify(mockPersistence,times(1)).persist(any(String[].class), anyBoolean());
+        verify(mockPersistence, times(1)).persist(any(String[].class), anyBoolean());
     }
 
 
