@@ -1,5 +1,4 @@
 com.microsoft.applicationinsights.contracts
-com.microsoft.applicationinsights.contracts.shared
 com.microsoft.applicationinsights.library
 com.microsoft.applicationinsights.library.config
 com.microsoft.applicationinsights.logging
