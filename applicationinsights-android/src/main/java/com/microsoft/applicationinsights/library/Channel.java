@@ -117,7 +117,7 @@ class Channel implements IChannel {
         }
     }
 
-    protected void processUnhandledException(Data<Domain> data) {
+    protected void processException(Data<Domain> data) {
         Envelope envelope = EnvelopeFactory.getInstance().createEnvelope(data);
 
         queue.isCrashing = true;

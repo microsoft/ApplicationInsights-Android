@@ -211,7 +211,7 @@ class TrackDataTask extends AsyncTask<Void, Void, Void> {
 //
 //    protected void forwardEnvelope(Envelope envelope){
 //        if(type == DataType.UNHANDLED_EXCEPTION){
-//            this.channel.processUnhandledException(envelope);
+//            this.channel.processException(envelope);
 //        }else{
 //            this.channel.log(envelope);
 //        }

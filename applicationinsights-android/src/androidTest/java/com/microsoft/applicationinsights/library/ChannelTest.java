@@ -45,7 +45,7 @@ public class ChannelTest extends InstrumentationTestCase {
     public void testProcessUnhandledExceptionIsPersistedDirectly(){
 //        // Test
 //        Data<Domain> testItem1 = new Data<Domain>();
-//        sut.processUnhandledException(testItem1);
+//        sut.processException(testItem1);
 //
 //        // Verify
 //        verify(mockQueue, times(0)).enqueue(testItem1);
@@ -57,7 +57,7 @@ public class ChannelTest extends InstrumentationTestCase {
 //        Data<Domain> testItem1 = new Data<Domain>();
 //
 //        // Test
-//        sut.processUnhandledException(testItem1);
+//        sut.processException(testItem1);
 //
 //        // Verify
 //        verify(mockQueue, times(0)).enqueue(testItem1);

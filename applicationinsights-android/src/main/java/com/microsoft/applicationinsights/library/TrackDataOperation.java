@@ -134,6 +134,24 @@ class TrackDataOperation implements Runnable {
 
     @Override
     public void run() {
+        Data<Domain> telemetry = getTelemetry();
+
+        if (telemetry != null) {
+            IChannel channel = ChannelManager.getInstance().getChannel();
+            if (type == DataType.UNHANDLED_EXCEPTION || type == DataType.MANAGED_EXCEPTION) {
+                ((Channel)Channel.getInstance()).processException(telemetry);
+            } else {
+                telemetry.getBaseData().QualifiedName = telemetry.getBaseType();
+                Map<String,String> tags = EnvelopeFactory.getInstance().getContext().getContextTags();
+                if(this.type == DataType.NEW_SESSION) {
+                    tags.put("ai.session.isNew", "true");
+                }
+                channel.log(telemetry, tags);
+            }
+        }
+    }
+
+    private Data<Domain> getTelemetry() {
         Data<Domain> telemetry = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties);
@@ -169,17 +187,7 @@ class TrackDataOperation implements Runnable {
                     break;
             }
         }
-
-        if (telemetry != null) {
-            IChannel channel = ChannelManager.getInstance().getChannel();
-            if (type == DataType.UNHANDLED_EXCEPTION || type == DataType.MANAGED_EXCEPTION) {
-                ((Channel)Channel.getInstance()).processUnhandledException(telemetry);
-            } else {
-                telemetry.getBaseData().QualifiedName = telemetry.getBaseType();
-                Map<String,String> tags = EnvelopeFactory.getInstance().getContext().getContextTags();
-                channel.log(telemetry, tags);
-            }
-        }
+        return telemetry;
     }
 
     private Object deepCopy(Object serializableObject) throws Exception {

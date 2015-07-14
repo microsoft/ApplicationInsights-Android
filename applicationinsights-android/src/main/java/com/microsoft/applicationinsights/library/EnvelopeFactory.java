@@ -323,7 +323,6 @@ class EnvelopeFactory {
         if (isConfigured()) {
             SessionStateData telemetry = new SessionStateData();
             telemetry.setState(SessionState.Start);
-
             data = createData(telemetry);
         }
         return data;

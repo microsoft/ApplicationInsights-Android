@@ -40,6 +40,7 @@ class TelemetryContext {
     protected static final String USER_ID_KEY = "USER_ID";
     protected static final String USER_ACQ_KEY = "USER_ACQ";
     protected static final String USER_ACCOUNT_ID_KEY = "USER_ACCOUNT_ID";
+    protected static final String SESSION_IS_FIRST_KEY = "SESSION_IS_FIRST";
     private static final String TAG = "TelemetryContext";
 
     /**
@@ -222,9 +223,7 @@ class TelemetryContext {
      */
     protected void renewSessionId() {
         String newId = UUID.randomUUID().toString();
-        this.session.setId(newId);
-        //TODO investigate why we don't set isNew to true here because comments says so (iOS doesn't do it either)
-        //also: the comment doesn't really match!
+        this.renewSessionId(newId);
     }
 
     /**
@@ -234,6 +233,17 @@ class TelemetryContext {
      */
     public void renewSessionId(String sessionId) {
         this.session.setId(sessionId);
+        this.session.setIsNew("false");
+
+        SharedPreferences.Editor editor = this.settings.edit();
+        if(!this.settings.getBoolean(SESSION_IS_FIRST_KEY, false)) {
+            editor.putBoolean(SESSION_IS_FIRST_KEY, true);
+            editor.commit();
+            this.session.setIsFirst("true");
+        }
+        else {
+            this.session.setIsFirst("false");
+        }
     }
 
     /**

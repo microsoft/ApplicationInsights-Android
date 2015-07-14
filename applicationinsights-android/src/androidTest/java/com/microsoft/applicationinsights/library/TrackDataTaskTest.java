@@ -213,7 +213,7 @@
 //        // Verify
 //        timeout(100);
 //        verify(mockEnvelopeFactory, times(1)).createExceptionEnvelope(exception, properties);
-//        verify(mockChannel, times(1)).processUnhandledException(any(Envelope.class));
+//        verify(mockChannel, times(1)).processException(any(Envelope.class));
 //        verifyNoMoreInteractions(mockEnvelopeFactory);
 //        verifyNoMoreInteractions(mockChannel);
 //    }
