@@ -144,6 +144,9 @@ class TrackDataOperation implements Runnable {
                 telemetry.getBaseData().QualifiedName = telemetry.getBaseType();
                 Map<String,String> tags = EnvelopeFactory.getInstance().getContext().getContextTags();
                 if(this.type == DataType.NEW_SESSION) {
+                    //updating IsNew tag from session context doesn't work because editing shared prefs
+                    //doesn't happen timely enough so we can be sure isNew is true for all cases
+                    //so we set it to true explicitly
                     tags.put("ai.session.isNew", "true");
                 }
                 channel.log(telemetry, tags);

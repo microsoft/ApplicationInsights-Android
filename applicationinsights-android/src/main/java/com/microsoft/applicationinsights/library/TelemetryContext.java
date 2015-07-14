@@ -233,6 +233,10 @@ class TelemetryContext {
      */
     public void renewSessionId(String sessionId) {
         this.session.setId(sessionId);
+        //normally, this should also be saved to SharedPrefs like isFirst.
+        //The problem is that there are cases when committing the changes is too slow and we get
+        //the wrong value. As isNew is only "true" when we start a new session, it is set in
+        //TrackDataOperation directly before enqueueing the session event.
         this.session.setIsNew("false");
 
         SharedPreferences.Editor editor = this.settings.edit();
