@@ -242,7 +242,7 @@ class TelemetryContext {
         SharedPreferences.Editor editor = this.settings.edit();
         if(!this.settings.getBoolean(SESSION_IS_FIRST_KEY, false)) {
             editor.putBoolean(SESSION_IS_FIRST_KEY, true);
-            editor.commit();
+            editor.apply();
             this.session.setIsFirst("true");
         }
         else {
