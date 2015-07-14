@@ -1,10 +1,9 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.contracts.shared.ITelemetry;
 import com.microsoft.applicationinsights.logging.InternalLogging;
+import com.microsoft.telemetry.ITelemetry;
 
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -161,7 +160,7 @@ public class TelemetryClient {
 
     /**
      * Sends information about an aggregated metric to Application Insights. Note: all data sent via
-     * this method will be aggregated. To enqueue non-aggregated data use
+     * this method will be aggregated. To log non-aggregated data use
      * {@link TelemetryClient#trackEvent(String, Map, Map)} with measurements.
      *
      * @param name  The name of the metric
@@ -195,6 +194,22 @@ public class TelemetryClient {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
                     handledException, properties));
         }
+    }
+
+    /**
+     * Sends unhandled Exception to Application Insights. This method should be called from your
+     * Xamarin code to send the C# stacktrace to ApplicationInsights and ignore the report created
+     * by {@link ExceptionTracking}.
+     *
+     *  @param type the exception type
+     *  @param message the exception message
+     *  @param stacktrace the stacktrace for the exception
+     *  @param handled a flag which determines if the exception was handled or not
+     */
+    public void trackManagedException(String type, String message, String stacktrace, boolean handled) {
+        ExceptionTracking.setIgnoreExceptions(!handled);
+        new TrackDataOperation(TrackDataOperation.DataType.MANAGED_EXCEPTION, type, message, stacktrace, handled).run();
+
     }
 
     /**

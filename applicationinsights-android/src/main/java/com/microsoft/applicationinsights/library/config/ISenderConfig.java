@@ -7,36 +7,36 @@ public interface ISenderConfig{
      *
      * @return the server's endpoint URL
      */
-    public String getEndpointUrl();
+    String getEndpointUrl();
 
     /**
      * Sets the url to which payloads will be sent
      *
      * @param endpointUrl url of the server that receives our data
      */
-    public void setEndpointUrl(String endpointUrl);
+    void setEndpointUrl(String endpointUrl);
 
     /**
      * Gets the timeout for reading the response from the data collector endpoint
      *
      * @return configured timeout in ms for reading
      */
-    public int getSenderReadTimeout();
+    int getSenderReadTimeout();
 
     /**
      * Set the timeout for reading the response from the data collector endpoint
      */
-    public void setSenderReadTimeout(int senderReadTimeout);
+    void setSenderReadTimeout(int senderReadTimeout);
 
     /**
      * Gets the timeout for connecting to the data collector endpoint
      *
      * @return configured timeout in ms for sending
      */
-    public int getSenderConnectTimeout();
+    int getSenderConnectTimeout();
 
     /**
      * Set the timeout for connecting to the data collector endpoint
      */
-    public void setSenderConnectTimeout(int senderConnectTimeout);
+    void setSenderConnectTimeout(int senderConnectTimeout);
 }

@@ -1,6 +1,8 @@
 package com.microsoft.applicationinsights.contracts;
 
-import com.microsoft.applicationinsights.contracts.shared.ITelemetryData;
+import com.microsoft.telemetry.Data;
+import com.microsoft.telemetry.Domain;
+import com.microsoft.telemetry.ITelemetry;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -15,10 +17,10 @@ public class DataTests extends TestCase
 {
     public void testBase_dataPropertyWorksAsExpected()
     {
-        ITelemetryData expected = new EventData();
+        ITelemetry expected = new EventData();
         Data item = new Data();
         item.setBaseData(expected);
-        ITelemetryData actual = item.getBaseData();
+        Domain actual = item.getBaseData();
         Assert.assertEquals(expected, actual);
         
         expected = new EventData();

@@ -66,7 +66,6 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      * A flag which determines whether session management has been enabled or not.
      */
     private static boolean autoSessionManagementEnabled;
-    ;
 
     protected static boolean isAutoAppearanceTrackingEnabled() {
         return autoAppearanceTrackingEnabled;
@@ -155,7 +154,7 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private static void registerActivityLifecycleCallbacks(Application application) {
         if (!hasRegisteredLifecycleCallbacks) {
-            if ((application != null ) && Util.isLifecycleTrackingAvailable()) {
+            if ((application != null) && Util.isLifecycleTrackingAvailable()) {
                 application.registerActivityLifecycleCallbacks(AutoCollection.getInstance());
                 hasRegisteredLifecycleCallbacks = true;
                 InternalLogging.info(TAG, "Registered activity lifecycle callbacks");
@@ -171,7 +170,7 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      */
     private static void registerForComponentCallbacks(Application application) {
         if (!hasRegisteredComponentCallbacks) {
-            if ((application != null ) && Util.isLifecycleTrackingAvailable()) {
+            if ((application != null) && Util.isLifecycleTrackingAvailable()) {
                 application.registerComponentCallbacks(AutoCollection.getInstance());
                 hasRegisteredComponentCallbacks = true;
                 InternalLogging.info(TAG, "Registered component callbacks");
@@ -270,19 +269,12 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      * @param savedInstanceState the bundle
      */
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        int count = this.activityCount.getAndIncrement();
-        synchronized (AutoCollection.LOCK) {
-            if (count == 0) {
-                if (autoSessionManagementEnabled) {
-                    InternalLogging.info(TAG, "Starting & tracking session");
-                    TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
-                    new Thread(sessionOp).start();
-                }
-                if(autoAppearanceTrackingEnabled) {
-                    //TODO track cold start as soon as it's available in new Schema.
-                }
-            }
-        }
+        // unused but required to implement ActivityLifecycleCallbacks
+        //NOTE:
+        //We first implemented Session management here. This callback doesn't work for the starting
+        //activity of the app because the SDK will be setup and initialized in the onCreate, so
+        //we don't get the very first call to an app activity's onCreate.
+        //This is why the logic was moved to onActivityResumed below
     }
 
     /**
@@ -300,23 +292,46 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      * @param activity the activity which left the foreground
      */
     public void onActivityResumed(Activity activity) {
-        // check if the session should be renewed
-        long now = this.getTime();
-        long then = this.lastBackground.getAndSet(this.getTime());
-        boolean shouldRenew = ((now - then) >= this.config.getSessionIntervalMs());
-
         synchronized (AutoCollection.LOCK) {
+            sessionManagement();
+            sendPagewView(activity);
+        }
+    }
+
+    private void sendPagewView(Activity activity) {
+        if (autoPageViewsEnabled) {
+            InternalLogging.info(TAG, "New Pageview");
+            TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName());
+            new Thread(pageViewOp).start();
+        }
+    }
+
+    private void sessionManagement() {
+        int count = this.activityCount.getAndIncrement();
+        if (count == 0) {
+            if (autoSessionManagementEnabled) {
+                InternalLogging.info(TAG, "Starting & tracking session");
+                TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
+                new Thread(sessionOp).start();
+            } else {
+                InternalLogging.info(TAG, "Session management disabled by the developer");
+            }
+            if (autoAppearanceTrackingEnabled) {
+                //TODO track cold start as soon as it's available in new Schema.
+            }
+        } else {
+            //we should already have a session now
+            //check if the session should be renewed
+            long now = this.getTime();
+            long then = this.lastBackground.getAndSet(this.getTime());
+            boolean shouldRenew = ((now - then) >= this.config.getSessionIntervalMs());
+            InternalLogging.info(TAG, "Checking if we have to renew a session, time difference is: " + (now-then));
+
             if (autoSessionManagementEnabled && shouldRenew) {
                 InternalLogging.info(TAG, "Renewing session");
                 this.telemetryContext.renewSessionId();
                 TrackDataOperation sessionOp = new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION);
                 new Thread(sessionOp).start();
-            }
-
-            if (autoPageViewsEnabled) {
-                InternalLogging.info(TAG, "New Pageview");
-                TrackDataOperation pageViewOp = new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW, activity.getClass().getName(), null, null);
-                new Thread(pageViewOp).start();
             }
         }
     }

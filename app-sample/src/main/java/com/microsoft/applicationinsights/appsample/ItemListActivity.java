@@ -1,6 +1,5 @@
 package com.microsoft.applicationinsights.appsample;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -17,17 +16,17 @@ import java.util.HashMap;
  * lead to a {@link ItemDetailActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
- * <p>
+ * <p/>
  * The activity makes heavy use of fragments. The list of items is a
  * {@link ItemListFragment} and the item details
  * (if present) is a {@link ItemDetailFragment}.
- * <p>
+ * <p/>
  * This activity also implements the required
  * {@link ItemListFragment.Callbacks} interface
  * to listen for item selections.
  */
 public class ItemListActivity extends FragmentActivity
-        implements ItemListFragment.Callbacks {
+      implements ItemListFragment.Callbacks {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -50,8 +49,8 @@ public class ItemListActivity extends FragmentActivity
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
             ((ItemListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.item_list))
-                    .setActivateOnItemClick(true);
+                  .findFragmentById(R.id.item_list))
+                  .setActivateOnItemClick(true);
         }
         ApplicationInsights.setup(this.getApplicationContext(), getApplication());
 
@@ -59,13 +58,12 @@ public class ItemListActivity extends FragmentActivity
         //config.setSessionIntervalMs(30000);
         //config.setEndpointUrl("https://myserver.com/v2/track");
         config.setMaxBatchCount(45);
-
         //ApplicationInsights.setUserId("New user ID");
         //ApplicationInsights.renewSession("New session ID");
 
         ApplicationInsights.setDeveloperMode(true);
 
-        HashMap<String, String> properties = new HashMap<String,String>();
+        HashMap<String, String> properties = new HashMap<String, String>();
         properties.put("Hometown", "Karlsruhe");
         ApplicationInsights.setCommonProperties(properties);
         ApplicationInsights.start();
@@ -86,8 +84,8 @@ public class ItemListActivity extends FragmentActivity
             ItemDetailFragment fragment = new ItemDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.item_detail_container, fragment)
-                    .commit();
+                  .replace(R.id.item_detail_container, fragment)
+                  .commit();
 
         } else {
             // In single-pane mode, simply start the detail activity

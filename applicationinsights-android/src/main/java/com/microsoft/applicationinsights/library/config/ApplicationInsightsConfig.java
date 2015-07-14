@@ -8,15 +8,15 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ApplicationInsightsConfig implements ISenderConfig, ISessionConfig, IQueueConfig {
 
     // Default values for queue config
-    protected static final int DEBUG_MAX_BATCH_COUNT = 5;
-    protected static final int DEBUG_MAX_BATCH_INTERVAL_MS = 3 * 1000;
-    protected static final int DEFAULT_MAX_BATCH_COUNT = 100;
-    protected static final int DEFAULT_MAX_BATCH_INTERVAL_MS = 15 * 1000;
+    static final int DEBUG_MAX_BATCH_COUNT = 5;
+    static final int DEBUG_MAX_BATCH_INTERVAL_MS = 3 * 1000;
+    static final int DEFAULT_MAX_BATCH_COUNT = 100;
+    static final int DEFAULT_MAX_BATCH_INTERVAL_MS = 15 * 1000;
 
     // Default values for sender config
-    protected static final String DEFAULT_ENDPOINT_URL = "https://dc.services.visualstudio.com/v2/track";
-    protected static final int DEFAULT_SENDER_READ_TIMEOUT = 10 * 1000;
-    protected static final int DEFAULT_SENDER_CONNECT_TIMEOUT = 15 * 1000;
+    static final String DEFAULT_ENDPOINT_URL = "https://dc.services.visualstudio.com/v2/track";
+    static final int DEFAULT_SENDER_READ_TIMEOUT = 10 * 1000;
+    static final int DEFAULT_SENDER_CONNECT_TIMEOUT = 15 * 1000;
 
     // Default values for session config
     protected static final int DEFAULT_SESSION_INTERVAL = 20 * 1000; // 20 seconds

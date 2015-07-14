@@ -24,11 +24,11 @@ public class UtilTest extends TestCase {
         this.testMsToTimeSpanHelper(1, "00:00:00.001", "milliseconds digit 1");
         this.testMsToTimeSpanHelper(10, "00:00:00.010", "milliseconds digit 2");
         this.testMsToTimeSpanHelper(100, "00:00:00.100", "milliseconds digit 3");
-        this.testMsToTimeSpanHelper(1 * 1000, "00:00:01.000", "seconds digit 1");
+        this.testMsToTimeSpanHelper(1000, "00:00:01.000", "seconds digit 1");
         this.testMsToTimeSpanHelper(10 * 1000, "00:00:10.000", "seconds digit 2");
-        this.testMsToTimeSpanHelper(1 * 60 * 1000, "00:01:00.000", "minutes digit 1");
+        this.testMsToTimeSpanHelper(60 * 1000, "00:01:00.000", "minutes digit 1");
         this.testMsToTimeSpanHelper(10 * 60 * 1000, "00:10:00.000", "minutes digit 2");
-        this.testMsToTimeSpanHelper(1 * 60 * 60 * 1000, "01:00:00.000", "hours digit 1");
+        this.testMsToTimeSpanHelper(60 * 60 * 1000, "01:00:00.000", "hours digit 1");
         this.testMsToTimeSpanHelper(10 * 60 * 60 * 1000, "10:00:00.000", "hours digit 2");
         this.testMsToTimeSpanHelper(24 * 60 * 60 * 1000, "1.00:00:00.000", "hours overflow");
         this.testMsToTimeSpanHelper(24 * 61 * 61 * 1010, "1.01:03:17.040", "hours overflow+");
