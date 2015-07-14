@@ -1,6 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-beta.5)
+# Application Insights for Android (1.0-beta.6)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
@@ -25,27 +25,32 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 ## <a name="1"></a> 1. Release Notes
 
-* The SDK is now built using the Android Tools Gradle plugin 1.2.3
-* Fix a null pointer exception in ```LifecycleTracking```[#43](https://github.com/Microsoft/ApplicationInsights-Android/pull/43)
-* Refactored Autocollection – ```LifecycleTracking```has been deprecated [#51](https://github.com/Microsoft/ApplicationInsights-Android/pull/51)
-* Fix for null pointer exceptions when trying to serialize ```null``` [#45](https://github.com/Microsoft/ApplicationInsights-Android/pull/45)
-* Fix for ```Concurrent Modification Exception``` in case the same Telemetry-Object was after it was modified [#44](https://github.com/Microsoft/ApplicationInsights-Android/pull/44)
-* **Fix for ```ClassNotFoundException``` when running the SDK on an Android 2.3 device** [#48](https://github.com/Microsoft/ApplicationInsights-Android/pull/48)
-* **Fix a bug that was introduced in 1.0-beta.4 that caused crashes not to be sent under some circumstances** [#52](https://github.com/Microsoft/ApplicationInsights-Android/pull/52) & [e3b51e7927f238cc123c50b654fbeab448ba6df6](https://github.com/Microsoft/ApplicationInsights-Android/commit/e3b51e7927f238cc123c50b654fbeab448ba6df6)
+* Integrated support for CLL channel
+* Improvements related to [our new Xamarin SDK]("https://github.com/Microsoft/ApplicationInsights-Xamarin")
+* Improved handling for user properties
+* [BUGFIX] Fixed bug for session management when starting an activity
+* Data will be now sent to the server using json-x-streaming
+* Removed previously deprecated `LifecycleTracking`
+* Small cleanups
 
+See [here](https://github.com/Microsoft/ApplicationInsights-Android/releases) for release notes of previous versions
 
 ##<a name="2"></a> 2. Breaking Changes & deprecations
 
 Starting with 1.0-beta.5, breaking changes will be announced 1 release in advance. Once a method has been deprecated, the next release of the SDK will remove the API.
 
+**[1.0-beta.6]**
+
+Previously deprecated `LifecycleTracking` has been removed, use `AutoCollection` instead.
+
 **[1.0-beta.5]**
 
-* Two previously deprecated setup-methods for ```ApplicationInsights```have been removed.
+* Two previously deprecated setup-methods for `ApplicationInsights` have been removed.
 * ```LifecycleTracking```has been deprecated, use ```AutoCollection```instead. 
 
 **[1.0-beta.4]**
 
-* Two setup-methods for ```ApplicationInsights```have been deprecated and will be removed in the next beta
+Two setup-methods for ```ApplicationInsights```have been deprecated and will be removed in the next beta
 
 **[1.0-beta.3]**
 
@@ -75,7 +80,7 @@ In your module's ```build.gradle```add a dependency for Application Insights
 
 ```groovy
 dependencies {
-    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.5'
+    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.6'
 }
 ```
 
@@ -210,7 +215,7 @@ Some data types allow for custom properties.
 //Get the instance of TelemetryClient
 TelemetryClient client = TelemetryClient.getInstance();
 
-Setup a custom property
+//Setup a custom property
 HashMap<String, String> properties = new HashMap<String, String>();
 properties.put("property1", "my custom property");
 
@@ -244,6 +249,28 @@ ApplicationInsights.disableAutoSessionManagement();
 // Enable automatic page view tracking
 ApplicationInsights.enableAutoPageViewTracking();
 ```
+
+###Note
+Automatic collection of pageviews logs the name of the activity class. If you need a more descriptive name for your pageviews, turn of autocollection of pageviews 
+
+```java
+ApplicationInsights.disableAutoPageViewTracking();
+```
+and log pageviews yourself using one of the three methods provided by ```TelemetryClient```.
+
+```java
+TelemetryClient.getInstance().trackPageView("Page 1");
+ 
+//Setup a custom property
+HashMap<String, String> properties = new HashMap<String, String>();
+properties.put("property1", "my custom property");
+TelemetryClient.getInstance().trackPageView("Page 2", properties);
+
+HashMap<String, Double> measurements = new HashMap<String, Double>();
+measurements.put("measurement1", 2);
+TelemetryClient.getInstance().trackPageView("Page 3", properties, measurements);
+```
+ 
 
 ## <a name="8"></a>8.  Exception Handling (Crashes)
 
