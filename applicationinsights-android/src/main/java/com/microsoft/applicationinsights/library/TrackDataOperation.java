@@ -126,6 +126,7 @@ class TrackDataOperation implements Runnable {
             this.name = (String) deepCopy(name);
             this.exceptionMessage = (String) deepCopy(message);
             this.exceptionStacktrace = (String) deepCopy(stacktrace);
+            this.handled = handled;
         }
         catch (Exception e) {
             e.printStackTrace();
