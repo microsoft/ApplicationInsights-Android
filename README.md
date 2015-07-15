@@ -26,7 +26,7 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 ## <a name="1"></a> 1. Release Notes
 
 * Integrated support for CLL channel
-* Improvements related to [our new Xamarin SDK]("https://github.com/Microsoft/ApplicationInsights-Xamarin")
+* Improvements related to [our new Xamarin SDK](https://github.com/Microsoft/ApplicationInsights-Xamarin)
 * Improved handling for user properties
 * [BUGFIX] Fixed bug for session management when starting an activity
 * Data will be now sent to the server using json-x-streaming
@@ -133,6 +133,13 @@ in the activity's `onCreate`-callback.
 **Congratulation, now you're all set to use Application Insights! See [Usage](#6) on how to use Application Insights.**
 
 ##<a name="4"></a> 4. Advanced Setup
+
+### 4.0 Download files manually
+
+We recommend integrating our SDK as described above, if, however, you want to add our SDK to your project manually, press on the button below to download our SDK from Bintray.
+
+[ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/1.0-beta.6/view#files)
+
 
 ### 4.1 Set the instrumentation key in your gradle.properties
 
