@@ -331,7 +331,6 @@ public enum ApplicationInsights {
      * Enables all auto-collection features. Call this before
      * {@link ApplicationInsights#start()} or when ApplicationInsights is already running to change
      * AutoCollection settings at runtime.
-     * <p/>
      * Requires ApplicationInsights to be setup with an Application object
      */
     public static void enableAutoCollection() {
