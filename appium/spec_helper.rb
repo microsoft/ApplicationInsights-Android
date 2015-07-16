@@ -14,12 +14,12 @@ RSpec.configure do |config|
       launchTimeout: 5000
     }
 
-    driver = Appium::Driver.new(options).start_driver
-    driver.manage.timeouts.implicit_wait = 10
+    @driver = Appium::Driver.new(options).start_driver
+    @driver.manage.timeouts.implicit_wait = 10
     Appium.promote_appium_methods Object
   end
 
   config.after(:all) do
-    driver_quit
+    @driver.driver_quit
   end
 end
