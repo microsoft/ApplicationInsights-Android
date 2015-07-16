@@ -1,7 +1,9 @@
-require File.expand_path('spec_helper')
+require 'rubygems'
+require 'rspec'
+require 'rspec/expectations'
+require 'appium_lib'
 
 def defaultTestRun
-
   it 'should should tap track 5 times' do
     list_el = text('Track event')
     list_el.click
@@ -52,8 +54,29 @@ end
     back
   end
 
- 
+#end of default test run
 end
+
+
+RSpec.describe 'ODL' do
+  before(:all) do
+    options = {
+      caps: {
+        platformName: 'Android',
+        app:'../app-sample/build/outputs/apk/app-sample-debug.apk',
+        deviceName: 'appinsights-appium' #required but doesn't have to match for genymotion  or android emu
+      },
+      launchTimeout: 5000
+    }
+
+    @driver = Appium::Driver.new(options).start_driver
+    @driver.manage.timeouts.implicit_wait = 10
+    Appium.promote_appium_methods Object
+  end
+
+  after(:all) do
+    @driver.driver_quit
+  end
 
 describe 'Run default tests' do
   defaultTestRun
@@ -127,5 +150,7 @@ end
   back
 end
 defaultTestRun 
+end
+  
 end
 
