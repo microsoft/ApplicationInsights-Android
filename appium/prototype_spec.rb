@@ -86,6 +86,14 @@ describe 'Run default tests' do
 end
 end
 
+describe 'restart' do
+      it 'should tap okay' do
+        restart
+        #launch_app
+        sleep(3)
+      end
+    end
+
 describe 'Run with disabled session management' do
   it 'Can disable session management' do
  list_el = text('Disable session management')
@@ -98,6 +106,14 @@ end
   list_el.click
 end
 end
+
+describe 'restart' do
+      it 'should tap okay' do
+        restart
+        #launch_app
+        sleep(3)
+      end
+    end
 
 describe 'Run with re-enabled session management' do
   it 'Can enable session management' do
@@ -112,6 +128,14 @@ end
 end
 end
 
+describe 'restart' do
+      it 'should tap okay' do
+        restart
+        #launch_app
+        sleep(3)
+      end
+    end
+
 describe 'Run with disabled pageviews' do
   it 'Can disable pageviews' do
  list_el = text('Disable page view tracking')
@@ -125,6 +149,14 @@ end
 end
 end
 
+describe 'restart' do
+      it 'should tap okay' do
+        restart
+        #launch_app
+        sleep(3)
+      end
+    end
+
 describe 'Run with re-enabled pageviews' do
   it 'Can re-enable pageviews' do
  list_el = text('Enable page view tracking')
@@ -137,6 +169,14 @@ end
   list_el.click
 end
 end
+
+describe 'restart' do
+      it 'should tap okay' do
+        restart
+        #launch_app
+        sleep(3)
+      end
+    end
 
 describe 'Run with disabled pageviews and session management' do
   it 'Can disable pageviews' do
@@ -153,4 +193,3 @@ defaultTestRun
 end
   
 end
-
