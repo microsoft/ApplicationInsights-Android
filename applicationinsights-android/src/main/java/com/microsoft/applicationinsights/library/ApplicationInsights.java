@@ -35,18 +35,21 @@ public enum ApplicationInsights {
     /**
      * A flag, which determines if auto page views should be disabled from the start.
      * Default is false.
+     * @deprecated
      */
     private boolean autoPageViewsDisabled;
 
     /**
      * A flag, which determines if auto session management should be disabled from the start.
      * Default is false.
+     * @deprecated
      */
     private boolean autoSessionManagementDisabled;
 
     /**
      * A flag, which determines if auto appearance should be disabled from the start.
      * Default is false.
+     * @deprecated
      */
     private boolean autoAppearanceDisabled;
 
@@ -91,7 +94,7 @@ public enum ApplicationInsights {
     /**
      * The application needed for auto collecting telemetry data
      */
-    private WeakReference<Application> weakApplication;
+    private static WeakReference<Application> weakApplication;
 
     /**
      * Properties associated with this telemetryContext.
@@ -101,12 +104,12 @@ public enum ApplicationInsights {
     /**
      * Flag that indicates that the user has called a setup-method before
      */
-    private static boolean isConfigured;
+    private static boolean isSetup;
 
     /**
      * Flag that indicates that the pipeline (Channel, Persistence, etc.) have been setup
      */
-    private static boolean isSetupAndRunning;
+    private static boolean isRunning;
 
     /**
      * The type of channel to use for logging
@@ -156,12 +159,12 @@ public enum ApplicationInsights {
      * @param instrumentationKey the instrumentation key associated with the app
      */
     private void setupInstance(Context context, Application application, String instrumentationKey) {
-        if (!isConfigured) {
+        if (!isSetup) {
             if (context != null) {
                 this.weakContext = new WeakReference<Context>(context);
                 this.instrumentationKey = instrumentationKey;
                 this.weakApplication = new WeakReference<Application>(application);
-                isConfigured = true;
+                isSetup = true;
                 InternalLogging.info(TAG, "ApplicationInsights has been setup correctly.", null);
             } else {
                 InternalLogging.warn(TAG, "ApplicationInsights could not be setup correctly " +
@@ -173,7 +176,7 @@ public enum ApplicationInsights {
 
     /**
      * Start ApplicationInsights
-     * Note: This should be called after {@link #isConfigured}
+     * Note: This should be called after {@link #isSetup}
      */
     public static void start() {
         INSTANCE.startInstance();
@@ -181,15 +184,15 @@ public enum ApplicationInsights {
 
     /**
      * Start ApplicationInsights
-     * Note: This should be called after {@link #isConfigured}
+     * Note: This should be called after {@link #isSetup}
      */
     private void startInstance() {
-        if (!isConfigured) {
+        if (!isSetup) {
             InternalLogging.warn(TAG, "Could not start Application Insights since it has not been " +
                   "setup correctly.");
             return;
         }
-        if (!isSetupAndRunning) {
+        if (!isRunning) {
             Context context = this.weakContext.get();
 
             if (context == null) {
@@ -283,9 +286,9 @@ public enum ApplicationInsights {
         ChannelManager.initialize(channelType);
 
         // Initialize Telemetry
-        TelemetryClient.initialize(!telemetryDisabled);
+        TelemetryClient.initialize(telemetryContext, !telemetryDisabled);
 
-        isSetupAndRunning = true;
+        isRunning = true;
 
         if (autoCollectionPossible("Initialise AutoCollection")) {
             AutoCollection.initialize(telemetryContext, this.config);
@@ -299,7 +302,7 @@ public enum ApplicationInsights {
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
-        if (!isSetupAndRunning) {
+        if (!isRunning) {
             InternalLogging.warn(TAG, "Could not set send pending data, because " +
                   "ApplicationInsights has not been started, yet.");
             return;
@@ -332,6 +335,7 @@ public enum ApplicationInsights {
      * {@link ApplicationInsights#start()} or when ApplicationInsights is already running to change
      * AutoCollection settings at runtime.
      * Requires ApplicationInsights to be setup with an Application object
+     * @deprecated
      */
     public static void enableAutoCollection() {
         INSTANCE.autoAppearanceDisabled = false;
@@ -344,6 +348,7 @@ public enum ApplicationInsights {
 
     /**
      * disables all auto-collection features
+     * @deprecated
      */
     public static void disableAutoCollection() {
         INSTANCE.autoAppearanceDisabled = true;
@@ -358,23 +363,22 @@ public enum ApplicationInsights {
      * Enable auto page view tracking before calling {@link ApplicationInsights#start()} or
      * at runtime. This featuee only works if ApplicationInsights has been setup
      * with an application.
+     * @deprecated
      */
     public static void enableAutoPageViewTracking() {
-        INSTANCE.autoPageViewsDisabled = false;
-        if (autoCollectionPossible("Auto PageView Tracking")) {
-            AutoCollection.enableAutoPageViews(INSTANCE.getApplication());
-        }
+       TelemetryClient.getInstance().enableAllAutoCollection();
     }
 
     /**
      * Disable auto page view tracking before calling {@link ApplicationInsights#start()} or
      * at runtime. This feature only works if ApplicationInsights has been setup
      * with an application.
+     * @deprecated
      */
     public static void disableAutoPageViewTracking() {
         INSTANCE.autoPageViewsDisabled = true;
         if (autoCollectionPossible("Auto PageView Tracking")) {
-            AutoCollection.disableAutoPageViews();
+            TelemetryClient.getInstance().disableAutoAppearanceTracking();
         }
     }
 
@@ -382,11 +386,12 @@ public enum ApplicationInsights {
      * Enable auto session management tracking before calling {@link ApplicationInsights#start()} or
      * at runtime. This feature only works if ApplicationInsights has been setup
      * with an application.
+     * @deprecated
      */
     public static void enableAutoSessionManagement() {
         INSTANCE.autoSessionManagementDisabled = false;
         if (autoCollectionPossible("Auto Session Management")) {
-            AutoCollection.enableAutoSessionManagement(INSTANCE.getApplication());
+            TelemetryClient.getInstance().enableAutoSessionManagement(INSTANCE.getApplication());
         }
     }
 
@@ -394,11 +399,12 @@ public enum ApplicationInsights {
      * Disable auto session management tracking before calling {@link ApplicationInsights#start()} or
      * at runtime. This feature only works if ApplicationInsights has been setup
      * with an application.
+     * @deprecated
      */
     public static void disableAutoSessionManagement() {
         INSTANCE.autoSessionManagementDisabled = true;
         if (autoCollectionPossible("Auto Session Management")) {
-            AutoCollection.disableAutoSessionManagement();
+            TelemetryClient.getInstance().disableAutoSessionManagement();
         }
     }
 
@@ -406,11 +412,12 @@ public enum ApplicationInsights {
      * Enable auto appearance management tracking before calling {@link ApplicationInsights#start()} or
      * at runtime. This feature only works if ApplicationInsights has been setup
      * with an application.
+     * @deprecated
      */
     public static void enableAutoAppearanceTracking() {
         INSTANCE.autoAppearanceDisabled = false;
         if (autoCollectionPossible("Auto Appearance")) {
-            AutoCollection.enableAutoAppearanceTracking(INSTANCE.getApplication());
+            TelemetryClient.getInstance().enableAutoAppearanceTracking();
         }
     }
 
@@ -418,11 +425,12 @@ public enum ApplicationInsights {
      * Disable auto appearance management tracking before calling {@link ApplicationInsights#start()} or
      * at runtime. This feature only works if ApplicationInsights has been setup
      * with an application.
+     * @deprecated
      */
     public static void disableAutoAppearanceTracking() {
         INSTANCE.autoAppearanceDisabled = true;
         if (autoCollectionPossible("Auto Appearance")) {
-            AutoCollection.disableAutoAppearanceTracking();
+            TelemetryClient.getInstance().disableAutoAppearanceTracking();
         }
     }
 
@@ -432,6 +440,7 @@ public enum ApplicationInsights {
      * @param featureName The name of the feature which will be logged in case autocollection is not
      *                    possible
      * @return a flag indicating if autocollection features can be activated
+     * @deprecated
      */
     private static boolean autoCollectionPossible(String featureName) {
         if (!Util.isLifecycleTrackingAvailable()) {
@@ -439,7 +448,7 @@ public enum ApplicationInsights {
                   " can't be enabled/disabled, because " +
                   "it is not supported on this OS version.");
             return false;
-        } else if (!isSetupAndRunning) {
+        } else if (!isRunning) {
             InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
                   " has been set and will be activated when calling start().");
             return false;
@@ -459,12 +468,12 @@ public enum ApplicationInsights {
      * @param disabled if set to true, crash reporting will be disabled
      */
     public static void setExceptionTrackingDisabled(boolean disabled) {
-        if (!isConfigured) {
+        if (!isSetup) {
             InternalLogging.warn(TAG, "Could not enable/disable exception tracking, because " +
                   "ApplicationInsights has not been setup correctly.");
             return;
         }
-        if (isSetupAndRunning) {
+        if (isRunning) {
             InternalLogging.warn(TAG, "Could not enable/disable exception tracking, because " +
                   "ApplicationInsights has already been started.");
             return;
@@ -478,12 +487,12 @@ public enum ApplicationInsights {
      * @param disabled if set to true, the telemetry feature will be disabled
      */
     public static void setTelemetryDisabled(boolean disabled) {
-        if (!isConfigured) {
+        if (!isSetup) {
             InternalLogging.warn(TAG, "Could not enable/disable telemetry, because " +
                   "ApplicationInsights has not been setup correctly.");
             return;
         }
-        if (isSetupAndRunning) {
+        if (isRunning) {
             InternalLogging.warn(TAG, "Could not enable/disable telemetry, because " +
                   "ApplicationInsights has already been started.");
             return;
@@ -506,12 +515,12 @@ public enum ApplicationInsights {
      * @param commonProperties a dictionary of properties to log with all telemetry.
      */
     public static void setCommonProperties(Map<String, String> commonProperties) {
-        if (!isConfigured) {
+        if (!isSetup) {
             InternalLogging.warn(TAG, "Could not set common properties, because " +
                   "ApplicationInsights has not been setup correctly.");
             return;
         }
-        if (isSetupAndRunning) {
+        if (isRunning) {
             InternalLogging.warn(TAG, "Could not set common properties, because " +
                   "ApplicationInsights has already been started.");
             return;
@@ -583,7 +592,7 @@ public enum ApplicationInsights {
      *
      * @return the reference to the application that was used during initialization of the SDK
      */
-    private Application getApplication() {
+    protected static Application getApplication() {
         Application application = null;
         if (weakApplication != null) {
             application = weakApplication.get();
@@ -632,7 +641,7 @@ public enum ApplicationInsights {
      * @deprecated use {@link ApplicationInsights#setCustomUserContext(User)} instead
      */
     public static void setUserId(String userId) {
-        if (isSetupAndRunning) {
+        if (isRunning) {
             INSTANCE.telemetryContext.configUserContext(userId);
         } else {
             INSTANCE.userId = userId;
@@ -646,7 +655,7 @@ public enum ApplicationInsights {
      *             the missing property will be generated by the SDK
      */
     public static void setCustomUserContext(User user) {
-        if (isSetupAndRunning) {
+        if (isRunning) {
             INSTANCE.telemetryContext.configUserContext(user);
         } else {
             INSTANCE.user = user;
@@ -659,7 +668,7 @@ public enum ApplicationInsights {
      * @param channelType The channel type to use
      */
     public static void setChannelType(ChannelType channelType) {
-        if (isSetupAndRunning) {
+        if (isRunning) {
             InternalLogging.warn(TAG, "Cannot set channel type, because " +
                   "ApplicationInsights has already been started.");
             return;
