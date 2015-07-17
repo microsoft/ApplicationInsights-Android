@@ -17,6 +17,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPOutputStream;
@@ -89,7 +91,7 @@ class Sender {
 
         return Sender.instance;
     }
-    
+
     protected void sendDataOnAppStart() {
         kickOffAsyncSendingTask().execute();
     }
@@ -200,35 +202,36 @@ class Sender {
     protected void onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
         this.operationsCount.getAndDecrement();
 
-        StringBuilder builder = new StringBuilder();
 
         InternalLogging.info(TAG, "response code", Integer.toString(responseCode));
-        boolean isExpected = ((responseCode > 199) && (responseCode < 203));
-        boolean isRecoverableError = (responseCode == 429) || (responseCode == 408) ||
-              (responseCode == 500) || (responseCode == 503) || (responseCode == 511);
-        boolean deleteFile = isExpected || !isRecoverableError;
 
-        // If this was expected and developer mode is enabled, read the response
-        if (isExpected) {
-            this.onExpected(connection, builder);
-            this.sendNextFile();
-        }
-
-        if (deleteFile) {
+        boolean isRecoverableError = isRecoverableError(responseCode);
+        if (isRecoverableError) {
+            this.onRecoverable(payload, fileToSend);
+        } else {
+            //delete in case of success or unrecoverable errors
             if (this.persistence != null) {
                 this.persistence.deleteFile(fileToSend);
             }
-        }
 
-        // If there was a server issue, flush the data
-        if (isRecoverableError) {
-            this.onRecoverable(payload, fileToSend);
+            //trigger send next file or log unexpected responses
+            StringBuilder builder = new StringBuilder();
+            if (isExpected(responseCode)) {
+                this.onExpected(connection, builder);
+                this.sendNextFile();
+            } else {
+                this.onUnexpected(connection, responseCode, builder);
+            }
         }
+    }
 
-        // If it isn't the usual success code (200), log the response from the server.
-        if (!isExpected) {
-            this.onUnexpected(connection, responseCode, builder);
-        }
+    protected boolean isRecoverableError(int responseCode) {
+        List<Integer> recoverableCodes = Arrays.asList(408, 429, 500, 503, 511);
+        return recoverableCodes.contains(responseCode);
+    }
+
+    protected boolean isExpected(int responseCode) {
+        return (199 < responseCode && responseCode <= 203);
     }
 
     /**
@@ -269,7 +272,7 @@ class Sender {
      * @param fileToSend reference to the file we sent
      */
     protected void onRecoverable(String payload, File fileToSend) {
-        InternalLogging.info(TAG, "Server error, persisting data", payload);
+        InternalLogging.info(TAG, "Recoverable error (probably a server error), persisting data", payload);
         if (this.persistence != null) {
             this.persistence.makeAvailable(fileToSend);
         }
