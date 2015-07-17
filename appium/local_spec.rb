@@ -58,7 +58,7 @@ end
 end
 
 
-RSpec.describe 'ODL' do
+RSpec.describe 'Run locally' do
   before(:all) do
     options = {
       caps: {
@@ -87,9 +87,8 @@ end
 end
 
 describe 'restart' do
-      it 'should tap okay' do
+      it 'should restart the driver after a crash' do
         restart
-        #launch_app
         sleep(3)
       end
     end
@@ -108,9 +107,8 @@ end
 end
 
 describe 'restart' do
-      it 'should tap okay' do
+      it 'should restart the driver after a crash' do
         restart
-        #launch_app
         sleep(3)
       end
     end
@@ -129,9 +127,8 @@ end
 end
 
 describe 'restart' do
-      it 'should tap okay' do
+      it 'should restart the driver after a crash' do
         restart
-        #launch_app
         sleep(3)
       end
     end
@@ -150,9 +147,8 @@ end
 end
 
 describe 'restart' do
-      it 'should tap okay' do
+      it 'should restart the driver after a crash' do
         restart
-        #launch_app
         sleep(3)
       end
     end
@@ -171,9 +167,8 @@ end
 end
 
 describe 'restart' do
-      it 'should tap okay' do
+      it 'should restart the driver after a crash' do
         restart
-        #launch_app
         sleep(3)
       end
     end
