@@ -236,7 +236,7 @@ public enum ApplicationInsights {
 
     /**
      * Start/Stop AutoCollection features depending on user's settings.
-     * Will be called during start of the SDK and when enabling/disabling ALL autocollection features
+     * Will be called during start of the SDK and when enabling/disabling ALL AutoCollection features
      */
     private void startAutoCollection() {
         if (autoCollectionPossible("Start of AutoCollection at app start.")) {
