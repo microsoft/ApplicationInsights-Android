@@ -526,10 +526,15 @@ public enum ApplicationInsights {
             return;
         }
         INSTANCE.commonProperties = commonProperties;
+
+        //set common properties at runtime.
+        if(EnvelopeFactory.getInstance().isConfigured()) {
+            EnvelopeFactory.getInstance().setCommonProperties(commonProperties);
+        }
     }
 
     /**
-     * Activates the developer mode which. It enables extensive logging as well as use different
+     * Activates the developer mode switch. It enables extensive logging as well as use different
      * settings for batching. Batch Size in debug mode is 5 and sending interval is 3s.
      * @param developerMode if true, developer mode will be activated
      */
