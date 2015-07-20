@@ -391,7 +391,7 @@ public enum ApplicationInsights {
     public static void enableAutoSessionManagement() {
         INSTANCE.autoSessionManagementDisabled = false;
         if (autoCollectionPossible("Auto Session Management")) {
-            TelemetryClient.getInstance().enableAutoSessionManagement(INSTANCE.getApplication());
+            TelemetryClient.getInstance().enableAutoSessionManagement();
         }
     }
 
