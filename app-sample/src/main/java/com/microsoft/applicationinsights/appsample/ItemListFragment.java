@@ -119,16 +119,16 @@ public class ItemListFragment extends ListFragment {
 
         switch (position) {
             case 0:
-                ApplicationInsights.enableAutoPageViewTracking();
+                TelemetryClient.getInstance().enableAutoPageViewTracking();
                 break;
             case 1:
-                ApplicationInsights.disableAutoPageViewTracking();
+                TelemetryClient.getInstance().disableAutoPageViewTracking();
                 break;
             case 2:
-                ApplicationInsights.enableAutoSessionManagement();
+                TelemetryClient.getInstance().enableAutoSessionManagement();
                 break;
             case 3:
-                ApplicationInsights.disableAutoSessionManagement();
+                TelemetryClient.getInstance().disableAutoSessionManagement();
                 break;
             case 4:
 
