@@ -23,7 +23,7 @@ import com.microsoft.telemetry.JsonHelper;
 /**
  * Data contract class PageViewPerfData.
  */
-public class PageViewPerfData extends PageViewData implements Serializable
+public class PageViewPerfData extends PageViewData
 {
     /**
      * Backing field for property PerfTotal.

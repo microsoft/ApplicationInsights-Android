@@ -23,7 +23,7 @@ import com.microsoft.telemetry.JsonHelper;
 /**
  * Data contract class SessionStateData.
  */
-public class SessionStateData extends ITelemetry implements Serializable
+public class SessionStateData extends TelemetryData
 {
     /**
      * Backing field for property Ver.

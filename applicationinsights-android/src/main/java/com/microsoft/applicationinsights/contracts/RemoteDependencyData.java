@@ -23,7 +23,7 @@ import com.microsoft.telemetry.JsonHelper;
 /**
  * Data contract class RemoteDependencyData.
  */
-public class RemoteDependencyData extends ITelemetry implements Serializable
+public class RemoteDependencyData extends TelemetryData
 {
     /**
      * Backing field for property Ver.

@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Data contract class CrashData.
  */
-public class CrashData extends ITelemetry implements Serializable
+public class CrashData extends TelemetryData
 {
     /**
      * Backing field for property Ver.

@@ -23,7 +23,7 @@ import com.microsoft.telemetry.JsonHelper;
 /**
  * Data contract class EventData.
  */
-public class EventData extends ITelemetry implements Serializable
+public class EventData extends TelemetryData
 {
     /**
      * Backing field for property Ver.

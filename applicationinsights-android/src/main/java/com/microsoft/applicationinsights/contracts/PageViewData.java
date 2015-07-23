@@ -23,7 +23,7 @@ import com.microsoft.telemetry.JsonHelper;
 /**
  * Data contract class PageViewData.
  */
-public class PageViewData extends EventData implements Serializable
+public class PageViewData extends EventData
 {
     /**
      * Backing field for property Url.
