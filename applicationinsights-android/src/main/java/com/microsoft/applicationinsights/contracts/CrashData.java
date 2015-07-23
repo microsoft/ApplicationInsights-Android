@@ -6,6 +6,7 @@ import com.microsoft.telemetry.ITelemetry;
 import com.microsoft.telemetry.JsonHelper;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Map;
 /**
  * Data contract class CrashData.
  */
-public class CrashData extends ITelemetry
+public class CrashData extends ITelemetry implements Serializable
 {
     /**
      * Backing field for property Ver.

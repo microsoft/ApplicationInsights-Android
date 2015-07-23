@@ -3,6 +3,7 @@
 */
 package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
 import java.util.List;
@@ -22,7 +23,7 @@ import com.microsoft.telemetry.JsonHelper;
 /**
  * Data contract class PageViewData.
  */
-public class PageViewData extends EventData
+public class PageViewData extends EventData implements Serializable
 {
     /**
      * Backing field for property Url.

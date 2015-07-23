@@ -3,6 +3,7 @@
 */
 package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
 import java.util.List;
@@ -23,7 +24,7 @@ import com.microsoft.telemetry.JsonHelper;
  * Data contract class CrashDataBinary.
  */
 public class CrashDataBinary
-     implements IJsonSerializable
+     implements IJsonSerializable, Serializable
 {
     /**
      * Backing field for property StartAddress.
