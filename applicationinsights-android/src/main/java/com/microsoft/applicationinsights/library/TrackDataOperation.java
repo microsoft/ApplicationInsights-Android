@@ -1,9 +1,9 @@
 package com.microsoft.applicationinsights.library;
 
+import com.microsoft.applicationinsights.contracts.TelemetryData;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
 import com.microsoft.telemetry.IChannel;
-import com.microsoft.telemetry.ITelemetry;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,12 +44,12 @@ class TrackDataOperation implements Runnable {
     private Throwable exception;
 
     // custom
-    private ITelemetry telemetry;
+    private TelemetryData telemetry;
 
-    protected TrackDataOperation(ITelemetry telemetry) {
+    protected TrackDataOperation(TelemetryData telemetry) {
         this.type = DataType.NONE;
         try {
-            this.telemetry = (ITelemetry)deepCopy(telemetry);
+            this.telemetry = (TelemetryData)deepCopy(telemetry);
         }
         catch (Exception e) {
             e.printStackTrace();
