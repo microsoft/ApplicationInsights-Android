@@ -3,6 +3,7 @@
 */
 package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
 import java.util.List;
@@ -22,7 +23,7 @@ import com.microsoft.telemetry.JsonHelper;
 /**
  * Data contract class MessageData.
  */
-public class MessageData extends ITelemetry
+public class MessageData extends TelemetryData
 {
     /**
      * Backing field for property Ver.

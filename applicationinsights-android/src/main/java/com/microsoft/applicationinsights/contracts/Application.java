@@ -6,6 +6,7 @@ import com.microsoft.telemetry.IJsonSerializable;
 import com.microsoft.telemetry.JsonHelper;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ import java.util.Map;
  * Data contract class Application.
  */
 public class Application
-     implements IJsonSerializable
+     implements IJsonSerializable, Serializable
 {
     /**
      * Backing field for property Ver.

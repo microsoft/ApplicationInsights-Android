@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights.library;
 
+import com.microsoft.applicationinsights.contracts.TelemetryData;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 import com.microsoft.telemetry.ITelemetry;
 
@@ -105,13 +106,13 @@ public class TelemetryClient {
     }
 
     /**
-     * Sends information about any object that implements the ITelemetry interface to Application Insights.
+     * Sends information about any object that extend TelemetryData interface to Application Insights.
      * For most use-cases, the other tracking methods will be sufficient. Providing this generic method
      * for very specific uses.
      *
-     * @param telemetry an object that implements the ITelemetry interface
+     * @param telemetry an object that extends TelemetryData
      */
-    public void track(ITelemetry telemetry){
+    public void track(TelemetryData telemetry){
         if(isTelemetryEnabled()){
             this.executorService.execute(new TrackDataOperation(telemetry));
         }

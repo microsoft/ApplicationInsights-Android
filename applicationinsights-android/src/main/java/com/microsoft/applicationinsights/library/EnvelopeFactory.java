@@ -15,11 +15,11 @@ import com.microsoft.applicationinsights.contracts.PageViewData;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.StackFrame;
+import com.microsoft.applicationinsights.contracts.TelemetryData;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
 import com.microsoft.telemetry.cs2.Envelope;
-import com.microsoft.telemetry.ITelemetry;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -148,8 +148,8 @@ class EnvelopeFactory {
         Envelope envelope = createEnvelope();
         envelope.setData(data);
         Domain baseData = data.getBaseData();
-        if(baseData instanceof ITelemetry) {
-            String envelopeName = ((ITelemetry) baseData).getEnvelopeName();
+        if(baseData instanceof TelemetryData) {
+            String envelopeName = ((TelemetryData) baseData).getEnvelopeName();
             envelope.setName(envelopeName);
         }
 
@@ -166,7 +166,7 @@ class EnvelopeFactory {
      * @param telemetryData The telemetry we want to wrap inside an Enevelope and send to the server
      * @return the envelope that includes the telemetry data
      */
-    protected Data<Domain> createData(ITelemetry telemetryData) {
+    protected Data<Domain> createData(TelemetryData telemetryData) {
         addCommonProperties(telemetryData);
 
         Data<Domain> data = new Data<Domain>();
@@ -333,7 +333,7 @@ class EnvelopeFactory {
      *
      * @param telemetry The telemetry data
      */
-    protected void addCommonProperties(ITelemetry telemetry) {
+    protected void addCommonProperties(TelemetryData telemetry) {
         telemetry.setVer(CONTRACT_VERSION);
         if (this.commonProperties != null) {
             Map<String, String> map = telemetry.getProperties();
