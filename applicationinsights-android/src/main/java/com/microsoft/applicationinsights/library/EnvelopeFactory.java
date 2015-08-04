@@ -264,8 +264,7 @@ class EnvelopeFactory {
     protected Data<Domain> createExceptionData(Throwable exception, Map<String, String> properties, Map<String, Double> measurements) {
         Data<Domain> data = null;
         if (isConfigured()) {
-            CrashData telemetry = this.getCrashData(exception, properties);
-            // TODO: Update contract files to support measurements for ExceptionData (see iOS)
+            CrashData telemetry = this.getCrashData(exception, properties, measurements);
             data = createData(telemetry);
         }
         return data;
@@ -369,15 +368,15 @@ class EnvelopeFactory {
         this.commonProperties = commonProperties;
     }
 
-
     /**
      * Parse an exception and it's stack trace and create the CrashData object
      *
-     * @param exception  the throwable object we want to create a crashdata from
-     * @param properties properties used foor the CrashData
+     * @param exception     The throwable object we want to create a crashdata from
+     * @param properties    Properties used foor the CrashData
+     * @param measurements  Key value par for custom metrics
      * @return a CrashData object that contains the stacktrace and context info
      */
-    private CrashData getCrashData(Throwable exception, Map<String, String> properties) {
+    private CrashData getCrashData(Throwable exception, Map<String, String> properties, Map<String, Double> measurements) {
         Throwable localException = exception;
         if (localException == null) {
             localException = new Exception();
@@ -411,7 +410,7 @@ class EnvelopeFactory {
         CrashData crashData = new CrashData();
         crashData.setThreads(threads);
         crashData.setHeaders(crashDataHeaders);
-        crashData.setProperties(properties);
+        // TODO: Add properties and measurements (not supported for CrashData in V2)
 
         return crashData;
     }
