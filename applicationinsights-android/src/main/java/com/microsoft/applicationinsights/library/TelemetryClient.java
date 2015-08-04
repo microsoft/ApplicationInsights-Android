@@ -192,7 +192,7 @@ public class TelemetryClient {
      * @see TelemetryClient#trackHandledException(Throwable, Map)
      */
     public void trackHandledException(Throwable handledException) {
-        this.trackHandledException(handledException, null);
+        this.trackHandledException(handledException, null, null);
     }
 
     /**
@@ -203,9 +203,20 @@ public class TelemetryClient {
      *                         supersede values set in {@link ApplicationInsights#setCommonProperties}.
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
+        trackHandledException(handledException, properties, null);
+    }
+
+    /**
+     * Sends information about an handledException to Application Insights.
+     *
+     * @param handledException The handledException to track.
+     * @param properties       Custom properties associated with the event. Note: values set here will
+     *                         supersede values set in {@link ApplicationInsights#setCommonProperties}.
+     */
+    public void trackHandledException(Throwable handledException, Map<String, String> properties, Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
-                    handledException, properties));
+                    handledException, properties, measurements));
         }
     }
 

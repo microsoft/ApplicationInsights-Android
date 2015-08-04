@@ -119,13 +119,19 @@ class TrackDataOperation implements Runnable {
         }
 
     }
+
+    protected TrackDataOperation(DataType type,
                                  Throwable exception,
-                                 Map<String, String> properties) {
+                                 Map<String, String> properties,
+                                 Map<String, Double> measurements) {
         this.type = type; // no need to copy as enum is pass by value
         try {
             this.exception = (Throwable) deepCopy(exception);
             if(properties != null) {
                 this.properties = new HashMap<String, String>(properties);
+            }
+            if(measurements != null) {
+                this.measurements = new HashMap<String, Double>(measurements);
             }
         }
         catch (Exception e) {
@@ -175,7 +181,7 @@ class TrackDataOperation implements Runnable {
     private Data<Domain> getTelemetry() {
         Data<Domain> telemetry = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
-            telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties);
+            telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties, this.measurements);
         }else if ((this.type == DataType.MANAGED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.name, this.exceptionMessage, this.exceptionStacktrace, this.handled);
 
@@ -202,7 +208,7 @@ class TrackDataOperation implements Runnable {
                     telemetry = EnvelopeFactory.getInstance().createNewSessionData();
                     break;
                 case HANDLED_EXCEPTION:
-                    telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties);
+                    telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties, this.measurements);
                     break;
                 default:
                     break;

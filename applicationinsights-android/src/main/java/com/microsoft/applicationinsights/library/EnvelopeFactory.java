@@ -256,15 +256,16 @@ class EnvelopeFactory {
      * method gets called by a CreateTelemetryDataTask in order to create and forward data on a
      * background thread.
      *
-     * @param exception  The exception to track
-     * @param properties Custom properties associated with the event
+     * @param exception     The exception to track
+     * @param properties    Custom properties associated with the event
+     * @param measurements  Custom measurements associated with the event
      * @return an Envelope object, which contains a handled or unhandled exception
      */
-    protected Data<Domain> createExceptionData(Throwable exception, Map<String, String> properties) {
+    protected Data<Domain> createExceptionData(Throwable exception, Map<String, String> properties, Map<String, Double> measurements) {
         Data<Domain> data = null;
         if (isConfigured()) {
             CrashData telemetry = this.getCrashData(exception, properties);
-
+            // TODO: Update contract files to support measurements for ExceptionData (see iOS)
             data = createData(telemetry);
         }
         return data;
