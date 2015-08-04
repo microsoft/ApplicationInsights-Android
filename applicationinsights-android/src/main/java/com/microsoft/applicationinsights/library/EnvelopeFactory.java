@@ -235,7 +235,7 @@ class EnvelopeFactory {
             MetricData telemetry = new MetricData();
             DataPoint dataPoint = new DataPoint();
             dataPoint.setCount(1);
-            dataPoint.setKind(DataPointType.Measurement);
+            dataPoint.setKind(DataPointType.MEASUREMENT);
             dataPoint.setMax(value);
             dataPoint.setMax(value);
             dataPoint.setName(ensureNotNull(name));
@@ -322,7 +322,7 @@ class EnvelopeFactory {
         Data<Domain> data = null;
         if (isConfigured()) {
             SessionStateData telemetry = new SessionStateData();
-            telemetry.setState(SessionState.Start);
+            telemetry.setState(SessionState.START);
             data = createData(telemetry);
         }
         return data;
