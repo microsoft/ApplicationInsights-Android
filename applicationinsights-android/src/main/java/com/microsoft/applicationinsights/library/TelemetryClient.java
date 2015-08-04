@@ -267,6 +267,24 @@ public class TelemetryClient {
     }
 
     /**
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     */
+    @Deprecated
+    public void trackPageView(String pageName, Map<String, String> properties, Map<String, Double> measurements) {
+        this.trackPageView(pageName, 0, properties, measurements);
+    }
+
+    /**
+     * {@code measurements} defaults to {@code null}.
+     *
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     */
+    @Deprecated
+    public void trackPageView(String pageName, Map<String, String> properties) {
+        this.trackPageView(pageName, 0, properties, null);
+    }
+
+    /**
      * Sends information about a page view to Application Insights.
      *
      * @param pageName     The name of the page.
