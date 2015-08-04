@@ -43,6 +43,9 @@ class TrackDataOperation implements Runnable {
     // unmanaged exceptions
     private Throwable exception;
 
+    // page views
+    private String duration;
+
     // custom
     private TelemetryData telemetry;
 
@@ -103,6 +106,19 @@ class TrackDataOperation implements Runnable {
     }
 
     protected TrackDataOperation(DataType type,
+                                 String name,
+                                 String duration,
+                                 Map<String, String> properties,
+                                 Map<String, Double> measurements) {
+        this(type, name, properties, measurements);
+        try {
+            this.duration = (String) deepCopy(duration);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
                                  Throwable exception,
                                  Map<String, String> properties) {
         this.type = type; // no need to copy as enum is pass by value
@@ -174,7 +190,7 @@ class TrackDataOperation implements Runnable {
                     telemetry = EnvelopeFactory.getInstance().createEventData(this.name, this.properties, this.measurements);
                     break;
                 case PAGE_VIEW:
-                    telemetry = EnvelopeFactory.getInstance().createPageViewData(this.name, this.properties, this.measurements);
+                    telemetry = EnvelopeFactory.getInstance().createPageViewData(this.name, this.duration, this.properties, this.measurements);
                     break;
                 case TRACE:
                     telemetry = EnvelopeFactory.getInstance().createTraceData(this.name, this.properties);

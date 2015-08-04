@@ -299,11 +299,13 @@ class EnvelopeFactory {
      */
     protected Data<Domain> createPageViewData(
           String pageName,
+          String duration,
           Map<String, String> properties,
           Map<String, Double> measurements) {
         Data<Domain> data = null;
         if (isConfigured()) {
             PageViewData telemetry = new PageViewData();
+            telemetry.setDuration(duration);
             telemetry.setName(ensureNotNull(pageName));
             telemetry.setUrl(null);
             telemetry.setProperties(properties);

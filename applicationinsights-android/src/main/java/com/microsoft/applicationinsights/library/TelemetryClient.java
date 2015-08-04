@@ -226,22 +226,33 @@ public class TelemetryClient {
     }
 
     /**
+     * {@code duration} defaults to {@code null}.
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, Map, Map)
+     * @see TelemetryClient#trackPageView(String, String, Map, Map)
      */
     public void trackPageView(String pageName) {
-        this.trackPageView(pageName, null, null);
+        this.trackPageView(pageName, null, null, null);
+    }
+
+    /**
+     * {@code properties} defaults to {@code null}.
+     * {@code measurements} defaults to {@code null}.
+     *
+     * @see TelemetryClient#trackPageView(String, String, Map, Map)
+     */
+    public void trackPageView(String pageName, String duration) {
+        this.trackPageView(pageName, duration, null, null);
     }
 
     /**
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, Map, Map)
+     * @see TelemetryClient#trackPageView(String, String, Map, Map)
      */
-    public void trackPageView(String pageName, Map<String, String> properties) {
-        this.trackPageView(pageName, properties, null);
+    public void trackPageView(String pageName, String duration, Map<String, String> properties) {
+        this.trackPageView(pageName, duration, properties, null);
     }
 
     /**
@@ -254,11 +265,12 @@ public class TelemetryClient {
      */
     public void trackPageView(
           String pageName,
+          String duration,
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
-                    pageName, properties, null));
+                    pageName, duration, properties, measurements));
         }
     }
 
