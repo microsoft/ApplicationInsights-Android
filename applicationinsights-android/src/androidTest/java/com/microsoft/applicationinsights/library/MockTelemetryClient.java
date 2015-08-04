@@ -94,7 +94,7 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackMetric(String name, double value) {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createMetricData(name, value));
+            messages.add(EnvelopeFactory.getInstance().createMetricData(name, value, null));
         }else{
             super.trackMetric(name, value);
         }

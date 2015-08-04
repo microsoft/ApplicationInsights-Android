@@ -225,11 +225,12 @@ class EnvelopeFactory {
      * Creates information about an aggregated metric for Application Insights. This method gets
      * called by a CreateTelemetryDataTask in order to create and forward data on a background thread.
      *
-     * @param name  The name of the metric
-     * @param value The value of the metric
+     * @param name          The name of the metric
+     * @param value         The value of the metric
+     * @param properties    Custom properties associated with the event
      * @return an Envelope object, which contains a metric
      */
-    protected Data<Domain> createMetricData(String name, double value) {
+    protected Data<Domain> createMetricData(String name, double value, Map<String, String> properties) {
         Data<Domain> data = null;
         if (isConfigured()) {
             MetricData telemetry = new MetricData();
@@ -243,6 +244,7 @@ class EnvelopeFactory {
             List<DataPoint> metricsList = new ArrayList<DataPoint>();
             metricsList.add(dataPoint);
             telemetry.setMetrics(metricsList);
+            telemetry.setProperties(properties);
 
             data = createData(telemetry);
         }

@@ -70,11 +70,12 @@ class TrackDataOperation implements Runnable {
         this.type = type; // no need to copy as enum is pass by value
     }
 
-    protected TrackDataOperation(DataType type, String metricName, double metric) {
+    protected TrackDataOperation(DataType type, String metricName, double metric, Map<String, String> properties) {
         this.type = type; // no need to copy as enum is pass by value
         this.metric = metric;  // no need to copy as enum is pass by value
         try {
             this.name = (String) deepCopy(metricName);
+            this.properties = new HashMap<String, String>(properties);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -179,7 +180,7 @@ class TrackDataOperation implements Runnable {
                     telemetry = EnvelopeFactory.getInstance().createTraceData(this.name, this.properties);
                     break;
                 case METRIC:
-                    telemetry = EnvelopeFactory.getInstance().createMetricData(this.name, this.metric);
+                    telemetry = EnvelopeFactory.getInstance().createMetricData(this.name, this.metric, this.properties);
                     break;
                 case NEW_SESSION:
                     telemetry = EnvelopeFactory.getInstance().createNewSessionData();

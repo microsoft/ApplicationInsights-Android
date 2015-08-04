@@ -168,8 +168,20 @@ public class TelemetryClient {
      * @param value The value of the metric
      */
     public void trackMetric(String name, double value) {
+        trackMetric(name, value, null);
+    }
+
+    /**
+     * Sends information about an aggregated metric to Application Insights. Note: all data sent via
+     * this method will be aggregated. To log non-aggregated data use
+     * {@link TelemetryClient#trackEvent(String, Map, Map)} with measurements.
+     *
+     * @param name  The name of the metric
+     * @param value The value of the metric
+     */
+    public void trackMetric(String name, double value, Map<String, String> properties) {
         if(isTelemetryEnabled()){
-            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value));
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value, properties));
         }
     }
 
