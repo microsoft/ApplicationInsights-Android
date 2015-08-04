@@ -79,7 +79,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     public void testPageViewEnvelope() {
         String expectedName = "PAGEVIEW";
-        String expectedDuration = "12345";
+        long expectedDuration = 12345;
         Envelope envelope = sut.createEnvelope(sut.createPageViewData(expectedName, expectedDuration, getCustomProperties(), getMeasurements()));
 
         // Validate

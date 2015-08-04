@@ -112,7 +112,7 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackPageView(
             String pageName,
-            String duration,
+            long duration,
             Map<String, String> properties,
             Map<String, Double> measurements) {
         if(this.mockTrackMethod) {

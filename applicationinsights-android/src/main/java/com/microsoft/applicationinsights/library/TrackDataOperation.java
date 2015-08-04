@@ -44,7 +44,7 @@ class TrackDataOperation implements Runnable {
     private Throwable exception;
 
     // page views
-    private String duration;
+    private long duration;
 
     // custom
     private TelemetryData telemetry;
@@ -107,17 +107,11 @@ class TrackDataOperation implements Runnable {
 
     protected TrackDataOperation(DataType type,
                                  String name,
-                                 String duration,
+                                 long duration,
                                  Map<String, String> properties,
                                  Map<String, Double> measurements) {
         this(type, name, properties, measurements);
-        try {
-            this.duration = (String) deepCopy(duration);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        this.duration = duration;
     }
 
     protected TrackDataOperation(DataType type,

@@ -237,32 +237,32 @@ public class TelemetryClient {
     }
 
     /**
-     * {@code duration} defaults to {@code null}.
+     * {@code duration} defaults to {@code 0}.
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, String, Map, Map)
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
      */
     public void trackPageView(String pageName) {
-        this.trackPageView(pageName, null, null, null);
+        this.trackPageView(pageName, 0, null, null);
     }
 
     /**
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, String, Map, Map)
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
      */
-    public void trackPageView(String pageName, String duration) {
+    public void trackPageView(String pageName, long duration) {
         this.trackPageView(pageName, duration, null, null);
     }
 
     /**
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, String, Map, Map)
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
      */
-    public void trackPageView(String pageName, String duration, Map<String, String> properties) {
+    public void trackPageView(String pageName, long duration, Map<String, String> properties) {
         this.trackPageView(pageName, duration, properties, null);
     }
 
@@ -270,13 +270,14 @@ public class TelemetryClient {
      * Sends information about a page view to Application Insights.
      *
      * @param pageName     The name of the page.
+     * @param duration     The time the page needs to show up.
      * @param properties   Custom properties associated with the event. Note: values set here will
      *                     supersede values set in {@link ApplicationInsights#setCommonProperties}.
      * @param measurements Custom measurements associated with the event.
      */
     public void trackPageView(
           String pageName,
-          String duration,
+          long duration,
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
