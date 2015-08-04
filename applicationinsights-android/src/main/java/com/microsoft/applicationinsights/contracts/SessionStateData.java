@@ -3,21 +3,9 @@
 */
 package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
+
 import com.microsoft.telemetry.JsonHelper;
 
 /**
@@ -33,7 +21,7 @@ public class SessionStateData extends TelemetryData
     /**
      * Backing field for property State.
      */
-    private int state = SessionState.Start;
+    private SessionState state = SessionState.START;
     
     /**
      * Initializes a new instance of the SessionStateData class.
@@ -43,21 +31,22 @@ public class SessionStateData extends TelemetryData
         this.InitializeFields();
         this.SetupAttributes();
     }
-    
+
     /**
      * Envelope Name for this telemetry.
      */
     public String getEnvelopeName() {
         return "Microsoft.ApplicationInsights.SessionState";
     }
-    
+
     /**
      * Base Type for this telemetry.
      */
     public String getBaseType() {
         return "Microsoft.ApplicationInsights.SessionStateData";
     }
-    
+
+
     /**
      * Gets the Ver property.
      */
@@ -75,14 +64,14 @@ public class SessionStateData extends TelemetryData
     /**
      * Gets the State property.
      */
-    public int getState() {
+    public SessionState getState() {
         return this.state;
     }
     
     /**
      * Sets the State property.
      */
-    public void setState(int value) {
+    public void setState(SessionState value) {
         this.state = value;
     }
     
@@ -114,7 +103,7 @@ public class SessionStateData extends TelemetryData
         prefix = ",";
         
         writer.write(prefix + "\"state\":");
-        writer.write(JsonHelper.convert(this.state));
+        writer.write(JsonHelper.convert(this.state.getValue()));
         prefix = ",";
         
         return prefix;

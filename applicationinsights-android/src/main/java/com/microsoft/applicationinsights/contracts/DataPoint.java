@@ -5,19 +5,8 @@ package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
+
 import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
 import com.microsoft.telemetry.JsonHelper;
 
 /**
@@ -34,7 +23,7 @@ public class DataPoint
     /**
      * Backing field for property Kind.
      */
-    private int kind = DataPointType.Measurement;
+    private DataPointType kind = DataPointType.MEASUREMENT;
     
     /**
      * Backing field for property Value.
@@ -86,14 +75,14 @@ public class DataPoint
     /**
      * Gets the Kind property.
      */
-    public int getKind() {
+    public DataPointType getKind() {
         return this.kind;
     }
     
     /**
      * Sets the Kind property.
      */
-    public void setKind(int value) {
+    public void setKind(DataPointType value) {
         this.kind = value;
     }
     
@@ -196,10 +185,10 @@ public class DataPoint
         writer.write(JsonHelper.convert(this.name));
         prefix = ",";
         
-        if (!(this.kind == 0))
+        if (!(this.kind == DataPointType.MEASUREMENT))
         {
             writer.write(prefix + "\"kind\":");
-            writer.write(JsonHelper.convert(this.kind));
+            writer.write(JsonHelper.convert(this.kind.getValue()));
             prefix = ",";
         }
         

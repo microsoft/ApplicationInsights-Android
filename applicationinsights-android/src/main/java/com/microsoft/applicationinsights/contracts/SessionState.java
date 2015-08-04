@@ -5,13 +5,17 @@ package com.microsoft.applicationinsights.contracts;
 /**
  * Enum SessionState.
  */
-public class SessionState
+public enum SessionState
 {
-    public static final int Start = 0;
-    public static final int End = 1;
-    
-    private SessionState() {
-        // hide default constructor
+    START(0), END(1);
+
+    private final int value;
+
+    private SessionState(int value) {
+        this.value = value;
     }
-    
+
+    public int getValue() {
+        return value;
+    }
 }

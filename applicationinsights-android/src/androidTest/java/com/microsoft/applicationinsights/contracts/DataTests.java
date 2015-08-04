@@ -2,7 +2,6 @@ package com.microsoft.applicationinsights.contracts;
 
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.ITelemetry;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;

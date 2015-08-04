@@ -2,7 +2,6 @@ package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.contracts.TelemetryData;
 import com.microsoft.applicationinsights.logging.InternalLogging;
-import com.microsoft.telemetry.ITelemetry;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;

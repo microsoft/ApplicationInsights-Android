@@ -6,18 +6,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
+
 import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
 import com.microsoft.telemetry.JsonHelper;
 
 /**
@@ -50,6 +40,21 @@ public class User
      * Backing field for property StoreRegion.
      */
     private String storeRegion;
+    
+    /**
+     * Backing field for property AuthUserId.
+     */
+    private String authUserId;
+    
+    /**
+     * Backing field for property AnonUserAcquisitionDate.
+     */
+    private String anonUserAcquisitionDate;
+    
+    /**
+     * Backing field for property AuthUserAcquisitionDate.
+     */
+    private String authUserAcquisitionDate;
     
     /**
      * Initializes a new instance of the User class.
@@ -129,6 +134,48 @@ public class User
         this.storeRegion = value;
     }
     
+    /**
+     * Gets the AuthUserId property.
+     */
+    public String getAuthUserId() {
+        return this.authUserId;
+    }
+    
+    /**
+     * Sets the AuthUserId property.
+     */
+    public void setAuthUserId(String value) {
+        this.authUserId = value;
+    }
+    
+    /**
+     * Gets the AnonUserAcquisitionDate property.
+     */
+    public String getAnonUserAcquisitionDate() {
+        return this.anonUserAcquisitionDate;
+    }
+    
+    /**
+     * Sets the AnonUserAcquisitionDate property.
+     */
+    public void setAnonUserAcquisitionDate(String value) {
+        this.anonUserAcquisitionDate = value;
+    }
+    
+    /**
+     * Gets the AuthUserAcquisitionDate property.
+     */
+    public String getAuthUserAcquisitionDate() {
+        return this.authUserAcquisitionDate;
+    }
+    
+    /**
+     * Sets the AuthUserAcquisitionDate property.
+     */
+    public void setAuthUserAcquisitionDate(String value) {
+        this.authUserAcquisitionDate = value;
+    }
+    
 
     /**
      * Adds all members of this class to a hashmap
@@ -150,6 +197,15 @@ public class User
         }
         if (!(this.storeRegion == null)) {
             map.put("ai.user.storeRegion", this.storeRegion);
+        }
+        if (!(this.authUserId == null)) {
+            map.put("ai.user.authUserId", this.authUserId);
+        }
+        if (!(this.anonUserAcquisitionDate == null)) {
+            map.put("ai.user.anonUserAcquisitionDate", this.anonUserAcquisitionDate);
+        }
+        if (!(this.authUserAcquisitionDate == null)) {
+            map.put("ai.user.authUserAcquisitionDate", this.authUserAcquisitionDate);
         }
     }
     
@@ -210,6 +266,27 @@ public class User
         {
             writer.write(prefix + "\"ai.user.storeRegion\":");
             writer.write(JsonHelper.convert(this.storeRegion));
+            prefix = ",";
+        }
+        
+        if (!(this.authUserId == null))
+        {
+            writer.write(prefix + "\"ai.user.authUserId\":");
+            writer.write(JsonHelper.convert(this.authUserId));
+            prefix = ",";
+        }
+        
+        if (!(this.anonUserAcquisitionDate == null))
+        {
+            writer.write(prefix + "\"ai.user.anonUserAcquisitionDate\":");
+            writer.write(JsonHelper.convert(this.anonUserAcquisitionDate));
+            prefix = ",";
+        }
+        
+        if (!(this.authUserAcquisitionDate == null))
+        {
+            writer.write(prefix + "\"ai.user.authUserAcquisitionDate\":");
+            writer.write(JsonHelper.convert(this.authUserAcquisitionDate));
             prefix = ",";
         }
         

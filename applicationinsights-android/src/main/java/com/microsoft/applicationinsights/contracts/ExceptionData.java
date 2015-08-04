@@ -3,21 +3,12 @@
 */
 package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
 import java.util.List;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
+
 import com.microsoft.telemetry.JsonHelper;
 
 /**
@@ -43,7 +34,7 @@ public class ExceptionData extends TelemetryData
     /**
      * Backing field for property SeverityLevel.
      */
-    private int severityLevel;
+    private SeverityLevel severityLevel;
     
     /**
      * Backing field for property ProblemId.
@@ -73,14 +64,14 @@ public class ExceptionData extends TelemetryData
         this.InitializeFields();
         this.SetupAttributes();
     }
-    
+
     /**
      * Envelope Name for this telemetry.
      */
     public String getEnvelopeName() {
         return "Microsoft.ApplicationInsights.Exception";
     }
-    
+
     /**
      * Base Type for this telemetry.
      */
@@ -136,14 +127,14 @@ public class ExceptionData extends TelemetryData
     /**
      * Gets the SeverityLevel property.
      */
-    public int getSeverityLevel() {
+    public SeverityLevel getSeverityLevel() {
         return this.severityLevel;
     }
     
     /**
      * Sets the SeverityLevel property.
      */
-    public void setSeverityLevel(int value) {
+    public void setSeverityLevel(SeverityLevel value) {
         this.severityLevel = value;
     }
     
@@ -229,10 +220,10 @@ public class ExceptionData extends TelemetryData
         JsonHelper.writeList(writer, this.exceptions);
         prefix = ",";
         
-        if (!(this.severityLevel == 0))
+        if (!(this.severityLevel == SeverityLevel.VERBOSE))
         {
             writer.write(prefix + "\"severityLevel\":");
-            writer.write(JsonHelper.convert(this.severityLevel));
+            writer.write(JsonHelper.convert(this.severityLevel.getValue()));
             prefix = ",";
         }
         
