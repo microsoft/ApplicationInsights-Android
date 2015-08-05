@@ -44,6 +44,21 @@ class TelemetryContext {
     private static final String TAG = "TelemetryContext";
 
     /**
+     * Volatile boolean for double checked synchronize block
+     */
+    private static volatile boolean isTelemetryContextLoaded = false;
+
+    /**
+     * The shared TelemetryContext instance.
+     */
+    private static TelemetryContext instance;
+
+    /**
+     * Synchronization LOCK for setting static context
+     */
+    private static final Object LOCK = new Object();
+
+    /**
      * The shared preferences INSTANCE for reading persistent context
      */
     private final SharedPreferences settings;
@@ -123,6 +138,34 @@ class TelemetryContext {
         this.lastSessionId = null;
         this.instrumentationKey = instrumentationKey;
         this.cachedTags = getCachedTags();
+    }
+
+    /**
+     * Initialize the INSTANCE of the telemetryContext
+     *
+     * @param context            the context for this telemetryContext
+     * @param instrumentationKey the instrumentationkey for this application
+     * @param user               a custom user object that will be assiciated with the telemetry data
+     */
+    protected static void initialize(Context context, String instrumentationKey, User user) {
+        if (!TelemetryContext.isTelemetryContextLoaded) {
+            synchronized (TelemetryContext.LOCK) {
+                if (!TelemetryContext.isTelemetryContextLoaded) {
+                    TelemetryContext.isTelemetryContextLoaded = true;
+                    TelemetryContext.instance = new TelemetryContext(context, instrumentationKey, user);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return the INSTANCE of persistence or null if not yet initialized
+     */
+    public static TelemetryContext getInstance() {
+        if (TelemetryContext.instance == null) {
+            InternalLogging.error(TAG, "getInstance was called before initialization");
+        }
+        return TelemetryContext.instance;
     }
 
     /**
