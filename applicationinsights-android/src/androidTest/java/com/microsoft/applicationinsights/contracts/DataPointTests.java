@@ -99,7 +99,7 @@ public class DataPointTests extends TestCase {
         Assert.assertEquals(expected, actual);
     }
 
-    public void testSerialize() throws IOException {
+    public void testSerializeMeasurement() throws IOException {
         DataPoint item = new DataPoint();
         item.setName("Test string");
         item.setKind(DataPointType.MEASUREMENT);
@@ -110,8 +110,22 @@ public class DataPointTests extends TestCase {
         item.setStdDev(1.5);
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"name\":\"Test string\",\"kind\":0,\"value\":1.5,\"count\":42,\"min\":1.5,\"max\":1.5,\"stdDev\":1.5}";
+        String expected = "{\"name\":\"Test string\",\"value\":1.5,\"count\":42,\"min\":1.5,\"max\":1.5,\"stdDev\":1.5}";
         Assert.assertEquals(expected, writer.toString());
     }
 
+    public void testSerializeAggregation() throws IOException {
+        DataPoint item = new DataPoint();
+        item.setName("Test string");
+        item.setKind(DataPointType.AGGREGATION);
+        item.setValue(1.5);
+        item.setCount(42);
+        item.setMin(1.5);
+        item.setMax(1.5);
+        item.setStdDev(1.5);
+        StringWriter writer = new StringWriter();
+        item.serialize(writer);
+        String expected = "{\"name\":\"Test string\",\"kind\":1,\"value\":1.5,\"count\":42,\"min\":1.5,\"max\":1.5,\"stdDev\":1.5}";
+        Assert.assertEquals(expected, writer.toString());
+    }
 }
