@@ -76,7 +76,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         String actualBaseType = envelope.getData().getBaseType();
         Assert.assertEquals(new MessageData().getBaseType(), actualBaseType);
     }
-
+    
     public void testPageViewEnvelope() {
         String expectedName = "PAGEVIEW";
         long expectedDuration = 12345;
@@ -92,7 +92,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         Assert.assertEquals(expectedName, actualName);
 
         String actualDuration = ((PageViewData)((Data<Domain>)envelope.getData()).getBaseData()).getDuration();
-        Assert.assertEquals(expectedDuration, actualDuration);
+        Assert.assertEquals(String.valueOf(expectedDuration), actualDuration);
 
         String actualBaseType = envelope.getData().getBaseType();
         Assert.assertEquals(new PageViewData().getBaseType(), actualBaseType);
