@@ -34,7 +34,7 @@ public class ExceptionData extends TelemetryData
     /**
      * Backing field for property SeverityLevel.
      */
-    private SeverityLevel severityLevel;
+    private SeverityLevel severityLevel = SeverityLevel.VERBOSE;
     
     /**
      * Backing field for property ProblemId.

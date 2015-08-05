@@ -27,7 +27,7 @@ public class MessageData extends TelemetryData {
     /**
      * Backing field for property SeverityLevel.
      */
-    private SeverityLevel severityLevel;
+    private SeverityLevel severityLevel = SeverityLevel.VERBOSE;
 
     /**
      * Backing field for property Properties.

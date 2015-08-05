@@ -18,6 +18,4 @@ public enum DependencyKind {
     public int getValue() {
         return value;
     }
-
-
 }

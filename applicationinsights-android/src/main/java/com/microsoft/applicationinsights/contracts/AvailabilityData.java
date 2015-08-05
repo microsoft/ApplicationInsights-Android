@@ -45,7 +45,7 @@ public class AvailabilityData extends Domain implements
     /**
      * Backing field for property Result.
      */
-    private TestResult result;
+    private TestResult result = TestResult.PASS;
 
     /**
      * Backing field for property RunLocation.
