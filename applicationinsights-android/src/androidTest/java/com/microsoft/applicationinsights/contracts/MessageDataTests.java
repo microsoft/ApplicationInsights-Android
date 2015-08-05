@@ -11,70 +11,66 @@ import java.util.Map;
 /// <summary>
 /// Data contract test class MessageDataTests.
 /// </summary>
-public class MessageDataTests extends TestCase
-{
-    public void testVerPropertyWorksAsExpected()
-    {
+public class MessageDataTests extends TestCase {
+    public void testVerPropertyWorksAsExpected() {
         int expected = 42;
         MessageData item = new MessageData();
         item.setVer(expected);
         int actual = item.getVer();
         Assert.assertEquals(expected, actual);
-        
+
         expected = 13;
         item.setVer(expected);
         actual = item.getVer();
         Assert.assertEquals(expected, actual);
     }
-    
-    public void testMessagePropertyWorksAsExpected()
-    {
+
+    public void testMessagePropertyWorksAsExpected() {
         String expected = "Test string";
         MessageData item = new MessageData();
         item.setMessage(expected);
         String actual = item.getMessage();
         Assert.assertEquals(expected, actual);
-        
+
         expected = "Other string";
         item.setMessage(expected);
         actual = item.getMessage();
         Assert.assertEquals(expected, actual);
     }
-    
-    public void testSeverity_levelPropertyWorksAsExpected()
-    {
-        int expected = 5;
+
+    public void testSeverity_levelPropertyWorksAsExpected() {
+        SeverityLevel expected = SeverityLevel.CRITICAL;
         MessageData item = new MessageData();
         item.setSeverityLevel(expected);
-        int actual = item.getSeverityLevel();
-        Assert.assertEquals(expected, actual);
-        
-        expected = 3;
+        SeverityLevel actual = item.getSeverityLevel();
+        Assert.assertEquals(expected.getValue(), actual.getValue());
+
+        expected = SeverityLevel.ERROR;
         item.setSeverityLevel(expected);
         actual = item.getSeverityLevel();
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(expected.getValue(), actual.getValue());
     }
-    
-    public void testPropertiesPropertyWorksAsExpected()
-    {
+
+    public void testPropertiesPropertyWorksAsExpected() {
         MessageData item = new MessageData();
-        LinkedHashMap<String, String> actual = (LinkedHashMap<String, String>)item.getProperties();
+        LinkedHashMap<String, String> actual = (LinkedHashMap<String, String>) item.getProperties();
         Assert.assertNotNull(actual);
     }
-    
-    public void testSerialize() throws IOException
-    {
+
+    public void testSerialize() throws IOException {
         MessageData item = new MessageData();
         item.setVer(42);
         item.setMessage("Test string");
-        item.setSeverityLevel(5);
-        for (Map.Entry<String, String> entry : new LinkedHashMap<String, String>() {{put("key1", "test value 1"); put("key2", "test value 2"); }}.entrySet())
-        {
+        item.setSeverityLevel(SeverityLevel.CRITICAL);
+        for (Map.Entry<String, String> entry : new LinkedHashMap<String, String>() {{
+            put("key1", "test value 1");
+            put("key2", "test value 2");
+        }}.entrySet()) {
             item.getProperties().put(entry.getKey(), entry.getValue());
         }
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"ver\":42,\"message\":\"Test string\",\"severityLevel\":5,\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"}}";
+        String expected = "{\"ver\":42,\"message\":\"Test string\",\"severityLevel\":4,\"properties\":{\"key1\":\"test value 1\",\"key2\":\"test value 2\"}}";
         Assert.assertEquals(expected, writer.toString());
     }
 

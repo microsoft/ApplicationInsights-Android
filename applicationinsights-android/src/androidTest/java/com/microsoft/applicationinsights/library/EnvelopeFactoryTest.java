@@ -32,9 +32,9 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        System.setProperty("dexmaker.dexcache",getInstrumentation().getTargetContext().getCacheDir().getPath());
+        System.setProperty("dexmaker.dexcache", getInstrumentation().getTargetContext().getCacheDir().getPath());
         PublicTelemetryContext telemetryContext = getMockContext();
-        HashMap<String,String> commonProperties = getCommonProperties();
+        HashMap<String, String> commonProperties = getCommonProperties();
         sut = new EnvelopeFactory(telemetryContext, commonProperties);
     }
 
@@ -54,7 +54,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         validateEnvelopeProperties(envelope);
         validateEnvelopeMeasurements(envelope);
 
-        String actualName = ((EventData)((Data<Domain>)envelope.getData()).getBaseData()).getName();
+        String actualName = ((EventData) ((Data<Domain>) envelope.getData()).getBaseData()).getName();
         Assert.assertEquals(expectedName, actualName);
 
         String actualBaseType = envelope.getData().getBaseType();
@@ -70,7 +70,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         Assert.assertNotNull(envelope.getData());
         validateEnvelopeProperties(envelope);
 
-        String actualName = ((MessageData)((Data<Domain>)envelope.getData()).getBaseData()).getMessage();
+        String actualName = ((MessageData) ((Data<Domain>) envelope.getData()).getBaseData()).getMessage();
         Assert.assertEquals(expectedName, actualName);
 
         String actualBaseType = envelope.getData().getBaseType();
@@ -87,7 +87,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         validateEnvelopeProperties(envelope);
         validateEnvelopeMeasurements(envelope);
 
-        String actualName = ((PageViewData)((Data<Domain>)envelope.getData()).getBaseData()).getName();
+        String actualName = ((PageViewData) ((Data<Domain>) envelope.getData()).getBaseData()).getName();
         Assert.assertEquals(expectedName, actualName);
 
         String actualBaseType = envelope.getData().getBaseType();
@@ -101,8 +101,8 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         validateEnvelopeTemplate(envelope);
         Assert.assertNotNull(envelope.getData());
 
-        int actualState = ((SessionStateData)((Data<Domain>)envelope.getData()).getBaseData()).getState();
-        Assert.assertEquals(SessionState.Start, actualState);
+        SessionState actualState = ((SessionStateData) ((Data<Domain>) envelope.getData()).getBaseData()).getState();
+        Assert.assertEquals(SessionState.START, actualState);
 
         String actualBaseType = envelope.getData().getBaseType();
         Assert.assertEquals(new SessionStateData().getBaseType(), actualBaseType);
@@ -123,7 +123,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         validateEnvelopeProperties(envelope);
         validateEnvelopeMeasurements(envelope);
 
-        String actualName = ((EventData)((Data<Domain>)envelope.getData()).getBaseData()).getName();
+        String actualName = ((EventData) ((Data<Domain>) envelope.getData()).getBaseData()).getName();
         Assert.assertEquals(expectedName, actualName);
 
         String actualBaseType = envelope.getData().getBaseType();
@@ -139,7 +139,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         validateEnvelopeTemplate(envelope);
         Assert.assertNotNull(envelope.getData());
 
-        MetricData metricData = ((MetricData)((Data<Domain>)envelope.getData()).getBaseData());
+        MetricData metricData = ((MetricData) ((Data<Domain>) envelope.getData()).getBaseData());
         List<DataPoint> actualMetrics = metricData.getMetrics();
         Assert.assertEquals(1, actualMetrics.size());
         Assert.assertEquals(expectedName, actualMetrics.get(0).getName());
@@ -228,14 +228,14 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     // TestHelper
 
-    private void validateEnvelopeProperties(Envelope envelope){
-        Map<String,String> actualProperties = null;
-        Domain baseData = ((Data<Domain>)envelope.getData()).getBaseData();
+    private void validateEnvelopeProperties(Envelope envelope) {
+        Map<String, String> actualProperties = null;
+        Domain baseData = ((Data<Domain>) envelope.getData()).getBaseData();
 
-        if(baseData instanceof EventData){
-            actualProperties = ((EventData)baseData).getProperties();
-        }else if (baseData instanceof MessageData){
-            actualProperties = ((MessageData)baseData).getProperties();
+        if (baseData instanceof EventData) {
+            actualProperties = ((EventData) baseData).getProperties();
+        } else if (baseData instanceof MessageData) {
+            actualProperties = ((MessageData) baseData).getProperties();
         }
 
         Assert.assertEquals(2, actualProperties.size());
@@ -243,21 +243,21 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         Assert.assertTrue(actualProperties.containsKey(MOCK_COMMON_PROPERTY_KEY));
     }
 
-    private void validateEnvelopeMeasurements(Envelope envelope){
-        Map<String,Double> actualMeasurements = null;
-        Domain baseData = ((Data<Domain>)envelope.getData()).getBaseData();
+    private void validateEnvelopeMeasurements(Envelope envelope) {
+        Map<String, Double> actualMeasurements = null;
+        Domain baseData = ((Data<Domain>) envelope.getData()).getBaseData();
 
-        if(baseData instanceof EventData){
-            actualMeasurements = ((EventData)baseData).getMeasurements();
-        }else if (baseData instanceof PageViewData){
-            actualMeasurements = ((PageViewData)baseData).getMeasurements();
+        if (baseData instanceof EventData) {
+            actualMeasurements = ((EventData) baseData).getMeasurements();
+        } else if (baseData instanceof PageViewData) {
+            actualMeasurements = ((PageViewData) baseData).getMeasurements();
         }
 
         Assert.assertEquals(1, actualMeasurements.size());
         Assert.assertTrue(actualMeasurements.containsKey(MOCK_MEASUREMENTS_KEY));
     }
 
-    private void validateEnvelopeTemplate(Envelope envelope){
+    private void validateEnvelopeTemplate(Envelope envelope) {
         Assert.assertNotNull(envelope);
         Assert.assertEquals(MOCK_APP_ID, envelope.getAppId());
         Assert.assertEquals(MOCK_APP_VER, envelope.getAppVer());
@@ -283,8 +283,8 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     private static final String MOCK_TAGS_KEY = "tagsKey";
     private static final String MOCK_TAGS_VALUE = "tagsValue";
 
-    private static PublicTelemetryContext getMockContext(){
-        HashMap<String,String> tags = new HashMap<String,String>();
+    private static PublicTelemetryContext getMockContext() {
+        HashMap<String, String> tags = new HashMap<String, String>();
         tags.put(MOCK_TAGS_KEY, MOCK_TAGS_VALUE);
 
         Application mockApplication = mock(Application.class);
@@ -312,8 +312,8 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     private static final String MOCK_PROPERTY_KEY = "propertyKey";
     private static final String MOCK_PROPERTY_VALUE = "propertyValue";
 
-    private static HashMap<String,String> getCustomProperties(){
-        HashMap<String,String> properties = new HashMap<String,String>();
+    private static HashMap<String, String> getCustomProperties() {
+        HashMap<String, String> properties = new HashMap<String, String>();
         properties.put(MOCK_PROPERTY_KEY, MOCK_PROPERTY_VALUE);
         return properties;
     }
@@ -321,8 +321,8 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     private static final String MOCK_COMMON_PROPERTY_KEY = "commonPropertyKey";
     private static final String MOCK_COMMON_PROPERTY_VALUE = "commonPropertyValue";
 
-    private static HashMap<String,String> getCommonProperties(){
-        HashMap<String,String> properties = new HashMap<String,String>();
+    private static HashMap<String, String> getCommonProperties() {
+        HashMap<String, String> properties = new HashMap<String, String>();
         properties.put(MOCK_COMMON_PROPERTY_KEY, MOCK_COMMON_PROPERTY_VALUE);
         return properties;
     }
@@ -330,8 +330,8 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     private static final String MOCK_MEASUREMENTS_KEY = "measurementsKey";
     private static final Double MOCK_MEASUREMENTS_VALUE = (double) 11;
 
-    private static HashMap<String,Double> getMeasurements(){
-        HashMap<String,Double> measurements = new HashMap<String,Double>();
+    private static HashMap<String, Double> getMeasurements() {
+        HashMap<String, Double> measurements = new HashMap<String, Double>();
         measurements.put(MOCK_MEASUREMENTS_KEY, MOCK_MEASUREMENTS_VALUE);
         return measurements;
     }
