@@ -5,16 +5,16 @@ package com.microsoft.applicationinsights.contracts;
 /**
  * Enum SeverityLevel.
  */
-public class SeverityLevel
+public enum SeverityLevel
 {
-    public static final int Verbose = 0;
-    public static final int Information = 1;
-    public static final int Warning = 2;
-    public static final int Error = 3;
-    public static final int Critical = 4;
-    
-    private SeverityLevel() {
-        // hide default constructor
+    VERBOSE(0), INFORMATION(1), WARNING(2), ERROR(3), CRITICAL(4);
+    private final int value;
+
+    private SeverityLevel(int value) {
+        this.value = value;
     }
-    
+
+    public int getValue() {
+        return value;
+    }
 }

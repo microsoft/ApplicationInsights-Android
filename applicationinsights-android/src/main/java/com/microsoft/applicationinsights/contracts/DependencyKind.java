@@ -2,17 +2,20 @@
  * Generated from DependencyKind.bond (https://github.com/Microsoft/bond)
 */
 package com.microsoft.applicationinsights.contracts;
+
 /**
  * Enum DependencyKind.
  */
-public class DependencyKind
-{
-    public static final int SQL = 0;
-    public static final int Http = 1;
-    public static final int Other = 2;
-    
-    private DependencyKind() {
-        // hide default constructor
+public enum DependencyKind {
+    SQL(0), HTTP(1), OTHER(2);
+
+    private final int value;
+
+    private DependencyKind(int value) {
+        this.value = value;
     }
-    
+
+    public int getValue() {
+        return value;
+    }
 }
