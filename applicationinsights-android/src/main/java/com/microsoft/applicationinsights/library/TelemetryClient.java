@@ -167,8 +167,20 @@ public class TelemetryClient {
      * @param value The value of the metric
      */
     public void trackMetric(String name, double value) {
+        trackMetric(name, value, null);
+    }
+
+    /**
+     * Sends information about an aggregated metric to Application Insights. Note: all data sent via
+     * this method will be aggregated. To log non-aggregated data use
+     * {@link TelemetryClient#trackEvent(String, Map, Map)} with measurements.
+     *
+     * @param name  The name of the metric
+     * @param value The value of the metric
+     */
+    public void trackMetric(String name, double value, Map<String, String> properties) {
         if(isTelemetryEnabled()){
-            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value));
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value, properties));
         }
     }
 
@@ -179,7 +191,7 @@ public class TelemetryClient {
      * @see TelemetryClient#trackHandledException(Throwable, Map)
      */
     public void trackHandledException(Throwable handledException) {
-        this.trackHandledException(handledException, null);
+        this.trackHandledException(handledException, null, null);
     }
 
     /**
@@ -190,9 +202,20 @@ public class TelemetryClient {
      *                         supersede values set in {@link ApplicationInsights#setCommonProperties}.
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
+        trackHandledException(handledException, properties, null);
+    }
+
+    /**
+     * Sends information about an handledException to Application Insights.
+     *
+     * @param handledException The handledException to track.
+     * @param properties       Custom properties associated with the event. Note: values set here will
+     *                         supersede values set in {@link ApplicationInsights#setCommonProperties}.
+     */
+    public void trackHandledException(Throwable handledException, Map<String, String> properties, Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
-                    handledException, properties));
+                    handledException, properties, measurements));
         }
     }
 
@@ -213,39 +236,70 @@ public class TelemetryClient {
     }
 
     /**
+     * {@code duration} defaults to {@code 0}.
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, Map, Map)
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
      */
     public void trackPageView(String pageName) {
-        this.trackPageView(pageName, null, null);
+        this.trackPageView(pageName, 0, null, null);
+    }
+
+    /**
+     * {@code properties} defaults to {@code null}.
+     * {@code measurements} defaults to {@code null}.
+     *
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     */
+    public void trackPageView(String pageName, long duration) {
+        this.trackPageView(pageName, duration, null, null);
     }
 
     /**
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, Map, Map)
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
      */
+    public void trackPageView(String pageName, long duration, Map<String, String> properties) {
+        this.trackPageView(pageName, duration, properties, null);
+    }
+
+    /**
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     */
+    @Deprecated
+    public void trackPageView(String pageName, Map<String, String> properties, Map<String, Double> measurements) {
+        this.trackPageView(pageName, 0, properties, measurements);
+    }
+
+    /**
+     * {@code measurements} defaults to {@code null}.
+     *
+     * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     */
+    @Deprecated
     public void trackPageView(String pageName, Map<String, String> properties) {
-        this.trackPageView(pageName, properties, null);
+        this.trackPageView(pageName, 0, properties, null);
     }
 
     /**
      * Sends information about a page view to Application Insights.
      *
      * @param pageName     The name of the page.
+     * @param duration     The time the page needs to show up.
      * @param properties   Custom properties associated with the event. Note: values set here will
      *                     supersede values set in {@link ApplicationInsights#setCommonProperties}.
      * @param measurements Custom measurements associated with the event.
      */
     public void trackPageView(
           String pageName,
+          long duration,
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if(isTelemetryEnabled()){
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
-                    pageName, properties, null));
+                    pageName, duration, properties, measurements));
         }
     }
 

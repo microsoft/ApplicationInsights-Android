@@ -225,11 +225,12 @@ class EnvelopeFactory {
      * Creates information about an aggregated metric for Application Insights. This method gets
      * called by a CreateTelemetryDataTask in order to create and forward data on a background thread.
      *
-     * @param name  The name of the metric
-     * @param value The value of the metric
+     * @param name          The name of the metric
+     * @param value         The value of the metric
+     * @param properties    Custom properties associated with the event
      * @return an Envelope object, which contains a metric
      */
-    protected Data<Domain> createMetricData(String name, double value) {
+    protected Data<Domain> createMetricData(String name, double value, Map<String, String> properties) {
         Data<Domain> data = null;
         if (isConfigured()) {
             MetricData telemetry = new MetricData();
@@ -243,6 +244,7 @@ class EnvelopeFactory {
             List<DataPoint> metricsList = new ArrayList<DataPoint>();
             metricsList.add(dataPoint);
             telemetry.setMetrics(metricsList);
+            telemetry.setProperties(properties);
 
             data = createData(telemetry);
         }
@@ -254,15 +256,15 @@ class EnvelopeFactory {
      * method gets called by a CreateTelemetryDataTask in order to create and forward data on a
      * background thread.
      *
-     * @param exception  The exception to track
-     * @param properties Custom properties associated with the event
+     * @param exception     The exception to track
+     * @param properties    Custom properties associated with the event
+     * @param measurements  Custom measurements associated with the event
      * @return an Envelope object, which contains a handled or unhandled exception
      */
-    protected Data<Domain> createExceptionData(Throwable exception, Map<String, String> properties) {
+    protected Data<Domain> createExceptionData(Throwable exception, Map<String, String> properties, Map<String, Double> measurements) {
         Data<Domain> data = null;
         if (isConfigured()) {
-            CrashData telemetry = this.getCrashData(exception, properties);
-
+            CrashData telemetry = this.getCrashData(exception, properties, measurements);
             data = createData(telemetry);
         }
         return data;
@@ -297,11 +299,15 @@ class EnvelopeFactory {
      */
     protected Data<Domain> createPageViewData(
           String pageName,
+          long duration,
           Map<String, String> properties,
           Map<String, Double> measurements) {
         Data<Domain> data = null;
         if (isConfigured()) {
             PageViewData telemetry = new PageViewData();
+            if(duration > 0){
+                telemetry.setDuration(String.valueOf(duration));
+            }
             telemetry.setName(ensureNotNull(pageName));
             telemetry.setUrl(null);
             telemetry.setProperties(properties);
@@ -364,15 +370,15 @@ class EnvelopeFactory {
         this.commonProperties = commonProperties;
     }
 
-
     /**
      * Parse an exception and it's stack trace and create the CrashData object
      *
-     * @param exception  the throwable object we want to create a crashdata from
-     * @param properties properties used foor the CrashData
+     * @param exception     The throwable object we want to create a crashdata from
+     * @param properties    Properties used foor the CrashData
+     * @param measurements  Key value par for custom metrics
      * @return a CrashData object that contains the stacktrace and context info
      */
-    private CrashData getCrashData(Throwable exception, Map<String, String> properties) {
+    private CrashData getCrashData(Throwable exception, Map<String, String> properties, Map<String, Double> measurements) {
         Throwable localException = exception;
         if (localException == null) {
             localException = new Exception();
@@ -406,7 +412,7 @@ class EnvelopeFactory {
         CrashData crashData = new CrashData();
         crashData.setThreads(threads);
         crashData.setHeaders(crashDataHeaders);
-        crashData.setProperties(properties);
+        // TODO: Add properties and measurements (not supported for CrashData in V2)
 
         return crashData;
     }

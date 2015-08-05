@@ -79,7 +79,8 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
     public void testPageViewEnvelope() {
         String expectedName = "PAGEVIEW";
-        Envelope envelope = sut.createEnvelope(sut.createPageViewData(expectedName, getCustomProperties(), getMeasurements()));
+        long expectedDuration = 12345;
+        Envelope envelope = sut.createEnvelope(sut.createPageViewData(expectedName, expectedDuration, getCustomProperties(), getMeasurements()));
 
         // Validate
         validateEnvelopeTemplate(envelope);
@@ -89,6 +90,9 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
 
         String actualName = ((PageViewData) ((Data<Domain>) envelope.getData()).getBaseData()).getName();
         Assert.assertEquals(expectedName, actualName);
+
+        String actualDuration = ((PageViewData)((Data<Domain>)envelope.getData()).getBaseData()).getDuration();
+        Assert.assertEquals(String.valueOf(expectedDuration), actualDuration);
 
         String actualBaseType = envelope.getData().getBaseType();
         Assert.assertEquals(new PageViewData().getBaseType(), actualBaseType);
@@ -133,7 +137,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
     public void testCreateMetricEnvelope() {
         String expectedName = "METRIC";
         double expectedValue = 2.0;
-        Envelope envelope = sut.createEnvelope(sut.createMetricData(expectedName, expectedValue));
+        Envelope envelope = sut.createEnvelope(sut.createMetricData(expectedName, expectedValue, null));
 
         // Validate
         validateEnvelopeTemplate(envelope);
