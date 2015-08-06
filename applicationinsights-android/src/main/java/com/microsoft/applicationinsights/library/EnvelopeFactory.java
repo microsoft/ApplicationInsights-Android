@@ -122,13 +122,13 @@ class EnvelopeFactory {
         Envelope envelope = new Envelope();
         this.context.updateScreenResolution(ApplicationInsights.INSTANCE.getContext());
         envelope.setAppId(this.context.getPackageName());
-        envelope.setAppVer(this.context.getApplication().getVer());
+        envelope.setAppVer(this.context.getAppVersion());
         envelope.setTime(Util.dateToISO8601(new Date()));
         envelope.setIKey(this.context.getInstrumentationKey());
-        envelope.setUserId(this.context.getUser().getId());
-        envelope.setDeviceId(this.context.getDevice().getId());
-        envelope.setOsVer(this.context.getDevice().getOsVersion());
-        envelope.setOs(this.context.getDevice().getOs());
+        envelope.setUserId(this.context.getUserId());
+        envelope.setDeviceId(this.context.getDeviceId());
+        envelope.setOsVer(this.context.getOsVersion());
+        envelope.setOs(this.context.getOsName());
 
         Map<String, String> tags = this.context.getContextTags();
         if (tags != null) {

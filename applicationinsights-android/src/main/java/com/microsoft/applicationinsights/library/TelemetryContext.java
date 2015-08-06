@@ -71,7 +71,7 @@ class TelemetryContext {
     /**
      * Device telemetryContext.
      */
-    private final Device device;
+    private Device device;
 
     /**
      * Session telemetryContext.
@@ -508,30 +508,6 @@ class TelemetryContext {
         this.user.addToHashMap(contextTags);
 
         return contextTags;
-    }
-
-    public Operation getOperation() {
-        return operation;
-    }
-
-    public Application getApplication() {
-        return application;
-    }
-
-    public Internal getInternal() {
-        return internal;
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    public Device getDevice() {
-        return device;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public String getInstrumentationKey() {

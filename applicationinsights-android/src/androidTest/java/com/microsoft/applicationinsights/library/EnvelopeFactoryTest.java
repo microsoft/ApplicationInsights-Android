@@ -291,24 +291,15 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         HashMap<String, String> tags = new HashMap<String, String>();
         tags.put(MOCK_TAGS_KEY, MOCK_TAGS_VALUE);
 
-        Application mockApplication = mock(Application.class);
-        when(mockApplication.getVer()).thenReturn(MOCK_APP_VER);
-
-        User mockUser = mock(User.class);
-        when(mockUser.getId()).thenReturn(MOCK_USER_ID);
-
-        Device mockDevice = mock(Device.class);
-        when(mockDevice.getId()).thenReturn(MOCK_DEVICE_ID);
-        when(mockDevice.getOsVersion()).thenReturn(MOCK_OS_VER);
-        when(mockDevice.getOs()).thenReturn(MOCK_OS);
-
         PublicTelemetryContext mockContext = mock(PublicTelemetryContext.class);
         when(mockContext.getPackageName()).thenReturn(MOCK_APP_ID);
         when(mockContext.getContextTags()).thenReturn(tags);
-        when(mockContext.getApplication()).thenReturn(mockApplication);
+        when(mockContext.getAppVersion()).thenReturn(MOCK_APP_VER);
         when(mockContext.getInstrumentationKey()).thenReturn(MOCK_IKEY);
-        when(mockContext.getDevice()).thenReturn(mockDevice);
-        when(mockContext.getUser()).thenReturn(mockUser);
+        when(mockContext.getDeviceId()).thenReturn(MOCK_DEVICE_ID);
+        when(mockContext.getOsVersion()).thenReturn(MOCK_OS_VER);
+        when(mockContext.getOsName()).thenReturn(MOCK_OS);
+        when(mockContext.getUserId()).thenReturn(MOCK_USER_ID);
 
         return mockContext;
     }
