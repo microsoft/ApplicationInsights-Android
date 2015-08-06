@@ -61,17 +61,12 @@ class TelemetryContext {
     /**
      * The shared preferences INSTANCE for reading persistent context
      */
-    private final SharedPreferences settings;
-
-    /**
-     * Content for tags field of an envelope
-     */
-    private Map<String, String> cachedTags;
+    private SharedPreferences settings;
 
     /**
      * Device telemetryContext.
      */
-    private final String instrumentationKey;
+    private String instrumentationKey;
 
     /**
      * Device telemetryContext.
@@ -101,7 +96,7 @@ class TelemetryContext {
     /**
      * The last session ID
      */
-    private final String lastSessionId;
+    private String lastSessionId;
 
     /**
      * The App ID for the envelope (defined as PackageInfo.packageName by CLL team)
@@ -113,6 +108,73 @@ class TelemetryContext {
      */
     private Operation operation;
 
+    protected String appVersion;
+
+    protected String userId;
+
+    protected String userAcqusitionDate;
+
+    protected String accountId;
+
+    protected String sdkVersion;
+
+    protected String sessionId;
+
+    protected String osVersion;
+
+    protected String osName;
+
+    protected String deviceModel;
+
+    protected String deviceOemName;
+
+    protected String osLocale;
+
+    protected String deviceId;
+
+    protected String deviceType;
+
+    protected String networkType;
+
+    protected String screenResolution;
+
+    public TelemetryContext(){
+        this.operation = new Operation();
+        this.device = new Device();
+        this.session = new Session();
+        this.user = new User();
+        this.internal = new Internal();
+        this.application = new Application();
+    }
+
+
+    public void resetContext(){
+        // Reset device context
+        setDeviceId(instance.getDeviceId());
+        setDeviceModel(instance.getDeviceModel());
+        setDeviceOemName(instance.getDeviceOemName());
+        setDeviceType(instance.getDeviceType());
+        setOsName(instance.getOsName());
+        setOsVersion(instance.getOsVersion());
+        setNetworkType(instance.getNetworkType());
+
+        // Reset session context
+        setSessionId(instance.getSessionId());
+
+        // Reset user context
+        setUserAcqusitionDate(instance.getUserAcqusitionDate());
+        setUserId(instance.getUserId());
+        setAccountId(instance.getAccountId());
+
+        // Reset internal context
+        setSdkVersion(instance.getSdkVersion());
+
+        // Reset applicationContext
+        setAppVersion(instance.getAppVersion());
+
+        // Reset other
+        setInstrumentationKey(instance.getInstrumentationKey());
+    }
     /**
      * Constructs a new INSTANCE of the Telemetry telemetryContext tag keys
      *
@@ -121,23 +183,17 @@ class TelemetryContext {
      * @param user               a custom user object that will be assiciated with the telemetry data
      */
     protected TelemetryContext(Context context, String instrumentationKey, User user) {
-        // get an INSTANCE of the shared preferences manager for persistent context fields
+        this();
         this.settings = context.getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-        this.operation = new Operation();
-        this.device = new Device();
+
         configDeviceContext(context);
-        this.session = new Session();
         configSessionContext();
-        this.user = new User();
         configUserContext(user);
-        this.internal = new Internal();
         configInternalContext(context);
-        this.application = new Application();
         configAppContext(context);
 
         this.lastSessionId = null;
         this.instrumentationKey = instrumentationKey;
-        this.cachedTags = getCachedTags();
     }
 
     /**
@@ -169,95 +225,6 @@ class TelemetryContext {
     }
 
     /**
-     * Get user the instrumentationKey.
-     *
-     * @return the instrumentation key
-     */
-    protected String getInstrumentationKey() {
-        return instrumentationKey;
-    }
-
-    /**
-     * Get user telemetryContext.
-     *
-     * @return the user object
-     */
-    protected User getUser() {
-        return user;
-    }
-
-    /**
-     * Get device telemetryContext.
-     *
-     * @return the device object
-     */
-    protected Device getDevice() {
-        return device;
-    }
-
-    /**
-     * Operation telemetryContext.
-     *
-     * @return the operation
-     */
-    protected Operation getOperation() {
-        return operation;
-    }
-
-    /**
-     * Session telemetryContext.
-     *
-     * @return the session
-     */
-    protected Session getSession() {
-        return session;
-    }
-
-    /**
-     * Application telemetryContext.
-     *
-     * @return the application
-     */
-    protected Application getApplication() {
-        return application;
-    }
-
-    /**
-     * The package name
-     *
-     * @see TelemetryContext#appIdForEnvelope
-     */
-    protected String getPackageName() {
-        return appIdForEnvelope;
-    }
-
-    /**
-     * @return a map of the context tags assembled in the required data contract format.
-     */
-    private Map<String, String> getCachedTags() {
-        if (this.cachedTags == null) {
-            // create a new hash map and add all context to it
-            this.cachedTags = new LinkedHashMap<String, String>();
-            this.application.addToHashMap(cachedTags);
-            this.internal.addToHashMap(cachedTags);
-            this.operation.addToHashMap(cachedTags);
-        }
-        return this.cachedTags;
-    }
-
-    protected Map<String, String> getContextTags() {
-        Map<String, String> contextTags = new LinkedHashMap<String, String>();
-        contextTags.putAll(getCachedTags());
-        this.device.addToHashMap(contextTags);
-        this.session.addToHashMap(contextTags);
-        this.user.addToHashMap(contextTags);
-
-        return contextTags;
-    }
-
-    // TODO: Synchronize session renewal
-
-    /**
      * Renews the session context
      * <p/>
      * The session ID is on demand. Additionally, the isFirst flag is set if no data was
@@ -274,7 +241,7 @@ class TelemetryContext {
      *
      * @param sessionId a custom session ID
      */
-    public void renewSessionId(String sessionId) {
+    protected void renewSessionId(String sessionId) {
         this.session.setId(sessionId);
         //normally, this should also be saved to SharedPrefs like isFirst.
         //The problem is that there are cases when committing the changes is too slow and we get
@@ -514,5 +481,179 @@ class TelemetryContext {
             }
         }
         this.internal.setSdkVersion("android:" + sdkVersionString);
+    }
+
+    /**
+     * The package name
+     *
+     * @see TelemetryContext#appIdForEnvelope
+     */
+    protected String getPackageName() {
+        return appIdForEnvelope;
+    }
+
+    protected Map<String, String> getContextTags() {
+        Map<String, String> contextTags = new LinkedHashMap<String, String>();
+
+        this.application.addToHashMap(contextTags);
+        this.internal.addToHashMap(contextTags);
+        this.operation.addToHashMap(contextTags);
+        this.device.addToHashMap(contextTags);
+        this.session.addToHashMap(contextTags);
+        this.user.addToHashMap(contextTags);
+
+        return contextTags;
+    }
+
+    public Operation getOperation() {
+        return operation;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public Internal getInternal() {
+        return internal;
+    }
+
+    public Session getSession() {
+        return session;
+    }
+
+    public Device getDevice() {
+        return device;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public String getInstrumentationKey() {
+        return instrumentationKey;
+    }
+
+    public void setInstrumentationKey(String instrumentationKey) {
+        this.instrumentationKey = instrumentationKey;
+    }
+
+    public String getScreenResolution() {
+        return this.device.getScreenResolution();
+    }
+
+    public void setScreenResolution(String screenResolution) {
+        this.device.setScreenResolution(screenResolution);
+    }
+
+    public String getAppVersion() {
+        return this.application.getVer();
+    }
+
+    public void setAppVersion(String appVersion) {
+        this.application.setVer(appVersion);
+    }
+
+    public String getUserId() {
+        return this.user.getId();
+    }
+
+    public void setUserId(String userId) {
+        this.user.setId(userId);
+    }
+
+    public String getUserAcqusitionDate() {
+        return this.user.getAccountAcquisitionDate();
+    }
+
+    public void setUserAcqusitionDate(String userAcqusitionDate) {
+        this.user.setAccountAcquisitionDate(userAcqusitionDate);
+    }
+
+    public String getAccountId() {
+        return this.user.getAccountId();
+    }
+
+    public void setAccountId(String accountId) {
+        this.user.setAccountId(accountId);
+    }
+
+    public String getSdkVersion() {
+        return this.internal.getSdkVersion();
+    }
+
+    public void setSdkVersion(String sdkVersion) {
+        this.internal.setSdkVersion(sdkVersion);
+    }
+
+    public String getSessionId() {
+        return this.session.getId();
+    }
+
+    public void setSessionId(String sessionId) {
+        this.session.setId(sessionId);
+    }
+
+    public String getOsVersion() {
+        return this.device.getOsVersion();
+    }
+
+    public void setOsVersion(String osVersion) {
+        this.device.setOsVersion(osVersion);
+    }
+
+    public String getOsName() {
+        return this.device.getOs();
+    }
+
+    public void setOsName(String osName) {
+        this.device.setOs(osName);
+    }
+
+    public String getDeviceModel() {
+        return this.device.getModel();
+    }
+
+    public void setDeviceModel(String deviceModel) {
+        this.device.setModel(deviceModel);
+    }
+
+    public String getDeviceOemName() {
+        return this.device.getOemName();
+    }
+
+    public void setDeviceOemName(String deviceOemName) {
+        this.device.setOemName(deviceOemName);
+    }
+
+    public String getOsLocale() {
+        return this.device.getLocale();
+    }
+
+    public void setOsLocale(String osLocale) {
+        this.device.setLocale(osLocale);
+    }
+
+    public String getDeviceId() {
+        return this.device.getId();
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.device.setId(deviceId);
+    }
+
+    public String getDeviceType() {
+        return this.device.getType();
+    }
+
+    public void setDeviceType(String deviceType) {
+        this.device.setType(deviceType);
+    }
+
+    public String getNetworkType() {
+        return this.device.getNetwork();
+    }
+
+    public void setNetworkType(String networkType) {
+        this.device.setNetwork(networkType);
     }
 }
