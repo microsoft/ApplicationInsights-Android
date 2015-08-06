@@ -108,36 +108,6 @@ class TelemetryContext {
      */
     private Operation operation;
 
-    protected String appVersion;
-
-    protected String userId;
-
-    protected String userAcqusitionDate;
-
-    protected String accountId;
-
-    protected String sdkVersion;
-
-    protected String sessionId;
-
-    protected String osVersion;
-
-    protected String osName;
-
-    protected String deviceModel;
-
-    protected String deviceOemName;
-
-    protected String osLocale;
-
-    protected String deviceId;
-
-    protected String deviceType;
-
-    protected String networkType;
-
-    protected String screenResolution;
-
     private TelemetryContext(){
         this.operation = new Operation();
         this.device = new Device();
