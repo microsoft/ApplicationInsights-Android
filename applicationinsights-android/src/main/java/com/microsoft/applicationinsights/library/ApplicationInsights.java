@@ -159,10 +159,9 @@ public enum ApplicationInsights {
         if (!isConfigured) {
             if (context != null) {
                 this.weakContext = new WeakReference<Context>(context);
-                this.instrumentationKey = instrumentationKey;
                 this.weakApplication = new WeakReference<Application>(application);
                 isConfigured = true;
-
+                this.instrumentationKey = instrumentationKey;
 
                 if (this.instrumentationKey == null) {
                     this.instrumentationKey = readInstrumentationKey(context);
@@ -173,7 +172,7 @@ public enum ApplicationInsights {
                     this.user = new User();
                     this.user.setId(this.userId);
                 }
-                TelemetryContext.initialize(context, instrumentationKey, this.user);
+                TelemetryContext.initialize(context, this.instrumentationKey, this.user);
                 this.telemetryContext = TelemetryContext.getSharedInstance();
                 InternalLogging.info(TAG, "ApplicationInsights has been setup correctly.", null);
             } else {
