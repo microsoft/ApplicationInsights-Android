@@ -138,7 +138,7 @@ class TelemetryContext {
 
     protected String screenResolution;
 
-    public TelemetryContext(){
+    private TelemetryContext(){
         this.operation = new Operation();
         this.device = new Device();
         this.session = new Session();
@@ -147,6 +147,20 @@ class TelemetryContext {
         this.application = new Application();
     }
 
+    /**
+     * @return the INSTANCE of persistence or null if not yet initialized
+     */
+    public static TelemetryContext newInstance() {
+        TelemetryContext context = null;
+        if (TelemetryContext.instance == null) {
+            InternalLogging.error(TAG, "newInstance was called before calling ApplicationInsights.setup()");
+        }else{
+            context = new TelemetryContext();
+            context.resetContext();
+
+        }
+        return context;
+    }
 
     public void resetContext(){
         // Reset device context
@@ -175,6 +189,7 @@ class TelemetryContext {
         // Reset other
         setInstrumentationKey(instance.getInstrumentationKey());
     }
+
     /**
      * Constructs a new INSTANCE of the Telemetry telemetryContext tag keys
      *
