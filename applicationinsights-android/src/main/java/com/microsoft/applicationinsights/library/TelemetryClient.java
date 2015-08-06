@@ -80,7 +80,7 @@ public class TelemetryClient {
      */
     public static TelemetryClient getInstance() {
         if (TelemetryClient.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
         return TelemetryClient.instance;
     }

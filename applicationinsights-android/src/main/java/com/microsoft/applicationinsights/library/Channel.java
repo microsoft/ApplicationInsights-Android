@@ -68,7 +68,7 @@ class Channel implements IChannel {
      */
     protected static IChannel getInstance() {
         if (Channel.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
 
         return Channel.instance;

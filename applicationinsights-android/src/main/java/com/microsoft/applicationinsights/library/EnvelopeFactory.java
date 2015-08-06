@@ -88,7 +88,7 @@ class EnvelopeFactory {
      */
     protected static EnvelopeFactory getInstance() {
         if (EnvelopeFactory.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
 
         return EnvelopeFactory.instance;

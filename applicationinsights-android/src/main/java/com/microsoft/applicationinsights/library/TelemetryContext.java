@@ -217,9 +217,9 @@ class TelemetryContext {
     /**
      * @return the INSTANCE of persistence or null if not yet initialized
      */
-    public static TelemetryContext getInstance() {
+    public static TelemetryContext getSharedInstance() {
         if (TelemetryContext.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
         return TelemetryContext.instance;
     }

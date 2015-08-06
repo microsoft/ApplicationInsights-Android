@@ -58,7 +58,7 @@ public class MockTelemetryClient extends TelemetryClient {
     public static MockTelemetryClient getInstance() {
 //        initialize();
 //        if (MockTelemetryClient.instance == null) {
-//            InternalLogging.error(TAG, "getInstance was called before initialization");
+//            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
 //        }
 //
 //        return MockTelemetryClient.instance;

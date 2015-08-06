@@ -86,7 +86,7 @@ class Sender {
      */
     protected static Sender getInstance() {
         if (Sender.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
 
         return Sender.instance;
