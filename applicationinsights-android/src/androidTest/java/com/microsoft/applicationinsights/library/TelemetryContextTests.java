@@ -10,21 +10,16 @@ public class TelemetryContextTests extends AndroidTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        sut = new TelemetryContext(this.getContext(), "ikey", null);
+        TelemetryContext.initialize(getContext(), "iKey", null);
+        sut = TelemetryContext.getSharedInstance();
     }
 
     public void testNewUserContext(){
 
-        // prepare
-        String userId = "userId";
-
-        // test
-        User user = sut.getUser();
-
         // validate
-        Assert.assertNull(user.getAccountId());
-        Assert.assertNull(user.getAccountAcquisitionDate());
-        Assert.assertNotSame(userId, user.getId());
+        Assert.assertNull(sut.getAccountId());
+        Assert.assertNull(sut.getUserAcqusitionDate());
+        Assert.assertNotNull(sut.getUserId());
     }
 
     public void testLoadOldUserContextIfNotSet(){
@@ -37,14 +32,33 @@ public class TelemetryContextTests extends AndroidTestCase {
         // simulate existing user info
         sut.saveUserInfo(userId, acquisitionDateString, accountId);
 
-        // test
-        sut = new TelemetryContext(this.getContext(), "ikey", null);
+        // verify
+        Assert.assertEquals(accountId, sut.getAccountId());
+        Assert.assertEquals(acquisitionDateString, sut.getUserAcqusitionDate());
+        Assert.assertEquals(userId, sut.getUserId());
+    }
+
+    public void testNewInstanceGetsSetupWithSharedInstance(){
+
+        // setup
+        TelemetryContext newInstance = TelemetryContext.newInstance();
 
         // verify
-        User loadedUser = sut.getUser();
-        Assert.assertEquals(accountId, loadedUser.getAccountId());
-        Assert.assertEquals(acquisitionDateString, loadedUser.getAccountAcquisitionDate());
-        Assert.assertEquals(userId, loadedUser.getId());
+        Assert.assertEquals(sut.getDeviceModel(), newInstance.getDeviceModel());
+    }
+
+    public void testNewInstanceWillNotChangeSharedInstance(){
+
+        TelemetryContext newInstance = TelemetryContext.newInstance();
+        newInstance.setDeviceModel("myDeviceModel");
+        Assert.assertNotSame(sut.getDeviceModel(), newInstance.getDeviceModel());
+    }
+
+    public void testSharedInstanceWillChangeNewInstance(){
+
+        TelemetryContext newInstance = TelemetryContext.newInstance();
+        sut.setDeviceModel("myDeviceModel");
+        Assert.assertEquals(sut.getDeviceModel(), newInstance.getDeviceModel());
     }
 
     protected void tearDown (){

@@ -127,12 +127,12 @@ class TelemetryContext {
         }else{
             context = new TelemetryContext();
             context.resetContext();
-
         }
         return context;
     }
 
     public void resetContext(){
+
         // Reset device context
         setDeviceId(instance.getDeviceId());
         setDeviceModel(instance.getDeviceModel());
