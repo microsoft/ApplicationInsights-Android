@@ -77,7 +77,7 @@ class EnvelopeFactory {
      * @param telemetryContext the telemetry context
      * @param commonProperties a map of common properties which should be set for all envelopes
      */
-    protected EnvelopeFactory(TelemetryContext telemetryContext, Map<String,String> commonProperties){
+    protected EnvelopeFactory(TelemetryContext telemetryContext, Map<String, String> commonProperties) {
         this.context = telemetryContext;
         this.commonProperties = commonProperties;
         this.configured = true;
@@ -148,7 +148,7 @@ class EnvelopeFactory {
         Envelope envelope = createEnvelope();
         envelope.setData(data);
         Domain baseData = data.getBaseData();
-        if(baseData instanceof TelemetryData) {
+        if (baseData instanceof TelemetryData) {
             String envelopeName = ((TelemetryData) baseData).getEnvelopeName();
             envelope.setName(envelopeName);
         }
@@ -225,17 +225,18 @@ class EnvelopeFactory {
      * Creates information about an aggregated metric for Application Insights. This method gets
      * called by a CreateTelemetryDataTask in order to create and forward data on a background thread.
      *
-     * @param name  The name of the metric
-     * @param value The value of the metric
+     * @param name          The name of the metric
+     * @param value         The value of the metric
+     * @param properties    Custom properties associated with the event
      * @return an Envelope object, which contains a metric
      */
-    protected Data<Domain> createMetricData(String name, double value) {
+    protected Data<Domain> createMetricData(String name, double value, Map<String, String> properties) {
         Data<Domain> data = null;
         if (isConfigured()) {
             MetricData telemetry = new MetricData();
             DataPoint dataPoint = new DataPoint();
             dataPoint.setCount(1);
-            dataPoint.setKind(DataPointType.Measurement);
+            dataPoint.setKind(DataPointType.MEASUREMENT);
             dataPoint.setMax(value);
             dataPoint.setMax(value);
             dataPoint.setName(ensureNotNull(name));
@@ -243,6 +244,7 @@ class EnvelopeFactory {
             List<DataPoint> metricsList = new ArrayList<DataPoint>();
             metricsList.add(dataPoint);
             telemetry.setMetrics(metricsList);
+            telemetry.setProperties(properties);
 
             data = createData(telemetry);
         }
@@ -254,15 +256,15 @@ class EnvelopeFactory {
      * method gets called by a CreateTelemetryDataTask in order to create and forward data on a
      * background thread.
      *
-     * @param exception  The exception to track
-     * @param properties Custom properties associated with the event
+     * @param exception     The exception to track
+     * @param properties    Custom properties associated with the event
+     * @param measurements  Custom measurements associated with the event
      * @return an Envelope object, which contains a handled or unhandled exception
      */
-    protected Data<Domain> createExceptionData(Throwable exception, Map<String, String> properties) {
+    protected Data<Domain> createExceptionData(Throwable exception, Map<String, String> properties, Map<String, Double> measurements) {
         Data<Domain> data = null;
         if (isConfigured()) {
-            CrashData telemetry = this.getCrashData(exception, properties);
-
+            CrashData telemetry = this.getCrashData(exception, properties, measurements);
             data = createData(telemetry);
         }
         return data;
@@ -271,9 +273,9 @@ class EnvelopeFactory {
     /**
      * Creates information about an handled or unhandled exception to Application Insights.
      *
-     *  @param type the exception type
-     *  @param message the exception message
-     *  @param stacktrace the stacktrace for the exception
+     * @param type       the exception type
+     * @param message    the exception message
+     * @param stacktrace the stacktrace for the exception
      * @return an Envelope object, which contains a handled or unhandled exception
      */
     protected Data<Domain> createExceptionData(String type, String message, String stacktrace, boolean handled) {
@@ -297,11 +299,15 @@ class EnvelopeFactory {
      */
     protected Data<Domain> createPageViewData(
           String pageName,
+          long duration,
           Map<String, String> properties,
           Map<String, Double> measurements) {
         Data<Domain> data = null;
         if (isConfigured()) {
             PageViewData telemetry = new PageViewData();
+            if(duration > 0){
+                telemetry.setDuration(String.valueOf(duration));
+            }
             telemetry.setName(ensureNotNull(pageName));
             telemetry.setUrl(null);
             telemetry.setProperties(properties);
@@ -322,7 +328,7 @@ class EnvelopeFactory {
         Data<Domain> data = null;
         if (isConfigured()) {
             SessionStateData telemetry = new SessionStateData();
-            telemetry.setState(SessionState.Start);
+            telemetry.setState(SessionState.START);
             data = createData(telemetry);
         }
         return data;
@@ -364,15 +370,15 @@ class EnvelopeFactory {
         this.commonProperties = commonProperties;
     }
 
-
     /**
      * Parse an exception and it's stack trace and create the CrashData object
      *
-     * @param exception  the throwable object we want to create a crashdata from
-     * @param properties properties used foor the CrashData
+     * @param exception     The throwable object we want to create a crashdata from
+     * @param properties    Properties used foor the CrashData
+     * @param measurements  Key value par for custom metrics
      * @return a CrashData object that contains the stacktrace and context info
      */
-    private CrashData getCrashData(Throwable exception, Map<String, String> properties) {
+    private CrashData getCrashData(Throwable exception, Map<String, String> properties, Map<String, Double> measurements) {
         Throwable localException = exception;
         if (localException == null) {
             localException = new Exception();
@@ -406,7 +412,7 @@ class EnvelopeFactory {
         CrashData crashData = new CrashData();
         crashData.setThreads(threads);
         crashData.setHeaders(crashDataHeaders);
-        crashData.setProperties(properties);
+        // TODO: Add properties and measurements (not supported for CrashData in V2)
 
         return crashData;
     }
@@ -414,8 +420,8 @@ class EnvelopeFactory {
     /**
      * Create the ExceptionData object.
      *
-     * @param type  The name of the exception type
-     * @param message The exception message
+     * @param type       The name of the exception type
+     * @param message    The exception message
      * @param stacktrace The stacktrace for the exception
      * @return a ExceptionData object that contains the stacktrace and context info
      */
@@ -423,7 +429,7 @@ class EnvelopeFactory {
 
         ArrayList<ExceptionDetails> exceptions = new ArrayList<ExceptionDetails>();
 
-        if(stacktrace != null){
+        if (stacktrace != null) {
 
             // Split raw stacktrace in case it contains managed and unmanaged exception info
             String[] subStackTraces = stacktrace.split("\\n\\s*--- End of managed exception stack trace ---\\s*\\n");
@@ -433,12 +439,12 @@ class EnvelopeFactory {
 
                 // Exception info
                 String exceptionSource;
-                boolean managed = (i==0);
+                boolean managed = (i == 0);
 
-                if(managed){
+                if (managed) {
                     exceptionSource = "Managed exception: ";
                     details.setId(1);
-                }else{
+                } else {
                     exceptionSource = "Unmanaged exception: ";
                     details.setOuterId(1);
                 }
@@ -449,7 +455,7 @@ class EnvelopeFactory {
 
                 // Parse stacktrace
                 List<StackFrame> stackFrames = getStackframes(subStackTraces[i], managed);
-                if(stackFrames.size() > 0){
+                if (stackFrames.size() > 0) {
                     details.setParsedStack(stackFrames);
                     details.setHasFullStack(true);
                 }
@@ -464,21 +470,21 @@ class EnvelopeFactory {
         return data;
     }
 
-    protected List<StackFrame> getStackframes(String stacktrace, boolean managed){
+    protected List<StackFrame> getStackframes(String stacktrace, boolean managed) {
 
         List<StackFrame> frameList = null;
 
-        if(stacktrace != null){
+        if (stacktrace != null) {
             frameList = new ArrayList<StackFrame>();
             String[] lines = stacktrace.split("\\n");
             for (String frameInfo : lines) {
                 StackFrame frame = getStackframe(frameInfo, managed);
-                if(frame != null){
+                if (frame != null) {
                     frameList.add(frame);
                 }
             }
 
-            int level = frameList.size()-1;
+            int level = frameList.size() - 1;
             for (StackFrame frame : frameList) {
                 frame.setLevel(level);
                 level--;
@@ -487,21 +493,21 @@ class EnvelopeFactory {
         return frameList;
     }
 
-    protected StackFrame getStackframe(String line, boolean managed){
+    protected StackFrame getStackframe(String line, boolean managed) {
 
         StackFrame frame = null;
-        if(line != null){
+        if (line != null) {
             Pattern methodPattern = managed ? Pattern.compile("^\\s*at\\s*(.*\\(.*\\)).*") : Pattern.compile("^[\\s\\t]*at\\s*(.*)\\(.*");
             Matcher methodMatcher = methodPattern.matcher(line);
 
-            if(methodMatcher.find() && methodMatcher.groupCount() > 0){
+            if (methodMatcher.find() && methodMatcher.groupCount() > 0) {
                 frame = new StackFrame();
                 frame.setMethod(methodMatcher.group(1));
 
                 Pattern filePattern = (managed) ? Pattern.compile("in\\s(.*):([0-9]+)\\s*") : Pattern.compile(".*\\((.*):([0-9]+)\\)\\s*");
                 Matcher fileMatcher = filePattern.matcher(line);
 
-                if(fileMatcher.find() && fileMatcher.groupCount() > 1){
+                if (fileMatcher.find() && fileMatcher.groupCount() > 1) {
                     frame.setFileName(fileMatcher.group(1));
                     int lineNumber = parseInt(fileMatcher.group(2));
                     frame.setLine(lineNumber);
@@ -511,12 +517,12 @@ class EnvelopeFactory {
         return frame;
     }
 
-    protected int parseInt(String text){
+    protected int parseInt(String text) {
         int number = 0;
 
         try {
             number = Integer.parseInt(text);
-        } catch(NumberFormatException nfe) {
+        } catch (NumberFormatException nfe) {
             InternalLogging.warn(TAG, "Couldn't parse the line number for crash report");
         }
 
@@ -532,6 +538,7 @@ class EnvelopeFactory {
 
     /**
      * Get Context
+     *
      * @return The telemetry context associated with this envelope factory
      */
     protected TelemetryContext getContext() {

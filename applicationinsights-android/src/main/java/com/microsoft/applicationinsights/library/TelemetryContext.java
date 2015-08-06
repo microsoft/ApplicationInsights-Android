@@ -345,7 +345,7 @@ class TelemetryContext {
      */
     public void configUserContext(User user) {
         if (user == null) {
-            user = new User();
+            user = loadUserInfo();
         }
 
         if (user.getId() == null) {
@@ -365,12 +365,32 @@ class TelemetryContext {
      * @param acqDateString the date of the acquisition as string
      * @param accountId     the accountId
      */
-    private void saveUserInfo(String userId, String acqDateString, String accountId) {
+    protected void saveUserInfo(String userId, String acqDateString, String accountId) {
         SharedPreferences.Editor editor = this.settings.edit();
         editor.putString(TelemetryContext.USER_ID_KEY, userId);
         editor.putString(TelemetryContext.USER_ACQ_KEY, acqDateString);
         editor.putString(TelemetryContext.USER_ACCOUNT_ID_KEY, accountId);
         editor.apply();
+    }
+
+    /**
+     * Load user information to shared preferences.
+     *
+     * @return the loaded user context
+     */
+    protected User loadUserInfo() {
+        User user = new User();
+
+        String userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
+        user.setId(userId);
+
+        String acquisitionDateString = this.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
+        user.setAccountAcquisitionDate(acquisitionDateString);
+
+        String accountId = this.settings.getString(TelemetryContext.USER_ACCOUNT_ID_KEY, null);
+        user.setAccountId(accountId);
+
+        return user;
     }
 
     /**

@@ -2,100 +2,88 @@
  * Generated from AppInsightsTypes.bond (https://github.com/Microsoft/bond)
 */
 package com.microsoft.applicationinsights.contracts;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.Writer;
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
+
 import com.microsoft.telemetry.JsonHelper;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Data contract class EventData.
  */
-public class EventData extends TelemetryData
-{
+public class EventData extends TelemetryData {
     /**
      * Backing field for property Ver.
      */
     private int ver = 2;
-    
+
     /**
      * Backing field for property Name.
      */
     private String name;
-    
+
     /**
      * Backing field for property Properties.
      */
     private Map<String, String> properties;
-    
+
     /**
      * Backing field for property Measurements.
      */
     private Map<String, Double> measurements;
-    
+
     /**
      * Initializes a new instance of the EventData class.
      */
-    public EventData()
-    {
+    public EventData() {
         this.InitializeFields();
         this.SetupAttributes();
     }
-    
+
     /**
      * Envelope Name for this telemetry.
      */
     public String getEnvelopeName() {
         return "Microsoft.ApplicationInsights.Event";
     }
-    
+
     /**
      * Base Type for this telemetry.
      */
     public String getBaseType() {
         return "Microsoft.ApplicationInsights.EventData";
     }
-    
+
     /**
      * Gets the Ver property.
      */
     public int getVer() {
         return this.ver;
     }
-    
+
     /**
      * Sets the Ver property.
      */
     public void setVer(int value) {
         this.ver = value;
     }
-    
+
     /**
      * Gets the Name property.
      */
     public String getName() {
         return this.name;
     }
-    
+
     /**
      * Sets the Name property.
      */
     public void setName(String value) {
         this.name = value;
     }
-    
+
     /**
      * Gets the Properties property.
      */
@@ -105,14 +93,14 @@ public class EventData extends TelemetryData
         }
         return this.properties;
     }
-    
+
     /**
      * Sets the Properties property.
      */
     public void setProperties(Map<String, String> value) {
         this.properties = value;
     }
-    
+
     /**
      * Gets the Measurements property.
      */
@@ -122,54 +110,51 @@ public class EventData extends TelemetryData
         }
         return this.measurements;
     }
-    
+
     /**
      * Sets the Measurements property.
      */
     public void setMeasurements(Map<String, Double> value) {
         this.measurements = value;
     }
-    
+
 
     /**
      * Serializes the beginning of this object to the passed in writer.
+     *
      * @param writer The writer to serialize this object to.
      */
-    protected String serializeContent(Writer writer) throws IOException
-    {
+    protected String serializeContent(Writer writer) throws IOException {
         String prefix = super.serializeContent(writer);
         writer.write(prefix + "\"ver\":");
         writer.write(JsonHelper.convert(this.ver));
         prefix = ",";
-        
+
         writer.write(prefix + "\"name\":");
         writer.write(JsonHelper.convert(this.name));
         prefix = ",";
-        
-        if (!(this.properties == null))
-        {
+
+        if (!(this.properties == null)) {
             writer.write(prefix + "\"properties\":");
             JsonHelper.writeDictionary(writer, this.properties);
             prefix = ",";
         }
-        
-        if (!(this.measurements == null))
-        {
+
+        if (!(this.measurements == null)) {
             writer.write(prefix + "\"measurements\":");
             JsonHelper.writeDictionary(writer, this.measurements);
             prefix = ",";
         }
-        
+
         return prefix;
     }
-    
+
     /**
      * Sets up the events attributes
      */
-    public void SetupAttributes()
-    {
+    public void SetupAttributes() {
     }
-    
+
     /**
      * Optionally initializes fields for the current context.
      */

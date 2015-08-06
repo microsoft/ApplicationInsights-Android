@@ -3,21 +3,10 @@
 */
 package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
+
 import com.microsoft.telemetry.JsonHelper;
 
 /**
@@ -88,21 +77,21 @@ public class RequestData extends TelemetryData
         this.InitializeFields();
         this.SetupAttributes();
     }
-    
+
     /**
      * Envelope Name for this telemetry.
      */
     public String getEnvelopeName() {
         return "Microsoft.ApplicationInsights.Request";
     }
-    
+
     /**
      * Base Type for this telemetry.
      */
     public String getBaseType() {
         return "Microsoft.ApplicationInsights.RequestData";
     }
-    
+
     /**
      * Gets the Ver property.
      */
