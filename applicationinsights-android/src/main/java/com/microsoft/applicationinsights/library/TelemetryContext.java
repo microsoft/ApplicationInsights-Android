@@ -34,7 +34,7 @@ import java.util.UUID;
 /**
  * This class is holding all telemetryContext information.
  */
-class TelemetryContext {
+public class TelemetryContext {
 
     protected static final String SHARED_PREFERENCES_KEY = "APP_INSIGHTS_CONTEXT";
     protected static final String USER_ID_KEY = "USER_ID";
@@ -202,7 +202,7 @@ class TelemetryContext {
     /**
      * @return the INSTANCE of persistence or null if not yet initialized
      */
-    public static TelemetryContext getSharedInstance() {
+    protected static TelemetryContext getSharedInstance() {
         if (TelemetryContext.instance == null) {
             InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
@@ -296,14 +296,12 @@ class TelemetryContext {
             if (userId == null) {
                 // No settings available, generate new user info
                 userId = UUID.randomUUID().toString();
-                saveUserInfo(userId, null, null);
+
             }
-        } else {
-            // UserId provided by the User
-            saveUserInfo(userId, null, null);
         }
 
-        this.user.setId(userId);
+        setUserId(userId);
+        saveUserInfo();
     }
 
     /**
@@ -313,33 +311,26 @@ class TelemetryContext {
      *             In case the user object that is passed is null, a new user object will be generated.
      *             If the user is missing a property, they will be generated, too.
      */
-    public void configUserContext(User user) {
+    protected void configUserContext(User user) {
         if (user == null) {
-            user = loadUserInfo();
+            loadUserInfo();
         }
 
-        if (user.getId() == null) {
-            user.setId(UUID.randomUUID().toString());
+        if (user != null && user.getId() == null) {
+            setUserId(UUID.randomUUID().toString());
         }
-
-        this.saveUserInfo(user.getId(), user.getAccountAcquisitionDate(), user.getAccountId());
-        this.user.setAccountId(user.getAccountId());
-        this.user.setAccountAcquisitionDate((user.getAccountAcquisitionDate()));
-        this.user.setId(user.getId());
+        saveUserInfo();
     }
 
     /**
      * Write user information to shared preferences.
      *
-     * @param userId        the user ID
-     * @param acqDateString the date of the acquisition as string
-     * @param accountId     the accountId
      */
-    protected void saveUserInfo(String userId, String acqDateString, String accountId) {
+    protected void saveUserInfo() {
         SharedPreferences.Editor editor = this.settings.edit();
-        editor.putString(TelemetryContext.USER_ID_KEY, userId);
-        editor.putString(TelemetryContext.USER_ACQ_KEY, acqDateString);
-        editor.putString(TelemetryContext.USER_ACCOUNT_ID_KEY, accountId);
+        editor.putString(TelemetryContext.USER_ID_KEY, getUserId());
+        editor.putString(TelemetryContext.USER_ACQ_KEY, getUserAcqusitionDate());
+        editor.putString(TelemetryContext.USER_ACCOUNT_ID_KEY, getAccountId());
         editor.apply();
     }
 
@@ -348,19 +339,17 @@ class TelemetryContext {
      *
      * @return the loaded user context
      */
-    protected User loadUserInfo() {
+    protected void loadUserInfo() {
         User user = new User();
 
         String userId = this.settings.getString(TelemetryContext.USER_ID_KEY, null);
-        user.setId(userId);
+        setUserId(userId);
 
         String acquisitionDateString = this.settings.getString(TelemetryContext.USER_ACQ_KEY, null);
-        user.setAccountAcquisitionDate(acquisitionDateString);
+        setUserAcqusitionDate(acquisitionDateString);
 
         String accountId = this.settings.getString(TelemetryContext.USER_ACCOUNT_ID_KEY, null);
-        user.setAccountId(accountId);
-
-        return user;
+        setAccountId(accountId);
     }
 
     /**
@@ -369,26 +358,26 @@ class TelemetryContext {
      * @param appContext the android Context
      */
     protected void configDeviceContext(Context appContext) {
-        this.device.setOsVersion(Build.VERSION.RELEASE);
-        this.device.setOs("Android"); //used by the AI extension in Azure Portal to build stack traces
-        this.device.setModel(Build.MODEL);
-        this.device.setOemName(Build.MANUFACTURER);
-        this.device.setLocale(Locale.getDefault().toString());
+        setOsVersion(Build.VERSION.RELEASE);
+        setOsName("Android"); //used by the AI extension in Azure Portal to build stack traces
+        setDeviceModel(Build.MODEL);
+        setDeviceOemName(Build.MANUFACTURER);
+        setOsLocale(Locale.getDefault().toString());
         updateScreenResolution(appContext);
         // get device ID
         ContentResolver resolver = appContext.getContentResolver();
         String deviceIdentifier = Settings.Secure.getString(resolver, Settings.Secure.ANDROID_ID);
         if (deviceIdentifier != null) {
-            this.device.setId(Util.tryHashStringSha256(deviceIdentifier));
+            setDeviceId(Util.tryHashStringSha256(deviceIdentifier));
         }
 
         // check device type
         final TelephonyManager telephonyManager = (TelephonyManager)
               appContext.getSystemService(Context.TELEPHONY_SERVICE);
         if (telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE) {
-            this.device.setType("Phone");
+            setDeviceType("Phone");
         } else {
-            this.device.setType("Tablet");
+            setDeviceType("Tablet");
         }
 
         // check network type
@@ -410,12 +399,12 @@ class TelemetryContext {
                     InternalLogging.warn(TAG, "Unknown network type:" + networkType);
                     break;
             }
-            this.device.setNetwork(networkString);
+            setNetworkType(networkString);
         }
 
         // detect emulator
         if (Util.isEmulator()) {
-            this.device.setModel("[Emulator]" + device.getModel());
+            setDeviceModel("[Emulator]" + device.getModel());
         }
     }
 
@@ -461,7 +450,7 @@ class TelemetryContext {
 
             resolutionString = String.valueOf(height) + "x" + String.valueOf(width);
 
-            this.device.setScreenResolution(resolutionString);
+            setScreenResolution(resolutionString);
         }
     }
 
@@ -485,7 +474,7 @@ class TelemetryContext {
                 Log.v(TAG, exception.toString());
             }
         }
-        this.internal.setSdkVersion("android:" + sdkVersionString);
+        setSdkVersion("android:" + sdkVersionString);
     }
 
     /**
@@ -540,6 +529,9 @@ class TelemetryContext {
 
     public void setUserId(String userId) {
         this.user.setId(userId);
+        if(this == instance){
+            saveUserInfo();
+        }
     }
 
     public String getUserAcqusitionDate() {
@@ -548,6 +540,9 @@ class TelemetryContext {
 
     public void setUserAcqusitionDate(String userAcqusitionDate) {
         this.user.setAccountAcquisitionDate(userAcqusitionDate);
+        if(this == instance){
+            saveUserInfo();
+        }
     }
 
     public String getAccountId() {
@@ -556,6 +551,9 @@ class TelemetryContext {
 
     public void setAccountId(String accountId) {
         this.user.setAccountId(accountId);
+        if(this == instance){
+            saveUserInfo();
+        }
     }
 
     public String getSdkVersion() {
