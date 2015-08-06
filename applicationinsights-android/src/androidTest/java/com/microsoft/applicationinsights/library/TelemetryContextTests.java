@@ -12,6 +12,8 @@ public class TelemetryContextTests extends AndroidTestCase {
         super.setUp();
         TelemetryContext.initialize(getContext(), "iKey", null);
         sut = TelemetryContext.getSharedInstance();
+        resetUserContext();
+
     }
 
     public void testNewUserContext(){
@@ -31,6 +33,8 @@ public class TelemetryContextTests extends AndroidTestCase {
 
         // simulate existing user info
         sut.saveUserInfo(userId, acquisitionDateString, accountId);
+        User user = null;
+        sut.configUserContext(user);
 
         // verify
         Assert.assertEquals(accountId, sut.getAccountId());
@@ -54,16 +58,23 @@ public class TelemetryContextTests extends AndroidTestCase {
         Assert.assertNotSame(sut.getDeviceModel(), newInstance.getDeviceModel());
     }
 
-    public void testSharedInstanceWillChangeNewInstance(){
+    public void testSharedInstanceWillNotChangeNewInstance(){
 
         TelemetryContext newInstance = TelemetryContext.newInstance();
         sut.setDeviceModel("myDeviceModel");
-        Assert.assertEquals(sut.getDeviceModel(), newInstance.getDeviceModel());
+        Assert.assertNotSame(sut.getDeviceModel(), newInstance.getDeviceModel());
     }
 
     protected void tearDown (){
 
         // reset saved user context
+    }
+
+    // helper
+
+    protected void resetUserContext(){
         sut.saveUserInfo(null, null, null);
+        User user = null;
+        sut.configUserContext(user);
     }
 }
