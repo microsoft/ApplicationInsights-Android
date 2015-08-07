@@ -211,7 +211,7 @@ public enum ApplicationInsights {
                 this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
             } else {
                 //in case the dev doesn't use a custom user object
-                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, new User());
+                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, null);
             }
 
             initializePipeline(context);
