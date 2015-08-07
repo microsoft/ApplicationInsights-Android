@@ -24,6 +24,9 @@ public class TelemetryContextTests extends AndroidTestCase {
         // validate
         Assert.assertNull(user.getAccountId());
         Assert.assertNull(user.getAccountAcquisitionDate());
+        Assert.assertNull(user.getAuthUserId());
+        Assert.assertNull(user.getAuthUserAcquisitionDate());
+        Assert.assertNull(user.getAnonUserAcquisitionDate());
         Assert.assertNotSame(userId, user.getId());
     }
 
@@ -33,9 +36,12 @@ public class TelemetryContextTests extends AndroidTestCase {
         String accountId = "accountId";
         String acquisitionDateString = "acqusitionDate";
         String userId = "userId";
+        String authenticatedUserId = "authenticatedUserId";
+        String authenticatedUserAcqDate = "authenticatedUserAcqDate";
+        String anonUserAcquDate = "anonUserAcquDate";
 
         // simulate existing user info
-        sut.saveUserInfo(userId, acquisitionDateString, accountId);
+        sut.saveUserInfo(userId, acquisitionDateString, accountId, authenticatedUserId, authenticatedUserAcqDate, anonUserAcquDate);
 
         // test
         sut = new TelemetryContext(this.getContext(), "ikey", null);
@@ -45,11 +51,14 @@ public class TelemetryContextTests extends AndroidTestCase {
         Assert.assertEquals(accountId, loadedUser.getAccountId());
         Assert.assertEquals(acquisitionDateString, loadedUser.getAccountAcquisitionDate());
         Assert.assertEquals(userId, loadedUser.getId());
+        Assert.assertEquals(authenticatedUserId, loadedUser.getAuthUserId());
+        Assert.assertEquals(authenticatedUserAcqDate, loadedUser.getAuthUserAcquisitionDate());
+        Assert.assertEquals(anonUserAcquDate, loadedUser.getAnonUserAcquisitionDate());
     }
 
     protected void tearDown (){
 
         // reset saved user context
-        sut.saveUserInfo(null, null, null);
+        sut.saveUserInfo(null, null, null, null, null, null);
     }
 }

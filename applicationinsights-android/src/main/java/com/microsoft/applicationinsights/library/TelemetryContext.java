@@ -40,6 +40,9 @@ class TelemetryContext {
     protected static final String USER_ID_KEY = "USER_ID";
     protected static final String USER_ACQ_KEY = "USER_ACQ";
     protected static final String USER_ACCOUNT_ID_KEY = "USER_ACCOUNT_ID";
+    protected static final String USER_AUTH_USER_ID_KEY = "USER_AUTH_USER_ID";
+    protected static final String USER_ANON_ACQ_DATE_KEY = "USER_ANON_ACQ_DATE";
+    protected static final String USER_AUTH_ACQ_DATE_KEY = "USER_AUTH_ACQ_DATE";
     protected static final String SESSION_IS_FIRST_KEY = "SESSION_IS_FIRST";
     private static final String TAG = "TelemetryContext";
 
@@ -240,12 +243,11 @@ class TelemetryContext {
         this.session.setIsNew("false");
 
         SharedPreferences.Editor editor = this.settings.edit();
-        if(!this.settings.getBoolean(SESSION_IS_FIRST_KEY, false)) {
+        if (!this.settings.getBoolean(SESSION_IS_FIRST_KEY, false)) {
             editor.putBoolean(SESSION_IS_FIRST_KEY, true);
             editor.apply();
             this.session.setIsFirst("true");
-        }
-        else {
+        } else {
             this.session.setIsFirst("false");
         }
     }
@@ -301,11 +303,11 @@ class TelemetryContext {
             if (userId == null) {
                 // No settings available, generate new user info
                 userId = UUID.randomUUID().toString();
-                saveUserInfo(userId, null, null);
+                saveUserInfo(userId, null, null, null, null, null);
             }
         } else {
             // UserId provided by the User
-            saveUserInfo(userId, null, null);
+            saveUserInfo(userId, null, null, null, null, null);
         }
 
         this.user.setId(userId);
@@ -327,10 +329,14 @@ class TelemetryContext {
             user.setId(UUID.randomUUID().toString());
         }
 
-        this.saveUserInfo(user.getId(), user.getAccountAcquisitionDate(), user.getAccountId());
+        this.saveUserInfo(user.getId(), user.getAccountAcquisitionDate(), user.getAccountId(),
+              user.getAuthUserId(), user.getAuthUserAcquisitionDate(), user.getAnonUserAcquisitionDate());
         this.user.setAccountId(user.getAccountId());
         this.user.setAccountAcquisitionDate((user.getAccountAcquisitionDate()));
         this.user.setId(user.getId());
+        this.user.setAuthUserId(user.getAuthUserId());
+        this.user.setAuthUserAcquisitionDate(user.getAuthUserAcquisitionDate());
+        this.user.setAnonUserAcquisitionDate(user.getAnonUserAcquisitionDate());
     }
 
     /**
@@ -340,11 +346,14 @@ class TelemetryContext {
      * @param acqDateString the date of the acquisition as string
      * @param accountId     the accountId
      */
-    protected void saveUserInfo(String userId, String acqDateString, String accountId) {
+    protected void saveUserInfo(String userId, String acqDateString, String accountId, String authUserId, String authAcqDateString, String anonAcqDateString) {
         SharedPreferences.Editor editor = this.settings.edit();
         editor.putString(TelemetryContext.USER_ID_KEY, userId);
         editor.putString(TelemetryContext.USER_ACQ_KEY, acqDateString);
         editor.putString(TelemetryContext.USER_ACCOUNT_ID_KEY, accountId);
+        editor.putString(TelemetryContext.USER_AUTH_USER_ID_KEY, authUserId);
+        editor.putString(TelemetryContext.USER_AUTH_ACQ_DATE_KEY, authAcqDateString);
+        editor.putString(TelemetryContext.USER_ANON_ACQ_DATE_KEY, anonAcqDateString);
         editor.apply();
     }
 
@@ -364,6 +373,15 @@ class TelemetryContext {
 
         String accountId = this.settings.getString(TelemetryContext.USER_ACCOUNT_ID_KEY, null);
         user.setAccountId(accountId);
+
+        String authorizedUserId = this.settings.getString(TelemetryContext.USER_AUTH_USER_ID_KEY, null);
+        user.setAuthUserId(authorizedUserId);
+
+        String authUserAcqDate = this.settings.getString(TelemetryContext.USER_AUTH_ACQ_DATE_KEY, null);
+        user.setAuthUserAcquisitionDate(authUserAcqDate);
+
+        String anonUserAcqDate = this.settings.getString(TelemetryContext.USER_ANON_ACQ_DATE_KEY, null);
+        user.setAnonUserAcquisitionDate(anonUserAcqDate);
 
         return user;
     }

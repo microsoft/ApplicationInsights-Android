@@ -412,7 +412,7 @@ class EnvelopeFactory {
         CrashData crashData = new CrashData();
         crashData.setThreads(threads);
         crashData.setHeaders(crashDataHeaders);
-        // TODO: Add properties and measurements (not supported for CrashData in V2)
+        // TODO: Add properties and measurements (not supported for CrashData in backend so far)
 
         return crashData;
     }
