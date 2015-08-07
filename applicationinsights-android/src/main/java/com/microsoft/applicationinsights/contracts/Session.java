@@ -2,101 +2,91 @@
  * Generated from ContextTagKeys.bond (https://github.com/Microsoft/bond)
 */
 package com.microsoft.applicationinsights.contracts;
+
+import com.microsoft.telemetry.IJsonSerializable;
+import com.microsoft.telemetry.JsonHelper;
+
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
-import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
-import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class Session.
  */
 public class Session
-     implements IJsonSerializable
-{
+      implements IJsonSerializable, Serializable {
     /**
      * Backing field for property Id.
      */
     private String id;
-    
+
     /**
      * Backing field for property IsFirst.
      */
     private String isFirst;
-    
+
     /**
      * Backing field for property IsNew.
      */
     private String isNew;
-    
+
     /**
      * Initializes a new instance of the Session class.
      */
-    public Session()
-    {
+    public Session() {
         this.InitializeFields();
     }
-    
+
     /**
      * Gets the Id property.
      */
     public String getId() {
         return this.id;
     }
-    
+
     /**
      * Sets the Id property.
      */
     public void setId(String value) {
         this.id = value;
     }
-    
+
     /**
      * Gets the IsFirst property.
      */
     public String getIsFirst() {
         return this.isFirst;
     }
-    
+
     /**
      * Sets the IsFirst property.
      */
     public void setIsFirst(String value) {
         this.isFirst = value;
     }
-    
+
     /**
      * Gets the IsNew property.
      */
     public String getIsNew() {
         return this.isNew;
     }
-    
+
     /**
      * Sets the IsNew property.
      */
     public void setIsNew(String value) {
         this.isNew = value;
     }
-    
+
 
     /**
      * Adds all members of this class to a hashmap
+     *
      * @param map to which the members of this class will be added.
      */
-    public void addToHashMap(Map<String, String> map)
-    {
+    public void addToHashMap(Map<String, String> map) {
         if (!(this.id == null)) {
             map.put("ai.session.id", this.id);
         }
@@ -107,20 +97,19 @@ public class Session
             map.put("ai.session.isNew", this.isNew);
         }
     }
-    
+
 
     /**
      * Serializes the beginning of this object to the passed in writer.
+     *
      * @param writer The writer to serialize this object to.
      */
     @Override
-    public void serialize(Writer writer) throws IOException
-    {
-        if (writer == null)
-        {
+    public void serialize(Writer writer) throws IOException {
+        if (writer == null) {
             throw new IllegalArgumentException("writer");
         }
-        
+
         writer.write('{');
         this.serializeContent(writer);
         writer.write('}');
@@ -128,39 +117,36 @@ public class Session
 
     /**
      * Serializes the beginning of this object to the passed in writer.
+     *
      * @param writer The writer to serialize this object to.
      */
-    protected String serializeContent(Writer writer) throws IOException
-    {
+    protected String serializeContent(Writer writer) throws IOException {
         String prefix = "";
-        if (!(this.id == null))
-        {
+        if (!(this.id == null)) {
             writer.write(prefix + "\"ai.session.id\":");
             writer.write(JsonHelper.convert(this.id));
             prefix = ",";
         }
-        
-        if (!(this.isFirst == null))
-        {
+
+        if (!(this.isFirst == null)) {
             writer.write(prefix + "\"ai.session.isFirst\":");
             writer.write(JsonHelper.convert(this.isFirst));
             prefix = ",";
         }
-        
-        if (!(this.isNew == null))
-        {
+
+        if (!(this.isNew == null)) {
             writer.write(prefix + "\"ai.session.isNew\":");
             writer.write(JsonHelper.convert(this.isNew));
             prefix = ",";
         }
-        
+
         return prefix;
     }
-    
+
     /**
      * Optionally initializes fields for the current context.
      */
     protected void InitializeFields() {
-        
+
     }
 }

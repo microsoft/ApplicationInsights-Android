@@ -3,27 +3,18 @@
 */
 package com.microsoft.applicationinsights.contracts;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.microsoft.telemetry.ITelemetry;
-import com.microsoft.telemetry.ITelemetryData;
-import com.microsoft.telemetry.IContext;
+
 import com.microsoft.telemetry.IJsonSerializable;
-import com.microsoft.telemetry.Base;
-import com.microsoft.telemetry.Data;
-import com.microsoft.telemetry.Domain;
-import com.microsoft.telemetry.Extension;
 import com.microsoft.telemetry.JsonHelper;
 
 /**
  * Data contract class Device.
  */
 public class Device
-     implements IJsonSerializable
+     implements IJsonSerializable, Serializable
 {
     /**
      * Backing field for property Id.
@@ -54,6 +45,11 @@ public class Device
      * Backing field for property Network.
      */
     private String network;
+    
+    /**
+     * Backing field for property NetworkName.
+     */
+    private String networkName;
     
     /**
      * Backing field for property OemName.
@@ -94,6 +90,11 @@ public class Device
      * Backing field for property MachineName.
      */
     private String machineName;
+    
+    /**
+     * Backing field for property VmName.
+     */
+    private String vmName;
     
     /**
      * Initializes a new instance of the Device class.
@@ -185,6 +186,20 @@ public class Device
      */
     public void setNetwork(String value) {
         this.network = value;
+    }
+    
+    /**
+     * Gets the NetworkName property.
+     */
+    public String getNetworkName() {
+        return this.networkName;
+    }
+    
+    /**
+     * Sets the NetworkName property.
+     */
+    public void setNetworkName(String value) {
+        this.networkName = value;
     }
     
     /**
@@ -299,6 +314,20 @@ public class Device
         this.machineName = value;
     }
     
+    /**
+     * Gets the VmName property.
+     */
+    public String getVmName() {
+        return this.vmName;
+    }
+    
+    /**
+     * Sets the VmName property.
+     */
+    public void setVmName(String value) {
+        this.vmName = value;
+    }
+    
 
     /**
      * Adds all members of this class to a hashmap
@@ -324,6 +353,9 @@ public class Device
         if (!(this.network == null)) {
             map.put("ai.device.network", this.network);
         }
+        if (!(this.networkName == null)) {
+            map.put("ai.device.networkName", this.networkName);
+        }
         if (!(this.oemName == null)) {
             map.put("ai.device.oemName", this.oemName);
         }
@@ -347,6 +379,9 @@ public class Device
         }
         if (!(this.machineName == null)) {
             map.put("ai.device.machineName", this.machineName);
+        }
+        if (!(this.vmName == null)) {
+            map.put("ai.device.vmName", this.vmName);
         }
     }
     
@@ -417,6 +452,13 @@ public class Device
             prefix = ",";
         }
         
+        if (!(this.networkName == null))
+        {
+            writer.write(prefix + "\"ai.device.networkName\":");
+            writer.write(JsonHelper.convert(this.networkName));
+            prefix = ",";
+        }
+        
         if (!(this.oemName == null))
         {
             writer.write(prefix + "\"ai.device.oemName\":");
@@ -470,6 +512,13 @@ public class Device
         {
             writer.write(prefix + "\"ai.device.machineName\":");
             writer.write(JsonHelper.convert(this.machineName));
+            prefix = ",";
+        }
+        
+        if (!(this.vmName == null))
+        {
+            writer.write(prefix + "\"ai.device.vmName\":");
+            writer.write(JsonHelper.convert(this.vmName));
             prefix = ",";
         }
         

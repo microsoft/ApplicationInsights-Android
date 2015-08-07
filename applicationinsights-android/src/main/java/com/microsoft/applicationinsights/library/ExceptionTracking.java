@@ -83,7 +83,7 @@ class ExceptionTracking implements UncaughtExceptionHandler {
 
             // track the crash
             Thread executor = new Thread(new TrackDataOperation(TrackDataOperation.DataType.UNHANDLED_EXCEPTION,
-                    exception, properties));
+                    exception, properties, null));
 
             executor.start();
         }else{

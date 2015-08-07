@@ -3,19 +3,17 @@
 */
 package com.microsoft.applicationinsights.contracts;
 /**
- * Enum DataPointType.
+ * Enum TestResult.
  */
-public enum DataPointType
+public enum TestResult
 {
-    MEASUREMENT(0), AGGREGATION(1);
-
+    PASS(0), FAIL(1);
     private final int value;
-    private DataPointType(int value) {
+    private TestResult(int value) {
         this.value = value;
     }
 
     public int getValue() {
         return value;
     }
-    
 }

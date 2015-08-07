@@ -31,8 +31,24 @@ public class SenderTest extends TestCase {
         Assert.assertSame(sender1, sender2);
     }
 
+    public void testExpectedResponseCode() {
+        for(int statusCode = 100; statusCode <= 510; statusCode++){
+            if(199 < statusCode && statusCode <= 203) {
+                assertTrue(sut.isExpected(statusCode));
+            }else{
+                assertFalse(sut.isExpected(statusCode));
+            }
+        }
+    }
 
-
-
+    public void testRecoverableResponseCode() {
+        for(int statusCode = 100; statusCode <= 510; statusCode++){
+            if((statusCode == 429) || (statusCode == 408) || (statusCode == 500) || (statusCode == 503) || (statusCode == 511)) {
+                assertTrue(sut.isRecoverableError(statusCode));
+            }else{
+                assertFalse(sut.isRecoverableError(statusCode));
+            }
+        }
+    }
 }
 

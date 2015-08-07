@@ -71,13 +71,6 @@ public enum ApplicationInsights {
     private TelemetryContext telemetryContext;
 
     /**
-     * A custom user ID used for sending telemetry data.
-     *
-     * @deprecated use user-property instead
-     */
-    private String userId;
-
-    /**
      * A custom user object for sending telemetry data. Replaces
      * userId as we allow more configuration of the user object
      */
@@ -204,14 +197,9 @@ public enum ApplicationInsights {
             if (this.user != null) {
                 //the dev has use setCustomUserContext to configure the user object
                 this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
-            } else if (this.userId != null) {
-                //in case the dev uses deprecated method to set the user's ID
-                this.user = new User();
-                this.user.setId(this.userId);
-                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, this.user);
             } else {
                 //in case the dev doesn't use a custom user object
-                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, new User());
+                this.telemetryContext = new TelemetryContext(context, this.instrumentationKey, null);
             }
 
             initializePipeline(context);
@@ -305,26 +293,6 @@ public enum ApplicationInsights {
             return;
         }
         ChannelManager.getInstance().getChannel().synchronize();
-    }
-
-    /**
-     * Enable / disable ALL auto collection of telemetry data at startup.Call this before calling
-     * {@link ApplicationInsights#start()}
-     *
-     * @param disabled if set to true, the auto collection features will be disabled at app start
-     * @deprecated with 1.0-beta.6 use {@link ApplicationInsights#disableAutoCollection()} or
-     * the more specific
-     * {@link ApplicationInsights#disableAutoSessionManagement()},
-     * {@link ApplicationInsights#disableAutoAppearanceTracking()} and
-     * {@link ApplicationInsights#disableAutoPageViewTracking()} instead
-     */
-    public static void setAutoCollectionDisabledAtStartup(boolean disabled) {
-        INSTANCE.autoAppearanceDisabled = disabled;
-        INSTANCE.autoPageViewsDisabled = disabled;
-        INSTANCE.autoSessionManagementDisabled = disabled;
-        //don't call startAutoCollection() because setAutoCollectionDisabledAtStartup(disabled)
-        //was intended to be called
-        //before the developer calls start()
     }
 
     /**
@@ -621,21 +589,6 @@ public enum ApplicationInsights {
     public static void renewSession(String sessionId) {
         if (!INSTANCE.telemetryDisabled && INSTANCE.telemetryContext != null) {
             INSTANCE.telemetryContext.renewSessionId(sessionId);
-        }
-    }
-
-    /**
-     * Set the user Id associated with the telemetry data. If userId == null, ApplicationInsights
-     * will generate a random ID.
-     *
-     * @param userId a user ID associated with the telemetry data
-     * @deprecated use {@link ApplicationInsights#setCustomUserContext(User)} instead
-     */
-    public static void setUserId(String userId) {
-        if (isSetupAndRunning) {
-            INSTANCE.telemetryContext.configUserContext(userId);
-        } else {
-            INSTANCE.userId = userId;
         }
     }
 

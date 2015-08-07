@@ -1,9 +1,9 @@
 package com.microsoft.applicationinsights.library;
 
+import com.microsoft.applicationinsights.contracts.TelemetryData;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
 import com.microsoft.telemetry.IChannel;
-import com.microsoft.telemetry.ITelemetry;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,13 +43,16 @@ class TrackDataOperation implements Runnable {
     // unmanaged exceptions
     private Throwable exception;
 
-    // custom
-    private ITelemetry telemetry;
+    // page views
+    private long duration;
 
-    protected TrackDataOperation(ITelemetry telemetry) {
+    // custom
+    private TelemetryData telemetry;
+
+    protected TrackDataOperation(TelemetryData telemetry) {
         this.type = DataType.NONE;
         try {
-            this.telemetry = (ITelemetry)deepCopy(telemetry);
+            this.telemetry = (TelemetryData)deepCopy(telemetry);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -70,11 +73,12 @@ class TrackDataOperation implements Runnable {
         this.type = type; // no need to copy as enum is pass by value
     }
 
-    protected TrackDataOperation(DataType type, String metricName, double metric) {
+    protected TrackDataOperation(DataType type, String metricName, double metric, Map<String, String> properties) {
         this.type = type; // no need to copy as enum is pass by value
         this.metric = metric;  // no need to copy as enum is pass by value
         try {
             this.name = (String) deepCopy(metricName);
+            this.properties = new HashMap<String, String>(properties);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -102,13 +106,26 @@ class TrackDataOperation implements Runnable {
     }
 
     protected TrackDataOperation(DataType type,
+                                 String name,
+                                 long duration,
+                                 Map<String, String> properties,
+                                 Map<String, Double> measurements) {
+        this(type, name, properties, measurements);
+        this.duration = duration;
+    }
+
+    protected TrackDataOperation(DataType type,
                                  Throwable exception,
-                                 Map<String, String> properties) {
+                                 Map<String, String> properties,
+                                 Map<String, Double> measurements) {
         this.type = type; // no need to copy as enum is pass by value
         try {
             this.exception = (Throwable) deepCopy(exception);
             if(properties != null) {
                 this.properties = new HashMap<String, String>(properties);
+            }
+            if(measurements != null) {
+                this.measurements = new HashMap<String, Double>(measurements);
             }
         }
         catch (Exception e) {
@@ -158,7 +175,7 @@ class TrackDataOperation implements Runnable {
     private Data<Domain> getTelemetry() {
         Data<Domain> telemetry = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
-            telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties);
+            telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties, this.measurements);
         }else if ((this.type == DataType.MANAGED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.name, this.exceptionMessage, this.exceptionStacktrace, this.handled);
 
@@ -173,19 +190,19 @@ class TrackDataOperation implements Runnable {
                     telemetry = EnvelopeFactory.getInstance().createEventData(this.name, this.properties, this.measurements);
                     break;
                 case PAGE_VIEW:
-                    telemetry = EnvelopeFactory.getInstance().createPageViewData(this.name, this.properties, this.measurements);
+                    telemetry = EnvelopeFactory.getInstance().createPageViewData(this.name, this.duration, this.properties, this.measurements);
                     break;
                 case TRACE:
                     telemetry = EnvelopeFactory.getInstance().createTraceData(this.name, this.properties);
                     break;
                 case METRIC:
-                    telemetry = EnvelopeFactory.getInstance().createMetricData(this.name, this.metric);
+                    telemetry = EnvelopeFactory.getInstance().createMetricData(this.name, this.metric, this.properties);
                     break;
                 case NEW_SESSION:
                     telemetry = EnvelopeFactory.getInstance().createNewSessionData();
                     break;
                 case HANDLED_EXCEPTION:
-                    telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties);
+                    telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties, this.measurements);
                     break;
                 default:
                     break;
