@@ -1,6 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-beta.6)
+# Application Insights for Android (1.0-beta.7)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
@@ -25,11 +25,8 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 ## <a name="1"></a> 1. Release Notes
 
-* Integrated support for CLL channel
-* Improvements related to [our new Xamarin SDK]("https://github.com/Microsoft/ApplicationInsights-Xamarin")
-* Improved handling for user properties
-* [BUGFIX] Fixed bug for session management when starting an activity
-* Data will be now sent to the server using json-x-streaming
+* [BUGFIX] Fixed bug where new user was created instead of loaded existing user from preferences
+* Updated contract files
 * Removed previously deprecated `LifecycleTracking`
 * Small cleanups
 
