@@ -342,9 +342,12 @@ class TelemetryContext {
     /**
      * Write user information to shared preferences.
      *
-     * @param userId        the user ID
-     * @param acqDateString the date of the acquisition as string
-     * @param accountId     the accountId
+     * @param userId                         the user ID
+     * @param acqDateString                  the date of the acquisition as string
+     * @param accountId                      the accountId
+     * @param authenticatedUserId            the id for an authenticated user
+     * @param authenticatedUserAcqDateString the date of the acquisition of an authenticated user as string
+     * @param anonUserAcqDateString          the date of the acquisition for an anon user¥
      */
     protected void saveUserInfo(String userId, String acqDateString, String accountId, String authenticatedUserId, String authenticatedUserAcqDateString, String anonUserAcqDateString) {
         SharedPreferences.Editor editor = this.settings.edit();
