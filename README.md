@@ -137,6 +137,13 @@ in the activity's `onCreate`-callback.
 
 ##<a name="4"></a> 4. Advanced Setup
 
+### 4.0 Download files manually
+
+We recommend integrating our SDK as described above, if, however, you want to add our SDK to your project manually, press on the button below to download our SDK from Bintray.
+
+[ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/1.0-beta.6/view#files)
+
+
 ### 4.1 Set the instrumentation key in your gradle.properties
 
 Add the ```<meta-data>```to your Android Manifest as described above but leave the variable ```${AI_INSTRUMENTATION_KEY}```as is. In your global ```gradle.properties```, add
