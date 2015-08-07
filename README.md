@@ -25,9 +25,11 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 ## <a name="1"></a> 1. Release Notes
 
-* [BUGFIX] Fixed bug where new user was created instead of loaded existing user from preferences
+* [BUGFIX] Fixed bug where new user was created instead of loaded existing user from preferences.
+* [BUGFIX] Fixed `NotSerializableException` when using the `track(ITelemetry)`-method.
 * Updated contract files
-* Removed previously deprecated `LifecycleTracking`
+* Deprecated track(..)-methods to align our API with other SDKs.
+* Removed previously deprecated methods to set a custom `userID`
 * Small cleanups
 
 See [here](https://github.com/Microsoft/ApplicationInsights-Android/releases) for release notes of previous versions
@@ -35,6 +37,10 @@ See [here](https://github.com/Microsoft/ApplicationInsights-Android/releases) fo
 ##<a name="2"></a> 2. Breaking Changes & deprecations
 
 Starting with 1.0-beta.5, breaking changes will be announced 1 release in advance. Once a method has been deprecated, the next release of the SDK will remove the API.
+
+**[1.0-beta.7]**
+
+Previously deprecated method to set custom `userID` have been removed, use `ApplicationInsights.setCustomUserContext(User user)`instead.
 
 **[1.0-beta.6]**
 
@@ -77,7 +83,7 @@ In your module's ```build.gradle```add a dependency for Application Insights
 
 ```groovy
 dependencies {
-    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.6'
+    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.7'
 }
 ```
 
@@ -336,13 +342,20 @@ config.setEndpointUrl("https://myserver.com/v2/track");
 
 ### 9.4 Override sessionID and userID
 
-Application Insights manages IDs for a session and for individual users for you. If you want to override the generated IDs with your own, it can be done like this:
+Application Insights manages the ID of a session for you. If you want to override the generated ID with your own, it can be done like this:
 
 ```java
-ApplicationInsights.setUserId("New user ID");
 ApplicationInsights.renewSession("New session ID");
 ```
 [**NOTE**] If you want to manage sessions manually, please disable [Automatic Collection of Lifecycle Events](#7).
+
+It's also possible to provide a custom user object to application insights, e.g. to set custom value for the `authUserId`. We're assuming that you know what you do if you customize the user object. Most user's won't need to customize the user object.
+
+```java
+User user = new User();
+//now customize your user object
+ApplicationInsights.setCustomUserContext(user);
+```
 
 ### 9.5 Other
 
