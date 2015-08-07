@@ -346,14 +346,14 @@ class TelemetryContext {
      * @param acqDateString the date of the acquisition as string
      * @param accountId     the accountId
      */
-    protected void saveUserInfo(String userId, String acqDateString, String accountId, String authUserId, String authAcqDateString, String anonAcqDateString) {
+    protected void saveUserInfo(String userId, String acqDateString, String accountId, String authenticatedUserId, String authenticatedUserAcqDateString, String anonUserAcqDateString) {
         SharedPreferences.Editor editor = this.settings.edit();
         editor.putString(TelemetryContext.USER_ID_KEY, userId);
         editor.putString(TelemetryContext.USER_ACQ_KEY, acqDateString);
         editor.putString(TelemetryContext.USER_ACCOUNT_ID_KEY, accountId);
-        editor.putString(TelemetryContext.USER_AUTH_USER_ID_KEY, authUserId);
-        editor.putString(TelemetryContext.USER_AUTH_ACQ_DATE_KEY, authAcqDateString);
-        editor.putString(TelemetryContext.USER_ANON_ACQ_DATE_KEY, anonAcqDateString);
+        editor.putString(TelemetryContext.USER_AUTH_USER_ID_KEY, authenticatedUserId);
+        editor.putString(TelemetryContext.USER_AUTH_ACQ_DATE_KEY, authenticatedUserAcqDateString);
+        editor.putString(TelemetryContext.USER_ANON_ACQ_DATE_KEY, anonUserAcqDateString);
         editor.apply();
     }
 
