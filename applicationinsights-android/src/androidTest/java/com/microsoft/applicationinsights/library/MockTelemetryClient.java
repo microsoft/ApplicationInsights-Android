@@ -94,7 +94,7 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackMetric(String name, double value) {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createMetricData(name, value));
+            messages.add(EnvelopeFactory.getInstance().createMetricData(name, value, null));
         }else{
             super.trackMetric(name, value);
         }
@@ -103,7 +103,7 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackHandledException(Throwable handledException, Map<String, String> properties) {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createExceptionData(handledException, properties));
+            messages.add(EnvelopeFactory.getInstance().createExceptionData(handledException, properties, null));
         }else{
             super.trackHandledException(handledException, properties);
         }
@@ -112,12 +112,13 @@ public class MockTelemetryClient extends TelemetryClient {
     @Override
     public void trackPageView(
             String pageName,
+            long duration,
             Map<String, String> properties,
             Map<String, Double> measurements) {
         if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createPageViewData(pageName, properties, measurements));
+            messages.add(EnvelopeFactory.getInstance().createPageViewData(pageName, duration, properties, measurements));
         }else{
-            super.trackPageView(pageName, properties, measurements);
+            super.trackPageView(pageName, duration, properties, measurements);
         }
     }
 

@@ -9,44 +9,40 @@ import java.io.StringWriter;
 /// <summary>
 /// Data contract test class SessionStateDataTests.
 /// </summary>
-public class SessionStateDataTests extends TestCase
-{
-    public void testVerPropertyWorksAsExpected()
-    {
+public class SessionStateDataTests extends TestCase {
+    public void testVerPropertyWorksAsExpected() {
         int expected = 42;
         SessionStateData item = new SessionStateData();
         item.setVer(expected);
         int actual = item.getVer();
         Assert.assertEquals(expected, actual);
-        
+
         expected = 13;
         item.setVer(expected);
         actual = item.getVer();
         Assert.assertEquals(expected, actual);
     }
-    
-    public void testStatePropertyWorksAsExpected()
-    {
-        int expected = 5;
+
+    public void testStatePropertyWorksAsExpected() {
+        SessionState expected = SessionState.START;
         SessionStateData item = new SessionStateData();
         item.setState(expected);
-        int actual = item.getState();
-        Assert.assertEquals(expected, actual);
-        
-        expected = 3;
+        SessionState actual = item.getState();
+        Assert.assertEquals(expected.getValue(), actual.getValue());
+
+        expected = SessionState.END;
         item.setState(expected);
         actual = item.getState();
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(expected.getValue(), actual.getValue());
     }
-    
-    public void testSerialize() throws IOException
-    {
+
+    public void testSerialize() throws IOException {
         SessionStateData item = new SessionStateData();
         item.setVer(42);
-        item.setState(5);
+        item.setState(SessionState.START);
         StringWriter writer = new StringWriter();
         item.serialize(writer);
-        String expected = "{\"ver\":42,\"state\":5}";
+        String expected = "{\"ver\":42,\"state\":0}";
         Assert.assertEquals(expected, writer.toString());
     }
 
