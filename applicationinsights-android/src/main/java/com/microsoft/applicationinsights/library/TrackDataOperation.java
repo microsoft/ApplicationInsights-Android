@@ -156,7 +156,7 @@ class TrackDataOperation implements Runnable {
 
         if (telemetry != null) {
             IChannel channel = ChannelManager.getInstance().getChannel();
-            if (type == DataType.UNHANDLED_EXCEPTION || type == DataType.MANAGED_EXCEPTION) {
+            if (type == DataType.UNHANDLED_EXCEPTION || (type == DataType.MANAGED_EXCEPTION && !handled)) {
                 ((Channel)Channel.getInstance()).processException(telemetry);
             } else {
                 telemetry.getBaseData().QualifiedName = telemetry.getBaseType();
@@ -176,9 +176,8 @@ class TrackDataOperation implements Runnable {
         Data<Domain> telemetry = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties, this.measurements);
-        }else if ((this.type == DataType.MANAGED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
+        }else if (this.type == DataType.MANAGED_EXCEPTION && Persistence.getInstance().isFreeSpaceAvailable(!handled)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.name, this.exceptionMessage, this.exceptionStacktrace, this.handled);
-
         } else if (Persistence.getInstance().isFreeSpaceAvailable(false)) {
             switch (this.type) {
                 case NONE:

@@ -231,8 +231,14 @@ public class TelemetryClient {
      */
     public void trackManagedException(String type, String message, String stacktrace, boolean handled) {
         ExceptionTracking.setIgnoreExceptions(!handled);
-        new TrackDataOperation(TrackDataOperation.DataType.MANAGED_EXCEPTION, type, message, stacktrace, handled).run();
-
+        TrackDataOperation op = new TrackDataOperation(TrackDataOperation.DataType.MANAGED_EXCEPTION, type, message, stacktrace, handled);
+        if(handled){
+            op.run();
+        }else{
+            if(isTelemetryEnabled()){
+                this.executorService.execute(op);
+            }
+        }
     }
 
     /**
