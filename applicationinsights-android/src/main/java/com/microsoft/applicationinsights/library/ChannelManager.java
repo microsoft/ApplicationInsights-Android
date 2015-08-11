@@ -87,7 +87,7 @@ public class ChannelManager {
             case Default:
                 this.channel = createDefaultChannel();
                 break;
-            case TelemetryClientForAndroid:
+            case CommonLoggingLibraryChannel:
                 this.channel = createTelemetryClientChannel();
                 break;
         }
