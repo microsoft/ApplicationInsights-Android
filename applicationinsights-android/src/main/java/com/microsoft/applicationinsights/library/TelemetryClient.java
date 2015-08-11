@@ -236,14 +236,33 @@ public class TelemetryClient {
     }
 
     /**
-     * {@code duration} defaults to {@code 0}.
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     * @see TelemetryClient#trackPageView(String, Map, Map)
      */
     public void trackPageView(String pageName) {
-        this.trackPageView(pageName, 0, null, null);
+        this.trackPageView(pageName, null, null);
+    }
+
+    /**
+     * {@code measurements} defaults to {@code null}.
+     *
+     * @see TelemetryClient#trackPageView(String, Map, Map)
+     */
+    public void trackPageView(String pageName, Map<String, String> properties) {
+        this.trackPageView(pageName, properties, null);
+    }
+
+
+    /**
+     * @see TelemetryClient#trackPageView(String, Map, Map)
+     */
+    public void trackPageView(String pageName, Map<String, String> properties, Map<String, Double> measurements) {
+        if(isTelemetryEnabled()){
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
+                    pageName, properties, measurements));
+        }
     }
 
     /**
@@ -252,6 +271,7 @@ public class TelemetryClient {
      *
      * @see TelemetryClient#trackPageView(String, long, Map, Map)
      */
+    @Deprecated
     public void trackPageView(String pageName, long duration) {
         this.trackPageView(pageName, duration, null, null);
     }
@@ -261,26 +281,9 @@ public class TelemetryClient {
      *
      * @see TelemetryClient#trackPageView(String, long, Map, Map)
      */
+    @Deprecated
     public void trackPageView(String pageName, long duration, Map<String, String> properties) {
         this.trackPageView(pageName, duration, properties, null);
-    }
-
-    /**
-     * @see TelemetryClient#trackPageView(String, long, Map, Map)
-     */
-    @Deprecated
-    public void trackPageView(String pageName, Map<String, String> properties, Map<String, Double> measurements) {
-        this.trackPageView(pageName, 0, properties, measurements);
-    }
-
-    /**
-     * {@code measurements} defaults to {@code null}.
-     *
-     * @see TelemetryClient#trackPageView(String, long, Map, Map)
-     */
-    @Deprecated
-    public void trackPageView(String pageName, Map<String, String> properties) {
-        this.trackPageView(pageName, 0, properties, null);
     }
 
     /**
@@ -292,6 +295,7 @@ public class TelemetryClient {
      *                     supersede values set in {@link ApplicationInsights#setCommonProperties}.
      * @param measurements Custom measurements associated with the event.
      */
+    @Deprecated
     public void trackPageView(
           String pageName,
           long duration,
