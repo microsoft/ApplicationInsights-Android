@@ -476,17 +476,14 @@ class EnvelopeFactory {
         if (stacktrace != null) {
             frameList = new ArrayList<StackFrame>();
             String[] lines = stacktrace.split("\\n");
+            int level = 0;
             for (String frameInfo : lines) {
                 StackFrame frame = getStackframe(frameInfo, managed);
                 if (frame != null) {
+                    frame.setLevel(level);
                     frameList.add(frame);
+                    level++;
                 }
-            }
-
-            int level = frameList.size() - 1;
-            for (StackFrame frame : frameList) {
-                frame.setLevel(level);
-                level--;
             }
         }
         return frameList;
