@@ -451,13 +451,12 @@ class EnvelopeFactory {
 
                 details.setMessage(exceptionSource + message);
                 details.setTypeName(type);
-                details.setStack(subStackTraces[i]);
 
                 // Parse stacktrace
                 List<StackFrame> stackFrames = getStackframes(subStackTraces[i], managed);
                 if (stackFrames.size() > 0) {
                     details.setParsedStack(stackFrames);
-                    details.setHasFullStack(true);
+                    details.setHasFullStack(false);
                 }
                 exceptions.add(details);
             }
