@@ -463,7 +463,7 @@ class EnvelopeFactory {
         }
 
         ExceptionData data = new ExceptionData();
-        data.setHandledAt(handled ? "HANDLED" : "UNHANDLED");
+        data.setHandledAt(handled ? "UserCode" : "Unhandled");
         data.setExceptions(exceptions);
 
         return data;
