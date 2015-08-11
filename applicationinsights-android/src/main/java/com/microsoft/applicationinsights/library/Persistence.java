@@ -83,7 +83,7 @@ class Persistence {
      */
     protected static Persistence getInstance() {
         if (Persistence.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
 
         return Persistence.instance;

@@ -79,7 +79,7 @@ public class TelemetryClient {
      */
     public static TelemetryClient getInstance() {
         if (TelemetryClient.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
         return TelemetryClient.instance;
     }
@@ -111,8 +111,8 @@ public class TelemetryClient {
      *
      * @param telemetry an object that extends TelemetryData
      */
-    public void track(TelemetryData telemetry){
-        if(isTelemetryEnabled()){
+    public void track(TelemetryData telemetry) {
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(telemetry));
         }
     }
@@ -129,9 +129,9 @@ public class TelemetryClient {
           String eventName,
           Map<String, String> properties,
           Map<String, Double> measurements) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.EVENT,
-                    eventName, properties, measurements));
+                  eventName, properties, measurements));
         }
     }
 
@@ -152,9 +152,9 @@ public class TelemetryClient {
      *                   supersede values set in {@link ApplicationInsights#setCommonProperties}.
      */
     public void trackTrace(String message, Map<String, String> properties) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.TRACE,
-                    message, properties, null));
+                  message, properties, null));
         }
     }
 
@@ -179,7 +179,7 @@ public class TelemetryClient {
      * @param value The value of the metric
      */
     public void trackMetric(String name, double value, Map<String, String> properties) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value, properties));
         }
     }
@@ -213,9 +213,9 @@ public class TelemetryClient {
      *                         supersede values set in {@link ApplicationInsights#setCommonProperties}.
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties, Map<String, Double> measurements) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
-                    handledException, properties, measurements));
+                  handledException, properties, measurements));
         }
     }
 
@@ -224,10 +224,10 @@ public class TelemetryClient {
      * Xamarin code to send the C# stacktrace to ApplicationInsights and ignore the report created
      * by {@link ExceptionTracking}.
      *
-     *  @param type the exception type
-     *  @param message the exception message
-     *  @param stacktrace the stacktrace for the exception
-     *  @param handled a flag which determines if the exception was handled or not
+     * @param type       the exception type
+     * @param message    the exception message
+     * @param stacktrace the stacktrace for the exception
+     * @param handled    a flag which determines if the exception was handled or not
      */
     public void trackManagedException(String type, String message, String stacktrace, boolean handled) {
         ExceptionTracking.setIgnoreExceptions(!handled);
@@ -259,9 +259,9 @@ public class TelemetryClient {
      * @see TelemetryClient#trackPageView(String, Map, Map)
      */
     public void trackPageView(String pageName, Map<String, String> properties, Map<String, Double> measurements) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
-                    pageName, properties, measurements));
+                  pageName, properties, measurements));
         }
     }
 
@@ -269,9 +269,8 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release*
      */
-    @Deprecated
     public void trackPageView(String pageName, long duration) {
         this.trackPageView(pageName, duration, null, null);
     }
@@ -280,8 +279,9 @@ public class TelemetryClient {
      * {@code measurements} defaults to {@code null}.
      *
      * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     *
+     * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release
      */
-    @Deprecated
     public void trackPageView(String pageName, long duration, Map<String, String> properties) {
         this.trackPageView(pageName, duration, properties, null);
     }
@@ -294,16 +294,17 @@ public class TelemetryClient {
      * @param properties   Custom properties associated with the event. Note: values set here will
      *                     supersede values set in {@link ApplicationInsights#setCommonProperties}.
      * @param measurements Custom measurements associated with the event.
+     *
+     * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release
      */
-    @Deprecated
     public void trackPageView(
           String pageName,
           long duration,
           Map<String, String> properties,
           Map<String, Double> measurements) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
-                    pageName, duration, properties, measurements));
+                  pageName, duration, properties, measurements));
         }
     }
 
@@ -311,7 +312,7 @@ public class TelemetryClient {
      * Sends information about a new Session to Application Insights.
      */
     public void trackNewSession() {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION));
         }
     }
@@ -322,9 +323,9 @@ public class TelemetryClient {
      * @return YES if telemetry data can be tracked
      */
     protected boolean isTelemetryEnabled() {
-        if(!this.telemetryEnabled){
+        if (!this.telemetryEnabled) {
             InternalLogging.warn(TAG, "Could not track telemetry item, because telemetry " +
-                    "feature is disabled.");
+                  "feature is disabled.");
         }
         return this.telemetryEnabled;
     }
