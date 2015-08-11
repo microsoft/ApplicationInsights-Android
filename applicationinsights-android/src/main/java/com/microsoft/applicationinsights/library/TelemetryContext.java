@@ -36,11 +36,14 @@ import java.util.UUID;
  */
 public class TelemetryContext {
 
-    protected static final String SHARED_PREFERENCES_KEY = "APP_INSIGHTS_CONTEXT";
-    protected static final String USER_ID_KEY = "USER_ID";
-    protected static final String USER_ACQ_KEY = "USER_ACQ";
-    protected static final String USER_ACCOUNT_ID_KEY = "USER_ACCOUNT_ID";
-    protected static final String SESSION_IS_FIRST_KEY = "SESSION_IS_FIRST";
+    private static final String SHARED_PREFERENCES_KEY = "APP_INSIGHTS_CONTEXT";
+    private static final String USER_ID_KEY = "USER_ID";
+    private static final String USER_ACQ_KEY = "USER_ACQ";
+    private static final String USER_ACCOUNT_ID_KEY = "USER_ACCOUNT_ID";
+    private static final String USER_AUTH_USER_ID_KEY = "USER_AUTH_USER_ID";
+    private static final String USER_ANON_ACQ_DATE_KEY = "USER_ANON_ACQ_DATE";
+    private static final String USER_AUTH_ACQ_DATE_KEY = "USER_AUTH_ACQ_DATE";
+    private static final String SESSION_IS_FIRST_KEY = "SESSION_IS_FIRST";
     private static final String TAG = "TelemetryContext";
 
     /**
@@ -108,7 +111,7 @@ public class TelemetryContext {
      */
     private Operation operation;
 
-    private TelemetryContext(){
+    private TelemetryContext() {
         this.operation = new Operation();
         this.device = new Device();
         this.session = new Session();
@@ -124,14 +127,14 @@ public class TelemetryContext {
         TelemetryContext context = null;
         if (TelemetryContext.instance == null) {
             InternalLogging.error(TAG, "newInstance was called before calling ApplicationInsights.setup()");
-        }else{
+        } else {
             context = new TelemetryContext();
             context.resetContext();
         }
         return context;
     }
 
-    public void resetContext(){
+    public void resetContext() {
 
         // Reset device context
         setDeviceId(instance.getDeviceId());
@@ -235,12 +238,11 @@ public class TelemetryContext {
         this.session.setIsNew("false");
 
         SharedPreferences.Editor editor = this.settings.edit();
-        if(!this.settings.getBoolean(SESSION_IS_FIRST_KEY, false)) {
+        if (!this.settings.getBoolean(SESSION_IS_FIRST_KEY, false)) {
             editor.putBoolean(SESSION_IS_FIRST_KEY, true);
             editor.apply();
             this.session.setIsFirst("true");
-        }
-        else {
+        } else {
             this.session.setIsFirst("false");
         }
     }
@@ -324,20 +326,21 @@ public class TelemetryContext {
 
     /**
      * Write user information to shared preferences.
-     *
      */
     protected void saveUserInfo() {
         SharedPreferences.Editor editor = this.settings.edit();
         editor.putString(TelemetryContext.USER_ID_KEY, getUserId());
         editor.putString(TelemetryContext.USER_ACQ_KEY, getUserAcqusitionDate());
         editor.putString(TelemetryContext.USER_ACCOUNT_ID_KEY, getAccountId());
+        editor.putString(TelemetryContext.USER_AUTH_USER_ID_KEY, getAuthenticatedUserId());
+        editor.putString(TelemetryContext.USER_AUTH_ACQ_DATE_KEY, getAuthenticatedUserAcquisitionDate());
+        editor.putString(TelemetryContext.USER_ANON_ACQ_DATE_KEY, getAnonymousUserAcquisitionDate());
         editor.apply();
     }
 
     /**
      * Load user information to shared preferences.
      *
-     * @return the loaded user context
      */
     protected void loadUserInfo() {
         User user = new User();
@@ -350,6 +353,15 @@ public class TelemetryContext {
 
         String accountId = this.settings.getString(TelemetryContext.USER_ACCOUNT_ID_KEY, null);
         setAccountId(accountId);
+
+        String authorizedUserId = this.settings.getString(TelemetryContext.USER_AUTH_USER_ID_KEY, null);
+        user.setAuthUserId(authorizedUserId);
+
+        String authUserAcqDate = this.settings.getString(TelemetryContext.USER_AUTH_ACQ_DATE_KEY, null);
+        user.setAuthUserAcquisitionDate(authUserAcqDate);
+
+        String anonUserAcqDate = this.settings.getString(TelemetryContext.USER_ANON_ACQ_DATE_KEY, null);
+        user.setAnonUserAcquisitionDate(anonUserAcqDate);
     }
 
     /**
@@ -409,7 +421,7 @@ public class TelemetryContext {
     }
 
     // TODO: Synchronize resolution update
-    @SuppressLint("NewApi")
+    @SuppressLint({"NewApi", "Deprecation"})
     protected void updateScreenResolution(Context context) {
         String resolutionString;
         int width;
@@ -529,7 +541,7 @@ public class TelemetryContext {
 
     public void setUserId(String userId) {
         this.user.setId(userId);
-        if(this == instance){
+        if (this == instance) {
             saveUserInfo();
         }
     }
@@ -540,7 +552,7 @@ public class TelemetryContext {
 
     public void setUserAcqusitionDate(String userAcqusitionDate) {
         this.user.setAccountAcquisitionDate(userAcqusitionDate);
-        if(this == instance){
+        if (this == instance) {
             saveUserInfo();
         }
     }
@@ -551,7 +563,40 @@ public class TelemetryContext {
 
     public void setAccountId(String accountId) {
         this.user.setAccountId(accountId);
-        if(this == instance){
+        if (this == instance) {
+            saveUserInfo();
+        }
+    }
+
+    public String getAuthenticatedUserId() {
+        return this.user.getAuthUserId();
+    }
+
+    public void setAuthenticatedUserId(String authenticatedUserId) {
+        this.user.setAuthUserId(authenticatedUserId);
+        if (this == instance) {
+            saveUserInfo();
+        }
+    }
+
+    public String getAuthenticatedUserAcquisitionDate() {
+        return this.user.getAuthUserAcquisitionDate();
+    }
+
+    public void setAuthenticatedUserAcquisitionDate(String authenticatedUserAcquisitionDate) {
+        this.user.setAuthUserAcquisitionDate(authenticatedUserAcquisitionDate);
+        if (this == instance) {
+            saveUserInfo();
+        }
+    }
+
+    public String getAnonymousUserAcquisitionDate() {
+        return this.user.getAnonUserAcquisitionDate();
+    }
+
+    public void setAnonymousUserAcquisitionDate(String anonymousUserAcquisitionDate) {
+        this.user.setAnonUserAcquisitionDate(anonymousUserAcquisitionDate);
+        if (this == instance) {
             saveUserInfo();
         }
     }

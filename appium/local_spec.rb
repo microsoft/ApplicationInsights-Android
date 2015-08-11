@@ -1,7 +1,9 @@
-require File.expand_path('spec_helper')
+require 'rubygems'
+require 'rspec'
+require 'rspec/expectations'
+require 'appium_lib'
 
 def defaultTestRun
-
   it 'should should tap track 5 times' do
     list_el = text('Track event')
     list_el.click
@@ -52,8 +54,29 @@ end
     back
   end
 
- 
+#end of default test run
 end
+
+
+RSpec.describe 'Run locally' do
+  before(:all) do
+    options = {
+      caps: {
+        platformName: 'Android',
+        app:'../app-sample/build/outputs/apk/app-sample-debug.apk',
+        deviceName: 'appinsights-appium' #required but doesn't have to match for genymotion  or android emu
+      },
+      launchTimeout: 5000
+    }
+
+    @driver = Appium::Driver.new(options).start_driver
+    @driver.manage.timeouts.implicit_wait = 10
+    Appium.promote_appium_methods Object
+  end
+
+  after(:all) do
+    @driver.driver_quit
+  end
 
 describe 'Run default tests' do
   defaultTestRun
@@ -62,6 +85,13 @@ describe 'Run default tests' do
   list_el.click
 end
 end
+
+describe 'restart' do
+      it 'should restart the driver after a crash' do
+        restart
+        sleep(3)
+      end
+    end
 
 describe 'Run with disabled session management' do
   it 'Can disable session management' do
@@ -76,6 +106,13 @@ end
 end
 end
 
+describe 'restart' do
+      it 'should restart the driver after a crash' do
+        restart
+        sleep(3)
+      end
+    end
+
 describe 'Run with re-enabled session management' do
   it 'Can enable session management' do
  list_el = text('Enable session management')
@@ -88,6 +125,13 @@ end
   list_el.click
 end
 end
+
+describe 'restart' do
+      it 'should restart the driver after a crash' do
+        restart
+        sleep(3)
+      end
+    end
 
 describe 'Run with disabled pageviews' do
   it 'Can disable pageviews' do
@@ -102,6 +146,13 @@ end
 end
 end
 
+describe 'restart' do
+      it 'should restart the driver after a crash' do
+        restart
+        sleep(3)
+      end
+    end
+
 describe 'Run with re-enabled pageviews' do
   it 'Can re-enable pageviews' do
  list_el = text('Enable page view tracking')
@@ -114,6 +165,13 @@ end
   list_el.click
 end
 end
+
+describe 'restart' do
+      it 'should restart the driver after a crash' do
+        restart
+        sleep(3)
+      end
+    end
 
 describe 'Run with disabled pageviews and session management' do
   it 'Can disable pageviews' do
@@ -128,4 +186,5 @@ end
 end
 defaultTestRun 
 end
-
+  
+end
