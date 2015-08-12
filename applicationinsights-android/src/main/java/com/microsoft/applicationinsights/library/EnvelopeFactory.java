@@ -443,10 +443,11 @@ class EnvelopeFactory {
 
                 if (managed) {
                     exceptionSource = "Managed exception: ";
-                    details.setId(1);
+                    details.setId(i+1);
                 } else {
                     exceptionSource = "Unmanaged exception: ";
-                    details.setOuterId(1);
+                    details.setId(i+1);
+                    details.setOuterId(i);
                 }
 
                 details.setMessage(exceptionSource + message);
