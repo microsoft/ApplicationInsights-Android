@@ -383,9 +383,11 @@ public class TelemetryClient {
      * with an application.
      */
     protected void enableAutoPageViewTracking() {
-        if(isAutoCollectionPossible("Auto PageViews") && this.autoPageViewsDisabled){
-            this.autoPageViewsDisabled = false;
-            AutoCollection.enableAutoPageViews(getApplication());
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Auto PageViews") && this.autoPageViewsDisabled){
+                this.autoPageViewsDisabled = false;
+                AutoCollection.enableAutoPageViews(getApplication());
+            }
         }
     }
 
@@ -395,9 +397,11 @@ public class TelemetryClient {
      * with an application.
      */
     protected void disableAutoPageViewTracking() {
-        if(isAutoCollectionPossible("Auto PageViews") && !this.autoPageViewsDisabled){
-            this.autoPageViewsDisabled = true;
-            AutoCollection.disableAutoPageViews();
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Auto PageViews") && !this.autoPageViewsDisabled){
+                this.autoPageViewsDisabled = true;
+                AutoCollection.disableAutoPageViews();
+            }
         }
     }
 
@@ -407,9 +411,11 @@ public class TelemetryClient {
      * with an application.
      */
     protected void enableAutoSessionManagement() {
-        if(isAutoCollectionPossible("Session Management") && this.autoSessionManagementDisabled){
-            this.autoSessionManagementDisabled = false;
-            AutoCollection.enableAutoSessionManagement(getApplication());
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Session Management") && this.autoSessionManagementDisabled){
+                this.autoSessionManagementDisabled = false;
+                AutoCollection.enableAutoSessionManagement(getApplication());
+            }
         }
     }
 
@@ -419,9 +425,11 @@ public class TelemetryClient {
      * with an application.
      */
     protected void disableAutoSessionManagement() {
-        if(isAutoCollectionPossible("Session Management") && !this.autoSessionManagementDisabled){
-            this.autoSessionManagementDisabled = true;
-            AutoCollection.disableAutoSessionManagement();
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Session Management") && !this.autoSessionManagementDisabled){
+                this.autoSessionManagementDisabled = true;
+                AutoCollection.disableAutoSessionManagement();
+            }
         }
     }
 
@@ -431,9 +439,11 @@ public class TelemetryClient {
      * with an application.
      */
     protected void enableAutoAppearanceTracking() {
-        if(isAutoCollectionPossible("Auto Appearance") && this.autoAppearanceDisabled){
-            this.autoAppearanceDisabled = false;
-            AutoCollection.enableAutoAppearanceTracking(getApplication());
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Auto Appearance") && this.autoAppearanceDisabled){
+                this.autoAppearanceDisabled = false;
+                AutoCollection.enableAutoAppearanceTracking(getApplication());
+            }
         }
     }
 
@@ -443,9 +453,11 @@ public class TelemetryClient {
      * with an application.
      */
     protected void disableAutoAppearanceTracking() {
-        if(isAutoCollectionPossible("Auto Appearance") && !this.autoAppearanceDisabled){
-            this.autoAppearanceDisabled = true;
-            AutoCollection.disableAutoAppearanceTracking();
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Auto Appearance") && !this.autoAppearanceDisabled){
+                this.autoAppearanceDisabled = true;
+                AutoCollection.disableAutoAppearanceTracking();
+            }
         }
     }
 
