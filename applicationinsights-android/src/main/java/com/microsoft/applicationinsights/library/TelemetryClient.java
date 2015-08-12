@@ -1,8 +1,12 @@
 package com.microsoft.applicationinsights.library;
 
+import android.app.Application;
+
 import com.microsoft.applicationinsights.contracts.TelemetryData;
+import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +19,11 @@ public class TelemetryClient {
 
     public static final int THREADS = 10;
     public static final String TAG = "TelemetryClient";
+
+    /**
+     * The configuration of the SDK.
+     */
+    private ApplicationInsightsConfig config;
 
     /**
      * The shared TelemetryClient instance.
@@ -42,12 +51,39 @@ public class TelemetryClient {
     private ExecutorService executorService;
 
     /**
+     * A flag, which determines if auto page views should be disabled from the start.
+     * Default is false.
+     */
+    private boolean autoPageViewsDisabled;
+
+    /**
+     * A flag, which determines if auto session management should be disabled from the start.
+     * Default is false.
+     */
+    private boolean autoSessionManagementDisabled;
+
+    /**
+     * A flag, which determines if auto appearance should be disabled from the start.
+     * Default is false.
+     */
+    private boolean autoAppearanceDisabled;
+
+    /**
+     * The application needed for auto collecting telemetry data
+     */
+    private WeakReference<Application> weakApplication;
+
+    /**
      * Restrict access to the default constructor
      *
      * @param telemetryEnabled YES if tracking telemetry data manually should be enabled
      */
     protected TelemetryClient(boolean telemetryEnabled) {
         this.telemetryEnabled = telemetryEnabled;
+        this.autoAppearanceDisabled = true;
+        this.autoPageViewsDisabled = true;
+        this.autoSessionManagementDisabled = true;
+
         this.executorService = Executors.newFixedThreadPool(THREADS, new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -63,12 +99,23 @@ public class TelemetryClient {
      *
      * @param telemetryEnabled YES if tracking telemetry data manually should be enabled
      */
-    protected static void initialize(boolean telemetryEnabled) {
+    protected static void initialize(boolean telemetryEnabled, boolean autoAppearanceEnabled, boolean autoPageViewsEnabled, boolean autoSessionManagementEnabled, Application application) {
         if (!TelemetryClient.isTelemetryClientLoaded) {
             synchronized (TelemetryClient.LOCK) {
                 if (!TelemetryClient.isTelemetryClientLoaded) {
                     TelemetryClient.isTelemetryClientLoaded = true;
                     TelemetryClient.instance = new TelemetryClient(telemetryEnabled);
+                    TelemetryClient.instance.weakApplication = new WeakReference<Application>(application);
+
+                    if (autoAppearanceEnabled) {
+                        TelemetryClient.instance.enableAutoAppearanceTracking();
+                    }
+                    if (autoSessionManagementEnabled) {
+                        TelemetryClient.instance.enableAutoSessionManagement();
+                    }
+                    if (autoPageViewsEnabled) {
+                        TelemetryClient.instance.enableAutoPageViewTracking();
+                    }
                 }
             }
         }
@@ -328,5 +375,128 @@ public class TelemetryClient {
                   "feature is disabled.");
         }
         return this.telemetryEnabled;
+    }
+
+    /**
+     * Enable auto page view tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This featuee only works if ApplicationInsights has been setup
+     * with an application.
+     */
+    protected void enableAutoPageViewTracking() {
+        if(isAutoCollectionPossible("Auto PageViews") && this.autoPageViewsDisabled){
+            this.autoPageViewsDisabled = false;
+            AutoCollection.enableAutoPageViews(getApplication());
+        }
+    }
+
+    /**
+     * Disable auto page view tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
+     */
+    protected void disableAutoPageViewTracking() {
+        if(isAutoCollectionPossible("Auto PageViews") && !this.autoPageViewsDisabled){
+            this.autoPageViewsDisabled = true;
+            AutoCollection.disableAutoPageViews();
+        }
+    }
+
+    /**
+     * Enable auto session management tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
+     */
+    protected void enableAutoSessionManagement() {
+        if(isAutoCollectionPossible("Session Management") && this.autoSessionManagementDisabled){
+            this.autoSessionManagementDisabled = false;
+            AutoCollection.enableAutoSessionManagement(getApplication());
+        }
+    }
+
+    /**
+     * Disable auto session management tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
+     */
+    protected void disableAutoSessionManagement() {
+        if(isAutoCollectionPossible("Session Management") && !this.autoSessionManagementDisabled){
+            this.autoSessionManagementDisabled = true;
+            AutoCollection.disableAutoSessionManagement();
+        }
+    }
+
+    /**
+     * Enable auto appearance management tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
+     */
+    protected void enableAutoAppearanceTracking() {
+        if(isAutoCollectionPossible("Auto Appearance") && this.autoAppearanceDisabled){
+            this.autoAppearanceDisabled = false;
+            AutoCollection.enableAutoAppearanceTracking(getApplication());
+        }
+    }
+
+    /**
+     * Disable auto appearance management tracking before calling {@link ApplicationInsights#start()} or
+     * at runtime. This feature only works if ApplicationInsights has been setup
+     * with an application.
+     */
+    protected void disableAutoAppearanceTracking() {
+        if(isAutoCollectionPossible("Auto Appearance") && !this.autoAppearanceDisabled){
+            this.autoAppearanceDisabled = true;
+            AutoCollection.disableAutoAppearanceTracking();
+        }
+    }
+
+    protected void startSyncWhenBackgrounding() {
+        if (!Util.isLifecycleTrackingAvailable()) {
+            return;
+        }
+
+        Application app = getApplication();
+        if (app != null) {
+            SyncUtil.getInstance().start(app);
+        } else {
+            InternalLogging.warn(TAG, "Couldn't turn on SyncUtil because given application " +
+                    "was null");
+        }
+    }
+
+    /**
+     * Will check if autocollection is possible
+     *
+     * @param featureName The name of the feature which will be logged in case autocollection is not
+     *                    possible
+     * @return a flag indicating if autocollection features can be activated
+     */
+    private boolean isAutoCollectionPossible(String featureName) {
+        if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
+                    " can't be enabled/disabled, because " +
+                    "it is not supported on this OS version.");
+            return false;
+        } else if (getApplication() == null) {
+            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
+                    " can't be enabled/disabled, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Get the reference to the Application (used for life-cycle tracking)
+     *
+     * @return the reference to the application that was used during initialization of the SDK
+     */
+    private Application getApplication() {
+        Application application = null;
+        if (weakApplication != null) {
+            application = weakApplication.get();
+        }
+
+        return application;
     }
 }

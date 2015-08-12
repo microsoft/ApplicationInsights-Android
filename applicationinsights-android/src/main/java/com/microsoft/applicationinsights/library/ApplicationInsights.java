@@ -192,8 +192,6 @@ public enum ApplicationInsights {
             Context context = this.weakContext.get();
 
             initializePipeline(context);
-            startSyncWhenBackgrounding();
-            startAutoCollection();
             startCrashReporting();
 
             Sender.getInstance().sendDataOnAppStart();
@@ -206,44 +204,6 @@ public enum ApplicationInsights {
         // Start crash reporting
         if (!this.exceptionTrackingDisabled) {
             ExceptionTracking.registerExceptionHandler();
-        }
-    }
-
-    /**
-     * Start/Stop AutoCollection features depending on user's settings.
-     * Will be called during start of the SDK and when enabling/disabling ALL autocollection features
-     */
-    private void startAutoCollection() {
-        if (autoCollectionPossible("Start of AutoCollection at app start.")) {
-            //if the SDK has already been started, activate/deactivate features
-            if (INSTANCE.autoAppearanceDisabled) {
-                disableAutoAppearanceTracking();
-            } else {
-                enableAutoAppearanceTracking();
-            }
-            if (INSTANCE.autoPageViewsDisabled) {
-                disableAutoPageViewTracking();
-            } else {
-                enableAutoPageViewTracking();
-            }
-            if (INSTANCE.autoSessionManagementDisabled) {
-                disableAutoSessionManagement();
-            } else {
-                enableAutoSessionManagement();
-            }
-        }
-    }
-
-    private void startSyncWhenBackgrounding() {
-        if (!Util.isLifecycleTrackingAvailable()) {
-            return;
-        }
-
-        if (INSTANCE.getApplication() != null) {
-            SyncUtil.getInstance().start(INSTANCE.getApplication());
-        } else {
-            InternalLogging.warn(TAG, "Couldn't turn on SyncUtil because given application " +
-                    "was null");
         }
     }
 
@@ -261,12 +221,13 @@ public enum ApplicationInsights {
         ChannelManager.initialize(channelType);
 
         // Initialize Telemetry
-        TelemetryClient.initialize(!telemetryDisabled);
-
-
-        if (autoCollectionPossible("Initialise AutoCollection")) {
-            AutoCollection.initialize(telemetryContext, this.config);
+        Application application = null;
+        if (this.weakApplication != null) {
+            application = this.weakApplication.get();
         }
+        AutoCollection.initialize(this.telemetryContext, this.config);
+        TelemetryClient.initialize(!this.telemetryDisabled, !this.autoAppearanceDisabled, !this.autoPageViewsDisabled, !this.autoSessionManagementDisabled, application);
+        TelemetryClient.getInstance().startSyncWhenBackgrounding();
     }
 
     /**
@@ -291,9 +252,6 @@ public enum ApplicationInsights {
      * Requires ApplicationInsights to be setup with an Application object
      */
     public static void enableAutoCollection() {
-        INSTANCE.autoAppearanceDisabled = false;
-        INSTANCE.autoPageViewsDisabled = false;
-        INSTANCE.autoSessionManagementDisabled = false;
         enableAutoAppearanceTracking();
         enableAutoPageViewTracking();
         enableAutoSessionManagement();
@@ -303,9 +261,6 @@ public enum ApplicationInsights {
      * disables all auto-collection features
      */
     public static void disableAutoCollection() {
-        INSTANCE.autoAppearanceDisabled = true;
-        INSTANCE.autoPageViewsDisabled = true;
-        INSTANCE.autoSessionManagementDisabled = true;
         disableAutoAppearanceTracking();
         disableAutoPageViewTracking();
         disableAutoSessionManagement();
@@ -317,9 +272,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void enableAutoPageViewTracking() {
-        INSTANCE.autoPageViewsDisabled = false;
-        if (autoCollectionPossible("Auto PageView Tracking")) {
-            AutoCollection.enableAutoPageViews(INSTANCE.getApplication());
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().enableAutoPageViewTracking();
+        }else{
+            INSTANCE.autoPageViewsDisabled = false;
         }
     }
 
@@ -329,9 +285,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void disableAutoPageViewTracking() {
-        INSTANCE.autoPageViewsDisabled = true;
-        if (autoCollectionPossible("Auto PageView Tracking")) {
-            AutoCollection.disableAutoPageViews();
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().disableAutoPageViewTracking();
+        }else{
+            INSTANCE.autoPageViewsDisabled = true;
         }
     }
 
@@ -341,9 +298,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void enableAutoSessionManagement() {
-        INSTANCE.autoSessionManagementDisabled = false;
-        if (autoCollectionPossible("Auto Session Management")) {
-            AutoCollection.enableAutoSessionManagement(INSTANCE.getApplication());
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().enableAutoSessionManagement();
+        }else{
+            INSTANCE.autoSessionManagementDisabled = false;
         }
     }
 
@@ -353,9 +311,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void disableAutoSessionManagement() {
-        INSTANCE.autoSessionManagementDisabled = true;
-        if (autoCollectionPossible("Auto Session Management")) {
-            AutoCollection.disableAutoSessionManagement();
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().disableAutoSessionManagement();
+        }else{
+            INSTANCE.autoSessionManagementDisabled = true;
         }
     }
 
@@ -365,9 +324,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void enableAutoAppearanceTracking() {
-        INSTANCE.autoAppearanceDisabled = false;
-        if (autoCollectionPossible("Auto Appearance")) {
-            AutoCollection.enableAutoAppearanceTracking(INSTANCE.getApplication());
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().enableAutoAppearanceTracking();
+        }else{
+            INSTANCE.autoAppearanceDisabled = false;
         }
     }
 
@@ -407,6 +367,10 @@ public enum ApplicationInsights {
             return false;
         } else {
             return true;
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().disableAutoAppearanceTracking();
+        }else{
+            INSTANCE.autoAppearanceDisabled = true;
         }
     }
 
