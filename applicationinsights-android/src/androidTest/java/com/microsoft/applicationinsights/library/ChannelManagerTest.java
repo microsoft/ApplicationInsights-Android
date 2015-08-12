@@ -12,7 +12,7 @@ public class ChannelManagerTest extends TestCase {
     }
 
     public void testGetSetTelemetryClientChannelManager() {
-        ChannelManager.initialize(ChannelType.TelemetryClientForAndroid);
+        ChannelManager.initialize(ChannelType.CommonLoggingLibraryChannel);
         ChannelManager channelManager = ChannelManager.getInstance();
         Assert.assertNotNull(channelManager);
     }
@@ -36,7 +36,7 @@ public class ChannelManagerTest extends TestCase {
         ChannelManager defaultChannelManager = ChannelManager.getInstance();
         Assert.assertNotNull(defaultChannelManager);
 
-        ChannelManager.initialize(ChannelType.TelemetryClientForAndroid);
+        ChannelManager.initialize(ChannelType.CommonLoggingLibraryChannel);
         ChannelManager telemetryClientChannelManager = ChannelManager.getInstance();
         Assert.assertNotNull(defaultChannelManager);
 

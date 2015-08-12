@@ -58,7 +58,7 @@ public class ChannelManager {
      */
     protected static ChannelManager getInstance() {
         if (ChannelManager.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
 
         return ChannelManager.instance;
@@ -87,7 +87,7 @@ public class ChannelManager {
             case Default:
                 this.channel = createDefaultChannel();
                 break;
-            case TelemetryClientForAndroid:
+            case CommonLoggingLibraryChannel:
                 this.channel = createTelemetryClientChannel();
                 break;
         }

@@ -1,8 +1,12 @@
 package com.microsoft.applicationinsights.library;
 
+import android.app.Application;
+
 import com.microsoft.applicationinsights.contracts.TelemetryData;
+import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +19,11 @@ public class TelemetryClient {
 
     public static final int THREADS = 10;
     public static final String TAG = "TelemetryClient";
+
+    /**
+     * The configuration of the SDK.
+     */
+    private ApplicationInsightsConfig config;
 
     /**
      * The shared TelemetryClient instance.
@@ -42,6 +51,29 @@ public class TelemetryClient {
     private ExecutorService executorService;
 
     /**
+     * A flag, which determines if auto page views should be disabled.
+     * Default is true.
+     */
+    private boolean autoPageViewsDisabled = true;
+
+    /**
+     * A flag, which determines if auto session management should be disabled.
+     * Default is true.
+     */
+    private boolean autoSessionManagementDisabled = true;
+
+    /**
+     * A flag, which determines if auto appearance should be disabled.
+     * Default is true.
+     */
+    private boolean autoAppearanceDisabled = true;
+
+    /**
+     * The application needed for auto collecting telemetry data
+     */
+    private WeakReference<Application> weakApplication;
+
+    /**
      * Restrict access to the default constructor
      *
      * @param telemetryEnabled YES if tracking telemetry data manually should be enabled
@@ -61,17 +93,41 @@ public class TelemetryClient {
     /**
      * Initialize the INSTANCE of the telemetryclient
      *
-     * @param telemetryEnabled YES if tracking telemetry data manually should be enabled
+     * @param telemetryEnabled  YES if tracking telemetry data manually should be enabled
+     * @param application       application used for auto collection features
      */
-    protected static void initialize(boolean telemetryEnabled) {
+    protected static void initialize(boolean telemetryEnabled, Application application) {
         if (!TelemetryClient.isTelemetryClientLoaded) {
             synchronized (TelemetryClient.LOCK) {
                 if (!TelemetryClient.isTelemetryClientLoaded) {
                     TelemetryClient.isTelemetryClientLoaded = true;
                     TelemetryClient.instance = new TelemetryClient(telemetryEnabled);
+                    TelemetryClient.instance.weakApplication = new WeakReference<Application>(application);
+
+
                 }
             }
         }
+    }
+
+    /**
+     * Start auto collection features.
+     */
+    protected static void startAutoCollection(TelemetryContext context, ApplicationInsightsConfig config, boolean autoAppearanceEnabled, boolean autoPageViewsEnabled, boolean autoSessionManagementEnabled){
+
+        AutoCollection.initialize(context, config);
+
+        if (autoAppearanceEnabled) {
+            TelemetryClient.instance.enableAutoAppearanceTracking();
+        }
+        if (autoSessionManagementEnabled) {
+            TelemetryClient.instance.enableAutoSessionManagement();
+        }
+        if (autoPageViewsEnabled) {
+            TelemetryClient.instance.enableAutoPageViewTracking();
+        }
+
+        TelemetryClient.getInstance().startSyncWhenBackgrounding();
     }
 
     /**
@@ -79,7 +135,7 @@ public class TelemetryClient {
      */
     public static TelemetryClient getInstance() {
         if (TelemetryClient.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
         return TelemetryClient.instance;
     }
@@ -111,8 +167,8 @@ public class TelemetryClient {
      *
      * @param telemetry an object that extends TelemetryData
      */
-    public void track(TelemetryData telemetry){
-        if(isTelemetryEnabled()){
+    public void track(TelemetryData telemetry) {
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(telemetry));
         }
     }
@@ -129,9 +185,9 @@ public class TelemetryClient {
           String eventName,
           Map<String, String> properties,
           Map<String, Double> measurements) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.EVENT,
-                    eventName, properties, measurements));
+                  eventName, properties, measurements));
         }
     }
 
@@ -152,7 +208,7 @@ public class TelemetryClient {
      *                   supersede values set in {@link ApplicationInsights#setCommonProperties}.
      */
     public void trackTrace(String message, Map<String, String> properties) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.TRACE,
                     message, properties, null));
         }
@@ -179,7 +235,7 @@ public class TelemetryClient {
      * @param value The value of the metric
      */
     public void trackMetric(String name, double value, Map<String, String> properties) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value, properties));
         }
     }
@@ -213,9 +269,9 @@ public class TelemetryClient {
      *                         supersede values set in {@link ApplicationInsights#setCommonProperties}.
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties, Map<String, Double> measurements) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
-                    handledException, properties, measurements));
+                  handledException, properties, measurements));
         }
     }
 
@@ -224,10 +280,10 @@ public class TelemetryClient {
      * Xamarin code to send the C# stacktrace to ApplicationInsights and ignore the report created
      * by {@link ExceptionTracking}.
      *
-     *  @param type the exception type
-     *  @param message the exception message
-     *  @param stacktrace the stacktrace for the exception
-     *  @param handled a flag which determines if the exception was handled or not
+     * @param type       the exception type
+     * @param message    the exception message
+     * @param stacktrace the stacktrace for the exception
+     * @param handled    a flag which determines if the exception was handled or not
      */
     public void trackManagedException(String type, String message, String stacktrace, boolean handled) {
         ExceptionTracking.setIgnoreExceptions(!handled);
@@ -236,21 +292,40 @@ public class TelemetryClient {
     }
 
     /**
-     * {@code duration} defaults to {@code 0}.
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     * @see TelemetryClient#trackPageView(String, Map, Map)
      */
     public void trackPageView(String pageName) {
-        this.trackPageView(pageName, 0, null, null);
+        this.trackPageView(pageName, null, null);
+    }
+
+    /**
+     * {@code measurements} defaults to {@code null}.
+     *
+     * @see TelemetryClient#trackPageView(String, Map, Map)
+     */
+    public void trackPageView(String pageName, Map<String, String> properties) {
+        this.trackPageView(pageName, properties, null);
+    }
+
+
+    /**
+     * @see TelemetryClient#trackPageView(String, Map, Map)
+     */
+    public void trackPageView(String pageName, Map<String, String> properties, Map<String, Double> measurements) {
+        if (isTelemetryEnabled()) {
+            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
+                  pageName, properties, measurements));
+        }
     }
 
     /**
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release*
      */
     public void trackPageView(String pageName, long duration) {
         this.trackPageView(pageName, duration, null, null);
@@ -260,27 +335,11 @@ public class TelemetryClient {
      * {@code measurements} defaults to {@code null}.
      *
      * @see TelemetryClient#trackPageView(String, long, Map, Map)
+     *
+     * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release
      */
     public void trackPageView(String pageName, long duration, Map<String, String> properties) {
         this.trackPageView(pageName, duration, properties, null);
-    }
-
-    /**
-     * @see TelemetryClient#trackPageView(String, long, Map, Map)
-     */
-    @Deprecated
-    public void trackPageView(String pageName, Map<String, String> properties, Map<String, Double> measurements) {
-        this.trackPageView(pageName, 0, properties, measurements);
-    }
-
-    /**
-     * {@code measurements} defaults to {@code null}.
-     *
-     * @see TelemetryClient#trackPageView(String, long, Map, Map)
-     */
-    @Deprecated
-    public void trackPageView(String pageName, Map<String, String> properties) {
-        this.trackPageView(pageName, 0, properties, null);
     }
 
     /**
@@ -291,13 +350,15 @@ public class TelemetryClient {
      * @param properties   Custom properties associated with the event. Note: values set here will
      *                     supersede values set in {@link ApplicationInsights#setCommonProperties}.
      * @param measurements Custom measurements associated with the event.
+     *
+     * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release
      */
     public void trackPageView(
           String pageName,
           long duration,
           Map<String, String> properties,
           Map<String, Double> measurements) {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
                     pageName, duration, properties, measurements));
         }
@@ -307,7 +368,7 @@ public class TelemetryClient {
      * Sends information about a new Session to Application Insights.
      */
     public void trackNewSession() {
-        if(isTelemetryEnabled()){
+        if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION));
         }
     }
@@ -318,10 +379,139 @@ public class TelemetryClient {
      * @return YES if telemetry data can be tracked
      */
     protected boolean isTelemetryEnabled() {
-        if(!this.telemetryEnabled){
+        if (!this.telemetryEnabled) {
             InternalLogging.warn(TAG, "Could not track telemetry item, because telemetry " +
                     "feature is disabled.");
         }
         return this.telemetryEnabled;
+    }
+
+    /**
+     * Enable auto page view tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     */
+    protected void enableAutoPageViewTracking() {
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Auto PageViews") && this.autoPageViewsDisabled){
+                this.autoPageViewsDisabled = false;
+                AutoCollection.enableAutoPageViews(getApplication());
+            }
+        }
+    }
+
+    /**
+     * Disable auto page view tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     */
+    protected void disableAutoPageViewTracking() {
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Auto PageViews") && !this.autoPageViewsDisabled){
+                this.autoPageViewsDisabled = true;
+                AutoCollection.disableAutoPageViews();
+            }
+        }
+    }
+
+    /**
+     * Enable auto session management tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     */
+    protected void enableAutoSessionManagement() {
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Session Management") && this.autoSessionManagementDisabled){
+                this.autoSessionManagementDisabled = false;
+                AutoCollection.enableAutoSessionManagement(getApplication());
+            }
+        }
+    }
+
+    /**
+     * Disable auto session management tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     */
+    protected void disableAutoSessionManagement() {
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Session Management") && !this.autoSessionManagementDisabled){
+                this.autoSessionManagementDisabled = true;
+                AutoCollection.disableAutoSessionManagement();
+            }
+        }
+    }
+
+    /**
+     * Enable auto appearance management tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     */
+    protected void enableAutoAppearanceTracking() {
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Auto Appearance") && this.autoAppearanceDisabled){
+                this.autoAppearanceDisabled = false;
+                AutoCollection.enableAutoAppearanceTracking(getApplication());
+            }
+        }
+    }
+
+    /**
+     * Disable auto appearance management tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     */
+    protected void disableAutoAppearanceTracking() {
+        synchronized (TelemetryClient.LOCK) {
+            if(isAutoCollectionPossible("Auto Appearance") && !this.autoAppearanceDisabled){
+                this.autoAppearanceDisabled = true;
+                AutoCollection.disableAutoAppearanceTracking();
+            }
+        }
+    }
+
+    protected void startSyncWhenBackgrounding() {
+        if (!Util.isLifecycleTrackingAvailable()) {
+            return;
+        }
+
+        Application app = getApplication();
+        if (app != null) {
+            SyncUtil.getInstance().start(app);
+        } else {
+            InternalLogging.warn(TAG, "Couldn't turn on SyncUtil because given application " +
+                    "was null");
+        }
+    }
+
+    /**
+     * Will check if autocollection is possible
+     *
+     * @param featureName The name of the feature which will be logged in case autocollection is not
+     *                    possible
+     * @return a flag indicating if autocollection features can be activated
+     */
+    private boolean isAutoCollectionPossible(String featureName) {
+        if (!Util.isLifecycleTrackingAvailable()) {
+            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
+                    " can't be enabled/disabled, because " +
+                    "it is not supported on this OS version.");
+            return false;
+        } else if (getApplication() == null) {
+            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
+                    " can't be enabled/disabled, because " +
+                    "ApplicationInsights has not been setup with an application.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Get the reference to the Application (used for life-cycle tracking)
+     *
+     * @return the reference to the application that was used during initialization of the SDK
+     */
+    private Application getApplication() {
+        Application application = null;
+        if (weakApplication != null) {
+            application = weakApplication.get();
+        }
+
+        return application;
     }
 }
