@@ -469,21 +469,6 @@ public enum ApplicationInsights {
         return context;
     }
 
-    /**
-     * Get the reference to the Application (used for life-cycle tracking)
-     *
-     * @return the reference to the application that was used during initialization of the SDK
-     */
-    private Application getApplication() {
-        Application application = null;
-        if (weakApplication != null) {
-            application = weakApplication.get();
-        }
-
-        return application;
-    }
-
-
     /* Writes instructions on how to configure the instrumentation key.
         */
     private static void logInstrumentationInstructions() {
