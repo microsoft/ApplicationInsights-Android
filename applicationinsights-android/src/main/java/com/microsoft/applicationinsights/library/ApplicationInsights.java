@@ -198,6 +198,7 @@ public enum ApplicationInsights {
 
             Sender.getInstance().sendDataOnAppStart();
             InternalLogging.info(TAG, "ApplicationInsights has been started.", "");
+            isSetupAndRunning = true;
         }
     }
 
@@ -262,7 +263,6 @@ public enum ApplicationInsights {
         // Initialize Telemetry
         TelemetryClient.initialize(!telemetryDisabled);
 
-        isSetupAndRunning = true;
 
         if (autoCollectionPossible("Initialise AutoCollection")) {
             AutoCollection.initialize(telemetryContext, this.config);
