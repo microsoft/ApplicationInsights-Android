@@ -225,9 +225,8 @@ public enum ApplicationInsights {
         if (this.weakApplication != null) {
             application = this.weakApplication.get();
         }
-        AutoCollection.initialize(this.telemetryContext, this.config);
-        TelemetryClient.initialize(!this.telemetryDisabled, !this.autoAppearanceDisabled, !this.autoPageViewsDisabled, !this.autoSessionManagementDisabled, application);
-        TelemetryClient.getInstance().startSyncWhenBackgrounding();
+        TelemetryClient.initialize(!this.telemetryDisabled, application);
+        TelemetryClient.startAutoCollection(this.telemetryContext, this.config, !this.autoAppearanceDisabled, !this.autoPageViewsDisabled, !this.autoSessionManagementDisabled);
     }
 
     /**

@@ -97,9 +97,10 @@ public class TelemetryClient {
     /**
      * Initialize the INSTANCE of the telemetryclient
      *
-     * @param telemetryEnabled YES if tracking telemetry data manually should be enabled
+     * @param telemetryEnabled  YES if tracking telemetry data manually should be enabled
+     * @param application       application used for auto collection features
      */
-    protected static void initialize(boolean telemetryEnabled, boolean autoAppearanceEnabled, boolean autoPageViewsEnabled, boolean autoSessionManagementEnabled, Application application) {
+    protected static void initialize(boolean telemetryEnabled, Application application) {
         if (!TelemetryClient.isTelemetryClientLoaded) {
             synchronized (TelemetryClient.LOCK) {
                 if (!TelemetryClient.isTelemetryClientLoaded) {
@@ -107,18 +108,30 @@ public class TelemetryClient {
                     TelemetryClient.instance = new TelemetryClient(telemetryEnabled);
                     TelemetryClient.instance.weakApplication = new WeakReference<Application>(application);
 
-                    if (autoAppearanceEnabled) {
-                        TelemetryClient.instance.enableAutoAppearanceTracking();
-                    }
-                    if (autoSessionManagementEnabled) {
-                        TelemetryClient.instance.enableAutoSessionManagement();
-                    }
-                    if (autoPageViewsEnabled) {
-                        TelemetryClient.instance.enableAutoPageViewTracking();
-                    }
+
                 }
             }
         }
+    }
+
+    /**
+     * Start auto collection features.
+     */
+    protected static void startAutoCollection(TelemetryContext context, ApplicationInsightsConfig config, boolean autoAppearanceEnabled, boolean autoPageViewsEnabled, boolean autoSessionManagementEnabled){
+
+        AutoCollection.initialize(context, config);
+
+        if (autoAppearanceEnabled) {
+            TelemetryClient.instance.enableAutoAppearanceTracking();
+        }
+        if (autoSessionManagementEnabled) {
+            TelemetryClient.instance.enableAutoSessionManagement();
+        }
+        if (autoPageViewsEnabled) {
+            TelemetryClient.instance.enableAutoPageViewTracking();
+        }
+
+        TelemetryClient.getInstance().startSyncWhenBackgrounding();
     }
 
     /**
