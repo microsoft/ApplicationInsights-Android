@@ -51,22 +51,22 @@ public class TelemetryClient {
     private ExecutorService executorService;
 
     /**
-     * A flag, which determines if auto page views should be disabled from the start.
-     * Default is false.
+     * A flag, which determines if auto page views should be disabled.
+     * Default is true.
      */
-    private boolean autoPageViewsDisabled;
+    private boolean autoPageViewsDisabled = true;
 
     /**
-     * A flag, which determines if auto session management should be disabled from the start.
-     * Default is false.
+     * A flag, which determines if auto session management should be disabled.
+     * Default is true.
      */
-    private boolean autoSessionManagementDisabled;
+    private boolean autoSessionManagementDisabled = true;
 
     /**
-     * A flag, which determines if auto appearance should be disabled from the start.
-     * Default is false.
+     * A flag, which determines if auto appearance should be disabled.
+     * Default is true.
      */
-    private boolean autoAppearanceDisabled;
+    private boolean autoAppearanceDisabled = true;
 
     /**
      * The application needed for auto collecting telemetry data
@@ -80,10 +80,6 @@ public class TelemetryClient {
      */
     protected TelemetryClient(boolean telemetryEnabled) {
         this.telemetryEnabled = telemetryEnabled;
-        this.autoAppearanceDisabled = true;
-        this.autoPageViewsDisabled = true;
-        this.autoSessionManagementDisabled = true;
-
         this.executorService = Executors.newFixedThreadPool(THREADS, new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -391,9 +387,8 @@ public class TelemetryClient {
     }
 
     /**
-     * Enable auto page view tracking before calling {@link ApplicationInsights#start()} or
-     * at runtime. This featuee only works if ApplicationInsights has been setup
-     * with an application.
+     * Enable auto page view tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
      */
     protected void enableAutoPageViewTracking() {
         synchronized (TelemetryClient.LOCK) {
@@ -405,9 +400,8 @@ public class TelemetryClient {
     }
 
     /**
-     * Disable auto page view tracking before calling {@link ApplicationInsights#start()} or
-     * at runtime. This feature only works if ApplicationInsights has been setup
-     * with an application.
+     * Disable auto page view tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
      */
     protected void disableAutoPageViewTracking() {
         synchronized (TelemetryClient.LOCK) {
@@ -419,9 +413,8 @@ public class TelemetryClient {
     }
 
     /**
-     * Enable auto session management tracking before calling {@link ApplicationInsights#start()} or
-     * at runtime. This feature only works if ApplicationInsights has been setup
-     * with an application.
+     * Enable auto session management tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
      */
     protected void enableAutoSessionManagement() {
         synchronized (TelemetryClient.LOCK) {
@@ -433,9 +426,8 @@ public class TelemetryClient {
     }
 
     /**
-     * Disable auto session management tracking before calling {@link ApplicationInsights#start()} or
-     * at runtime. This feature only works if ApplicationInsights has been setup
-     * with an application.
+     * Disable auto session management tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
      */
     protected void disableAutoSessionManagement() {
         synchronized (TelemetryClient.LOCK) {
@@ -447,9 +439,8 @@ public class TelemetryClient {
     }
 
     /**
-     * Enable auto appearance management tracking before calling {@link ApplicationInsights#start()} or
-     * at runtime. This feature only works if ApplicationInsights has been setup
-     * with an application.
+     * Enable auto appearance management tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
      */
     protected void enableAutoAppearanceTracking() {
         synchronized (TelemetryClient.LOCK) {
@@ -461,9 +452,8 @@ public class TelemetryClient {
     }
 
     /**
-     * Disable auto appearance management tracking before calling {@link ApplicationInsights#start()} or
-     * at runtime. This feature only works if ApplicationInsights has been setup
-     * with an application.
+     * Disable auto appearance management tracking. This feature only works if
+     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
      */
     protected void disableAutoAppearanceTracking() {
         synchronized (TelemetryClient.LOCK) {
