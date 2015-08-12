@@ -33,6 +33,16 @@ public enum ApplicationInsights {
     private ApplicationInsightsConfig config;
 
     /**
+     * A flag, which determines if sending telemetry data should be disabled. Default is false.
+     */
+    private boolean telemetryDisabled;
+
+    /**
+     * A flag, which determines if crash reporting should be disabled. Default is false.
+     */
+    private boolean exceptionTrackingDisabled;
+
+    /**
      * A flag, which determines if auto page views should be disabled from the start.
      * Default is false.
      */
@@ -49,16 +59,6 @@ public enum ApplicationInsights {
      * Default is false.
      */
     private boolean autoAppearanceDisabled;
-
-    /**
-     * A flag, which determines if sending telemetry data should be disabled. Default is false.
-     */
-    private boolean telemetryDisabled;
-
-    /**
-     * A flag, which determines if crash reporting should be disabled. Default is false.
-     */
-    private boolean exceptionTrackingDisabled;
 
     /**
      * The instrumentation key associated with the app.
@@ -337,36 +337,6 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void disableAutoAppearanceTracking() {
-        INSTANCE.autoAppearanceDisabled = true;
-        if (autoCollectionPossible("Auto Appearance")) {
-            AutoCollection.disableAutoAppearanceTracking();
-        }
-    }
-
-    /**
-     * Will check if autocollection is possible
-     *
-     * @param featureName The name of the feature which will be logged in case autocollection is not
-     *                    possible
-     * @return a flag indicating if autocollection features can be activated
-     */
-    private static boolean autoCollectionPossible(String featureName) {
-        if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
-                  " can't be enabled/disabled, because " +
-                  "it is not supported on this OS version.");
-            return false;
-        } else if (!isSetupAndRunning) {
-            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
-                  " has been set and will be activated when calling start().");
-            return false;
-        } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
-                  " can't be enabled/disabled, because " +
-                  "ApplicationInsights has not been setup with an application.");
-            return false;
-        } else {
-            return true;
         if(isSetupAndRunning){
             TelemetryClient.getInstance().disableAutoAppearanceTracking();
         }else{
@@ -434,7 +404,7 @@ public enum ApplicationInsights {
         }
         if (isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not set common properties, because " +
-                  "ApplicationInsights has already been started.");
+                    "ApplicationInsights has already been started.");
             return;
         }
         INSTANCE.commonProperties = commonProperties;

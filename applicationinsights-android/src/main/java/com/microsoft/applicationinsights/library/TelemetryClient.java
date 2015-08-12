@@ -201,7 +201,7 @@ public class TelemetryClient {
     public void trackTrace(String message, Map<String, String> properties) {
         if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.TRACE,
-                  message, properties, null));
+                    message, properties, null));
         }
     }
 
@@ -351,7 +351,7 @@ public class TelemetryClient {
           Map<String, Double> measurements) {
         if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
-                  pageName, duration, properties, measurements));
+                    pageName, duration, properties, measurements));
         }
     }
 
@@ -372,7 +372,7 @@ public class TelemetryClient {
     protected boolean isTelemetryEnabled() {
         if (!this.telemetryEnabled) {
             InternalLogging.warn(TAG, "Could not track telemetry item, because telemetry " +
-                  "feature is disabled.");
+                    "feature is disabled.");
         }
         return this.telemetryEnabled;
     }
