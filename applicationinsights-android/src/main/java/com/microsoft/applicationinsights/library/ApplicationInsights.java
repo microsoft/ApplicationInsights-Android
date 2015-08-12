@@ -110,11 +110,6 @@ public enum ApplicationInsights {
      * Create ApplicationInsights instance
      */
     ApplicationInsights() {
-        this.telemetryDisabled = false;
-        this.exceptionTrackingDisabled = false;
-        this.autoAppearanceDisabled = false;
-        this.autoPageViewsDisabled = false;
-        this.autoSessionManagementDisabled = false;
         this.channelType = ChannelType.Default;
         this.config = new ApplicationInsightsConfig();
     }
