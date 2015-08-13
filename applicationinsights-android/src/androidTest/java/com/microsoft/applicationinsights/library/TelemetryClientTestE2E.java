@@ -3,7 +3,7 @@ package com.microsoft.applicationinsights.library;
 import android.test.ApplicationTestCase;
 import android.util.Log;
 
-import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.applicationinsights.library.config.Configuration;
 
 import junit.framework.Assert;
 
@@ -26,7 +26,7 @@ public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication>
         ApplicationInsights.setup(this.getContext(), this.getApplication());
         ApplicationInsights.setDeveloperMode(true);
 
-        ApplicationInsightsConfig config = ApplicationInsights.getConfig();
+        Configuration config = ApplicationInsights.getConfiguration();
         config.setEndpointUrl(config.getEndpointUrl().replace("https", "http"));
         config.setMaxBatchIntervalMs(10);
         config.setMaxBatchCount(batchCount);
@@ -99,7 +99,7 @@ public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication>
 
     public void validate(int count) {
         try {
-            ApplicationInsightsConfig config = new ApplicationInsightsConfig();
+            Configuration config = new Configuration();
             MockSender sender = new MockSender(count, config);
 
             sender.flush(count);

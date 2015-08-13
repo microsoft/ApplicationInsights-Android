@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.microsoft.applicationinsights.contracts.User;
-import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.applicationinsights.library.config.Configuration;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.ref.WeakReference;
@@ -32,7 +32,7 @@ public enum ApplicationInsights {
     /**
      * The configuration of the SDK.
      */
-    private ApplicationInsightsConfig config;
+    private Configuration configuration;
 
     /**
      * A flag, which determines if sending telemetry data should be disabled. Default is false.
@@ -113,7 +113,7 @@ public enum ApplicationInsights {
      */
     ApplicationInsights() {
         this.channelType = ChannelType.Default;
-        this.config = new ApplicationInsightsConfig();
+        this.configuration = new Configuration();
     }
 
     /**
@@ -219,7 +219,7 @@ public enum ApplicationInsights {
         EnvelopeFactory.initialize(telemetryContext, this.commonProperties);
 
         Persistence.initialize(context);
-        Sender.initialize(this.config);
+        Sender.initialize(this.configuration);
         ChannelManager.initialize(channelType);
 
         // Initialize Telemetry
@@ -228,13 +228,13 @@ public enum ApplicationInsights {
             application = this.weakApplication.get();
         }
         TelemetryClient.initialize(!this.telemetryDisabled, application);
-        TelemetryClient.startAutoCollection(this.telemetryContext, this.config, !this.autoAppearanceDisabled, !this.autoPageViewsDisabled, !this.autoSessionManagementDisabled);
+        TelemetryClient.startAutoCollection(this.telemetryContext, this.configuration, !this.autoAppearanceDisabled, !this.autoPageViewsDisabled, !this.autoSessionManagementDisabled);
     }
 
     /**
      * Triggers persisting and if applicable sending of queued data
      * note: this will be called
-     * {@link com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig#maxBatchIntervalMs} after
+     * {@link Configuration#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
@@ -486,8 +486,8 @@ public enum ApplicationInsights {
      *
      * @return the instance ApplicationInsights configuration
      */
-    public static ApplicationInsightsConfig getConfig() {
-        return INSTANCE.config;
+    public static Configuration getConfiguration() {
+        return INSTANCE.configuration;
     }
 
     /**
