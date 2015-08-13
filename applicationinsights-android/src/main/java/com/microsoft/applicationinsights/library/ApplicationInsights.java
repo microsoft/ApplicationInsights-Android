@@ -269,7 +269,7 @@ public enum ApplicationInsights {
 
     /**
      * Enable auto page view tracking before calling {@link ApplicationInsights#start()} or
-     * at runtime. This featuee only works if ApplicationInsights has been setup
+     * at runtime. This feature only works if ApplicationInsights has been setup
      * with an application.
      */
     public static void enableAutoPageViewTracking() {
