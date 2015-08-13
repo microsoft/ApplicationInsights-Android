@@ -61,6 +61,14 @@ public class TelemetryContext {
      */
     private static final Object LOCK = new Object();
 
+
+    private final Object IKEY_LOCK = new Object();
+
+    /**
+     * Synchronization LOCK for setting static context
+     */
+    private final Object INSTANCE_LOCK = new Object();
+
     /**
      * The shared preferences INSTANCE for reading persistent context
      */
@@ -74,7 +82,7 @@ public class TelemetryContext {
     /**
      * Device telemetryContext.
      */
-    private Device device;
+    private final Device device;
 
     /**
      * Session telemetryContext.
@@ -181,7 +189,7 @@ public class TelemetryContext {
         configAppContext(context);
 
         this.lastSessionId = null;
-        this.instrumentationKey = instrumentationKey;
+        setInstrumentationKey(instrumentationKey);
     }
 
     /**
@@ -230,20 +238,20 @@ public class TelemetryContext {
      * @param sessionId a custom session ID
      */
     protected void renewSessionId(String sessionId) {
-        this.session.setId(sessionId);
+        setSessionId(sessionId);
         //normally, this should also be saved to SharedPrefs like isFirst.
         //The problem is that there are cases when committing the changes is too slow and we get
         //the wrong value. As isNew is only "true" when we start a new session, it is set in
         //TrackDataOperation directly before enqueueing the session event.
-        this.session.setIsNew("false");
+        setIsNewSession("false");
 
         SharedPreferences.Editor editor = this.settings.edit();
         if (!this.settings.getBoolean(SESSION_IS_FIRST_KEY, false)) {
             editor.putBoolean(SESSION_IS_FIRST_KEY, true);
             editor.apply();
-            this.session.setIsFirst("true");
+            setIsFirstSession("true");
         } else {
-            this.session.setIsFirst("false");
+            setIsFirstSession("false");
         }
     }
 
@@ -254,7 +262,7 @@ public class TelemetryContext {
         if (this.lastSessionId == null) {
             renewSessionId();
         } else {
-            this.session.setId(this.lastSessionId);
+            setSessionId(this.lastSessionId);
         }
     }
 
@@ -281,7 +289,7 @@ public class TelemetryContext {
         } catch (PackageManager.NameNotFoundException e) {
             InternalLogging.warn(TAG, "Could not collect application context");
         } finally {
-            this.application.setVer(version);
+            setAppVersion(version);
         }
     }
 
@@ -420,7 +428,6 @@ public class TelemetryContext {
         }
     }
 
-    // TODO: Synchronize resolution update
     @SuppressLint({"NewApi", "Deprecation"})
     protected void updateScreenResolution(Context context) {
         String resolutionString;
@@ -501,160 +508,260 @@ public class TelemetryContext {
     protected Map<String, String> getContextTags() {
         Map<String, String> contextTags = new LinkedHashMap<String, String>();
 
-        this.application.addToHashMap(contextTags);
-        this.internal.addToHashMap(contextTags);
-        this.operation.addToHashMap(contextTags);
-        this.device.addToHashMap(contextTags);
-        this.session.addToHashMap(contextTags);
-        this.user.addToHashMap(contextTags);
+        synchronized (this.application){
+            this.application.addToHashMap(contextTags);
+        }
+        synchronized (this.internal){
+            this.internal.addToHashMap(contextTags);
+        }
+        synchronized (this.operation){
+            this.operation.addToHashMap(contextTags);
+        }
+        synchronized (this.device){
+            this.device.addToHashMap(contextTags);
+        }
+        synchronized (this.session){
+            this.session.addToHashMap(contextTags);
+        }
+        synchronized (this.user) {
+            this.user.addToHashMap(contextTags);
+        }
 
         return contextTags;
     }
 
     public String getInstrumentationKey() {
-        return instrumentationKey;
+        synchronized(IKEY_LOCK){
+            return this.instrumentationKey;
+        }
     }
 
-    public void setInstrumentationKey(String instrumentationKey) {
-        this.instrumentationKey = instrumentationKey;
+    public synchronized void setInstrumentationKey(String instrumentationKey) {
+        synchronized(IKEY_LOCK){
+            this.instrumentationKey = instrumentationKey;
+        }
     }
 
     public String getScreenResolution() {
-        return this.device.getScreenResolution();
+        synchronized (this.application) {
+            return this.device.getScreenResolution();
+        }
     }
 
     public void setScreenResolution(String screenResolution) {
-        this.device.setScreenResolution(screenResolution);
+        synchronized (this.application) {
+            this.device.setScreenResolution(screenResolution);
+        }
     }
 
     public String getAppVersion() {
-        return this.application.getVer();
+        synchronized (this.application) {
+            return this.application.getVer();
+        }
     }
 
     public void setAppVersion(String appVersion) {
-        this.application.setVer(appVersion);
+        synchronized (this.application){
+            this.application.setVer(appVersion);
+        }
     }
 
     public String getUserId() {
-        return this.user.getId();
+        synchronized (this.user) {
+            return this.user.getId();
+        }
     }
 
     public void setUserId(String userId) {
-        this.user.setId(userId);
-        if (this == instance) {
-            saveUserInfo();
+        synchronized (this.user){
+            this.user.setId(userId);
+            if (this == instance) {
+                saveUserInfo();
+            }
         }
     }
 
     public String getUserAcqusitionDate() {
-        return this.user.getAccountAcquisitionDate();
+        synchronized (this.user){
+            return this.user.getAccountAcquisitionDate();
+        }
     }
 
     public void setUserAcqusitionDate(String userAcqusitionDate) {
-        this.user.setAccountAcquisitionDate(userAcqusitionDate);
-        if (this == instance) {
-            saveUserInfo();
+        synchronized (this.user){
+            this.user.setAccountAcquisitionDate(userAcqusitionDate);
+            if (this == instance) {
+                saveUserInfo();
+            }
         }
     }
 
     public String getAccountId() {
-        return this.user.getAccountId();
+        synchronized (this.user){
+            return this.user.getAccountId();
+        }
     }
 
     public void setAccountId(String accountId) {
-        this.user.setAccountId(accountId);
-        if (this == instance) {
-            saveUserInfo();
+        synchronized (this.user){
+            this.user.setAccountId(accountId);
+            if (this == instance) {
+                saveUserInfo();
+            }
         }
     }
 
     public String getAuthenticatedUserId() {
-        return this.user.getAuthUserId();
+        synchronized (this.user){
+            return this.user.getAuthUserId();
+        }
     }
 
     public void setAuthenticatedUserId(String authenticatedUserId) {
-        this.user.setAuthUserId(authenticatedUserId);
-        if (this == instance) {
-            saveUserInfo();
+        synchronized (this.user){
+            this.user.setAuthUserId(authenticatedUserId);
+            if (this == instance) {
+                saveUserInfo();
+            }
         }
     }
 
     public String getAuthenticatedUserAcquisitionDate() {
-        return this.user.getAuthUserAcquisitionDate();
+        synchronized (this.user){
+            return this.user.getAuthUserAcquisitionDate();
+        }
     }
 
     public void setAuthenticatedUserAcquisitionDate(String authenticatedUserAcquisitionDate) {
-        this.user.setAuthUserAcquisitionDate(authenticatedUserAcquisitionDate);
-        if (this == instance) {
-            saveUserInfo();
+        synchronized (this.user){
+            this.user.setAuthUserAcquisitionDate(authenticatedUserAcquisitionDate);
+            if (this == instance) {
+                saveUserInfo();
+            }
         }
     }
 
     public String getAnonymousUserAcquisitionDate() {
-        return this.user.getAnonUserAcquisitionDate();
+        synchronized (this.user){
+            return this.user.getAnonUserAcquisitionDate();
+        }
     }
 
     public void setAnonymousUserAcquisitionDate(String anonymousUserAcquisitionDate) {
-        this.user.setAnonUserAcquisitionDate(anonymousUserAcquisitionDate);
-        if (this == instance) {
-            saveUserInfo();
+        synchronized (this.user){
+            this.user.setAnonUserAcquisitionDate(anonymousUserAcquisitionDate);
+            if (this == instance) {
+                saveUserInfo();
+            }
         }
     }
 
     public String getSdkVersion() {
-        return this.internal.getSdkVersion();
+        synchronized (this.internal){
+            return this.internal.getSdkVersion();
+        }
     }
 
     public void setSdkVersion(String sdkVersion) {
-        this.internal.setSdkVersion(sdkVersion);
+        synchronized (this.internal){
+            this.internal.setSdkVersion(sdkVersion);
+        }
     }
 
     public String getSessionId() {
-        return this.session.getId();
+        synchronized (this.session){
+            return this.session.getId();
+        }
     }
 
     public void setSessionId(String sessionId) {
-        this.session.setId(sessionId);
+        synchronized (this.session){
+            this.session.setId(sessionId);
+        }
+    }
+
+    public String getIsFirstSession() {
+        synchronized (this.session){
+            return this.session.getIsFirst();
+        }
+    }
+
+    public void setIsFirstSession(String isFirst) {
+        synchronized (this.session){
+            this.session.setIsFirst(isFirst);
+        }
+    }
+
+    public String getIsNewSession() {
+        synchronized (this.session){
+            return this.session.getIsNew();
+        }
+    }
+
+    public void setIsNewSession(String isFirst) {
+        synchronized (this.session){
+            this.session.setIsNew(isFirst);
+        }
     }
 
     public String getOsVersion() {
-        return this.device.getOsVersion();
+        synchronized (this.device) {
+            return this.device.getOsVersion();
+        }
     }
 
     public void setOsVersion(String osVersion) {
-        this.device.setOsVersion(osVersion);
+        synchronized (this.device) {
+            this.device.setOsVersion(osVersion);
+        }
     }
 
     public String getOsName() {
-        return this.device.getOs();
+        synchronized (this.device) {
+            return this.device.getOs();
+        }
     }
 
     public void setOsName(String osName) {
-        this.device.setOs(osName);
+        synchronized (this.device) {
+            this.device.setOs(osName);
+        }
     }
 
     public String getDeviceModel() {
-        return this.device.getModel();
+        synchronized (this.device){
+            return this.device.getModel();
+        }
     }
 
     public void setDeviceModel(String deviceModel) {
-        this.device.setModel(deviceModel);
+        synchronized (this.device){
+            this.device.setModel(deviceModel);
+        }
     }
 
     public String getDeviceOemName() {
-        return this.device.getOemName();
+        synchronized (this.device) {
+            return this.device.getOemName();
+        }
     }
 
     public void setDeviceOemName(String deviceOemName) {
-        this.device.setOemName(deviceOemName);
+        synchronized (this.device) {
+            this.device.setOemName(deviceOemName);
+        }
     }
 
     public String getOsLocale() {
-        return this.device.getLocale();
+        synchronized (this.device){
+            return this.device.getLocale();
+        }
     }
 
     public void setOsLocale(String osLocale) {
-        this.device.setLocale(osLocale);
+        synchronized (this.device){
+            this.device.setLocale(osLocale);
+        }
     }
 
     public String getDeviceId() {
@@ -662,7 +769,9 @@ public class TelemetryContext {
     }
 
     public void setDeviceId(String deviceId) {
-        this.device.setId(deviceId);
+        synchronized (this.device){
+            this.device.setId(deviceId);
+        }
     }
 
     public String getDeviceType() {
@@ -670,7 +779,9 @@ public class TelemetryContext {
     }
 
     public void setDeviceType(String deviceType) {
-        this.device.setType(deviceType);
+        synchronized (this.device){
+            this.device.setType(deviceType);
+        }
     }
 
     public String getNetworkType() {
@@ -678,6 +789,8 @@ public class TelemetryContext {
     }
 
     public void setNetworkType(String networkType) {
-        this.device.setNetwork(networkType);
+        synchronized (this.device) {
+            this.device.setNetwork(networkType);
+        }
     }
 }

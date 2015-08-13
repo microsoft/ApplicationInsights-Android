@@ -11,6 +11,8 @@ import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfi
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -89,7 +91,7 @@ public enum ApplicationInsights {
     /**
      * Properties associated with this telemetryContext.
      */
-    private Map<String, String> commonProperties;
+    private Map<String, String> commonProperties = Collections.synchronizedMap(new HashMap<String, String>());
 
     /**
      * Flag that indicates that the user has called a setup-method before
@@ -403,7 +405,7 @@ public enum ApplicationInsights {
         }
         if (isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not set common properties, because " +
-                    "ApplicationInsights has already been started.");
+                  "ApplicationInsights has already been started.");
             return;
         }
         INSTANCE.commonProperties = commonProperties;
