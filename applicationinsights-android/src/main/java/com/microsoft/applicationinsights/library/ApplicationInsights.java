@@ -35,6 +35,16 @@ public enum ApplicationInsights {
     private ApplicationInsightsConfig config;
 
     /**
+     * A flag, which determines if sending telemetry data should be disabled. Default is false.
+     */
+    private boolean telemetryDisabled;
+
+    /**
+     * A flag, which determines if crash reporting should be disabled. Default is false.
+     */
+    private boolean exceptionTrackingDisabled;
+
+    /**
      * A flag, which determines if auto page views should be disabled from the start.
      * Default is false.
      */
@@ -51,16 +61,6 @@ public enum ApplicationInsights {
      * Default is false.
      */
     private boolean autoAppearanceDisabled;
-
-    /**
-     * A flag, which determines if sending telemetry data should be disabled. Default is false.
-     */
-    private boolean telemetryDisabled;
-
-    /**
-     * A flag, which determines if crash reporting should be disabled. Default is false.
-     */
-    private boolean exceptionTrackingDisabled;
 
     /**
      * The instrumentation key associated with the app.
@@ -112,11 +112,6 @@ public enum ApplicationInsights {
      * Create ApplicationInsights instance
      */
     ApplicationInsights() {
-        this.telemetryDisabled = false;
-        this.exceptionTrackingDisabled = false;
-        this.autoAppearanceDisabled = false;
-        this.autoPageViewsDisabled = false;
-        this.autoSessionManagementDisabled = false;
         this.channelType = ChannelType.Default;
         this.config = new ApplicationInsightsConfig();
     }
@@ -199,12 +194,11 @@ public enum ApplicationInsights {
             Context context = this.weakContext.get();
 
             initializePipeline(context);
-            startSyncWhenBackgrounding();
-            startAutoCollection();
             startCrashReporting();
 
             Sender.getInstance().sendDataOnAppStart();
             InternalLogging.info(TAG, "ApplicationInsights has been started.", "");
+            isSetupAndRunning = true;
         }
     }
 
@@ -212,44 +206,6 @@ public enum ApplicationInsights {
         // Start crash reporting
         if (!this.exceptionTrackingDisabled) {
             ExceptionTracking.registerExceptionHandler();
-        }
-    }
-
-    /**
-     * Start/Stop AutoCollection features depending on user's settings.
-     * Will be called during start of the SDK and when enabling/disabling ALL autocollection features
-     */
-    private void startAutoCollection() {
-        if (autoCollectionPossible("Start of AutoCollection at app start.")) {
-            //if the SDK has already been started, activate/deactivate features
-            if (INSTANCE.autoAppearanceDisabled) {
-                disableAutoAppearanceTracking();
-            } else {
-                enableAutoAppearanceTracking();
-            }
-            if (INSTANCE.autoPageViewsDisabled) {
-                disableAutoPageViewTracking();
-            } else {
-                enableAutoPageViewTracking();
-            }
-            if (INSTANCE.autoSessionManagementDisabled) {
-                disableAutoSessionManagement();
-            } else {
-                enableAutoSessionManagement();
-            }
-        }
-    }
-
-    private void startSyncWhenBackgrounding() {
-        if (!Util.isLifecycleTrackingAvailable()) {
-            return;
-        }
-
-        if (INSTANCE.getApplication() != null) {
-            SyncUtil.getInstance().start(INSTANCE.getApplication());
-        } else {
-            InternalLogging.warn(TAG, "Couldn't turn on SyncUtil because given application " +
-                    "was null");
         }
     }
 
@@ -267,13 +223,12 @@ public enum ApplicationInsights {
         ChannelManager.initialize(channelType);
 
         // Initialize Telemetry
-        TelemetryClient.initialize(!telemetryDisabled);
-
-        isSetupAndRunning = true;
-
-        if (autoCollectionPossible("Initialise AutoCollection")) {
-            AutoCollection.initialize(telemetryContext, this.config);
+        Application application = null;
+        if (this.weakApplication != null) {
+            application = this.weakApplication.get();
         }
+        TelemetryClient.initialize(!this.telemetryDisabled, application);
+        TelemetryClient.startAutoCollection(this.telemetryContext, this.config, !this.autoAppearanceDisabled, !this.autoPageViewsDisabled, !this.autoSessionManagementDisabled);
     }
 
     /**
@@ -298,9 +253,6 @@ public enum ApplicationInsights {
      * Requires ApplicationInsights to be setup with an Application object
      */
     public static void enableAutoCollection() {
-        INSTANCE.autoAppearanceDisabled = false;
-        INSTANCE.autoPageViewsDisabled = false;
-        INSTANCE.autoSessionManagementDisabled = false;
         enableAutoAppearanceTracking();
         enableAutoPageViewTracking();
         enableAutoSessionManagement();
@@ -310,9 +262,6 @@ public enum ApplicationInsights {
      * disables all auto-collection features
      */
     public static void disableAutoCollection() {
-        INSTANCE.autoAppearanceDisabled = true;
-        INSTANCE.autoPageViewsDisabled = true;
-        INSTANCE.autoSessionManagementDisabled = true;
         disableAutoAppearanceTracking();
         disableAutoPageViewTracking();
         disableAutoSessionManagement();
@@ -320,13 +269,14 @@ public enum ApplicationInsights {
 
     /**
      * Enable auto page view tracking before calling {@link ApplicationInsights#start()} or
-     * at runtime. This featuee only works if ApplicationInsights has been setup
+     * at runtime. This feature only works if ApplicationInsights has been setup
      * with an application.
      */
     public static void enableAutoPageViewTracking() {
-        INSTANCE.autoPageViewsDisabled = false;
-        if (autoCollectionPossible("Auto PageView Tracking")) {
-            AutoCollection.enableAutoPageViews(INSTANCE.getApplication());
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().enableAutoPageViewTracking();
+        }else{
+            INSTANCE.autoPageViewsDisabled = false;
         }
     }
 
@@ -336,9 +286,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void disableAutoPageViewTracking() {
-        INSTANCE.autoPageViewsDisabled = true;
-        if (autoCollectionPossible("Auto PageView Tracking")) {
-            AutoCollection.disableAutoPageViews();
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().disableAutoPageViewTracking();
+        }else{
+            INSTANCE.autoPageViewsDisabled = true;
         }
     }
 
@@ -348,9 +299,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void enableAutoSessionManagement() {
-        INSTANCE.autoSessionManagementDisabled = false;
-        if (autoCollectionPossible("Auto Session Management")) {
-            AutoCollection.enableAutoSessionManagement(INSTANCE.getApplication());
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().enableAutoSessionManagement();
+        }else{
+            INSTANCE.autoSessionManagementDisabled = false;
         }
     }
 
@@ -360,9 +312,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void disableAutoSessionManagement() {
-        INSTANCE.autoSessionManagementDisabled = true;
-        if (autoCollectionPossible("Auto Session Management")) {
-            AutoCollection.disableAutoSessionManagement();
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().disableAutoSessionManagement();
+        }else{
+            INSTANCE.autoSessionManagementDisabled = true;
         }
     }
 
@@ -372,9 +325,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void enableAutoAppearanceTracking() {
-        INSTANCE.autoAppearanceDisabled = false;
-        if (autoCollectionPossible("Auto Appearance")) {
-            AutoCollection.enableAutoAppearanceTracking(INSTANCE.getApplication());
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().enableAutoAppearanceTracking();
+        }else{
+            INSTANCE.autoAppearanceDisabled = false;
         }
     }
 
@@ -384,36 +338,10 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void disableAutoAppearanceTracking() {
-        INSTANCE.autoAppearanceDisabled = true;
-        if (autoCollectionPossible("Auto Appearance")) {
-            AutoCollection.disableAutoAppearanceTracking();
-        }
-    }
-
-    /**
-     * Will check if autocollection is possible
-     *
-     * @param featureName The name of the feature which will be logged in case autocollection is not
-     *                    possible
-     * @return a flag indicating if autocollection features can be activated
-     */
-    private static boolean autoCollectionPossible(String featureName) {
-        if (!Util.isLifecycleTrackingAvailable()) {
-            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
-                  " can't be enabled/disabled, because " +
-                  "it is not supported on this OS version.");
-            return false;
-        } else if (!isSetupAndRunning) {
-            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
-                  " has been set and will be activated when calling start().");
-            return false;
-        } else if (INSTANCE.getApplication() == null) {
-            InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
-                  " can't be enabled/disabled, because " +
-                  "ApplicationInsights has not been setup with an application.");
-            return false;
-        } else {
-            return true;
+        if(isSetupAndRunning){
+            TelemetryClient.getInstance().disableAutoAppearanceTracking();
+        }else{
+            INSTANCE.autoAppearanceDisabled = true;
         }
     }
 
@@ -470,10 +398,17 @@ public enum ApplicationInsights {
      * @param commonProperties a dictionary of properties to log with all telemetry.
      */
     public static void setCommonProperties(Map<String, String> commonProperties) {
-        INSTANCE.commonProperties.clear();
-        if(commonProperties != null){
-            INSTANCE.commonProperties.putAll(commonProperties);
+        if (!isConfigured) {
+            InternalLogging.warn(TAG, "Could not set common properties, because " +
+                  "ApplicationInsights has not been setup correctly.");
+            return;
         }
+        if (isSetupAndRunning) {
+            InternalLogging.warn(TAG, "Could not set common properties, because " +
+                  "ApplicationInsights has already been started.");
+            return;
+        }
+        INSTANCE.commonProperties = commonProperties;
     }
 
     /**
@@ -534,21 +469,6 @@ public enum ApplicationInsights {
 
         return context;
     }
-
-    /**
-     * Get the reference to the Application (used for life-cycle tracking)
-     *
-     * @return the reference to the application that was used during initialization of the SDK
-     */
-    private Application getApplication() {
-        Application application = null;
-        if (weakApplication != null) {
-            application = weakApplication.get();
-        }
-
-        return application;
-    }
-
 
     /* Writes instructions on how to configure the instrumentation key.
         */
