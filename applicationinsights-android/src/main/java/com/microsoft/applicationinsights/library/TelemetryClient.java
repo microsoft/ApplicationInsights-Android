@@ -17,8 +17,8 @@ import java.util.concurrent.ThreadFactory;
  */
 public class TelemetryClient {
 
-    public static final int THREADS = 10;
-    public static final String TAG = "TelemetryClient";
+    private static final int THREADS = 10;
+    private static final String TAG = "TelemetryClient";
 
     /**
      * The configuration of the SDK.
@@ -93,8 +93,8 @@ public class TelemetryClient {
     /**
      * Initialize the INSTANCE of the telemetryclient
      *
-     * @param telemetryEnabled  YES if tracking telemetry data manually should be enabled
-     * @param application       application used for auto collection features
+     * @param telemetryEnabled YES if tracking telemetry data manually should be enabled
+     * @param application      application used for auto collection features
      */
     protected static void initialize(boolean telemetryEnabled, Application application) {
         if (!TelemetryClient.isTelemetryClientLoaded) {
@@ -113,8 +113,11 @@ public class TelemetryClient {
     /**
      * Start auto collection features.
      */
-    protected static void startAutoCollection(TelemetryContext context, Configuration config, boolean autoAppearanceEnabled, boolean autoPageViewsEnabled, boolean autoSessionManagementEnabled){
-
+    protected static void startAutoCollection(TelemetryContext context,
+                                              Configuration config,
+                                              boolean autoAppearanceEnabled,
+                                              boolean autoPageViewsEnabled,
+                                              boolean autoSessionManagementEnabled) {
         AutoCollection.initialize(context, config);
 
         if (autoAppearanceEnabled) {
@@ -210,7 +213,7 @@ public class TelemetryClient {
     public void trackTrace(String message, Map<String, String> properties) {
         if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.TRACE,
-                    message, properties, null));
+                  message, properties, null));
         }
     }
 
@@ -335,7 +338,6 @@ public class TelemetryClient {
      * {@code measurements} defaults to {@code null}.
      *
      * @see TelemetryClient#trackPageView(String, long, Map, Map)
-     *
      * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release
      */
     public void trackPageView(String pageName, long duration, Map<String, String> properties) {
@@ -350,7 +352,6 @@ public class TelemetryClient {
      * @param properties   Custom properties associated with the event. Note: values set here will
      *                     supersede values set in {@link ApplicationInsights#setCommonProperties}.
      * @param measurements Custom measurements associated with the event.
-     *
      * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release
      */
     public void trackPageView(
@@ -360,7 +361,7 @@ public class TelemetryClient {
           Map<String, Double> measurements) {
         if (isTelemetryEnabled()) {
             this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
-                    pageName, duration, properties, measurements));
+                  pageName, duration, properties, measurements));
         }
     }
 
@@ -381,7 +382,7 @@ public class TelemetryClient {
     protected boolean isTelemetryEnabled() {
         if (!this.telemetryEnabled) {
             InternalLogging.warn(TAG, "Could not track telemetry item, because telemetry " +
-                    "feature is disabled.");
+                  "feature is disabled.");
         }
         return this.telemetryEnabled;
     }
@@ -392,7 +393,7 @@ public class TelemetryClient {
      */
     protected void enableAutoPageViewTracking() {
         synchronized (TelemetryClient.LOCK) {
-            if(isAutoCollectionPossible("Auto PageViews") && this.autoPageViewsDisabled){
+            if (isAutoCollectionPossible("Auto PageViews") && this.autoPageViewsDisabled) {
                 this.autoPageViewsDisabled = false;
                 AutoCollection.enableAutoPageViews(getApplication());
             }
@@ -405,7 +406,7 @@ public class TelemetryClient {
      */
     protected void disableAutoPageViewTracking() {
         synchronized (TelemetryClient.LOCK) {
-            if(isAutoCollectionPossible("Auto PageViews") && !this.autoPageViewsDisabled){
+            if (isAutoCollectionPossible("Auto PageViews") && !this.autoPageViewsDisabled) {
                 this.autoPageViewsDisabled = true;
                 AutoCollection.disableAutoPageViews();
             }
@@ -418,7 +419,7 @@ public class TelemetryClient {
      */
     protected void enableAutoSessionManagement() {
         synchronized (TelemetryClient.LOCK) {
-            if(isAutoCollectionPossible("Session Management") && this.autoSessionManagementDisabled){
+            if (isAutoCollectionPossible("Session Management") && this.autoSessionManagementDisabled) {
                 this.autoSessionManagementDisabled = false;
                 AutoCollection.enableAutoSessionManagement(getApplication());
             }
@@ -431,7 +432,7 @@ public class TelemetryClient {
      */
     protected void disableAutoSessionManagement() {
         synchronized (TelemetryClient.LOCK) {
-            if(isAutoCollectionPossible("Session Management") && !this.autoSessionManagementDisabled){
+            if (isAutoCollectionPossible("Session Management") && !this.autoSessionManagementDisabled) {
                 this.autoSessionManagementDisabled = true;
                 AutoCollection.disableAutoSessionManagement();
             }
@@ -444,7 +445,7 @@ public class TelemetryClient {
      */
     protected void enableAutoAppearanceTracking() {
         synchronized (TelemetryClient.LOCK) {
-            if(isAutoCollectionPossible("Auto Appearance") && this.autoAppearanceDisabled){
+            if (isAutoCollectionPossible("Auto Appearance") && this.autoAppearanceDisabled) {
                 this.autoAppearanceDisabled = false;
                 AutoCollection.enableAutoAppearanceTracking(getApplication());
             }
@@ -457,7 +458,7 @@ public class TelemetryClient {
      */
     protected void disableAutoAppearanceTracking() {
         synchronized (TelemetryClient.LOCK) {
-            if(isAutoCollectionPossible("Auto Appearance") && !this.autoAppearanceDisabled){
+            if (isAutoCollectionPossible("Auto Appearance") && !this.autoAppearanceDisabled) {
                 this.autoAppearanceDisabled = true;
                 AutoCollection.disableAutoAppearanceTracking();
             }
@@ -474,7 +475,7 @@ public class TelemetryClient {
             SyncUtil.getInstance().start(app);
         } else {
             InternalLogging.warn(TAG, "Couldn't turn on SyncUtil because given application " +
-                    "was null");
+                  "was null");
         }
     }
 
@@ -488,13 +489,13 @@ public class TelemetryClient {
     private boolean isAutoCollectionPossible(String featureName) {
         if (!Util.isLifecycleTrackingAvailable()) {
             InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
-                    " can't be enabled/disabled, because " +
-                    "it is not supported on this OS version.");
+                  " can't be enabled/disabled, because " +
+                  "it is not supported on this OS version.");
             return false;
         } else if (getApplication() == null) {
             InternalLogging.warn(TAG, "AutoCollection feature " + featureName +
-                    " can't be enabled/disabled, because " +
-                    "ApplicationInsights has not been setup with an application.");
+                  " can't be enabled/disabled, because " +
+                  "ApplicationInsights has not been setup with an application.");
             return false;
         } else {
             return true;
