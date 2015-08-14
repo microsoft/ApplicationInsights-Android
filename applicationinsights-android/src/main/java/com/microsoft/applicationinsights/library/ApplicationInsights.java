@@ -163,6 +163,8 @@ public enum ApplicationInsights {
     }
 
     public static void addModule(String moduleName, String instrumentationKey, Context context, Application application) {
+        //TODO: in case context and application are null -> use default context/application
+        //TODO: each new module == clone of default module
         initializeModuleForName(moduleName, context, application,  instrumentationKey);
     }
 

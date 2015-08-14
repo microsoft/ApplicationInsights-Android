@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
+import com.microsoft.applicationinsights.library.TelemetryClient;
+import com.microsoft.applicationinsights.library.TelemetryContext;
 import com.microsoft.applicationinsights.library.config.Configuration;
 
 import java.util.HashMap;
@@ -67,6 +69,20 @@ public class ItemListActivity extends FragmentActivity
         properties.put("Hometown", "Karlsruhe");
         ApplicationInsights.setCommonProperties(properties);
         ApplicationInsights.start();
+
+
+        //TODO: proposal by Benny for multiple telemetryclients
+
+        ApplicationInsights.addModule("foobar", "ikey", getApplicationContext(), getApplication());
+        ApplicationInsights.start(); //starts all modules
+        TelemetryClient foobarclient = ApplicationInsights.getTelemetryClient("foobar");
+        foobarclient.trackEvent("myevent");
+        TelemetryContext context = ApplicationInsights.getTelemetryContext("foobar");
+        context.setAccountId("foobarUser");
+
+        //TODO Proposal von Chris
+        TelemetryManager tm = new TelemetryManager(getApplicationContext(), new TelemtryConfig());
+        //we could
     }
 
     /**
