@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
-import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.applicationinsights.library.config.Configuration;
 
 import java.util.HashMap;
 
@@ -54,7 +54,7 @@ public class ItemListActivity extends FragmentActivity
         }
         ApplicationInsights.setup(this.getApplicationContext(), getApplication());
 
-        ApplicationInsightsConfig config = ApplicationInsights.getConfig();
+        Configuration config = ApplicationInsights.getConfiguration();
         //config.setSessionIntervalMs(30000);
         //config.setEndpointUrl("https://myserver.com/v2/track");
         config.setMaxBatchCount(45);

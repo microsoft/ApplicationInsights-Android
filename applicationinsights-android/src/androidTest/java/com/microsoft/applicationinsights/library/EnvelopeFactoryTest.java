@@ -2,9 +2,7 @@ package com.microsoft.applicationinsights.library;
 
 import android.test.InstrumentationTestCase;
 
-import com.microsoft.applicationinsights.contracts.Application;
 import com.microsoft.applicationinsights.contracts.DataPoint;
-import com.microsoft.applicationinsights.contracts.Device;
 import com.microsoft.applicationinsights.contracts.EventData;
 import com.microsoft.applicationinsights.contracts.MessageData;
 import com.microsoft.applicationinsights.contracts.MetricData;
@@ -12,7 +10,6 @@ import com.microsoft.applicationinsights.contracts.PageViewData;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.StackFrame;
-import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
 import com.microsoft.telemetry.cs2.Envelope;
@@ -91,7 +88,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         String actualName = ((PageViewData) ((Data<Domain>) envelope.getData()).getBaseData()).getName();
         Assert.assertEquals(expectedName, actualName);
 
-        String actualDuration = ((PageViewData)((Data<Domain>)envelope.getData()).getBaseData()).getDuration();
+        String actualDuration = ((PageViewData) ((Data<Domain>) envelope.getData()).getBaseData()).getDuration();
         Assert.assertEquals(String.valueOf(expectedDuration), actualDuration);
 
         String actualBaseType = envelope.getData().getBaseType();
@@ -291,24 +288,15 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         HashMap<String, String> tags = new HashMap<String, String>();
         tags.put(MOCK_TAGS_KEY, MOCK_TAGS_VALUE);
 
-        Application mockApplication = mock(Application.class);
-        when(mockApplication.getVer()).thenReturn(MOCK_APP_VER);
-
-        User mockUser = mock(User.class);
-        when(mockUser.getId()).thenReturn(MOCK_USER_ID);
-
-        Device mockDevice = mock(Device.class);
-        when(mockDevice.getId()).thenReturn(MOCK_DEVICE_ID);
-        when(mockDevice.getOsVersion()).thenReturn(MOCK_OS_VER);
-        when(mockDevice.getOs()).thenReturn(MOCK_OS);
-
         PublicTelemetryContext mockContext = mock(PublicTelemetryContext.class);
         when(mockContext.getPackageName()).thenReturn(MOCK_APP_ID);
         when(mockContext.getContextTags()).thenReturn(tags);
-        when(mockContext.getApplication()).thenReturn(mockApplication);
+        when(mockContext.getAppVersion()).thenReturn(MOCK_APP_VER);
         when(mockContext.getInstrumentationKey()).thenReturn(MOCK_IKEY);
-        when(mockContext.getDevice()).thenReturn(mockDevice);
-        when(mockContext.getUser()).thenReturn(mockUser);
+        when(mockContext.getDeviceId()).thenReturn(MOCK_DEVICE_ID);
+        when(mockContext.getOsVersion()).thenReturn(MOCK_OS_VER);
+        when(mockContext.getOsName()).thenReturn(MOCK_OS);
+        when(mockContext.getUserId()).thenReturn(MOCK_USER_ID);
 
         return mockContext;
     }

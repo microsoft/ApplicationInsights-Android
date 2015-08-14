@@ -5,5 +5,5 @@ package com.microsoft.applicationinsights.library;
  */
 public enum ChannelType {
     Default,
-    TelemetryClientForAndroid
+    CommonLoggingLibraryChannel
 }

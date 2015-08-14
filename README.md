@@ -1,6 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-beta.7)
+# Application Insights for Android (1.0-beta.8)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
@@ -25,18 +25,27 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 ## <a name="1"></a> 1. Release Notes
 
-* [BUGFIX] Fixed bug where new user was created instead of loaded existing user from preferences.
-* [BUGFIX] Fixed `NotSerializableException` when using the `track(ITelemetry)`-method.
-* Updated contract files
-* Deprecated track(..)-methods to align our API with other SDKs.
-* Removed previously deprecated methods to set a custom `userID`
-* Small cleanups
+* added CHANGELOG.md
+* Deprecate `track`-Methods of `TelemetryClient`that have a `duration`-parameter
+* The `TelemetryContext`object is now completely exposed for customization – this includes the `User` object.
+* Common Properties can be changed after calling `ApplicationInsights.start()`
+* Some more cleanup
+* `AutoCollection` is now initialized by `TelemetryClient`
+* Improved threat-safety for `AutoCollection`
+* Added spec to run very simple automated UI tests on an Appium device grid (requires additional configuration in case you want to use it)
+* Rename `ApplicationInsightsConfig`to `Configuration` – the former class has been deprecated.
 
-See [here](https://github.com/Microsoft/ApplicationInsights-Android/releases) for release notes of previous versions
+
+See [here](https://github.com/Microsoft/ApplicationInsights-Android/releases) for release notes of previous versions or our [changelog](https://github.com/Microsoft/ApplicationInsights-Android/blob/master/CHANGELOG.md).
 
 ##<a name="2"></a> 2. Breaking Changes & deprecations
 
 Starting with 1.0-beta.5, breaking changes will be announced 1 release in advance. Once a method has been deprecated, the next release of the SDK will remove the API.
+
+**[1.0-beta.8]**
+
+* Rename `ApplicationInsightsConfig`to `Configuration` – the former class has been deprecated.
+* `ApplicationInsights.setUserContext(..)` has been deprecated. Use 
 
 **[1.0-beta.7]**
 
@@ -83,7 +92,7 @@ In your module's ```build.gradle```add a dependency for Application Insights
 
 ```groovy
 dependencies {
-    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.7'
+    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.8'
 }
 ```
 
@@ -246,7 +255,7 @@ If you want to explicitly **Disable** automatic collection of life-cycle events 
 
 ```java
 ApplicationInsights.setup(this.getApplicationContext());
-ApplicationInsights.setAutoCollectionDisabled(true); //disable the auto-collection
+ApplicationInsights.disableAutoCollection(); //disable the auto-collection
 ApplicationInsights.start();
 ```
 
@@ -301,7 +310,7 @@ To configure Application Insights according to your needs, first, call
 ApplicationInsights.setup(this.getApplicationContext(), this.getApplication());
 ```
 
-After that you can use `ApplicationInsightsConfig` to customize the behavior and values of the SDK.
+After that you can use `Configuration` to customize the behavior and values of the SDK.
 
 ```java
 ApplicationInsightsConfig config = ApplicationInsights.getConfig();
@@ -347,7 +356,7 @@ You can also configure a different server endpoint for the SDK if needed:
 config.setEndpointUrl("https://myserver.com/v2/track");
 ```
 
-### 9.4 Override sessionID and userID
+### 9.4 Override sessionID and user fields
 
 Application Insights manages the ID of a session for you. If you want to override the generated ID with your own, it can be done like this:
 
@@ -356,17 +365,22 @@ ApplicationInsights.renewSession("New session ID");
 ```
 [**NOTE**] If you want to manage sessions manually, please disable [Automatic Collection of Lifecycle Events](#7).
 
-It's also possible to provide a custom user object to application insights, e.g. to set custom value for the `authUserId`. We're assuming that you know what you do if you customize the user object. Most user's won't need to customize the user object.
+It's also possible to make a lot of custom settings on the `TelemetryContext`of application insights, e.g. to set custom value for the `authUserId`. We're assuming that you know what you do if you customize the user object. Most user's won't need to customize the user object.
+
+To get the TelemetryContext, call:
+```java
+ApplicationInsights.getTelemetryContext();
+```
+
+The telemetryContext has a lot of setters, e.g. to customize the user object.
 
 ```java
-User user = new User();
-//now customize your user object
-ApplicationInsights.setCustomUserContext(user);
+ApplicationInsights.getTelemetryContext().setAccountId("someId");
 ```
 
 ### 9.5 Other
 
-For all available configarion options, see our [Javadoc](http://microsoft.github.io/ApplicationInsights-Android/) for ```ApplicationInsightsConfig```
+For all available configarion options, see our [Javadoc](http://microsoft.github.io/ApplicationInsights-Android/) for ```Configuration```
 
 ##<a name="10"></a> 10. Documentation
 

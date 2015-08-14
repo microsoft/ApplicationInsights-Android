@@ -140,7 +140,7 @@ class AutoCollection implements Application.ActivityLifecycleCallbacks, Componen
      */
     protected static AutoCollection getInstance() {
         if (AutoCollection.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
 
         return AutoCollection.instance;

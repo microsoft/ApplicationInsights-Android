@@ -10,27 +10,23 @@ public class TelemetryContextTests extends AndroidTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        sut = new TelemetryContext(this.getContext(), "ikey", null);
+        TelemetryContext.initialize(getContext(), "iKey", null);
+        sut = TelemetryContext.getSharedInstance();
+        resetUserContext();
+
     }
 
     public void testNewUserContext(){
-
-        // prepare
-        String userId = "userId";
-
-        // test
-        User user = sut.getUser();
-
         // validate
-        Assert.assertNull(user.getAccountId());
-        Assert.assertNull(user.getAccountAcquisitionDate());
-        Assert.assertNull(user.getAuthUserId());
-        Assert.assertNull(user.getAuthUserAcquisitionDate());
-        Assert.assertNull(user.getAnonUserAcquisitionDate());
-        Assert.assertNotSame(userId, user.getId());
+        Assert.assertNull(sut.getAccountId());
+        Assert.assertNull(sut.getUserAcqusitionDate());
+        Assert.assertNull(sut.getUserId());
+        Assert.assertNull(sut.getAuthenticatedUserId());
+        Assert.assertNull(sut.getAuthenticatedUserAcquisitionDate());
+        Assert.assertNull(sut.getAnonymousUserAcquisitionDate());
     }
 
-    public void testLoadOldUserContextIfNotSet(){
+    public void testSavingAndLoadingUserContextWorks(){
 
         // prepare
         String accountId = "accountId";
@@ -40,25 +36,69 @@ public class TelemetryContextTests extends AndroidTestCase {
         String authenticatedUserAcqDate = "authenticatedUserAcqDate";
         String anonUserAcquDate = "anonUserAcquDate";
 
-        // simulate existing user info
-        sut.saveUserInfo(userId, acquisitionDateString, accountId, authenticatedUserId, authenticatedUserAcqDate, anonUserAcquDate);
+        //save user context
+        sut.setAccountId(accountId);
+        sut.setUserAcqusitionDate(acquisitionDateString);
+        sut.setUserId(userId);
+        sut.setAuthenticatedUserId(authenticatedUserId);
+        sut.setAuthenticatedUserAcquisitionDate(authenticatedUserAcqDate);
+        sut.setAnonymousUserAcquisitionDate(anonUserAcquDate);
 
-        // test
-        sut = new TelemetryContext(this.getContext(), "ikey", null);
+        // simulate existing user info
+        User user = null;
+        sut.configUserContext(user);
 
         // verify
-        User loadedUser = sut.getUser();
-        Assert.assertEquals(accountId, loadedUser.getAccountId());
-        Assert.assertEquals(acquisitionDateString, loadedUser.getAccountAcquisitionDate());
-        Assert.assertEquals(userId, loadedUser.getId());
-        Assert.assertEquals(authenticatedUserId, loadedUser.getAuthUserId());
-        Assert.assertEquals(authenticatedUserAcqDate, loadedUser.getAuthUserAcquisitionDate());
-        Assert.assertEquals(anonUserAcquDate, loadedUser.getAnonUserAcquisitionDate());
+        Assert.assertEquals(accountId, sut.getAccountId());
+        Assert.assertEquals(acquisitionDateString, sut.getUserAcqusitionDate());
+        Assert.assertEquals(userId, sut.getUserId());
+        Assert.assertEquals(authenticatedUserId, sut.getAuthenticatedUserId());
+        Assert.assertEquals(authenticatedUserAcqDate, sut.getAuthenticatedUserAcquisitionDate());
+        Assert.assertEquals(anonUserAcquDate, sut.getAnonymousUserAcquisitionDate());
+    }
+
+    public void testNewInstanceGetsSetupWithSharedInstance(){
+
+        // setup
+        TelemetryContext newInstance = TelemetryContext.newInstance();
+
+        // verify
+        Assert.assertEquals(sut.getDeviceModel(), newInstance.getDeviceModel());
+        Assert.assertEquals(sut.getAccountId(), newInstance.getAccountId());
+        Assert.assertEquals(sut.getUserAcqusitionDate(), newInstance.getUserAcqusitionDate());
+        Assert.assertEquals(sut.getUserId(), newInstance.getUserId());
+        Assert.assertEquals(sut.getAuthenticatedUserId(), newInstance.getAuthenticatedUserId());
+        Assert.assertEquals(sut.getAuthenticatedUserAcquisitionDate(), newInstance.getAuthenticatedUserAcquisitionDate());
+        Assert.assertEquals(sut.getAnonymousUserAcquisitionDate(), newInstance.getAnonymousUserAcquisitionDate());
+    }
+
+    public void testNewInstanceWillNotChangeSharedInstance(){
+        TelemetryContext newInstance = TelemetryContext.newInstance();
+        newInstance.setDeviceModel("myDeviceModel");
+        Assert.assertNotSame(sut.getDeviceModel(), newInstance.getDeviceModel());
+    }
+
+    public void testSharedInstanceWillNotChangeNewInstance(){
+        TelemetryContext newInstance = TelemetryContext.newInstance();
+        sut.setDeviceModel("myDeviceModel");
+        Assert.assertNotSame(sut.getDeviceModel(), newInstance.getDeviceModel());
     }
 
     protected void tearDown (){
-
         // reset saved user context
-        sut.saveUserInfo(null, null, null, null, null, null);
+        resetUserContext();
+    }
+
+    // helper
+
+    protected void resetUserContext(){
+        sut.setUserId(null);
+        sut.setAccountId(null);
+        sut.setUserAcqusitionDate(null);
+        sut.setAuthenticatedUserId(null);
+        sut.setAuthenticatedUserAcquisitionDate(null);
+        sut.setAnonymousUserAcquisitionDate(null);
+        User user = null;
+        sut.configUserContext(user);
     }
 }

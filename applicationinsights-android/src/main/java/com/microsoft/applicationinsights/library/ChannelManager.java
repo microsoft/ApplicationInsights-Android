@@ -35,7 +35,7 @@ public class ChannelManager {
      */
 
     protected ChannelManager(ChannelType channelType) {
-        Channel.initialize(ApplicationInsights.getConfig());
+        Channel.initialize(ApplicationInsights.getConfiguration());
         setChannel(channelType);
     }
 
@@ -58,7 +58,7 @@ public class ChannelManager {
      */
     protected static ChannelManager getInstance() {
         if (ChannelManager.instance == null) {
-            InternalLogging.error(TAG, "getInstance was called before initialization");
+            InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
 
         return ChannelManager.instance;
@@ -87,7 +87,7 @@ public class ChannelManager {
             case Default:
                 this.channel = createDefaultChannel();
                 break;
-            case TelemetryClientForAndroid:
+            case CommonLoggingLibraryChannel:
                 this.channel = createTelemetryClientChannel();
                 break;
         }
@@ -115,7 +115,7 @@ public class ChannelManager {
     private IChannel createDefaultChannel() {
         IChannel defaultChannel = Channel.getInstance();
         if(defaultChannel == null) {
-            Channel.initialize(ApplicationInsights.getConfig());
+            Channel.initialize(ApplicationInsights.getConfiguration());
             defaultChannel = Channel.getInstance();
         }
 
@@ -128,7 +128,7 @@ public class ChannelManager {
      */
     private IChannel createTelemetryClientChannel() {
         String iKey = ApplicationInsights.getInstrumentationKey() == null ? "" : ApplicationInsights.getInstrumentationKey();
-        AndroidCll cll = (AndroidCll)AndroidCll.initialize(iKey, ApplicationInsights.INSTANCE.getContext(), ApplicationInsights.getConfig().getEndpointUrl());
+        AndroidCll cll = (AndroidCll)AndroidCll.initialize(iKey, ApplicationInsights.INSTANCE.getContext(), ApplicationInsights.getConfiguration().getEndpointUrl());
         cll.useLagacyCS(true);
         return cll;
     }

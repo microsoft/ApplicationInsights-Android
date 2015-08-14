@@ -5,11 +5,7 @@ import com.microsoft.applicationinsights.library.ApplicationInsights;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-/*
-* @deprecated in 1.0-beta.8, use {@link Configution instead}
- */
-@Deprecated
-public class ApplicationInsightsConfig implements ISenderConfig, ISessionConfig, IQueueConfig {
+public class Configuration implements ISenderConfig, ISessionConfig, IQueueConfig {
 
     // Default values for queue config
     static final int DEBUG_MAX_BATCH_COUNT = 5;
@@ -59,7 +55,9 @@ public class ApplicationInsightsConfig implements ISenderConfig, ISessionConfig,
     /**
      * Constructs a new INSTANCE of a config
      */
-    public ApplicationInsightsConfig() {
+    public Configuration() {
+
+
         // Initialize default values for queue config
         //TODO: If running on a device with developer mode enabled, the default values will be set (move to getter)
         this.maxBatchCount = new AtomicInteger(DEFAULT_MAX_BATCH_COUNT);
