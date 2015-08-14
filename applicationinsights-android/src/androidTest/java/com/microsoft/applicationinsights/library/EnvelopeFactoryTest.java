@@ -2,9 +2,7 @@ package com.microsoft.applicationinsights.library;
 
 import android.test.InstrumentationTestCase;
 
-import com.microsoft.applicationinsights.contracts.Application;
 import com.microsoft.applicationinsights.contracts.DataPoint;
-import com.microsoft.applicationinsights.contracts.Device;
 import com.microsoft.applicationinsights.contracts.EventData;
 import com.microsoft.applicationinsights.contracts.MessageData;
 import com.microsoft.applicationinsights.contracts.MetricData;
@@ -12,7 +10,6 @@ import com.microsoft.applicationinsights.contracts.PageViewData;
 import com.microsoft.applicationinsights.contracts.SessionState;
 import com.microsoft.applicationinsights.contracts.SessionStateData;
 import com.microsoft.applicationinsights.contracts.StackFrame;
-import com.microsoft.applicationinsights.contracts.User;
 import com.microsoft.telemetry.Data;
 import com.microsoft.telemetry.Domain;
 import com.microsoft.telemetry.cs2.Envelope;
@@ -91,7 +88,7 @@ public class EnvelopeFactoryTest extends InstrumentationTestCase {
         String actualName = ((PageViewData) ((Data<Domain>) envelope.getData()).getBaseData()).getName();
         Assert.assertEquals(expectedName, actualName);
 
-        String actualDuration = ((PageViewData)((Data<Domain>)envelope.getData()).getBaseData()).getDuration();
+        String actualDuration = ((PageViewData) ((Data<Domain>) envelope.getData()).getBaseData()).getDuration();
         Assert.assertEquals(String.valueOf(expectedDuration), actualDuration);
 
         String actualBaseType = envelope.getData().getBaseType();
