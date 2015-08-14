@@ -2,6 +2,16 @@
 
 ## 1.0-beta.8
 
+* added CHANGELOG.md
+* Deprecate `track`-Methods of `TelemetryClient`that have a `duration`-parameter
+* The `TelemetryContext`object is now completely exposed for customization – this includes the `User` object.
+* Common Properties can be changed after calling `ApplicationInsights.start()`
+* Some more cleanup
+* `AutoCollection` is now initialized by `TelemetryClient`
+* Improved threat-safety for `AutoCollection`
+* Added spec to run very simple automated UI tests on an Appium device grid (requires additional configuration in case you want to use it)
+* Rename `ApplicationInsightsConfig`to `Configuration` – the former class has been deprecated.
+
 ## 1.0-beta.7
 
 * [BUGFIX] Fixed bug where new user was created instead of loaded existing user from preferences.
