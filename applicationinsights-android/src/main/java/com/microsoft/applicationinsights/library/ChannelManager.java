@@ -1,7 +1,9 @@
 package com.microsoft.applicationinsights.library;
 
 import com.microsoft.applicationinsights.logging.InternalLogging;
-import com.microsoft.cll.Android.AndroidCll;
+
+import com.microsoft.cll.android.AndroidCll;
+
 import com.microsoft.telemetry.IChannel;
 
 /**
