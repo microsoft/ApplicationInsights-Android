@@ -4,22 +4,22 @@ import android.test.AndroidTestCase;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
 
-public class ApplicationInsightsConfigTest extends AndroidTestCase {
+public class ConfigurationTest extends AndroidTestCase {
 
-    private ApplicationInsightsConfig sut;
+    private Configuration sut;
     public void setUp() throws Exception {
         super.setUp();
-        sut = new ApplicationInsightsConfig();
+        sut = new Configuration();
         ApplicationInsights.setDeveloperMode(false);
     }
 
     public void testInitializesCorrectly() throws Exception {
-        assertEquals(ApplicationInsightsConfig.DEFAULT_MAX_BATCH_COUNT, sut.getMaxBatchCount());
-        assertEquals(ApplicationInsightsConfig.DEFAULT_MAX_BATCH_INTERVAL_MS, sut.getMaxBatchIntervalMs());
-        assertEquals(ApplicationInsightsConfig.DEFAULT_ENDPOINT_URL, sut.getEndpointUrl());
-        assertEquals(ApplicationInsightsConfig.DEFAULT_SENDER_READ_TIMEOUT, sut.getSenderReadTimeout());
-        assertEquals(ApplicationInsightsConfig.DEFAULT_SENDER_CONNECT_TIMEOUT, sut.getSenderConnectTimeout());
-        assertEquals(ApplicationInsightsConfig.DEFAULT_SESSION_INTERVAL, sut.getSessionIntervalMs());
+        assertEquals(Configuration.DEFAULT_MAX_BATCH_COUNT, sut.getMaxBatchCount());
+        assertEquals(Configuration.DEFAULT_MAX_BATCH_INTERVAL_MS, sut.getMaxBatchIntervalMs());
+        assertEquals(Configuration.DEFAULT_ENDPOINT_URL, sut.getEndpointUrl());
+        assertEquals(Configuration.DEFAULT_SENDER_READ_TIMEOUT, sut.getSenderReadTimeout());
+        assertEquals(Configuration.DEFAULT_SENDER_CONNECT_TIMEOUT, sut.getSenderConnectTimeout());
+        assertEquals(Configuration.DEFAULT_SESSION_INTERVAL, sut.getSessionIntervalMs());
     }
 
     public void testReturnsDebugValuesInDevMode() throws Exception {
@@ -30,8 +30,8 @@ public class ApplicationInsightsConfigTest extends AndroidTestCase {
 
         // if dev mode enabled, actual values should be ignored
         ApplicationInsights.setDeveloperMode(true);
-        assertEquals(ApplicationInsightsConfig.DEBUG_MAX_BATCH_COUNT, sut.getMaxBatchCount());
-        assertEquals(ApplicationInsightsConfig.DEBUG_MAX_BATCH_INTERVAL_MS, sut.getMaxBatchIntervalMs());
+        assertEquals(Configuration.DEBUG_MAX_BATCH_COUNT, sut.getMaxBatchCount());
+        assertEquals(Configuration.DEBUG_MAX_BATCH_INTERVAL_MS, sut.getMaxBatchIntervalMs());
 
         // if dev mode disabled, actual values should be used
         ApplicationInsights.setDeveloperMode(false);

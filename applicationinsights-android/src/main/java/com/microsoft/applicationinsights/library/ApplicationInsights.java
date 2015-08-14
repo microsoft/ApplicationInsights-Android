@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.microsoft.applicationinsights.contracts.User;
-import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.applicationinsights.library.config.Configuration;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.ref.WeakReference;
@@ -32,7 +32,7 @@ public enum ApplicationInsights {
     /**
      * The configuration of the SDK.
      */
-    private ApplicationInsightsConfig config;
+    private Configuration config;
 
     /**
      * A flag, which determines if sending telemetry data should be disabled. Default is false.
@@ -113,7 +113,7 @@ public enum ApplicationInsights {
      */
     ApplicationInsights() {
         this.channelType = ChannelType.Default;
-        this.config = new ApplicationInsightsConfig();
+        this.config = new Configuration();
     }
 
     /**
@@ -234,7 +234,7 @@ public enum ApplicationInsights {
     /**
      * Triggers persisting and if applicable sending of queued data
      * note: this will be called
-     * {@link com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig#maxBatchIntervalMs} after
+     * {@link Configuration#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
@@ -485,8 +485,19 @@ public enum ApplicationInsights {
      * Gets the configuration for the ApplicationInsights instance
      *
      * @return the instance ApplicationInsights configuration
+     *
+     * @deprecated in 1.0-beta.8, use {@link ApplicationInsights#getConfiguration() instead}
      */
-    public static ApplicationInsightsConfig getConfig() {
+    public static Configuration getConfig() {
+        return INSTANCE.config;
+    }
+
+    /**
+     * Gets the configuration for the ApplicationInsights instance
+     *
+     * @return the Configuration object
+     */
+    public static Configuration getConfiguration() {
         return INSTANCE.config;
     }
 

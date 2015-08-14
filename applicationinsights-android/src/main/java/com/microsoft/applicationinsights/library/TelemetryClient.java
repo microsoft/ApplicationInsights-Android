@@ -3,7 +3,7 @@ package com.microsoft.applicationinsights.library;
 import android.app.Application;
 
 import com.microsoft.applicationinsights.contracts.TelemetryData;
-import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.applicationinsights.library.config.Configuration;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.ref.WeakReference;
@@ -23,7 +23,7 @@ public class TelemetryClient {
     /**
      * The configuration of the SDK.
      */
-    private ApplicationInsightsConfig config;
+    private Configuration config;
 
     /**
      * The shared TelemetryClient instance.
@@ -113,7 +113,7 @@ public class TelemetryClient {
     /**
      * Start auto collection features.
      */
-    protected static void startAutoCollection(TelemetryContext context, ApplicationInsightsConfig config, boolean autoAppearanceEnabled, boolean autoPageViewsEnabled, boolean autoSessionManagementEnabled){
+    protected static void startAutoCollection(TelemetryContext context, Configuration config, boolean autoAppearanceEnabled, boolean autoPageViewsEnabled, boolean autoSessionManagementEnabled){
 
         AutoCollection.initialize(context, config);
 
