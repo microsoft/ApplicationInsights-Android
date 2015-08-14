@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.microsoft.applicationinsights.contracts.User;
-import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.applicationinsights.library.config.Configuration;
 import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.ref.WeakReference;
@@ -32,7 +32,7 @@ public enum ApplicationInsights {
     /**
      * The configuration of the SDK.
      */
-    private ApplicationInsightsConfig config;
+    private Configuration configuration;
 
     /**
      * A flag, which determines if sending telemetry data should be disabled. Default is false.
@@ -109,18 +109,24 @@ public enum ApplicationInsights {
     private ChannelType channelType;
 
     /**
+     * Map of Modules
+     */
+    private static Map<String, Module> modules;
+
+    /**
      * Create ApplicationInsights instance
      */
     ApplicationInsights() {
         this.channelType = ChannelType.Default;
-        this.config = new ApplicationInsightsConfig();
+        this.configuration = new Configuration();
     }
 
     /**
      * Configure Application Insights
      * Note: This should be called before start
      *
-     * @param application the application context the application needed for auto collecting telemetry data
+     * @param context     the application context associated with Application Insights
+     * @param application the application needed for auto collecting telemetry data
      */
     public static void setup(Context context, Application application) {
         ApplicationInsights.INSTANCE.setupInstance(context, application, null);
@@ -136,6 +142,30 @@ public enum ApplicationInsights {
      */
     public static void setup(Context context, Application application, String instrumentationKey) {
         ApplicationInsights.INSTANCE.setupInstance(context, application, instrumentationKey);
+        initializeModuleForName("default", context, application, instrumentationKey);
+    }
+
+    private static void initializeModuleForName(String moduleName, Context context, Application application, String instrumentationKey) {
+        Module module = new Module(moduleName, context, application, instrumentationKey);
+
+        if(modules == null) {
+            modules = Collections.synchronizedMap(new HashMap<String, Module>(3));//TODO how many modules are realistic?
+            modules.put(moduleName, module);
+        }
+        else {
+            if(modules.containsKey(moduleName)) {
+                InternalLogging.warn(TAG, "Already initialized module with name: " + moduleName);
+            }
+            else {
+                modules.put(moduleName, module);
+            }
+        }
+    }
+
+    public static void addModule(String moduleName, String instrumentationKey, Context context, Application application) {
+        //TODO: in case context and application are null -> use default context/application
+        //TODO: each new module == clone of default module
+        initializeModuleForName(moduleName, context, application,  instrumentationKey);
     }
 
     /**
@@ -178,6 +208,13 @@ public enum ApplicationInsights {
      */
     public static void start() {
         INSTANCE.startInstance();
+
+        HashMap<String, HashMap> selects = new HashMap<String, HashMap>();
+
+        for(Map.Entry<String, HashMap> entry : selects.entrySet()) {
+            String key = entry.getKey();
+            modules.get(key).start();
+        }
     }
 
     /**
@@ -219,7 +256,7 @@ public enum ApplicationInsights {
         EnvelopeFactory.initialize(telemetryContext, this.commonProperties);
 
         Persistence.initialize(context);
-        Sender.initialize(this.config);
+        Sender.initialize(this.configuration);
         ChannelManager.initialize(channelType);
 
         // Initialize Telemetry
@@ -228,19 +265,19 @@ public enum ApplicationInsights {
             application = this.weakApplication.get();
         }
         TelemetryClient.initialize(!this.telemetryDisabled, application);
-        TelemetryClient.startAutoCollection(this.telemetryContext, this.config, !this.autoAppearanceDisabled, !this.autoPageViewsDisabled, !this.autoSessionManagementDisabled);
+        TelemetryClient.startAutoCollection(this.telemetryContext, this.configuration, !this.autoAppearanceDisabled, !this.autoPageViewsDisabled, !this.autoSessionManagementDisabled);
     }
 
     /**
      * Triggers persisting and if applicable sending of queued data
      * note: this will be called
-     * {@link com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig#maxBatchIntervalMs} after
+     * {@link Configuration#maxBatchIntervalMs} after
      * tracking any telemetry so it is not necessary to call this in most cases.
      */
     public static void sendPendingData() {
         if (!isSetupAndRunning) {
             InternalLogging.warn(TAG, "Could not set send pending data, because " +
-                    "ApplicationInsights has not been started, yet.");
+                  "ApplicationInsights has not been started, yet.");
             return;
         }
         ChannelManager.getInstance().getChannel().synchronize();
@@ -273,9 +310,9 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void enableAutoPageViewTracking() {
-        if(isSetupAndRunning){
+        if (isSetupAndRunning) {
             TelemetryClient.getInstance().enableAutoPageViewTracking();
-        }else{
+        } else {
             INSTANCE.autoPageViewsDisabled = false;
         }
     }
@@ -286,9 +323,9 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void disableAutoPageViewTracking() {
-        if(isSetupAndRunning){
+        if (isSetupAndRunning) {
             TelemetryClient.getInstance().disableAutoPageViewTracking();
-        }else{
+        } else {
             INSTANCE.autoPageViewsDisabled = true;
         }
     }
@@ -299,9 +336,9 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void enableAutoSessionManagement() {
-        if(isSetupAndRunning){
+        if (isSetupAndRunning) {
             TelemetryClient.getInstance().enableAutoSessionManagement();
-        }else{
+        } else {
             INSTANCE.autoSessionManagementDisabled = false;
         }
     }
@@ -312,9 +349,9 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void disableAutoSessionManagement() {
-        if(isSetupAndRunning){
+        if (isSetupAndRunning) {
             TelemetryClient.getInstance().disableAutoSessionManagement();
-        }else{
+        } else {
             INSTANCE.autoSessionManagementDisabled = true;
         }
     }
@@ -325,9 +362,9 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void enableAutoAppearanceTracking() {
-        if(isSetupAndRunning){
+        if (isSetupAndRunning) {
             TelemetryClient.getInstance().enableAutoAppearanceTracking();
-        }else{
+        } else {
             INSTANCE.autoAppearanceDisabled = false;
         }
     }
@@ -338,9 +375,9 @@ public enum ApplicationInsights {
      * with an application.
      */
     public static void disableAutoAppearanceTracking() {
-        if(isSetupAndRunning){
+        if (isSetupAndRunning) {
             TelemetryClient.getInstance().disableAutoAppearanceTracking();
-        }else{
+        } else {
             INSTANCE.autoAppearanceDisabled = true;
         }
     }
@@ -414,6 +451,7 @@ public enum ApplicationInsights {
     /**
      * Activates the developer mode which. It enables extensive logging as well as use different
      * settings for batching. Batch Size in debug mode is 5 and sending interval is 3s.
+     *
      * @param developerMode if true, developer mode will be activated
      */
     public static void setDeveloperMode(boolean developerMode) {
@@ -422,6 +460,7 @@ public enum ApplicationInsights {
 
     /**
      * Check if developerMode is activated
+     *
      * @return flag indicating activated developer mode
      */
     public static boolean isDeveloperMode() {
@@ -470,6 +509,15 @@ public enum ApplicationInsights {
         return context;
     }
 
+    Application getApplication() {
+        Application application = null;
+        if(this.weakApplication != null) {
+            application = this.weakApplication.get();
+        }
+
+        return application;
+    }
+
     /* Writes instructions on how to configure the instrumentation key.
         */
     private static void logInstrumentationInstructions() {
@@ -486,8 +534,8 @@ public enum ApplicationInsights {
      *
      * @return the instance ApplicationInsights configuration
      */
-    public static ApplicationInsightsConfig getConfig() {
-        return INSTANCE.config;
+    public static Configuration getConfiguration() {
+        return INSTANCE.configuration;
     }
 
     /**
@@ -496,9 +544,9 @@ public enum ApplicationInsights {
      * @return the instance ApplicationInsights configuration
      */
     public static TelemetryContext getTelemetryContext() {
-        if(!isConfigured){
+        if (!isConfigured) {
             InternalLogging.warn(TAG, "Global telemetry context has not been set up, yet. " +
-                    "You need to call setup() first.");
+                  "You need to call setup() first.");
             return null;
         }
         return INSTANCE.telemetryContext;

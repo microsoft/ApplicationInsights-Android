@@ -1,6 +1,6 @@
 package com.microsoft.applicationinsights.library;
 
-import com.microsoft.applicationinsights.library.config.ApplicationInsightsConfig;
+import com.microsoft.applicationinsights.library.config.Configuration;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -13,7 +13,7 @@ public class SenderTest extends TestCase {
 
     public void setUp() throws Exception {
         super.setUp();
-        ApplicationInsightsConfig config = new ApplicationInsightsConfig();
+        Configuration config = new Configuration();
         this.sut = new Sender(config);
     }
 
@@ -24,7 +24,7 @@ public class SenderTest extends TestCase {
 
     public void testCallGetInstanceTwiceReturnsSameObject(){
 
-        Sender.initialize(new ApplicationInsightsConfig());
+        Sender.initialize(new Configuration());
         Sender sender1 = Sender.getInstance();
         Sender sender2 = Sender.getInstance();
 
