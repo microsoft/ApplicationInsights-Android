@@ -117,7 +117,7 @@ public class TelemetryContext {
     /**
      * Operation telemetryContext.
      */
-    private Operation operation;
+    private final Operation operation;
 
     private TelemetryContext() {
         this.operation = new Operation();
