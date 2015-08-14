@@ -389,7 +389,7 @@ public class TelemetryClient {
 
     /**
      * Enable auto page view tracking. This feature only works if
-     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     * {@link TelemetryClient#initialize} has been called before.
      */
     protected void enableAutoPageViewTracking() {
         synchronized (TelemetryClient.LOCK) {
@@ -402,7 +402,7 @@ public class TelemetryClient {
 
     /**
      * Disable auto page view tracking. This feature only works if
-     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     * {@link TelemetryClient#initialize} has been called before.
      */
     protected void disableAutoPageViewTracking() {
         synchronized (TelemetryClient.LOCK) {
@@ -415,7 +415,7 @@ public class TelemetryClient {
 
     /**
      * Enable auto session management tracking. This feature only works if
-     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     * {@link TelemetryClient#initialize} has been called before.
      */
     protected void enableAutoSessionManagement() {
         synchronized (TelemetryClient.LOCK) {
@@ -428,7 +428,7 @@ public class TelemetryClient {
 
     /**
      * Disable auto session management tracking. This feature only works if
-     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     * {@link TelemetryClient#initialize} has been called before.
      */
     protected void disableAutoSessionManagement() {
         synchronized (TelemetryClient.LOCK) {
@@ -441,7 +441,7 @@ public class TelemetryClient {
 
     /**
      * Enable auto appearance management tracking. This feature only works if
-     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     * {@link TelemetryClient#initialize} has been called before.
      */
     protected void enableAutoAppearanceTracking() {
         synchronized (TelemetryClient.LOCK) {
@@ -454,7 +454,7 @@ public class TelemetryClient {
 
     /**
      * Disable auto appearance management tracking. This feature only works if
-     * {@link TelemetryClient#initialize(boolean, Application)} has been called before.
+     * {@link TelemetryClient#initialize} has been called before.
      */
     protected void disableAutoAppearanceTracking() {
         synchronized (TelemetryClient.LOCK) {
