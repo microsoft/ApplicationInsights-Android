@@ -66,7 +66,7 @@ before(:all) do
       caps: {
         #Appium capabilities for android app
         #Add
-        app: '{PATH TO APK}',
+        app: 'URL TO APK',
         appPackage: 'com.microsoft.applicationinsights.sampleapp',
         appActivity: 'com.microsoft.applicationinsights.appsample.ItemListActivity',
         platform: 'WINDOWS',  
@@ -77,7 +77,7 @@ before(:all) do
         olympusSessionId: randomId,
         launchTimeout: 5000
       },
-      appium_lib: {server_url: '{URL OF DEVICE LAB}'}
+      appium_lib: {server_url: 'URL OF DEVICE LAB'}
     }  
   # appium specific driver with helpers available
   @driver = Appium::Driver.new(options).start_driver
