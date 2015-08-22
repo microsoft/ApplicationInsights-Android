@@ -152,11 +152,15 @@ class TrackDataOperation implements Runnable {
 
     @Override
     public void run() {
-        Data<Domain> telemetry = getTelemetry();
+        boolean highPrioItem = (type == DataType.UNHANDLED_EXCEPTION) || (type == DataType.MANAGED_EXCEPTION && !handled);
+        if(!Persistence.getInstance().isFreeSpaceAvailable(highPrioItem)){
+            return;
+        }
 
+        Data<Domain> telemetry = getTelemetry();
         if (telemetry != null) {
             IChannel channel = ChannelManager.getInstance().getChannel();
-            if (type == DataType.UNHANDLED_EXCEPTION || type == DataType.MANAGED_EXCEPTION) {
+            if (highPrioItem) {
                 ((Channel)Channel.getInstance()).processException(telemetry);
             } else {
                 telemetry.getBaseData().QualifiedName = telemetry.getBaseType();
@@ -174,12 +178,11 @@ class TrackDataOperation implements Runnable {
 
     private Data<Domain> getTelemetry() {
         Data<Domain> telemetry = null;
-        if ((this.type == DataType.UNHANDLED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
+        if ((this.type == DataType.UNHANDLED_EXCEPTION)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties, this.measurements);
-        }else if ((this.type == DataType.MANAGED_EXCEPTION) && Persistence.getInstance().isFreeSpaceAvailable(true)) {
+        }else if ((this.type == DataType.MANAGED_EXCEPTION)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.name, this.exceptionMessage, this.exceptionStacktrace, this.handled);
-
-        } else if (Persistence.getInstance().isFreeSpaceAvailable(false)) {
+        } else {
             switch (this.type) {
                 case NONE:
                     if (this.telemetry != null) {
