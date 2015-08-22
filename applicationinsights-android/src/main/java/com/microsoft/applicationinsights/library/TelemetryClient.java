@@ -8,16 +8,18 @@ import com.microsoft.applicationinsights.logging.InternalLogging;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The public API for recording application insights telemetry.
  */
 public class TelemetryClient {
 
-    private static final int THREADS = 10;
     private static final String TAG = "TelemetryClient";
 
     /**
@@ -48,7 +50,7 @@ public class TelemetryClient {
     /**
      * Executor service for running track operations on several threads.
      */
-    private ExecutorService executorService;
+    private ThreadPoolExecutor threadPoolExecutor;
 
     /**
      * A flag, which determines if auto page views should be disabled.
@@ -80,14 +82,30 @@ public class TelemetryClient {
      */
     protected TelemetryClient(boolean telemetryEnabled) {
         this.telemetryEnabled = telemetryEnabled;
-        this.executorService = Executors.newFixedThreadPool(THREADS, new ThreadFactory() {
+        configThreadPool();
+    }
+
+    private void configThreadPool(){
+        int corePoolSize = 5;
+        int maxPoolSize = 10;
+        int queueSize = 5;
+        long timeout = 1;
+        ArrayBlockingQueue<Runnable> queue= new ArrayBlockingQueue<Runnable>(queueSize);
+        ThreadFactory threadFactory = new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
                 Thread thread = new Thread(r);
                 thread.setDaemon(false);
                 return thread;
             }
-        });
+        };
+        RejectedExecutionHandler handler = new RejectedExecutionHandler() {
+            @Override
+            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                InternalLogging.error(TAG, "too many track() calls at a time");
+            }
+        };
+        threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, timeout, TimeUnit.SECONDS, queue, threadFactory, handler);
     }
 
     /**
@@ -172,7 +190,7 @@ public class TelemetryClient {
      */
     public void track(TelemetryData telemetry) {
         if (isTelemetryEnabled()) {
-            this.executorService.execute(new TrackDataOperation(telemetry));
+            this.threadPoolExecutor.execute(new TrackDataOperation(telemetry));
         }
     }
 
@@ -189,8 +207,8 @@ public class TelemetryClient {
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if (isTelemetryEnabled()) {
-            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.EVENT,
-                  eventName, properties, measurements));
+            this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.EVENT,
+                    eventName, properties, measurements));
         }
     }
 
@@ -212,8 +230,8 @@ public class TelemetryClient {
      */
     public void trackTrace(String message, Map<String, String> properties) {
         if (isTelemetryEnabled()) {
-            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.TRACE,
-                  message, properties, null));
+            this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.TRACE,
+                    message, properties, null));
         }
     }
 
@@ -239,7 +257,7 @@ public class TelemetryClient {
      */
     public void trackMetric(String name, double value, Map<String, String> properties) {
         if (isTelemetryEnabled()) {
-            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value, properties));
+            this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.METRIC, name, value, properties));
         }
     }
 
@@ -273,8 +291,8 @@ public class TelemetryClient {
      */
     public void trackHandledException(Throwable handledException, Map<String, String> properties, Map<String, Double> measurements) {
         if (isTelemetryEnabled()) {
-            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
-                  handledException, properties, measurements));
+            this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
+                    handledException, properties, measurements));
         }
     }
 
@@ -319,8 +337,8 @@ public class TelemetryClient {
      */
     public void trackPageView(String pageName, Map<String, String> properties, Map<String, Double> measurements) {
         if (isTelemetryEnabled()) {
-            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
-                  pageName, properties, measurements));
+            this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
+                    pageName, properties, measurements));
         }
     }
 
@@ -360,8 +378,8 @@ public class TelemetryClient {
           Map<String, String> properties,
           Map<String, Double> measurements) {
         if (isTelemetryEnabled()) {
-            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
-                  pageName, duration, properties, measurements));
+            this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
+                    pageName, duration, properties, measurements));
         }
     }
 
@@ -370,7 +388,7 @@ public class TelemetryClient {
      */
     public void trackNewSession() {
         if (isTelemetryEnabled()) {
-            this.executorService.execute(new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION));
+            this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.NEW_SESSION));
         }
     }
 
