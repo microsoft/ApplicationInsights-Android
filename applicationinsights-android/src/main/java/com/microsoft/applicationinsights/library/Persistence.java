@@ -132,7 +132,7 @@ class Persistence {
         Boolean isSuccess = false;
         Context context = this.getContext();
         if (context != null) {
-            FileOutputStream outputStream;
+            FileOutputStream outputStream = null;
             try {
                 File filesDir = getContext().getFilesDir();
                 if (highPriority) {
@@ -145,13 +145,20 @@ class Persistence {
                     InternalLogging.warn(TAG, "Saving data" + "REGULAR PRIO");
                 }
                 outputStream.write(data.getBytes());
-                outputStream.close();
+
                 isSuccess = true;
                 InternalLogging.warn(TAG, "Saved data");
-
             } catch (Exception e) {
                 //Do nothing
                 InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
+            }finally {
+                if(outputStream != null){
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
 
@@ -167,11 +174,11 @@ class Persistence {
     protected String load(File file) {
         StringBuilder buffer = new StringBuilder();
         if (file != null) {
+            BufferedReader reader = null;
             try {
                 FileInputStream inputStream = new FileInputStream(file);
                 InputStreamReader streamReader = new InputStreamReader(inputStream);
-                BufferedReader reader = new BufferedReader(streamReader);
-
+                reader = new BufferedReader(streamReader);
                 //comment: we can't use BufferedReader's readline() as this removes linebreaks that
                 //are required for JSON stream
                 int c;
@@ -179,10 +186,19 @@ class Persistence {
                     //Cast c to char. As it's not -1, we won't get a problem
                     buffer.append((char) c);
                 }
-                reader.close();
             } catch (Exception e) {
                 InternalLogging.warn(TAG, "Error reading telemetry data from file with exception message "
                       + e.getMessage());
+            }finally {
+
+                try{
+                    if(reader != null) {
+                        reader.close();
+                    }
+                }catch (IOException e){
+                    InternalLogging.warn(TAG, "Error closing stream."
+                                + e.getMessage());
+                }
             }
         }
 
