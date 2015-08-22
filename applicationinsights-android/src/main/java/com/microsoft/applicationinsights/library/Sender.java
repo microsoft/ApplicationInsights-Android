@@ -92,11 +92,11 @@ class Sender {
         return Sender.instance;
     }
 
-    protected void sendDataOnAppStart() {
-        kickOffAsyncSendingTask().execute();
+    protected void triggerSending() {
+        Util.executeTask(createSenderTask());
     }
 
-    private AsyncTask<Void, Void, Void> kickOffAsyncSendingTask() {
+    private AsyncTask<Void, Void, Void> createSenderTask() {
         return new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -111,7 +111,7 @@ class Sender {
         //create an async task if necessary
         if (Looper.myLooper() == Looper.getMainLooper()) {
             InternalLogging.info(TAG, "Kick of new async task", "");
-            kickOffAsyncSendingTask().execute();
+            Util.executeTask(createSenderTask());
         } else {
             if (runningRequestCount() < 10) {
                 // Send the persisted data

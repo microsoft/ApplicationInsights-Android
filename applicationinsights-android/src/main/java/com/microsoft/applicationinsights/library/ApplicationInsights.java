@@ -196,7 +196,7 @@ public enum ApplicationInsights {
             initializePipeline(context);
             startCrashReporting();
 
-            Sender.getInstance().sendDataOnAppStart();
+            Sender.getInstance().triggerSending();
             InternalLogging.info(TAG, "ApplicationInsights has been started.", "");
             isSetupAndRunning = true;
         }
