@@ -30,7 +30,7 @@ class Sender {
 
     private static final String TAG = "Sender";
 
-    private static final int SENDER_COUNT = 10;
+    private static final int SENDER_COUNT = 3;
     /**
      * Synchronization LOCK for setting static config.
      */
@@ -216,6 +216,7 @@ class Sender {
             StringBuilder builder = new StringBuilder();
             if (isExpected(responseCode)) {
                 this.onExpected(connection, builder);
+                sendNextFile();
             } else {
                 this.onUnexpected(connection, responseCode, builder);
             }
