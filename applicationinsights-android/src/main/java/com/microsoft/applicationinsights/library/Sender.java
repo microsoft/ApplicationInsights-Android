@@ -29,6 +29,8 @@ import java.util.zip.GZIPOutputStream;
 class Sender {
 
     private static final String TAG = "Sender";
+
+    private static final int SENDER_COUNT = 10;
     /**
      * Synchronization LOCK for setting static config.
      */
@@ -112,7 +114,7 @@ class Sender {
             InternalLogging.info(TAG, "Kick of new async task", "");
             Util.executeTask(createSenderTask());
         } else {
-            if (runningRequestCount() < 10) {
+            if (runningRequestCount() < SENDER_COUNT) {
                 this.operationsCount.getAndIncrement();
                 System.out.println("Sending Operation Instance " + runningRequestCount());
                 // Send the persisted data
