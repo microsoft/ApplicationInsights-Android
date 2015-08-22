@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -100,22 +101,20 @@ class Persistence {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
             Sender.getInstance().sendNextFile();
-            return; //return immediately,as no free space is available
-        }
-
-        StringBuilder buffer = new StringBuilder();
-        Boolean isSuccess;
-        for (String aData : data) {
-            buffer.append('\n');
-            buffer.append(aData);
-        }
-
-        String serializedData = buffer.toString();
-        isSuccess = this.writeToDisk(serializedData, highPriority);
-        if (isSuccess) {
-            Sender sender = Sender.getInstance();
-            if (sender != null && !highPriority) {
-                sender.sendNextFile();
+        }else{
+            StringBuilder buffer = new StringBuilder();
+            Boolean isSuccess;
+            for (String aData : data) {
+                buffer.append('\n');
+                buffer.append(aData);
+            }
+            String serializedData = buffer.toString();
+            isSuccess = this.writeToDisk(serializedData, highPriority);
+            if (isSuccess) {
+                Sender sender = Sender.getInstance();
+                if (sender != null && !highPriority) {
+                    Sender.getInstance().sendNextFile();
+                }
             }
         }
     }
