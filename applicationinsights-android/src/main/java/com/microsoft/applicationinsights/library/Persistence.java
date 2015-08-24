@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -100,22 +101,20 @@ class Persistence {
         if (!this.isFreeSpaceAvailable(highPriority)) {
             InternalLogging.warn(TAG, "No free space on disk to flush data.");
             Sender.getInstance().sendNextFile();
-            return; //return immediately,as no free space is available
-        }
-
-        StringBuilder buffer = new StringBuilder();
-        Boolean isSuccess;
-        for (String aData : data) {
-            buffer.append('\n');
-            buffer.append(aData);
-        }
-
-        String serializedData = buffer.toString();
-        isSuccess = this.writeToDisk(serializedData, highPriority);
-        if (isSuccess) {
-            Sender sender = Sender.getInstance();
-            if (sender != null && !highPriority) {
-                sender.sendNextFile();
+        }else{
+            StringBuilder buffer = new StringBuilder();
+            Boolean isSuccess;
+            for (String aData : data) {
+                buffer.append('\n');
+                buffer.append(aData);
+            }
+            String serializedData = buffer.toString();
+            isSuccess = this.writeToDisk(serializedData, highPriority);
+            if (isSuccess) {
+                Sender sender = Sender.getInstance();
+                if (sender != null && !highPriority) {
+                    Sender.getInstance().sendNextFile();
+                }
             }
         }
     }
@@ -132,7 +131,7 @@ class Persistence {
         Boolean isSuccess = false;
         Context context = this.getContext();
         if (context != null) {
-            FileOutputStream outputStream;
+            FileOutputStream outputStream = null;
             try {
                 File filesDir = getContext().getFilesDir();
                 if (highPriority) {
@@ -145,13 +144,20 @@ class Persistence {
                     InternalLogging.warn(TAG, "Saving data" + "REGULAR PRIO");
                 }
                 outputStream.write(data.getBytes());
-                outputStream.close();
+
                 isSuccess = true;
                 InternalLogging.warn(TAG, "Saved data");
-
             } catch (Exception e) {
                 //Do nothing
                 InternalLogging.warn(TAG, "Failed to save data with exception: " + e.toString());
+            }finally {
+                if(outputStream != null){
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
 
@@ -167,11 +173,11 @@ class Persistence {
     protected String load(File file) {
         StringBuilder buffer = new StringBuilder();
         if (file != null) {
+            BufferedReader reader = null;
             try {
                 FileInputStream inputStream = new FileInputStream(file);
                 InputStreamReader streamReader = new InputStreamReader(inputStream);
-                BufferedReader reader = new BufferedReader(streamReader);
-
+                reader = new BufferedReader(streamReader);
                 //comment: we can't use BufferedReader's readline() as this removes linebreaks that
                 //are required for JSON stream
                 int c;
@@ -179,10 +185,19 @@ class Persistence {
                     //Cast c to char. As it's not -1, we won't get a problem
                     buffer.append((char) c);
                 }
-                reader.close();
             } catch (Exception e) {
                 InternalLogging.warn(TAG, "Error reading telemetry data from file with exception message "
                       + e.getMessage());
+            }finally {
+
+                try{
+                    if(reader != null) {
+                        reader.close();
+                    }
+                }catch (IOException e){
+                    InternalLogging.warn(TAG, "Error closing stream."
+                                + e.getMessage());
+                }
             }
         }
 

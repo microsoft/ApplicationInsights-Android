@@ -29,6 +29,8 @@ import java.util.zip.GZIPOutputStream;
 class Sender {
 
     private static final String TAG = "Sender";
+
+    private static final int SENDER_COUNT = 3;
     /**
      * Synchronization LOCK for setting static config.
      */
@@ -88,15 +90,14 @@ class Sender {
         if (Sender.instance == null) {
             InternalLogging.error(TAG, "getSharedInstance was called before initialization");
         }
-
         return Sender.instance;
     }
 
-    protected void sendDataOnAppStart() {
-        kickOffAsyncSendingTask().execute();
+    protected void triggerSending() {
+        Util.executeTask(createSenderTask());
     }
 
-    private AsyncTask<Void, Void, Void> kickOffAsyncSendingTask() {
+    private AsyncTask<Void, Void, Void> createSenderTask() {
         return new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -111,9 +112,11 @@ class Sender {
         //create an async task if necessary
         if (Looper.myLooper() == Looper.getMainLooper()) {
             InternalLogging.info(TAG, "Kick of new async task", "");
-            kickOffAsyncSendingTask().execute();
+            Util.executeTask(createSenderTask());
         } else {
-            if (runningRequestCount() < 10) {
+            if (runningRequestCount() < SENDER_COUNT) {
+                this.operationsCount.getAndIncrement();
+                System.out.println("Sending Operation Instance " + runningRequestCount());
                 // Send the persisted data
                 if (this.persistence != null) {
                     File fileToSend = this.persistence.nextAvailableFile();
@@ -121,6 +124,7 @@ class Sender {
                         send(fileToSend);
                     }
                 }
+                this.operationsCount.getAndDecrement();
             } else {
                 InternalLogging.info(TAG, "We have already 10 pending reguests", "");
             }
@@ -132,15 +136,12 @@ class Sender {
         String persistedData = this.persistence.load(fileToSend);
         if (!persistedData.isEmpty()) {
             try {
-                this.operationsCount.getAndIncrement();
                 this.sendRequestWithPayload(persistedData, fileToSend);
             } catch (IOException e) {
                 InternalLogging.warn(TAG, "Couldn't send request with IOException: " + e.toString());
-                this.operationsCount.getAndDecrement();
             }
         } else {
             this.persistence.deleteFile(fileToSend);
-            sendNextFile();
         }
     }
 
@@ -200,9 +201,6 @@ class Sender {
      * @param fileToSend   reference to the file we want to send
      */
     protected void onResponse(HttpURLConnection connection, int responseCode, String payload, File fileToSend) {
-        this.operationsCount.getAndDecrement();
-
-
         InternalLogging.info(TAG, "response code", Integer.toString(responseCode));
 
         boolean isRecoverableError = isRecoverableError(responseCode);
@@ -218,7 +216,7 @@ class Sender {
             StringBuilder builder = new StringBuilder();
             if (isExpected(responseCode)) {
                 this.onExpected(connection, builder);
-                this.sendNextFile();
+                sendNextFile();
             } else {
                 this.onUnexpected(connection, responseCode, builder);
             }

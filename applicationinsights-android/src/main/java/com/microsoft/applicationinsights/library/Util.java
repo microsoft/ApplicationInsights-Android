@@ -1,5 +1,6 @@
 package com.microsoft.applicationinsights.library;
 
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Debug;
 
@@ -125,5 +126,16 @@ class Util {
      */
     protected static boolean isLifecycleTrackingAvailable() {
         return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH);
+    }
+
+    /**
+     * Executes an async task depending on the os version the app runs on
+     */
+    public static void executeTask(AsyncTask<Void, ?, ?> asyncTask) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            asyncTask.execute();
+        } else {
+            asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
     }
 }
