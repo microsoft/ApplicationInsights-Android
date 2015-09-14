@@ -105,7 +105,9 @@ class Persistence {
             StringBuilder buffer = new StringBuilder();
             Boolean isSuccess;
             for (String aData : data) {
-                buffer.append('\n');
+                if(buffer.length() > 0){
+                    buffer.append('\n');
+                }
                 buffer.append(aData);
             }
             String serializedData = buffer.toString();
