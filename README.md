@@ -2,7 +2,7 @@
 
 # Application Insights for Android (1.0-beta.8)
 
-This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/en-us/services/application-insights/) is a service that allows developers to keep their applications available, performing, and succeeding. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
+This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/services/application-insights/) is a service for monitoring the performance and usage of your apps. This module allows you to send telemetry of various kinds (events, traces, exceptions, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
 The minimum SDK to use the Application Insights SDK in your app is 9.
 
@@ -96,9 +96,14 @@ dependencies {
 }
 ```
 
-### 3.2 Configure the instrumentation key
+### 3.2 Get the Instrumentation Key of an Application Insights resource
 
-Please see the "[Getting an Application Insights Instrumentation Key](https://github.com/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key)" section of the wiki for more information on acquiring a key.
+To view your telemetry, you'll need an Application Insights resource in the [Microsoft Azure Portal](https://portal.azure.com). You can either:
+
+* [Create a new resource](https://azure.microsoft.com/documentation/articles/app-insights-create-new-resource/); or
+* Use the same resource that you created to monitor your web service [on ASP.NET](https://azure.microsoft.com/documentation/articles/app-insights-asp-net/) or [on J2EE](https://azure.microsoft.com/documentation/articles/app-insights-java-get-started/).
+
+Open your resource, open the Essentials drop-down. You'll need to copy the Instrumentation Key shortly.
 
 ### 3.3 Add permissions
 
@@ -199,7 +204,7 @@ ApplicationInsights.setDeveloperMode(false);
 
 ## <a name="6"></a> 6. Basic Usage  ##
 
-The ```TelemetryClient```-instance provides various methods to track events, traces, metrics page views, and handled exceptions.
+The ```TelemetryClient```-instance provides various methods to track events, traces, metrics page views, and handled exceptions. To view metrics and event counts on the portal, use [Metric Explorer](https://azure.microsoft.com/documentation/articles/app-insights-metrics-explorer/). To inspect events, traces and exceptions, use [Search](https://azure.microsoft.com/documentation/articles/app-insights-diagnostic-search/).
 
 ```java
 	
@@ -242,6 +247,8 @@ properties.put("property1", "my custom property");
 client.trackEvent("sample event", properties);
 
 ```
+
+See the [Guide to the API](https://azure.microsoft.com/documentation/articles/app-insights-api-custom-events-metrics/) for more about using the API and viewing the results.
 
 ## <a name="7"></a>7. Automatic collection of life-cycle events (Sessions & Page Views)
 
