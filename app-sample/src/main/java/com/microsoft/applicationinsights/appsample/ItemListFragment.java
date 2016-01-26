@@ -148,6 +148,9 @@ public class ItemListFragment extends ListFragment {
             case 7:
                 TelemetryClient.getInstance().trackEvent("My Event");
                 break;
+            case 8:
+                TelemetryClient.getInstance().trackMetric("SomeMetric", 2.0);
+                break;
             default:
                 break;
         }

@@ -31,6 +31,7 @@ public class DummyContent {
         addItem(new DummyItem("6", "Crash the App!"));
         addItem(new DummyItem("7", "Trigger Synchronize"));
         addItem(new DummyItem("8", "Track event"));
+        addItem(new DummyItem("9", "Send Metric"));
     }
 
     private static void addItem(DummyItem item) {
