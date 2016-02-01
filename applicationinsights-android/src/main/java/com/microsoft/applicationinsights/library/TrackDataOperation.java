@@ -14,47 +14,29 @@ import java.util.Map;
 
 class TrackDataOperation implements Runnable {
 
-    protected enum DataType {
-        NONE,
-        EVENT,
-        TRACE,
-        METRIC,
-        PAGE_VIEW,
-        HANDLED_EXCEPTION,
-        UNHANDLED_EXCEPTION,
-        MANAGED_EXCEPTION,
-        NEW_SESSION
-    }
-
     // common
     private final DataType type;
     private String name;
     private Map<String, String> properties;
     private Map<String, Double> measurements;
-
     // managed exceptions
     private String exceptionMessage;
     private String exceptionStacktrace;
     private boolean handled;
-
     // metric
     private double metric;
-
     // unmanaged exceptions
     private Throwable exception;
-
     // page views
     private long duration;
-
     // custom
     private TelemetryData telemetry;
 
     protected TrackDataOperation(TelemetryData telemetry) {
         this.type = DataType.NONE;
         try {
-            this.telemetry = (TelemetryData)deepCopy(telemetry);
-        }
-        catch (Exception e) {
+            this.telemetry = (TelemetryData) deepCopy(telemetry);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -62,9 +44,8 @@ class TrackDataOperation implements Runnable {
     protected TrackDataOperation(DataType type, String name) {
         this.type = type;
         try {
-            this.name = (String)deepCopy(name);
-        }
-        catch (Exception e) {
+            this.name = (String) deepCopy(name);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -74,15 +55,9 @@ class TrackDataOperation implements Runnable {
     }
 
     protected TrackDataOperation(DataType type, String metricName, double metric, Map<String, String> properties) {
-        this.type = type; // no need to copy as enum is pass by value
+        this(type, metricName, properties, null);
+
         this.metric = metric;  // no need to copy as enum is pass by value
-        try {
-            this.name = (String) deepCopy(metricName);
-            this.properties = new HashMap<String, String>(properties);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     protected TrackDataOperation(DataType type,
@@ -92,14 +67,13 @@ class TrackDataOperation implements Runnable {
         this.type = type; // no need to copy as enum is pass by value
         try {
             this.name = (String) deepCopy(name);
-            if(properties != null) {
+            if (properties != null) {
                 this.properties = new HashMap<String, String>(properties);
             }
-            if(measurements != null) {
+            if (measurements != null) {
                 this.measurements = new HashMap<String, Double>(measurements);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -118,17 +92,11 @@ class TrackDataOperation implements Runnable {
                                  Throwable exception,
                                  Map<String, String> properties,
                                  Map<String, Double> measurements) {
-        this.type = type; // no need to copy as enum is pass by value
+        this(type, "", properties, measurements);
         try {
             this.exception = (Throwable) deepCopy(exception);
-            if(properties != null) {
-                this.properties = new HashMap<String, String>(properties);
-            }
-            if(measurements != null) {
-                this.measurements = new HashMap<String, Double>(measurements);
-            }
-        }
-        catch (Exception e) {
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -144,8 +112,7 @@ class TrackDataOperation implements Runnable {
             this.exceptionMessage = (String) deepCopy(message);
             this.exceptionStacktrace = (String) deepCopy(stacktrace);
             this.handled = handled;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -153,7 +120,7 @@ class TrackDataOperation implements Runnable {
     @Override
     public void run() {
         boolean highPrioItem = (type == DataType.UNHANDLED_EXCEPTION) || (type == DataType.MANAGED_EXCEPTION && !handled);
-        if(!Persistence.getInstance().isFreeSpaceAvailable(highPrioItem)){
+        if (!Persistence.getInstance().isFreeSpaceAvailable(highPrioItem)) {
             return;
         }
 
@@ -161,11 +128,11 @@ class TrackDataOperation implements Runnable {
         if (telemetry != null) {
             IChannel channel = ChannelManager.getInstance().getChannel();
             if (highPrioItem) {
-                ((Channel)Channel.getInstance()).processException(telemetry);
+                ((Channel) Channel.getInstance()).processException(telemetry);
             } else {
                 telemetry.getBaseData().QualifiedName = telemetry.getBaseType();
-                Map<String,String> tags = EnvelopeFactory.getInstance().getContext().getContextTags();
-                if(this.type == DataType.NEW_SESSION) {
+                Map<String, String> tags = EnvelopeFactory.getInstance().getContext().getContextTags();
+                if (this.type == DataType.NEW_SESSION) {
                     //updating IsNew tag from session context doesn't work because editing shared prefs
                     //doesn't happen timely enough so we can be sure isNew is true for all cases
                     //so we set it to true explicitly
@@ -180,7 +147,7 @@ class TrackDataOperation implements Runnable {
         Data<Domain> telemetry = null;
         if ((this.type == DataType.UNHANDLED_EXCEPTION)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.exception, this.properties, this.measurements);
-        }else if ((this.type == DataType.MANAGED_EXCEPTION)) {
+        } else if ((this.type == DataType.MANAGED_EXCEPTION)) {
             telemetry = EnvelopeFactory.getInstance().createExceptionData(this.name, this.exceptionMessage, this.exceptionStacktrace, this.handled);
         } else {
             switch (this.type) {
@@ -220,5 +187,17 @@ class TrackDataOperation implements Runnable {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
 
         return new ObjectInputStream(inputStream).readObject();
+    }
+
+    protected enum DataType {
+        NONE,
+        EVENT,
+        TRACE,
+        METRIC,
+        PAGE_VIEW,
+        HANDLED_EXCEPTION,
+        UNHANDLED_EXCEPTION,
+        MANAGED_EXCEPTION,
+        NEW_SESSION
     }
 }
