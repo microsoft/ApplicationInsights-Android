@@ -40,11 +40,6 @@ public enum ApplicationInsights {
     private boolean telemetryDisabled;
 
     /**
-     * A flag, which determines if crash reporting should be disabled. Default is false.
-     */
-    private boolean exceptionTrackingDisabled;
-
-    /**
      * A flag, which determines if auto page views should be disabled from the start.
      * Default is false.
      */
@@ -194,18 +189,10 @@ public enum ApplicationInsights {
             Context context = this.weakContext.get();
 
             initializePipeline(context);
-            startCrashReporting();
 
             Sender.getInstance().triggerSending();
             InternalLogging.info(TAG, "ApplicationInsights has been started.", "");
             isSetupAndRunning = true;
-        }
-    }
-
-    private void startCrashReporting() {
-        // Start crash reporting
-        if (!this.exceptionTrackingDisabled) {
-            ExceptionTracking.registerExceptionHandler();
         }
     }
 
@@ -343,25 +330,6 @@ public enum ApplicationInsights {
         }else{
             INSTANCE.autoAppearanceDisabled = true;
         }
-    }
-
-    /**
-     * Enable / disable tracking of unhandled exceptions.
-     *
-     * @param disabled if set to true, crash reporting will be disabled
-     */
-    public static void setExceptionTrackingDisabled(boolean disabled) {
-        if (!isConfigured) {
-            InternalLogging.warn(TAG, "Could not enable/disable exception tracking, because " +
-                  "ApplicationInsights has not been setup correctly.");
-            return;
-        }
-        if (isSetupAndRunning) {
-            InternalLogging.warn(TAG, "Could not enable/disable exception tracking, because " +
-                  "ApplicationInsights has already been started.");
-            return;
-        }
-        INSTANCE.exceptionTrackingDisabled = disabled;
     }
 
     /**
