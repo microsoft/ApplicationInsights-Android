@@ -162,10 +162,12 @@ class Sender {
         connection.setUseCaches(false);
 
         try {
-            InternalLogging.info(TAG, "Logging payload", payload);
-            writer = getWriter(connection);
-            writer.write(payload);
-            writer.flush();
+            if(ApplicationInsights.isDeveloperMode()) {
+                InternalLogging.info(TAG, "Logging payload", payload);
+                writer = getWriter(connection);
+                writer.write(payload);
+                writer.flush();
+            }
 
             // Starts the query
             connection.connect();
