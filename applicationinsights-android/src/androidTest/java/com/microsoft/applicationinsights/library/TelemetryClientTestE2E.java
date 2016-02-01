@@ -68,9 +68,6 @@ public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication>
 
     public void testTrackPageView() throws Exception {
         TelemetryClient.getInstance().trackPageView("android page");
-        TelemetryClient.getInstance().trackPageView("android page", 12345);
-        TelemetryClient.getInstance().trackPageView("android page", 12345, properties);
-        TelemetryClient.getInstance().trackPageView("android page", 12345, properties, measurements);
         Thread.sleep(50);
         this.validate(1);
     }

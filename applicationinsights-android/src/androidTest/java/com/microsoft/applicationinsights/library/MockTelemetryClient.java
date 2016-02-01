@@ -110,19 +110,6 @@ public class MockTelemetryClient extends TelemetryClient {
     }
 
     @Override
-    public void trackPageView(
-            String pageName,
-            long duration,
-            Map<String, String> properties,
-            Map<String, Double> measurements) {
-        if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createPageViewData(pageName, duration, properties, measurements));
-        }else{
-            super.trackPageView(pageName, duration, properties, measurements);
-        }
-    }
-
-    @Override
     public void trackNewSession() {
         if(this.mockTrackMethod) {
             messages.add(EnvelopeFactory.getInstance().createNewSessionData());
