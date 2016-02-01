@@ -9,7 +9,6 @@ import com.microsoft.applicationinsights.logging.InternalLogging;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -339,47 +338,6 @@ public class TelemetryClient {
         if (isTelemetryEnabled()) {
             this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
                     pageName, properties, measurements));
-        }
-    }
-
-    /**
-     * {@code properties} defaults to {@code null}.
-     * {@code measurements} defaults to {@code null}.
-     *
-     * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release*
-     */
-    public void trackPageView(String pageName, long duration) {
-        this.trackPageView(pageName, duration, null, null);
-    }
-
-    /**
-     * {@code measurements} defaults to {@code null}.
-     *
-     * @see TelemetryClient#trackPageView(String, long, Map, Map)
-     * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release
-     */
-    public void trackPageView(String pageName, long duration, Map<String, String> properties) {
-        this.trackPageView(pageName, duration, properties, null);
-    }
-
-    /**
-     * Sends information about a page view to Application Insights.
-     *
-     * @param pageName     The name of the page.
-     * @param duration     The time the page needs to show up.
-     * @param properties   Custom properties associated with the event. Note: values set here will
-     *                     supersede values set in {@link ApplicationInsights#setCommonProperties}.
-     * @param measurements Custom measurements associated with the event.
-     * @deprecated in 1.0-beta.8, duration won't be supported in 1.0 release
-     */
-    public void trackPageView(
-          String pageName,
-          long duration,
-          Map<String, String> properties,
-          Map<String, Double> measurements) {
-        if (isTelemetryEnabled()) {
-            this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.PAGE_VIEW,
-                    pageName, duration, properties, measurements));
         }
     }
 
