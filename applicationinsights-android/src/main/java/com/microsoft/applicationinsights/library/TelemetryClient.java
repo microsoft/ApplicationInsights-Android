@@ -264,55 +264,6 @@ public class TelemetryClient {
      * {@code properties} defaults to {@code null}.
      * {@code measurements} defaults to {@code null}.
      *
-     * @see TelemetryClient#trackHandledException(Throwable, Map)
-     */
-    public void trackHandledException(Throwable handledException) {
-        this.trackHandledException(handledException, null, null);
-    }
-
-    /**
-     * Sends information about an handledException to Application Insights.
-     *
-     * @param handledException The handledException to track.
-     * @param properties       Custom properties associated with the event. Note: values set here will
-     *                         supersede values set in {@link ApplicationInsights#setCommonProperties}.
-     */
-    public void trackHandledException(Throwable handledException, Map<String, String> properties) {
-        trackHandledException(handledException, properties, null);
-    }
-
-    /**
-     * Sends information about an handledException to Application Insights.
-     *
-     * @param handledException The handledException to track.
-     * @param properties       Custom properties associated with the event. Note: values set here will
-     *                         supersede values set in {@link ApplicationInsights#setCommonProperties}.
-     */
-    public void trackHandledException(Throwable handledException, Map<String, String> properties, Map<String, Double> measurements) {
-        if (isTelemetryEnabled()) {
-            this.threadPoolExecutor.execute(new TrackDataOperation(TrackDataOperation.DataType.HANDLED_EXCEPTION,
-                    handledException, properties, measurements));
-        }
-    }
-
-    /**
-     * Sends unhandled Exception to Application Insights. This method should be called from your
-     * Xamarin code to send the C# stacktrace to ApplicationInsights
-     *
-     * @param type       the exception type
-     * @param message    the exception message
-     * @param stacktrace the stacktrace for the exception
-     * @param handled    a flag which determines if the exception was handled or not
-     */
-    public void trackManagedException(String type, String message, String stacktrace, boolean handled) {
-        new TrackDataOperation(TrackDataOperation.DataType.MANAGED_EXCEPTION, type, message, stacktrace, handled).run();
-
-    }
-
-    /**
-     * {@code properties} defaults to {@code null}.
-     * {@code measurements} defaults to {@code null}.
-     *
      * @see TelemetryClient#trackPageView(String, Map, Map)
      */
     public void trackPageView(String pageName) {

@@ -12,13 +12,12 @@ import java.util.concurrent.TimeUnit;
 
 public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication> {
 
+    private static int batchCount = 10;
+    private LinkedHashMap<String, String> properties;
+    private LinkedHashMap<String, Double> measurements;
     public TelemetryClientTestE2E() {
         super(MockApplication.class);
     }
-
-    private LinkedHashMap<String, String> properties;
-    private LinkedHashMap<String, Double> measurements;
-    private static int batchCount = 10;
 
     public void setUp() throws Exception {
         super.setUp();
@@ -73,19 +72,11 @@ public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication>
     }
 
     public void testTrackAllRequests() throws Exception {
-        Exception exception;
-        try {
-            throw new Exception();
-        } catch (Exception e) {
-            exception = e;
-        }
-
-        ((Channel)Channel.getInstance()).queue.config.setMaxBatchCount(10);
+        ((Channel) Channel.getInstance()).queue.config.setMaxBatchCount(10);
         for (int i = 0; i < batchCount; i++) {
             TelemetryClient.getInstance().trackEvent("android event");
             TelemetryClient.getInstance().trackTrace("android trace");
             TelemetryClient.getInstance().trackMetric("android metric", 0.0);
-            TelemetryClient.getInstance().trackHandledException(exception);
             TelemetryClient.getInstance().trackPageView("android page");
             Thread.sleep(10);
         }
@@ -108,8 +99,8 @@ public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication>
                 Log.w("BACKEND_ERROR", "response count is lower than enqueue count");
             }
 
-            for(int i = 0; i < count; i++) {
-                if(i < sender.responseCodes.size()) {
+            for (int i = 0; i < count; i++) {
+                if (i < sender.responseCodes.size()) {
                     Assert.assertTrue("response is 206, some telemetry was rejected",
                             sender.responseCodes.get(i) == 200);
                 }
@@ -119,5 +110,5 @@ public class TelemetryClientTestE2E extends ApplicationTestCase<MockApplication>
         } catch (InterruptedException e) {
             Assert.fail(e.toString());
         }
-   }
+    }
 }

@@ -27,11 +27,10 @@ public class DummyContent {
         addItem(new DummyItem("2", "Disable page view tracking"));
         addItem(new DummyItem("3", "Enable session management"));
         addItem(new DummyItem("4", "Disable session management"));
-        addItem(new DummyItem("5", "Send handled exception"));
-        addItem(new DummyItem("6", "Crash the App!"));
-        addItem(new DummyItem("7", "Trigger Synchronize"));
-        addItem(new DummyItem("8", "Track event"));
-        addItem(new DummyItem("9", "Send Metric"));
+        addItem(new DummyItem("5", "Send Managed Exception"));
+        addItem(new DummyItem("6", "Trigger Synchronize"));
+        addItem(new DummyItem("7", "Track event"));
+        addItem(new DummyItem("8", "Send Metric"));
     }
 
     private static void addItem(DummyItem item) {

@@ -100,14 +100,6 @@ public class MockTelemetryClient extends TelemetryClient {
         }
     }
 
-    @Override
-    public void trackHandledException(Throwable handledException, Map<String, String> properties) {
-        if(this.mockTrackMethod) {
-            messages.add(EnvelopeFactory.getInstance().createExceptionData(handledException, properties, null));
-        }else{
-            super.trackHandledException(handledException, properties);
-        }
-    }
 
     @Override
     public void trackNewSession() {

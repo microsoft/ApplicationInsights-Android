@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import com.microsoft.applicationinsights.library.ApplicationInsights;
+import com.microsoft.applicationinsights.library.TelemetryClient;
 import com.microsoft.applicationinsights.library.config.Configuration;
 
 import java.util.HashMap;
@@ -57,7 +58,7 @@ public class ItemListActivity extends FragmentActivity
         Configuration config = ApplicationInsights.getConfiguration();
         //config.setSessionIntervalMs(30000);
         //config.setEndpointUrl("https://myserver.com/v2/track");
-        config.setMaxBatchCount(45);
+        config.setMaxBatchCount(5);
         //ApplicationInsights.setUserId("New user ID");
         //ApplicationInsights.renewSession("New session ID");
 
@@ -67,6 +68,7 @@ public class ItemListActivity extends FragmentActivity
         properties.put("Hometown", "Karlsruhe");
         ApplicationInsights.setCommonProperties(properties);
         ApplicationInsights.start();
+        TelemetryClient.getInstance().trackMetric("blub", 1.0, null);
     }
 
     /**

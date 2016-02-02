@@ -11,8 +11,6 @@ import com.microsoft.applicationinsights.appsample.dummy.DummyContent;
 import com.microsoft.applicationinsights.library.ApplicationInsights;
 import com.microsoft.applicationinsights.library.TelemetryClient;
 
-import java.util.ArrayList;
-
 /**
  * A list fragment representing a list of Items. This fragment
  * also supports tablet devices by allowing list items to be given an
@@ -131,24 +129,12 @@ public class ItemListFragment extends ListFragment {
                 ApplicationInsights.disableAutoSessionManagement();
                 break;
             case 4:
-
-                ArrayList<Object> myList = new ArrayList<Object>();
-                try {
-                    Object test = myList.get(2);
-                } catch (Exception e) {
-                    TelemetryClient.getInstance().trackHandledException(e);
-                }
-                break;
-            case 5:
-                crashMe1();
-                break;
-            case 6:
                 ApplicationInsights.sendPendingData();
                 break;
-            case 7:
+            case 5:
                 TelemetryClient.getInstance().trackEvent("My Event");
                 break;
-            case 8:
+            case 6:
                 TelemetryClient.getInstance().trackMetric("SomeMetric", 2.0);
                 break;
             default:
@@ -160,17 +146,6 @@ public class ItemListFragment extends ListFragment {
         mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
     }
 
-    private void crashMe1() {
-        crashMe2();
-    }
-
-    private void crashMe2() {
-        crashMe3();
-    }
-
-    private void crashMe3() {
-        throw new RuntimeException("oh no!");
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
