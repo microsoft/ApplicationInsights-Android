@@ -1,5 +1,17 @@
 
 
+## 1.0-beta.9
+
+* Removed crash reporting feature.
+* Removed APIs for handled exceptions.
+* Updated version of CLL
+* Build with latest build tools
+* Remove noise from logcat
+* Remove previously deprecated methods
+* Fix nullpointerexception when passing null properties to the metrics-API (#78)[https://github.com/Microsoft/ApplicationInsights-Android/issues/78]
+
+
+
 ## 1.0-beta.8
 
 * added CHANGELOG.md
