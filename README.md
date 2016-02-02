@@ -10,17 +10,17 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 ### Breaking Changes!
 
-Version 1.0-beta.9 of the Android SDK came with one major change: 
+Version 1.0-beta.9 of the Application Insights for Android SDK comes with one major change: 
 
 Crash Reporting and the API to send handled exceptions have been removed from the SDK. 
 In addition, the Application Insights for Android SDK is now **deprecated**.
 
-The reason for this is that [HockeyApp](www.hockeyapp.net) is now our major offering for mobile and cross-plattform crash reporting, beta-distribution and feedback. We are working with all we have on making the HockeySDKs better and add Telemetry features to make HockeyApp the best plattform to make your apps awesome.
-We've started the [HockeyApp Preseason](http://hockeyapp.net/blog/2016/02/02/introducing-preseason.html) so you can try all the new bits and bits yourself, including **User Metrics**.
+The reason for this is that [HockeyApp](https://hockeyapp.net) is now our major offering for mobile and cross-plattform crash reporting, update distribution and user feedback. We are concentrating all our efforts on enhancing the HockeySDK and add telemetry features to make HockeyApp the best plattform to build awesome apps.
+We've launched [HockeyApp Preseason](http://hockeyapp.net/blog/2016/02/02/introducing-preseason.html) so you can try all the new bits yourself, including **User Metrics** which is HockeyApp's telemetry offering.
 
-While the Application Insight for Android SDK will still be available, we don't plan on investing time in it but focus on HockeyApp.
+While the Application Insights for Android SDK will still be available, we don't plan on investing time in it but focus on HockeyApp instead.
 
-We apologize for any inconvenience and please feel free to shoot as a mail any time. 
+We apologize for any inconvenience and please feel free to contact us at any time.
 
 ## Content
 1. [Release Notes](#1)
@@ -40,8 +40,8 @@ We apologize for any inconvenience and please feel free to shoot as a mail any t
 * Build with latest build tools
 * Remove noise from logcat
 * Remove previously deprecated methods
-* Removed crash reporting feature.
-* Removed APIs for handled exceptions.
+* Removed crash reporting feature
+* Removed APIs for handled exceptions
 
 
 See [here](https://github.com/Microsoft/ApplicationInsights-Android/releases) for release notes of previous versions or our [changelog](https://github.com/Microsoft/ApplicationInsights-Android/blob/master/CHANGELOG.md).
@@ -294,7 +294,7 @@ config.setSessionIntervalMs(30000); //set intercal to 30s (30,000ms)
 
 ### 7.2 Batch Size for a Bundle of Telemetry
 
-Unhandled exceptions (aka ”your app is crashing!“) are sent out immediately, while regular telemetry data is send out in batches or after a specified interval.
+Regular telemetry data is send out in batches or after a specified interval.
 
 [**NOTE**] The [developer mode](#4) will automatically set the batching interval to 3s and the size of a batch to 5 items.
 
