@@ -10,7 +10,7 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 ### Breaking Changes!
 
-Version 1.0-beta.9 of the Android SDK came with one major change: 
+Version 1.0-beta.9 of the Android SDK came with two major changes: 
 
 Crash Reporting and the API to send handled exceptions have been removed from the SDK. 
 In addition, the Application Insights for Android SDK is now **deprecated**.
