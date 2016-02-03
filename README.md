@@ -18,7 +18,7 @@ In addition, the Application Insights for Android SDK is now **deprecated**.
 The reason for this is that [HockeyApp](http://hockeyapp.net) is now our major offering for mobile and cross-plattform crash reporting, beta distribution and user feedback. We are focusing all our efforts on enhancing the HockeySDK and adding telemetry features to make HockeyApp the best platform to build awesome apps.
 We've launched [HockeyApp Preseason](http://hockeyapp.net/blog/2016/02/02/introducing-preseason.html) so you can try all the new bits yourself, including **User Metrics**.
 
-We apologize for any inconvenience and please feel free to contact us at any time.
+We apologize for any inconvenience and please feel free to [contact us](http://support.hockeyapp.net/) at any time.
 
 ## Content
 1. [Release Notes](#1)
