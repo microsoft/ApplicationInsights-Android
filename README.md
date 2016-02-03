@@ -15,10 +15,8 @@ Version 1.0-beta.9 of the Application Insights for Android SDK comes with two ma
 Crash Reporting and the API to send handled exceptions have been removed from the SDK. 
 In addition, the Application Insights for Android SDK is now **deprecated**.
 
-The reason for this is that [HockeyApp](https://hockeyapp.net) is now our major offering for mobile and cross-plattform crash reporting, update distribution and user feedback. We are concentrating all our efforts on enhancing the HockeySDK and add telemetry features to make HockeyApp the best plattform to build awesome apps.
-We've launched [HockeyApp Preseason](http://hockeyapp.net/blog/2016/02/02/introducing-preseason.html) so you can try all the new bits yourself, including **User Metrics** which is HockeyApp's telemetry offering.
-
-While the Application Insights for Android SDK will still be available, we don't plan on investing time in it but focus on HockeyApp instead.
+The reason for this is that [HockeyApp](https://hockeyapp.net) is now our major offering for mobile and cross-plattform crash reporting, beta distribution and user feedback. We are focusing all our efforts on enhancing the HockeySDK and adding telemetry features to make HockeyApp the best platform to build awesome apps.
+We've launched [HockeyApp Preseason](http://hockeyapp.net/blog/2016/02/02/introducing-preseason.html) so you can try all the new bits yourself, including **User Metrics**.
 
 We apologize for any inconvenience and please feel free to contact us at any time.
 
