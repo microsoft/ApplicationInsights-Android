@@ -334,8 +334,12 @@ class Persistence {
             if (context != null) {
                 String path = highPriority ? (context.getFilesDir() + AI_SDK_DIRECTORY + HIGH_PRIO_DIRECTORY) :
                       (getContext().getFilesDir() + AI_SDK_DIRECTORY + REGULAR_PRIO_DIRECTORY);
-                File dir = new File(path);
-                return (dir.listFiles().length < MAX_FILE_COUNT);
+                if(path != null && (path.length() > 0)) {
+                    File dir = new File(path);
+                    if(dir != null) {
+                        return (dir.listFiles().length < MAX_FILE_COUNT);
+                    }
+                }
             }
 
             return false;
