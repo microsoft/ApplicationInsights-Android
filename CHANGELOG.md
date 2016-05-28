@@ -1,4 +1,6 @@
+## 1.0-beta.10
 
+* Fix for critical bug that prevented telemetry from being sent when developerMode was not enabled
 
 ## 1.0-beta.9
 

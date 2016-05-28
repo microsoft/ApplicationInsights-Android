@@ -1,6 +1,6 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-beta.9)
+# Application Insights for Android (1.0-beta.10)
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/services/application-insights/) is a service for monitoring the performance and usage of your apps. This module allows you to send telemetry of various kinds (events, traces, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
@@ -10,7 +10,7 @@ Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream
 
 ### Breaking Changes!
 
-Version 1.0-beta.9 of the Application Insights for Android SDK comes with two major changes: 
+Version 1.0-beta.9 of the Application Insights for Android SDK came with two major changes: 
 
 Crash Reporting and the API to send handled exceptions have been removed from the SDK. 
 In addition, the Application Insights for Android SDK is now **deprecated**.
@@ -34,13 +34,7 @@ We apologize for any inconvenience and please feel free to [contact us](http://s
 
 ## <a name="1"></a> 1. Release Notes
 
-* Updated version of CLL
-* Build with latest build tools
-* Remove noise from logcat
-* Remove previously deprecated methods
-* Removed crash reporting feature
-* Removed APIs for handled exceptions
-
+* Fix for critical bug that prevented telemetry from being sent when developerMode was not enabled
 
 See [here](https://github.com/Microsoft/ApplicationInsights-Android/releases) for release notes of previous versions or our [changelog](https://github.com/Microsoft/ApplicationInsights-Android/blob/master/CHANGELOG.md).
 
@@ -56,7 +50,7 @@ In your module's ```build.gradle```add a dependency for Application Insights
 
 ```groovy
 dependencies {
-    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.9'
+    compile 'com.microsoft.azure:applicationinsights-android:1.0-beta.10'
 }
 ```
 
