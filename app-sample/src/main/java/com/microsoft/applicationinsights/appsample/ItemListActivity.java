@@ -62,7 +62,7 @@ public class ItemListActivity extends FragmentActivity
         //ApplicationInsights.setUserId("New user ID");
         //ApplicationInsights.renewSession("New session ID");
 
-        ApplicationInsights.setDeveloperMode(true);
+        ApplicationInsights.setDeveloperMode(false);
 
         HashMap<String, String> properties = new HashMap<String, String>();
         properties.put("Hometown", "Karlsruhe");
