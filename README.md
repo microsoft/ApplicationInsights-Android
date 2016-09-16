@@ -345,7 +345,7 @@ Our Javadoc can be found at [http://microsoft.github.io/ApplicationInsights-Andr
 
 * Install a Java Development Kit (JDK). The SDK can be compiled using JDK 1.6, though we recoommend installing <a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank">JDK 1.8</a>
 * Install <a href="http://developer.android.com/sdk/index.html" target="_blank">Android studio</a>
-* [Get an instrumentation key](/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key) and set it in the manifest
+* [Get an instrumentation key](https://github.com/Microsoft/ApplicationInsights-Home/wiki#getting-an-application-insights-instrumentation-key) and set it in the manifest
 * Run tests from Android Studio
 
 <a id="codeofconduct"></a>
