@@ -1,12 +1,22 @@
 [ ![Download](https://api.bintray.com/packages/appinsights-android/maven/ApplicationInsights-Android/images/download.svg) ](https://bintray.com/appinsights-android/maven/ApplicationInsights-Android/_latestVersion)
 
-# Application Insights for Android (1.0-beta.10) (DEPRECATED)
+# Application Insights for Android (1.0-beta.10) DEPRECATED
+
+This SDK is officially deprecated. Please switch to [HockeyApp](https://hockeyapp.net) or consider to [MobileCenter](https://www.visualstudio.com/vs/mobile-center/).
+
+You can find more about the transition from Application Insights to HockeyApp [here](https://www.hockeyapp.net/blog/2016/03/11/welcome-application-insights-users.html) and about how Mobile Center will be the future of HockeyApp [here](https://www.hockeyapp.net/blog/2016/11/16/mobile-center-next-generation-hockeyapp.html).
+
+Please don't hesitate to get in touch ([AppInsights-Android@microsoft.com](mailto:AppInsights-Android@microsoft.com))
+ if you have questions.
+
+### About
 
 This project provides an Android SDK for Application Insights. [Application Insights](http://azure.microsoft.com/services/application-insights/) is a service for monitoring the performance and usage of your apps. This module allows you to send telemetry of various kinds (events, traces, etc.) to the Application Insights service where your data can be visualized in the Azure Portal.
 
 The minimum SDK to use the Application Insights SDK in your app is 9.
 
 Automatic collection of lifecycle-events requires API level 15 and up (Ice Cream Sandwich+).
+
 
 ### Breaking Changes!
 
