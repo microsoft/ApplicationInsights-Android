@@ -2,12 +2,14 @@
 
 # Application Insights for Android (1.0-beta.10) DEPRECATED
 
-This SDK is officially deprecated. Please switch to [HockeyApp](https://hockeyapp.net) or consider to [MobileCenter](https://www.visualstudio.com/vs/mobile-center/).
+This SDK is officially deprecated. Please switch to [HockeyApp](https://hockeyapp.net) or consider [MobileCenter](https://www.visualstudio.com/vs/mobile-center/).
 
 You can find more about the transition from Application Insights to HockeyApp [here](https://www.hockeyapp.net/blog/2016/03/11/welcome-application-insights-users.html) and about how Mobile Center will be the future of HockeyApp [here](https://www.hockeyapp.net/blog/2016/11/16/mobile-center-next-generation-hockeyapp.html).
 
-Please don't hesitate to get in touch ([AppInsights-Android@microsoft.com](mailto:AppInsights-Android@microsoft.com))
+Please don't hesitate to get in touch via [support@hockeyapp.net](mailto:support@hockeyapp.net).
  if you have questions.
+
+### About
 
 ### About
 
@@ -359,5 +361,5 @@ Our Javadoc can be found at [http://microsoft.github.io/ApplicationInsights-Andr
 
 ##<a name="10"></a> 10. Contact
 
-If you have further questions or are running into trouble that cannot be resolved by any of the steps here, feel free to contact us at [AppInsights-Android@microsoft.com](mailto:AppInsights-Android@microsoft.com)
+If you have further questions or are running into trouble that cannot be resolved by any of the steps here, feel free to contact us at [support@hockeyapp.net](mailto:support@hockeyapp.net).
 
